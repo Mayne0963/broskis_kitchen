@@ -18,19 +18,21 @@ interface ProvidersProps {
 export const Providers: React.FC<ProvidersProps> = ({ children }) => {
   return (
     <UserProvider>
-      <AuthProvider>
-        <CartProvider>
-          <RewardsProvider>
-            <DeliveryProvider>
-              <AgeVerificationProvider>
-                <ChatProvider>
-                  <MediaPlayerProvider>{children}</MediaPlayerProvider>
-                </ChatProvider>
-              </AgeVerificationProvider>
-            </DeliveryProvider>
-          </RewardsProvider>
-        </CartProvider>
-      </AuthProvider>
+    <AuthProvider>
+    <CartProvider>
+    <RewardsProvider>
+    <DeliveryProvider>
+    <AgeVerificationProvider>
+    <ChatProvider>
+    <MediaPlayerProvider>
+      {children}
+    </MediaPlayerProvider>
+    </ChatProvider>
+    </AgeVerificationProvider>
+    </DeliveryProvider>
+    </RewardsProvider>
+    </CartProvider>
+    </AuthProvider>
     </UserProvider>
   )
 }
