@@ -1,9 +1,7 @@
-import { FaUtensils, FaCalendarAlt, FaBoxOpen, FaUsers, FaChalkboardTeacher, FaHandsHelping } from "react-icons/fa"
-
 export const volunteerOpportunities = [
   {
     title: "Kitchen Assistant",
-    icon: <FaUtensils className="text-gold-foil text-2xl" />,
+    icon: "FaUtensils",
     description: "Help our chefs prepare meals, organize ingredients, and maintain kitchen cleanliness.",
     commitment: "4-hour shifts, minimum 2 shifts per month",
     skills: [
@@ -15,40 +13,40 @@ export const volunteerOpportunities = [
   },
   {
     title: "Event Support",
-    icon: <FaCalendarAlt className="text-gold-foil text-2xl" />,
+    icon: "FaCalendarAlt",
     description: "Assist with setup, service, and cleanup during special events and community gatherings.",
     commitment: "Event-based, typically 4-6 hours per event",
     skills: ["Customer service", "Organization", "Flexibility", "Positive attitude"],
   },
   {
     title: "Food Distribution",
-    icon: <FaBoxOpen className="text-gold-foil text-2xl" />,
+    icon: "FaBoxOpen",
     description: "Package and distribute meals to community partners and those in need.",
     commitment: "3-hour shifts, weekly or bi-weekly",
     skills: ["Reliability", "Organization", "Physical stamina", "Compassion"],
   },
   {
     title: "Community Outreach",
-    icon: <FaUsers className="text-gold-foil text-2xl" />,
+    icon: "FaUsers",
     description: "Represent Broski's Kitchen at community events and help build partnerships.",
     commitment: "Flexible, 4-8 hours per month",
     skills: ["Communication", "Interpersonal skills", "Knowledge of local community", "Enthusiasm"],
   },
   {
     title: "Culinary Educator",
-    icon: <FaChalkboardTeacher className="text-gold-foil text-2xl" />,
+    icon: "FaChalkboardTeacher",
     description: "Share your culinary knowledge by assisting with cooking classes and demonstrations.",
     commitment: "2-3 hour classes, 1-2 times per month",
     skills: ["Cooking experience", "Teaching ability", "Patience", "Creativity"],
   },
   {
     title: "Administrative Support",
-    icon: <FaHandsHelping className="text-gold-foil text-2xl" />,
+    icon: "FaHandsHelping",
     description: "Help with office tasks, volunteer coordination, and program administration.",
     commitment: "Flexible, 3-6 hours per week",
     skills: ["Computer literacy", "Organization", "Communication", "Attention to detail"],
   },
-]
+];
 
 export const volunteerRequirements = [
   {
@@ -91,7 +89,7 @@ export const volunteerRequirements = [
       "Ongoing learning opportunities available",
     ],
   },
-]
+];
 
 export const volunteerTestimonials = [
   {
@@ -122,7 +120,7 @@ export const volunteerTestimonials = [
     quote:
       "Volunteering with the food distribution program has opened my eyes to food insecurity issues in our community. It's gratifying to help provide nutritious meals to those who need them most, and the Broski's Kitchen team makes every shift meaningful and enjoyable.",
   },
-]
+];
 
 export const volunteerFAQs = [
   {
@@ -155,4 +153,4 @@ export const volunteerFAQs = [
     answer:
       "While volunteering doesn't guarantee employment, many of our staff members started as volunteers. Volunteering is a great way to demonstrate your skills, work ethic, and commitment to our mission.",
   },
-]
+];

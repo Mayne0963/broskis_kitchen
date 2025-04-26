@@ -1,73 +1,73 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 
 export interface ToastProps {
-  message: string
-  type?: "success" | "error" | "warning" | "info"
-  duration?: number
+  message: string;
+  type?: "success" | "error" | "warning" | "info";
+  duration?: number;
 }
 
 export const toast = {
   success: (message: string, duration = 3000) => {
     const event = new CustomEvent("toast", {
       detail: { message, type: "success", duration },
-    })
-    window.dispatchEvent(event)
+    });
+    window.dispatchEvent(event);
   },
   error: (message: string, duration = 3000) => {
     const event = new CustomEvent("toast", {
       detail: { message, type: "error", duration },
-    })
-    window.dispatchEvent(event)
+    });
+    window.dispatchEvent(event);
   },
   warning: (message: string, duration = 3000) => {
     const event = new CustomEvent("toast", {
       detail: { message, type: "warning", duration },
-    })
-    window.dispatchEvent(event)
+    });
+    window.dispatchEvent(event);
   },
   info: (message: string, duration = 3000) => {
     const event = new CustomEvent("toast", {
       detail: { message, type: "info", duration },
-    })
-    window.dispatchEvent(event)
+    });
+    window.dispatchEvent(event);
   },
-}
+};
 
 export const useToast = () => {
-  const [toasts, setToasts] = useState<(ToastProps & { id: string })[]>([])
+  const [toasts, setToasts] = useState<(ToastProps & { id: string })[]>([]);
 
   useEffect(() => {
     const handleToast = (e: CustomEvent<ToastProps>) => {
-      const { message, type, duration } = e.detail
-      const id = Date.now().toString()
+      const { message, type, duration } = e.detail;
+      const id = Date.now().toString();
 
-      setToasts((prev) => [...prev, { id, message, type, duration }])
+      setToasts((prev) => [...prev, { id, message, type, duration }]);
 
       if (duration) {
         setTimeout(() => {
-          setToasts((prev) => prev.filter((toast) => toast.id !== id))
-        }, duration)
+          setToasts((prev) => prev.filter((toast) => toast.id !== id));
+        }, duration);
       }
-    }
+    };
 
-    window.addEventListener("toast", handleToast as EventListener)
+    window.addEventListener("toast", handleToast as EventListener);
 
     return () => {
-      window.removeEventListener("toast", handleToast as EventListener)
-    }
-  }, [])
+      window.removeEventListener("toast", handleToast as EventListener);
+    };
+  }, []);
 
   const removeToast = (id: string) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id))
-  }
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  };
 
-  return { toasts, removeToast }
-}
+  return { toasts, removeToast };
+};
 
 export const ToastContainer = () => {
-  const { toasts, removeToast } = useToast()
+  const { toasts, removeToast } = useToast();
 
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
@@ -78,10 +78,10 @@ export const ToastContainer = () => {
             toast.type === "success"
               ? "bg-emerald-green"
               : toast.type === "error"
-                ? "bg-blood-red"
-                : toast.type === "warning"
-                  ? "bg-amber-500"
-                  : "bg-blue-500"
+              ? "bg-blood-red"
+              : toast.type === "warning"
+              ? "bg-amber-500"
+              : "bg-blue-500"
           }`}
         >
           <span>{toast.message}</span>
@@ -94,5 +94,5 @@ export const ToastContainer = () => {
         </div>
       ))}
     </div>
-  )
-}
+  );
+};
