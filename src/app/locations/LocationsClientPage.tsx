@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { FaSearch, FaMapMarkerAlt, FaPhone, FaClock, FaDirections, FaUtensils } from "react-icons/fa"
-import { LocationMap } from "../../components/locations/LocationMap"
-import { LocationCard } from "../../components/locations/LocationCard"
-import { LocationFilter } from "../../components/locations/LocationFilter"
+import LocationMap from "../../components/locations/LocationMap"
+import LocationCard from "../../components/locations/LocationCard"
+import LocationFilter from "../../components/locations/LocationFilter"
 import { locationData } from "../../data/location-data"
 
 export default function LocationsClientPage() {
