@@ -16,7 +16,7 @@ import {
 } from "react-icons/fa"
 import ContactForm from "../../components/contact/ContactForm"
 import ContactMap from "../../components/contact/ContactMap"
-import { locations } from "../../data/location-data"
+import { locationData } from "../../data/location-data"
 
 export default function ContactPage() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null)
