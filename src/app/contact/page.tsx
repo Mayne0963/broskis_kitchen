@@ -215,7 +215,7 @@ export default function ContactPage() {
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold mb-8 text-center">Our Locations</h2>
           <div className="h-[500px] rounded-lg overflow-hidden">
-            <ContactMap locations={locations} />
+            <ContactMap locations={locationData} />
           </div>
           <div className="mt-8 text-center">
             <Link href="/locations" className="btn-outline inline-flex items-center gap-2">
