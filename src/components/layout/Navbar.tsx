@@ -1,0 +1,213 @@
+"use client"
+
+import type React from "react"
+
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { FaBars, FaTimes, FaUser, FaShoppingBag } from "react-icons/fa"
+import CartDropdown from "../../components/cart/CartDropdown"
+import { useCart } from "../../lib/context/CartContext"
+import { useAuth } from "../../lib/context/AuthContext"
+
+const Navbar: React.FC = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { itemCount } = useCart()
+  const pathname = usePathname()
+  const { user, logout } = useAuth()
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setMobileMenuOpen(false)
+  }, [pathname])
+
+  return (
+    <nav className="fixed top-0 w-full bg-opacity-90 backdrop-blur-md bg-matte-black text-white p-4 z-50 shadow-lg border-b border-[#333333]">
+      <div className="container mx-auto flex justify-between items-center">
+        <Link href="/" className="text-2xl font-bold graffiti-text hover:text-white transition-colors duration-300">
+          Broski&apos;s Kitchen
+        </Link>
+
+        <button
+          className="md:hidden text-white focus:outline-none hover:text-gold-foil transition-colors"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          {mobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+        </button>
+
+        <div className="hidden md:flex items-center space-x-6">
+          <Link href="/menu" className={`nav-link ${pathname === "/menu" ? "nav-link-active" : ""}`}>
+            Menu
+          </Link>
+          <Link href="/infused-menu" className={`nav-link ${pathname === "/infused-menu" ? "nav-link-active" : ""}`}>
+            Infused Menu
+          </Link>
+          <Link href="/locations" className={`nav-link ${pathname === "/locations" ? "nav-link-active" : ""}`}>
+            Locations
+          </Link>
+          <Link href="/events" className={`nav-link ${pathname === "/events" ? "nav-link-active" : ""}`}>
+            Events
+          </Link>
+          <Link href="/rewards" className={`nav-link ${pathname === "/rewards" ? "nav-link-active" : ""}`}>
+            Rewards
+          </Link>
+          <Link href="/shop" className={`nav-link ${pathname === "/shop" ? "nav-link-active" : ""}`}>
+            Shop
+          </Link>
+          <Link href="/contact" className={`nav-link ${pathname === "/contact" ? "nav-link-active" : ""}`}>
+            Contact
+          </Link>
+          <a 
+            href="https://otw-chi.vercel.app" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="nav-link hover:text-gold-foil transition-colors duration-300"
+          >
+            OTW
+          </a>
+
+          <CartDropdown />
+
+          {user ? (
+            <div className="relative group">
+              <button className="btn-outline flex items-center gap-2">
+                <FaUser /> {user.name.split(" ")[0]}
+              </button>
+              <div className="absolute right-0 mt-2 w-48 bg-[#1A1A1A] rounded-md shadow-lg py-1 z-50 hidden group-hover:block border border-[#333333]">
+                <Link href="/profile" className="block px-4 py-2 text-sm text-white hover:bg-[#333333]">
+                  Profile
+                </Link>
+                <Link href="/orders" className="block px-4 py-2 text-sm text-white hover:bg-[#333333]">
+                  Order History
+                </Link>
+                <button
+                  onClick={logout}
+                  className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#333333]"
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
+          ) : (
+            <Link href="/auth/login" className="btn-outline flex items-center gap-2">
+              <FaUser /> Login
+            </Link>
+          )}
+        </div>
+      </div>
+
+      <div
+        className={`md:hidden mobile-menu ${mobileMenuOpen ? "open" : ""} bg-[#111111] border-t border-[#333333] mt-4`}
+      >
+        <div className="container mx-auto flex flex-col space-y-3 px-4 py-4">
+          <Link
+            href="/menu"
+            className={`py-2 hover:text-gold-foil transition-colors duration-300 flex items-center ${pathname === "/menu" ? "text-gold-foil font-bold" : ""}`}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Menu
+          </Link>
+          <Link
+            href="/infused-menu"
+            className={`py-2 hover:text-gold-foil transition-colors duration-300 flex items-center ${pathname === "/infused-menu" ? "text-gold-foil font-bold" : ""}`}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            <span className="badge badge-new mr-2">NEW</span> Infused Menu
+          </Link>
+          <Link
+            href="/locations"
+            className={`py-2 hover:text-gold-foil transition-colors duration-300 flex items-center ${pathname === "/locations" ? "text-gold-foil font-bold" : ""}`}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Locations
+          </Link>
+          <Link
+            href="/events"
+            className={`py-2 hover:text-gold-foil transition-colors duration-300 flex items-center ${pathname === "/events" ? "text-gold-foil font-bold" : ""}`}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Events
+          </Link>
+          <Link
+            href="/rewards"
+            className={`py-2 hover:text-gold-foil transition-colors duration-300 flex items-center ${pathname === "/rewards" ? "text-gold-foil font-bold" : ""}`}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Rewards
+          </Link>
+          <Link
+            href="/shop"
+            className={`py-2 hover:text-gold-foil transition-colors duration-300 flex items-center ${pathname === "/shop" ? "text-gold-foil font-bold" : ""}`}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Shop
+          </Link>
+          <Link
+            href="/contact"
+            className={`py-2 hover:text-gold-foil transition-colors duration-300 flex items-center ${pathname === "/contact" ? "text-gold-foil font-bold" : ""}`}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Contact
+          </Link>
+          <a
+            href="https://otw-chi.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="py-2 hover:text-gold-foil transition-colors duration-300 flex items-center"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            OTW
+          </a>
+          <Link
+            href="/cart"
+            className="py-2 flex items-center hover:text-gold-foil transition-colors duration-300"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            <FaShoppingBag className="mr-2" /> Cart {itemCount > 0 && `(${itemCount})`}
+          </Link>
+
+          {user ? (
+            <div className="pt-4 border-t border-[#333333] mt-2 space-y-2">
+              <Link
+                href="/profile"
+                className="block py-2 hover:text-gold-foil transition-colors duration-300"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <FaUser className="inline mr-2" /> {user.name}
+              </Link>
+              <Link
+                href="/orders"
+                className="block py-2 hover:text-gold-foil transition-colors duration-300"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Order History
+              </Link>
+              <button
+                onClick={() => {
+                  logout()
+                  setMobileMenuOpen(false)
+                }}
+                className="w-full text-left py-2 hover:text-gold-foil transition-colors duration-300"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <div className="pt-4 border-t border-[#333333] mt-2">
+              <Link
+                href="/auth/login"
+                className="btn-primary w-full flex items-center justify-center gap-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <FaUser /> Login
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
+  )
+}
+
+export default Navbar
