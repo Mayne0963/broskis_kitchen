@@ -11,7 +11,7 @@ import {
   sendPasswordResetEmail,
   onAuthStateChanged,
 } from "firebase/auth"
-import { app } from "../services/firebase"
+import { app, isFirebaseConfigured } from "../services/firebase"
 import type { User } from "@/types"
 
 interface AuthContextType {
@@ -41,9 +41,14 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const auth = getAuth(app)
+  const auth = isFirebaseConfigured && app ? getAuth(app) : null
 
   useEffect(() => {
+    if (!auth || !isFirebaseConfigured) {
+      setIsLoading(false)
+      return
+    }
+    
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
       if (authUser) {
         // Convert Firebase user to our User type
@@ -64,6 +69,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [auth])
 
   const login = async (email: string, password: string): Promise<boolean> => {
+    if (!auth || !isFirebaseConfigured) {
+      console.warn("Firebase not configured - login disabled")
+      return false
+    }
     try {
       setIsLoading(true)
       await signInWithEmailAndPassword(auth, email, password)
@@ -77,6 +86,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }
 
   const signup = async (name: string, email: string, password: string): Promise<boolean> => {
+    if (!auth || !isFirebaseConfigured) {
+      console.warn("Firebase not configured - signup disabled")
+      return false
+    }
     try {
       setIsLoading(true)
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
@@ -96,6 +109,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }
 
   const logout = async (): Promise<void> => {
+    if (!auth || !isFirebaseConfigured) {
+      console.warn("Firebase not configured - logout disabled")
+      return
+    }
     try {
       await signOut(auth)
     } catch (error) {
@@ -104,6 +121,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }
 
   const resetPassword = async (email: string): Promise<boolean> => {
+    if (!auth || !isFirebaseConfigured) {
+      console.warn("Firebase not configured - password reset disabled")
+      return false
+    }
     try {
       await sendPasswordResetEmail(auth, email)
       return true
