@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { FaBars, FaTimes, FaUser, FaShoppingBag } from "react-icons/fa"
 import CartDropdown from "../../components/cart/CartDropdown"
@@ -62,9 +63,16 @@ const Navbar: React.FC = () => {
             href="https://otw-chi.vercel.app" 
             target="_blank" 
             rel="noopener noreferrer" 
-            className="nav-link hover:text-gold-foil transition-colors duration-300"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300 border-2 border-red-500 hover:border-red-400"
           >
-            OTW
+            <Image 
+              src="/images/otw-logo.svg" 
+              alt="OTW Logo" 
+              width={24} 
+              height={12} 
+              className="filter brightness-110"
+            />
+            <span className="text-sm font-extrabold tracking-wide">OTW</span>
           </a>
 
           <CartDropdown />
@@ -154,10 +162,17 @@ const Navbar: React.FC = () => {
             href="https://otw-chi.vercel.app"
             target="_blank"
             rel="noopener noreferrer"
-            className="py-2 hover:text-gold-foil transition-colors duration-300 flex items-center"
+            className="py-3 px-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300 border-2 border-red-500 hover:border-red-400 flex items-center gap-3 my-2"
             onClick={() => setMobileMenuOpen(false)}
           >
-            OTW
+            <Image 
+              src="/images/otw-logo.svg" 
+              alt="OTW Logo" 
+              width={28} 
+              height={14} 
+              className="filter brightness-110"
+            />
+            <span className="text-base font-extrabold tracking-wide">ON THE WAY</span>
           </a>
           <Link
             href="/cart"
