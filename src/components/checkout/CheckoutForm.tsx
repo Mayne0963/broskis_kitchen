@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useCart } from '@/lib/context/CartContext'
-import { useOrder } from '@/lib/context/OrderContext'
-import { useAuth } from '@/lib/context/AuthContext'
-import { OrderFormData } from '@/types/order'
-import { toast } from '@/components/ui/use-toast'
+import { useCart } from '../../lib/context/CartContext'
+import { useOrder } from '../../lib/context/OrderContext'
+import { useAuth } from '../../lib/context/AuthContext'
+import { OrderFormData } from '../../types/order'
+import { toast } from '../../components/ui/use-toast'
 import { FaCreditCard, FaLock, FaMapMarkerAlt, FaClock, FaPhone, FaEnvelope } from 'react-icons/fa'
 import StripePaymentForm from './StripePaymentForm'
 
