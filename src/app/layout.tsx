@@ -6,6 +6,7 @@ import "./chat-animations.css"
 import Navbar from "../components/layout/Navbar"
 import Footer from "../components/layout/Footer"
 import { Providers } from "../lib/context/Providers"
+import { OrderProvider } from "../lib/context/OrderContext"
 import MusicPlayer from "../components/layout/MusicPlayer"
 import ChatBot from "../components/chat/ChatBot"
 
@@ -25,11 +26,13 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} bg-black text-white min-h-screen flex flex-col`}>
         <Providers>
-          <Navbar />
-          <main className="flex-grow">{children}</main>
-          <Footer />
-          <MusicPlayer />
-          <ChatBot />
+          <OrderProvider>
+            <Navbar />
+            <main className="flex-grow">{children}</main>
+            <Footer />
+            <MusicPlayer />
+            <ChatBot />
+          </OrderProvider>
         </Providers>
       </body>
     </html>
