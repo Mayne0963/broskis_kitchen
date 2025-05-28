@@ -42,12 +42,12 @@ class VectorStore {
   // Search for similar documents
   public search(query: string, limit = 3): { text: string; score: number; url: string }[] {
     const queryWords = query.toLowerCase().split(/\W+/).filter(Boolean)
-    const uniqueQueryWords = [...new Set(queryWords)]
+    // const uniqueQueryWords = [...new Set(queryWords)]
 
     // Create a simple query vector
-    const queryVector = uniqueQueryWords.map((word) => {
-      return Array.from(word).reduce((acc, char) => acc + char.charCodeAt(0), 0)
-    })
+    // const queryVector = uniqueQueryWords.map((word) => {
+    //   return Array.from(word).reduce((acc, char) => acc + char.charCodeAt(0), 0)
+    // })
 
     // Calculate similarity scores (very simplified)
     const results = this.vectors.map((doc) => {

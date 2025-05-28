@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
 
   // If you need to use the Google Maps API key in middleware,
   // use the server-only environment variable
-  const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY
+  // const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY
 
   // Only apply to infused menu paths
   if (path.startsWith("/infused-menu")) {

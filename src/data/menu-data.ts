@@ -533,6 +533,6 @@ export const customizationOptions: { [key: string]: CustomizationCategory[] } = 
 }
 
 // Update the menuItems export to include a function to get customization options
-export const getItemCustomizationOptions = (item: any) => {
+export const getItemCustomizationOptions = (item: { category: string }) => {
   return customizationOptions[item.category] || []
 }

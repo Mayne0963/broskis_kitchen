@@ -10,7 +10,7 @@ import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle, FaFacebook, Fa
 import AuthLayout from "../../../components/auth/AuthLayout"
 import PasswordStrengthMeter from "../../../components/auth/PasswordStrengthMeter"
 import { validateEmail, validatePassword, validateName, checkPasswordStrength } from "../../../lib/utils/validation"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "@/hooks/use-toast"
 
 export default function SignupPage() {
   const router = useRouter()

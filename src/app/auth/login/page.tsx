@@ -9,7 +9,7 @@ import { useAuth } from "../../../lib/context/AuthContext"
 import { FaEnvelope, FaLock, FaGoogle, FaFacebook, FaApple } from "react-icons/fa"
 import AuthLayout from "../../../components/auth/AuthLayout"
 import { validateEmail, validatePassword } from "../../../lib/utils/validation"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "@/hooks/use-toast"
 
 export default function LoginPage() {
   const router = useRouter()

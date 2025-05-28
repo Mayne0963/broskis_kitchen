@@ -1,7 +1,7 @@
-import { initializeApp, getApps, getApp } from "firebase/app"
-import { getAuth, onAuthStateChanged } from "firebase/auth"
-import { getFirestore, doc, setDoc, getDoc, Timestamp } from "firebase/firestore"
-import { getStorage } from "firebase/storage"
+import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app"
+import { getAuth, onAuthStateChanged, Auth, User } from "firebase/auth"
+import { getFirestore, doc, setDoc, getDoc, Timestamp, Firestore } from "firebase/firestore"
+import { getStorage, FirebaseStorage } from "firebase/storage"
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "demo-api-key",
@@ -18,10 +18,10 @@ const isFirebaseConfigured = process.env.NEXT_PUBLIC_FIREBASE_API_KEY &&
   process.env.NEXT_PUBLIC_FIREBASE_API_KEY !== "your-firebase-api-key"
 
 // Initialize Firebase only if properly configured
-let app: any = null
-let auth: any = null
-let db: any = null
-let storage: any = null
+let app: FirebaseApp | null = null
+let auth: Auth | null = null
+let db: Firestore | null = null
+let storage: FirebaseStorage | null = null
 
 if (isFirebaseConfigured) {
   try {
@@ -67,7 +67,7 @@ export const getLocalUser = () => {
 }
 
 // Listen for auth state changes with local fallback
-export const onAuthStateChange = (callback: (user: any) => void) => {
+export const onAuthStateChange = (callback: (user: User | null) => void) => {
   // First check if there's a signed-in user
   const unsubscribe = onAuthStateChanged(auth, (user) => {
     if (user) {

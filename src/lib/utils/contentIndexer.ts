@@ -40,8 +40,8 @@ async function scanPage(url: string): Promise<IndexedContent | null> {
   try {
     // In a real implementation, this would be a fetch to your actual deployed site
     // For now, we'll simulate content based on the URL path
-    const baseUrl = process.env.NEXT_PUBLIC_WEBSITE_URL || "https://broskiskitchen.com"
-    const fullUrl = `${baseUrl}${url}`
+    // const baseUrl = process.env.NEXT_PUBLIC_WEBSITE_URL || "https://broskiskitchen.com"
+    // const fullUrl = `${baseUrl}${url}`
 
     // Simulate fetching the page
     // In a real implementation: const response = await fetch(fullUrl);

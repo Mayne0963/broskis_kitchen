@@ -236,7 +236,7 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
     try {
       const savedOrders = localStorage.getItem('orders')
       if (savedOrders) {
-        const parsedOrders = JSON.parse(savedOrders).map((order: any) => ({
+        const parsedOrders = JSON.parse(savedOrders).map((order: { createdAt: string; updatedAt: string }) => ({
           ...order,
           createdAt: new Date(order.createdAt),
           updatedAt: new Date(order.updatedAt)

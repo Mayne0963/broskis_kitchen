@@ -4,7 +4,7 @@ import type React from "react"
 
 import { createContext, useState, useContext, useEffect, type ReactNode } from "react"
 import type { CartContextType, CartItem } from "@/types"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "@/hooks/use-toast"
 
 // Create the context with a default undefined value
 const CartContext = createContext<CartContextType | undefined>(undefined)
@@ -12,8 +12,8 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 // Provider component
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([])
-  const [loading, setLoading] = useState<boolean>(false)
-  const [error, setError] = useState<string | null>(null)
+  const [loading] = useState<boolean>(false)
+  const [error] = useState<string | null>(null)
 
   // Calculate cart totals
   const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0)

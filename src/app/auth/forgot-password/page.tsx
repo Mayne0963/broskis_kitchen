@@ -8,7 +8,7 @@ import { FaEnvelope, FaArrowLeft } from "react-icons/fa"
 import AuthLayout from "../../../components/auth/AuthLayout"
 import { validateEmail } from "../../../lib/utils/validation"
 import { useAuth } from "../../../lib/context/AuthContext"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "@/hooks/use-toast"
 
 export default function ForgotPasswordPage() {
   const { resetPassword } = useAuth()

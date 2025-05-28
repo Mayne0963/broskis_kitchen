@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "../../lib/context/AuthContext"
 import { FaUser, FaEnvelope, FaLock, FaSignOutAlt, FaHistory, FaHeart, FaCreditCard } from "react-icons/fa"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "@/hooks/use-toast"
 
 export default function ProfilePage() {
   const router = useRouter()

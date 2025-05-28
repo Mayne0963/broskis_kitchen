@@ -30,10 +30,10 @@ export async function generateChatResponse(messages: { role: string; text: strin
     const systemMessage = SYSTEM_PROMPT.replace("{{context}}", context)
 
     // Format messages for OpenAI
-    const formattedMessages = [
+    const formattedMessages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
       { role: "system", content: systemMessage },
       ...messages.map((msg) => ({
-        role: msg.role === "user" ? "user" : "assistant",
+        role: msg.role === "user" ? "user" as const : "assistant" as const,
         content: msg.text,
       })),
     ]
@@ -41,7 +41,7 @@ export async function generateChatResponse(messages: { role: string; text: strin
     // Call OpenAI API
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
-      messages: formattedMessages as any,
+      messages: formattedMessages,
       temperature: 0.7,
       max_tokens: 500,
     })
