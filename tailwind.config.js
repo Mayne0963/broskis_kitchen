@@ -33,11 +33,16 @@ module.exports = {
       animation: {
         "fade-in": "fadeIn 0.8s forwards",
         shimmer: "shimmer 1.5s infinite",
+        soundbar: "soundbar 1s ease-in-out infinite",
       },
       keyframes: {
         shimmer: {
           "0%": { transform: "translateX(-100%)" },
           "100%": { transform: "translateX(100%)" },
+        },
+        soundbar: {
+          "0%, 100%": { height: "0.5rem" },
+          "50%": { height: "1.5rem" },
         },
       },
       boxShadow: {
