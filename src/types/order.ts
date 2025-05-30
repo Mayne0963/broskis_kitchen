@@ -43,7 +43,6 @@ export interface Order {
   subtotal: number
   tax: number
   deliveryFee: number
-  discountAmount?: number
   total: number
   status: OrderStatus
   orderType: 'delivery' | 'pickup'
@@ -54,12 +53,6 @@ export interface Order {
     phone: string
   }
   paymentInfo?: Partial<PaymentInfo>
-  appliedCoupon?: {
-    id: string
-    code: string
-    rewardName: string
-    discountAmount: number
-  }
   specialInstructions?: string
   estimatedTime?: string
   scheduledTime?: string

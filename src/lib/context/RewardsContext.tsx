@@ -109,10 +109,8 @@ export const RewardsProvider: React.FC<RewardsProviderProps> = ({ children }) =>
   }
 
   const spinWheel = (): number => {
-    // This function is deprecated - SpinGame component handles its own logic
-    // Generate a random number of points between 50 and 200 (matching wheel segments)
-    const wheelSegments = [50, 75, 100, 125, 150, 175, 200, 65, 85, 110, 135, 160]
-    const randomPoints = wheelSegments[Math.floor(Math.random() * wheelSegments.length)]
+    // Generate a random number of points between 10 and 100
+    const randomPoints = Math.floor(Math.random() * 91) + 10
     addPoints(randomPoints)
     return randomPoints
   }

@@ -9,8 +9,6 @@ import { OrderFormData } from '../../types/order'
 import { toast } from '../../components/ui/use-toast'
 import { FaCreditCard, FaLock, FaMapMarkerAlt, FaClock, FaPhone, FaEnvelope } from 'react-icons/fa'
 import StripePaymentForm from './StripePaymentForm'
-import CouponValidation from './CouponValidation'
-import type { Coupon } from '../../lib/services/couponService'
 
 interface CheckoutFormProps {
   onOrderComplete: (orderId: string) => void
@@ -32,8 +30,6 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
   })
   
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null)
-  const [discountAmount, setDiscountAmount] = useState(0)
 
   // Pickup locations
   const pickupLocations = [
@@ -70,54 +66,11 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
     return Object.keys(newErrors).length === 0
   }
 
-  // Calculate final total with coupon discount
-  const calculateFinalTotal = () => {
-    const deliveryFee = formData.orderType === 'delivery' && subtotal < 50 ? 4.99 : 0
-    const baseTotal = subtotal + tax + deliveryFee
-    return Math.max(0, baseTotal - discountAmount)
-  }
-
-  // Handle coupon application
-  const handleCouponApplied = (coupon: Coupon) => {
-    setAppliedCoupon(coupon)
-    // For now, we'll apply a simple discount based on reward type
-    // This could be enhanced to support different discount types
-    const discount = calculateCouponDiscount(coupon)
-    setDiscountAmount(discount)
-  }
-
-  // Handle coupon removal
-  const handleCouponRemoved = () => {
-    setAppliedCoupon(null)
-    setDiscountAmount(0)
-  }
-
-  // Calculate discount amount based on coupon
-  const calculateCouponDiscount = (coupon: Coupon): number => {
-    // This is a simple implementation - you can enhance this based on your reward types
-    const rewardName = coupon.rewardName.toLowerCase()
-    
-    if (rewardName.includes('10% off')) {
-      return subtotal * 0.1
-    } else if (rewardName.includes('$5 off')) {
-      return 5
-    } else if (rewardName.includes('$10 off')) {
-      return 10
-    } else if (rewardName.includes('free delivery')) {
-      return formData.orderType === 'delivery' && subtotal < 50 ? 4.99 : 0
-    }
-    
-    // Default discount for other rewards
-    return 5
-  }
-
   // Handle form submission
   const handleSubmit = async (paymentIntentId?: string) => {
     if (!validateStep(2)) return
 
     try {
-      const finalTotal = calculateFinalTotal()
-      
       const orderData = {
         userId: user?.id,
         items: items.map(item => ({
@@ -130,9 +83,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
         })),
         subtotal,
         tax,
-        deliveryFee: formData.orderType === 'delivery' && subtotal < 50 ? 4.99 : 0,
-        discountAmount,
-        total: finalTotal,
+        deliveryFee: 0, // Will be calculated in context
+        total: 0, // Will be calculated in context
         status: 'pending' as const,
         orderType: formData.orderType,
         deliveryAddress: formData.deliveryAddress,
@@ -145,29 +97,12 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
           ...formData.paymentInfo,
           stripePaymentIntentId: paymentIntentId
         },
-        appliedCoupon: appliedCoupon ? {
-          id: appliedCoupon.id,
-          code: appliedCoupon.code,
-          rewardName: appliedCoupon.rewardName,
-          discountAmount
-        } : undefined,
         specialInstructions: formData.specialInstructions,
         estimatedTime: formData.deliveryTime === 'scheduled' ? formData.scheduledTime : undefined
       }
 
       // Create the order
       const orderId = await createOrder(orderData)
-      
-      // Mark coupon as used if one was applied
-      if (appliedCoupon && orderId) {
-        try {
-          const { useCoupon } = await import('../../lib/services/couponService')
-          await useCoupon(appliedCoupon.code, orderId)
-        } catch (error) {
-          console.error('Failed to mark coupon as used:', error)
-          // Don't fail the order if coupon marking fails
-        }
-      }
       
       clearCart()
       onOrderComplete(orderId)
@@ -449,18 +384,10 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
 
           // In the CheckoutForm component, replace the credit card form section with:
 
-          {/* Coupon Validation */}
-          <CouponValidation
-            onCouponApplied={handleCouponApplied}
-            onCouponRemoved={handleCouponRemoved}
-            appliedCoupon={appliedCoupon}
-            disabled={isLoading}
-          />
-
           {/* Credit Card Form - Replace with Stripe */}
           {formData.paymentMethod === 'card' && (
           <StripePaymentForm
-            amount={calculateFinalTotal()}
+            amount={total}
             onPaymentSuccess={(paymentIntentId) => {
               // Update form data with payment info
               updateNestedFormData('paymentInfo', 'stripePaymentIntentId', paymentIntentId)
@@ -547,15 +474,9 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
                     <span>$4.99</span>
                   </div>
                 )}
-                {appliedCoupon && discountAmount > 0 && (
-                  <div className="flex justify-between text-green-400">
-                    <span>Coupon Discount ({appliedCoupon.code}):</span>
-                    <span>-${discountAmount.toFixed(2)}</span>
-                  </div>
-                )}
                 <div className="flex justify-between font-bold text-lg border-t border-[#333333] pt-2 mt-2">
                   <span>Total:</span>
-                  <span className="text-gold-foil">${calculateFinalTotal().toFixed(2)}</span>
+                  <span className="text-gold-foil">${(total + (formData.orderType === 'delivery' && subtotal < 50 ? 4.99 : 0)).toFixed(2)}</span>
                 </div>
               </div>
             </div>
