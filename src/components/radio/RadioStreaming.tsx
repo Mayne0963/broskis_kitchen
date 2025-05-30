@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
-import { FaPlay, FaPause, FaVolumeUp, FaVolumeDown, FaRadio, FaSignal } from "react-icons/fa"
+import { FaPlay, FaPause, FaVolumeUp, FaVolumeDown, FaBroadcastTower, FaSignal } from "react-icons/fa"
 
 interface RadioStation {
   id: string
@@ -163,7 +163,7 @@ const RadioStreaming = () => {
   return (
     <div className="bg-gradient-to-br from-gray-900 to-black p-6 rounded-xl border border-gray-700 shadow-2xl">
       <div className="flex items-center mb-6">
-        <FaRadio className="text-gold-foil mr-3" size={24} />
+        <FaBroadcastTower className="text-gold-foil mr-3" size={24} />
         <h2 className="text-2xl font-bold text-white">Live Radio Streaming</h2>
         {currentStation?.isLive && (
           <div className="ml-3 flex items-center">

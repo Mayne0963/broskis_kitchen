@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { FaRadio, FaMusic, FaHeadphones } from "react-icons/fa"
+import { FaBroadcastTower, FaMusic, FaHeadphones } from "react-icons/fa"
 import RadioStreaming from "../../components/radio/RadioStreaming"
 import { useAuth } from "../../lib/context/AuthContext"
 
@@ -16,7 +16,7 @@ const RadioPage = () => {
         <div className="relative z-20 container mx-auto px-4 py-20">
           <div className="max-w-4xl">
             <div className="flex items-center mb-6">
-              <FaRadio className="text-gold-foil mr-4" size={48} />
+              <FaBroadcastTower className="text-gold-foil mr-4" size={48} />
               <div>
                 <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
                   Broski's Radio
@@ -54,7 +54,7 @@ const RadioPage = () => {
           
           <div className="text-center">
             <div className="bg-gradient-to-br from-gold-foil to-amber-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FaRadio className="text-black" size={24} />
+              <FaBroadcastTower className="text-black" size={24} />
             </div>
             <h3 className="text-xl font-bold text-white mb-2">Live Streaming</h3>
             <p className="text-gray-400">
