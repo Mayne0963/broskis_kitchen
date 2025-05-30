@@ -8,7 +8,8 @@ import PointsTracker from "../../components/rewards/PointsTracker"
 import RewardHistory from "../../components/rewards/RewardHistory"
 import SpinGame from "../../components/rewards/SpinGame"
 import RedeemModal from "../../components/rewards/RedeemModal"
-import { FaTrophy, FaGift, FaHistory, FaGamepad } from "react-icons/fa"
+import CouponList from "../../components/rewards/CouponList"
+import { FaTrophy, FaGift, FaHistory, FaGamepad, FaTicketAlt } from "react-icons/fa"
 
 export default function RewardsPage() {
   const { points, tier, history } = useRewards()
@@ -115,6 +116,16 @@ export default function RewardsPage() {
             </button>
             <button
               className={`px-6 py-2 font-medium text-sm whitespace-nowrap ${
+                activeTab === "coupons"
+                  ? "text-gold-foil border-b-2 border-gold-foil"
+                  : "text-gray-400 hover:text-white"
+              }`}
+              onClick={() => setActiveTab("coupons")}
+            >
+              <FaTicketAlt className="inline mr-2" /> My Coupons
+            </button>
+            <button
+              className={`px-6 py-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === "history"
                   ? "text-gold-foil border-b-2 border-gold-foil"
                   : "text-gray-400 hover:text-white"
@@ -151,6 +162,13 @@ export default function RewardsPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Coupons Tab */}
+          {activeTab === "coupons" && (
+            <div className="animate-fade-in">
+              <CouponList />
             </div>
           )}
 
