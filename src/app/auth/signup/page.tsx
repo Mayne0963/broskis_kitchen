@@ -8,8 +8,9 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "../../../lib/context/AuthContext"
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle, FaFacebook, FaApple } from "react-icons/fa"
 import AuthLayout from "../../../components/auth/AuthLayout"
+
 import PasswordStrengthMeter from "../../../components/auth/PasswordStrengthMeter"
-import { validateEmail, validatePassword, validateName, checkPasswordStrength } from "../../../lib/utils/validation"
+import { validateEmail, validatePassword, validateName, checkPasswordStrength, validatePasswordStrength } from "../../../lib/utils/validation"
 import { toast } from "@/hooks/use-toast"
 
 export default function SignupPage() {
@@ -29,6 +30,7 @@ export default function SignupPage() {
     terms?: string
     general?: string
   }>({})
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([])
 
   const passwordStrength = checkPasswordStrength(password)
 
@@ -59,9 +61,14 @@ export default function SignupPage() {
       hasErrors = true
     }
 
-    if (!validatePassword(password)) {
-      newErrors.password = "Password must be at least 8 characters"
+    // Validate password with enhanced validation
+    const passwordValidation = validatePasswordStrength(password)
+    if (!passwordValidation.isValid) {
+      newErrors.password = passwordValidation.errors[0] // Show first error in the field
+      setPasswordErrors(passwordValidation.errors) // Store all errors for detailed display
       hasErrors = true
+    } else {
+      setPasswordErrors([])
     }
 
     if (password !== confirmPassword) {
@@ -197,6 +204,19 @@ export default function SignupPage() {
               </button>
             </div>
             {errors.password && <p className="mt-1 text-sm text-blood-red">{errors.password}</p>}
+            {passwordErrors.length > 0 && (
+              <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-md">
+                <p className="text-sm font-medium text-red-800 mb-1">Password requirements:</p>
+                <ul className="text-sm text-red-700 space-y-1">
+                  {passwordErrors.map((error, index) => (
+                    <li key={index} className="flex items-center">
+                      <span className="w-1 h-1 bg-red-500 rounded-full mr-2"></span>
+                      {error}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {password && <PasswordStrengthMeter strength={passwordStrength} />}
 

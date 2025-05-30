@@ -14,26 +14,31 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [isSpinning, setIsSpinning] = useState(false)
   const [result, setResult] = useState<number | null>(null)
-  const [canSpin, setCanSpin] = useState(true)
+  const [canSpin, setCanSpin] = useState(() => {
+    // Check if user has already spun today
+    const lastSpinDate = localStorage.getItem('lastSpinDate')
+    const today = new Date().toDateString()
+    return lastSpinDate !== today
+  })
   const [spinAngle, setSpinAngle] = useState(0)
   const [targetAngle, setTargetAngle] = useState(0)
   const [finalPoints, setFinalPoints] = useState(0)
 
-  // Define wheel segments (points values between 50-200)
-  const segments = [50, 75, 100, 125, 150, 175, 200, 65, 85, 110, 135, 160]
+  // Define wheel segments with better distribution and more segments
+  const segments = [10, 25, 50, 75, 100, 150, 200, 300, 15, 35, 60, 90]
   const colors = [
     "#D4AF37", // gold-foil
     "#880808", // blood-red
     "#50C878", // emerald-green
     "#7851A9", // royal-purple
-    "#D4AF37", // gold-foil
-    "#880808", // blood-red
-    "#50C878", // emerald-green
-    "#7851A9", // royal-purple
-    "#D4AF37", // gold-foil
-    "#880808", // blood-red
-    "#50C878", // emerald-green
-    "#7851A9", // royal-purple
+    "#FF6B35", // orange
+    "#4ECDC4", // teal
+    "#45B7D1", // blue
+    "#96CEB4", // mint
+    "#FFEAA7", // yellow
+    "#DDA0DD", // plum
+    "#98D8C8", // seafoam
+    "#F7DC6F", // light gold
   ]
 
   // Function to draw the wheel
@@ -41,9 +46,10 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
     ctx.clearRect(0, 0, width, height)
     const centerX = width / 2
     const centerY = height / 2
-    const radius = Math.min(centerX, centerY) - 10
+    const radius = Math.min(centerX, centerY) - 20
     const segmentAngle = (2 * Math.PI) / segments.length
 
+    // Draw segments
     for (let i = 0; i < segments.length; i++) {
       const startAngle = i * segmentAngle + (angle * Math.PI) / 180
       const endAngle = (i + 1) * segmentAngle + (angle * Math.PI) / 180
@@ -53,39 +59,56 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
       ctx.arc(centerX, centerY, radius, startAngle, endAngle)
       ctx.closePath()
 
-      ctx.fillStyle = colors[i]
+      ctx.fillStyle = colors[i % colors.length]
       ctx.fill()
       ctx.strokeStyle = "#000"
-      ctx.lineWidth = 1
+      ctx.lineWidth = 2
       ctx.stroke()
 
+      // Draw text (numbers)
       ctx.save()
       ctx.translate(centerX, centerY)
       ctx.rotate(startAngle + segmentAngle / 2)
-      ctx.textAlign = "right"
+      ctx.textAlign = "center"
+      ctx.textBaseline = "middle"
       ctx.fillStyle = "white"
-      ctx.font = "bold 16px sans-serif"
-      ctx.fillText(segments[i].toString(), radius - 20, 5)
+      ctx.strokeStyle = "black"
+      ctx.lineWidth = 3
+      ctx.font = "bold 18px Arial"
+      
+      // Add text stroke for better visibility
+      ctx.strokeText(segments[i].toString(), radius * 0.75, 0)
+      ctx.fillText(segments[i].toString(), radius * 0.75, 0)
       ctx.restore()
     }
 
-    // Draw center circle
+    // Draw outer border
     ctx.beginPath()
-    ctx.arc(centerX, centerY, 15, 0, 2 * Math.PI)
-    ctx.fillStyle = "#1A1A1A"
-    ctx.fill()
-    ctx.strokeStyle = "#333333"
-    ctx.lineWidth = 2
+    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI)
+    ctx.strokeStyle = "#D4AF37"
+    ctx.lineWidth = 4
     ctx.stroke()
 
-    // Draw pointer
+    // Draw center circle
     ctx.beginPath()
-    ctx.moveTo(centerX, centerY - radius - 10)
-    ctx.lineTo(centerX - 10, centerY - radius + 10)
-    ctx.lineTo(centerX + 10, centerY - radius + 10)
+    ctx.arc(centerX, centerY, 20, 0, 2 * Math.PI)
+    ctx.fillStyle = "#1A1A1A"
+    ctx.fill()
+    ctx.strokeStyle = "#D4AF37"
+    ctx.lineWidth = 3
+    ctx.stroke()
+
+    // Draw pointer (triangle pointing down)
+    ctx.beginPath()
+    ctx.moveTo(centerX, centerY - radius - 15)
+    ctx.lineTo(centerX - 15, centerY - radius + 5)
+    ctx.lineTo(centerX + 15, centerY - radius + 5)
     ctx.closePath()
     ctx.fillStyle = "#D4AF37"
     ctx.fill()
+    ctx.strokeStyle = "#000"
+    ctx.lineWidth = 2
+    ctx.stroke()
   }
 
   // Function to calculate which segment the wheel lands on
@@ -93,10 +116,11 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
     const segmentAngle = 360 / segments.length
     // Normalize the angle to 0-360 range
     const normalizedAngle = ((finalAngle % 360) + 360) % 360
-    // The pointer is at the top (0 degrees), so we need to account for that
-    // Since the wheel rotates clockwise, we calculate from the top
-    const pointerAngle = (360 - normalizedAngle) % 360
-    const segmentIndex = Math.floor(pointerAngle / segmentAngle) % segments.length
+    // The pointer is at the top, pointing down into the wheel
+    // We need to find which segment the pointer is pointing to
+    // Add half segment angle to center the calculation on segment midpoints
+    const adjustedAngle = (normalizedAngle + (segmentAngle / 2)) % 360
+    const segmentIndex = Math.floor(adjustedAngle / segmentAngle) % segments.length
     return segmentIndex
   }
 
@@ -107,12 +131,19 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
     setIsSpinning(true)
     setResult(null)
 
-    // Generate random spin: 3-7 full rotations plus random angle
-    const minRotations = 3
-    const maxRotations = 7
+    // Pre-determine the winning segment for better control
+    const winningSegmentIndex = Math.floor(Math.random() * segments.length)
+    const segmentAngle = 360 / segments.length
+    
+    // Calculate the target angle to land on the winning segment
+    // We want the pointer (at top) to point to the center of the winning segment
+    const targetSegmentAngle = winningSegmentIndex * segmentAngle + (segmentAngle / 2)
+    
+    // Add multiple full rotations for dramatic effect
+    const minRotations = 4
+    const maxRotations = 8
     const randomRotations = Math.random() * (maxRotations - minRotations) + minRotations
-    const randomAngle = Math.random() * 360
-    const totalRotation = randomRotations * 360 + randomAngle
+    const totalRotation = randomRotations * 360 + targetSegmentAngle
     
     const finalAngle = spinAngle + totalRotation
     setTargetAngle(finalAngle)
@@ -147,8 +178,7 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
       if (time < 1) {
         requestAnimationFrame(animate)
       } else {
-        // Calculate the winning segment based on final position
-        const winningSegmentIndex = calculateWinningSegment(newAngle)
+        // Use the pre-determined winning segment
         const points = segments[winningSegmentIndex]
         
         setFinalPoints(points)
@@ -157,6 +187,10 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
         setCanSpin(false)
         
         console.log(`Wheel stopped at angle: ${newAngle}, Winning segment: ${winningSegmentIndex}, Points: ${points}`)
+        
+        // Verify the calculation matches
+        const calculatedWinner = calculateWinningSegment(newAngle)
+        console.log(`Calculated winner: ${calculatedWinner}, Expected: ${winningSegmentIndex}`)
       }
     }
 
@@ -175,6 +209,11 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
   const handleClaim = () => {
     if (result !== null) {
       addPoints(result)
+      // Set daily spin cooldown (24 hours)
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      tomorrow.setHours(0, 0, 0, 0)
+      localStorage.setItem('lastSpinDate', new Date().toDateString())
       onComplete(result)
     }
   }
@@ -182,7 +221,7 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
   return (
     <div className="text-center">
       <div className="relative mb-6">
-        <canvas ref={canvasRef} width={300} height={300} className="mx-auto" />
+        <canvas ref={canvasRef} width={350} height={350} className="mx-auto border-2 border-gold-foil rounded-full" />
 
         {!isSpinning && !result && (
           <button

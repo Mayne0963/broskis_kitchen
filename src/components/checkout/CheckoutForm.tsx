@@ -67,7 +67,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
   }
 
   // Handle form submission
-  const handleSubmit = async () => {
+  const handleSubmit = async (paymentIntentId?: string) => {
     if (!validateStep(2)) return
 
     try {
@@ -93,12 +93,17 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
           email: formData.email,
           phone: formData.phone
         },
-        paymentInfo: formData.paymentInfo,
+        paymentInfo: {
+          ...formData.paymentInfo,
+          stripePaymentIntentId: paymentIntentId
+        },
         specialInstructions: formData.specialInstructions,
         estimatedTime: formData.deliveryTime === 'scheduled' ? formData.scheduledTime : undefined
       }
 
+      // Create the order
       const orderId = await createOrder(orderData)
+      
       clearCart()
       onOrderComplete(orderId)
     } catch (error) {
@@ -397,6 +402,11 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
               })
             }}
             disabled={isLoading}
+            orderMetadata={{
+              email: formData.email,
+              phone: formData.phone,
+              orderType: formData.orderType
+            }}
           />
           )}
 
@@ -510,57 +520,3 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
 }
 
 export default CheckoutForm
-
-// Update the handleSubmit function to handle Stripe payments:
-const handleSubmit = async () => {
-  if (!validateStep(2)) return
-
-  setIsLoading(true)
-  try {
-    // For cash payments, proceed directly
-    if (formData.paymentMethod === 'cash') {
-      await createOrder({
-        items: cartItems,
-        orderType: formData.orderType,
-        deliveryAddress: formData.orderType === 'delivery' ? formData.deliveryAddress : undefined,
-        pickupLocation: formData.orderType === 'pickup' ? formData.pickupLocation : undefined,
-        contactInfo: formData.contactInfo,
-        paymentInfo: {
-          ...formData.paymentInfo,
-          paymentMethod: formData.paymentMethod,
-        },
-        specialInstructions: formData.specialInstructions,
-        scheduledTime: formData.scheduledTime,
-        paymentStatus: 'pending',
-      })
-    } else {
-      // For card payments, the order creation is handled in the Stripe success callback
-      // This function will be called from StripePaymentForm after successful payment
-      await createOrder({
-        items: cartItems,
-        orderType: formData.orderType,
-        deliveryAddress: formData.orderType === 'delivery' ? formData.deliveryAddress : undefined,
-        pickupLocation: formData.orderType === 'pickup' ? formData.pickupLocation : undefined,
-        contactInfo: formData.contactInfo,
-        paymentInfo: formData.paymentInfo,
-        specialInstructions: formData.specialInstructions,
-        scheduledTime: formData.scheduledTime,
-        paymentStatus: 'succeeded',
-        stripePaymentIntentId: formData.paymentInfo?.stripePaymentIntentId,
-      })
-    }
-
-    // Clear cart and redirect
-    clearCart()
-    router.push('/checkout?success=true')
-  } catch (error) {
-    console.error('Order creation failed:', error)
-    toast({
-      title: 'Order Failed',
-      description: 'There was an error creating your order. Please try again.',
-      variant: 'destructive',
-    })
-  } finally {
-    setIsLoading(false)
-  }
-}

@@ -7,6 +7,7 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
+  sendEmailVerification,
   onAuthStateChanged,
   updateProfile,
   type User as FirebaseUser,
@@ -23,6 +24,7 @@ interface AuthContextType {
   signup: (name: string, email: string, password: string) => Promise<boolean>
   logout: () => Promise<void>
   resetPassword: (email: string) => Promise<boolean>
+  resendEmailVerification: () => Promise<boolean>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -69,6 +71,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             name: userData?.name || authUser.displayName || "User",
             email: authUser.email || "",
             isGuest: false,
+            emailVerified: authUser.emailVerified,
+            role: userData?.role || 'customer',
           }
           setUser(appUser)
         } catch (error) {
@@ -79,6 +83,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             name: authUser.displayName || "User",
             email: authUser.email || "",
             isGuest: false,
+            emailVerified: authUser.emailVerified,
+            role: 'customer',
           }
           setUser(appUser)
         }
@@ -109,17 +115,58 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
     try {
       setIsLoading(true)
-      await signInWithEmailAndPassword(auth, email, password)
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      
+      // Check if email is verified
+      if (!userCredential.user.emailVerified) {
+        toast({
+          title: "Email Not Verified",
+          description: "Please verify your email address before signing in. Check your inbox for a verification link.",
+          variant: "destructive",
+        })
+        await signOut(auth) // Sign out the user
+        return false
+      }
+      
       toast({
         title: "Login Successful",
-        description: "Welcome back!",
+        description: "Welcome back to Broski's Kitchen!",
       })
       return true
     } catch (error: any) {
       console.error("Login error:", error)
+      let errorMessage = "Invalid email or password"
+      
+      // Handle specific Firebase error codes
+      switch (error.code) {
+        case 'auth/invalid-email':
+          errorMessage = "Please enter a valid email address."
+          break
+        case 'auth/user-disabled':
+          errorMessage = "This account has been disabled. Please contact support."
+          break
+        case 'auth/user-not-found':
+          errorMessage = "No account found with this email address. Please sign up first."
+          break
+        case 'auth/wrong-password':
+          errorMessage = "Incorrect password. Please try again or reset your password."
+          break
+        case 'auth/invalid-credential':
+          errorMessage = "Invalid email or password. Please check your credentials and try again."
+          break
+        case 'auth/too-many-requests':
+          errorMessage = "Too many failed login attempts. Please try again later or reset your password."
+          break
+        case 'auth/network-request-failed':
+          errorMessage = "Network error. Please check your connection and try again."
+          break
+        default:
+          errorMessage = error.message || "Invalid email or password"
+      }
+      
       toast({
         title: "Login Failed",
-        description: error.message || "Invalid email or password",
+        description: errorMessage,
         variant: "destructive",
       })
       return false
@@ -146,24 +193,51 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         displayName: name,
       })
 
+      // Send email verification
+      await sendEmailVerification(userCredential.user)
+
       // Save user data to Firestore
       await setDoc(doc(db, 'users', userCredential.user.uid), {
         name,
         email,
+        role: 'customer',
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
       })
 
       toast({
-        title: "Account Created",
-        description: "Welcome to Broski's Kitchen!",
+        title: "Account Created Successfully",
+        description: "Please check your email to verify your account before signing in.",
       })
       return true
     } catch (error: any) {
       console.error("Signup error:", error)
+      let errorMessage = "Failed to create account"
+      
+      // Handle specific Firebase error codes
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          errorMessage = "An account with this email already exists. Please sign in instead."
+          break
+        case 'auth/invalid-email':
+          errorMessage = "Please enter a valid email address."
+          break
+        case 'auth/operation-not-allowed':
+          errorMessage = "Email/password accounts are not enabled. Please contact support."
+          break
+        case 'auth/weak-password':
+          errorMessage = "Password is too weak. Please choose a stronger password."
+          break
+        case 'auth/network-request-failed':
+          errorMessage = "Network error. Please check your connection and try again."
+          break
+        default:
+          errorMessage = error.message || "Failed to create account"
+      }
+      
       toast({
         title: "Signup Failed",
-        description: error.message || "Failed to create account",
+        description: errorMessage,
         variant: "destructive",
       })
       return false
@@ -216,9 +290,67 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return true
     } catch (error: any) {
       console.error("Password reset error:", error)
+      let errorMessage = "Failed to send password reset email"
+      
+      // Handle specific Firebase error codes
+      switch (error.code) {
+        case 'auth/invalid-email':
+          errorMessage = "Please enter a valid email address."
+          break
+        case 'auth/user-not-found':
+          errorMessage = "No account found with this email address."
+          break
+        case 'auth/network-request-failed':
+          errorMessage = "Network error. Please check your connection and try again."
+          break
+        default:
+          errorMessage = error.message || "Failed to send password reset email"
+      }
+      
       toast({
         title: "Password Reset Failed",
-        description: error.message || "Failed to send password reset email",
+        description: errorMessage,
+        variant: "destructive",
+      })
+      return false
+    }
+  }
+  
+  const resendEmailVerification = async (): Promise<boolean> => {
+    if (!auth || !auth.currentUser) {
+      toast({
+        title: "Verification Error",
+        description: "You must be logged in to resend verification email",
+        variant: "destructive",
+      })
+      return false
+    }
+    try {
+      await sendEmailVerification(auth.currentUser)
+      toast({
+        title: "Verification Email Sent",
+        description: "Please check your email to verify your account",
+      })
+      return true
+    } catch (error: any) {
+      console.error("Email verification error:", error)
+      let errorMessage = "Failed to send verification email"
+      
+      // Handle specific Firebase error codes
+      switch (error.code) {
+        case 'auth/too-many-requests':
+          errorMessage = "Too many requests. Please try again later."
+          break
+        case 'auth/network-request-failed':
+          errorMessage = "Network error. Please check your connection and try again."
+          break
+        default:
+          errorMessage = error.message || "Failed to send verification email"
+      }
+      
+      toast({
+        title: "Verification Email Failed",
+        description: errorMessage,
         variant: "destructive",
       })
       return false
@@ -235,6 +367,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         signup,
         logout,
         resetPassword,
+        resendEmailVerification,
       }}
     >
       {children}

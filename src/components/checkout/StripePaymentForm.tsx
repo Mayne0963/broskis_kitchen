@@ -20,6 +20,8 @@ interface StripePaymentFormProps {
   onPaymentSuccess: (paymentIntentId: string) => void
   onPaymentError: (error: string) => void
   disabled?: boolean
+  orderId?: string
+  orderMetadata?: Record<string, string>
 }
 
 function PaymentForm({
@@ -27,6 +29,8 @@ function PaymentForm({
   onPaymentSuccess,
   onPaymentError,
   disabled = false,
+  orderId,
+  orderMetadata = {},
 }: StripePaymentFormProps) {
   const stripe = useStripe()
   const elements = useElements()
@@ -46,6 +50,8 @@ function PaymentForm({
             currency: 'usd',
             metadata: {
               source: 'broskis-kitchen-checkout',
+              orderId: orderId || '',
+              ...orderMetadata,
             },
           }),
         })

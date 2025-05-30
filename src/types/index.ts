@@ -3,15 +3,21 @@ export interface User {
   id: string
   name: string
   email: string
-  role: "user" | "admin"
+  role?: "user" | "admin"
+  isGuest?: boolean
+  emailVerified?: boolean
 }
 
 // Auth types
 export interface AuthContextType {
   user: User | null
-  login: (email: string, password: string) => Promise<void>
-  signup: (name: string, email: string, password: string) => Promise<void>
-  logout: () => void
+  isLoading: boolean
+  isAuthenticated: boolean
+  login: (email: string, password: string) => Promise<boolean>
+  signup: (name: string, email: string, password: string) => Promise<boolean>
+  logout: () => Promise<void>
+  resetPassword: (email: string) => Promise<boolean>
+  resendEmailVerification: () => Promise<boolean>
 }
 
 // Cart types

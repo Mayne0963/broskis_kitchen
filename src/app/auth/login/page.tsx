@@ -207,12 +207,20 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <p className="mt-8 text-center text-sm text-gray-400">
-        Don&apos;t have an account?{" "}
-        <Link href="/auth/signup" className="font-medium text-gold-foil hover:underline">
-          Sign up
+      <div className="mt-8 text-center space-y-2">
+        <Link
+          href="/auth/reset-password"
+          className="text-gold-foil hover:text-gold-foil/80 text-sm font-medium block"
+        >
+          Forgot your password?
         </Link>
-      </p>
+        <p className="text-sm text-gray-400">
+          Don&apos;t have an account?{" "}
+          <Link href="/auth/signup" className="text-gold-foil hover:text-gold-foil/80 font-medium">
+            Sign up
+          </Link>
+        </p>
+      </div>
     </AuthLayout>
   )
 }
