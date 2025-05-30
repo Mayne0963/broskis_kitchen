@@ -41,6 +41,41 @@ const MusicPlayer = () => {
       url: "/music/ambient-nature.mp3",
       coverImage: "/images/relaxing-piano.jpg",
     },
+    {
+      id: "8",
+      title: "Dreamy Synthwave",
+      artist: "Retro Vibes",
+      url: "/music/dreamy-synthwave.mp3",
+      coverImage: "/images/chilled-vibes.jpg",
+    },
+    {
+      id: "9",
+      title: "Midnight Study Session",
+      artist: "Lo-Fi Collective",
+      url: "/music/midnight-study.mp3",
+      coverImage: "/images/lofi-study-beats.jpg",
+    },
+    {
+      id: "10",
+      title: "Rainy Day Vibes",
+      artist: "Ambient Sounds",
+      url: "/music/rainy-day-vibes.mp3",
+      coverImage: "/images/relaxing-piano.jpg",
+    },
+    {
+      id: "11",
+      title: "Coffee Shop Atmosphere",
+      artist: "Urban Sounds",
+      url: "/music/coffee-shop-atmosphere.mp3",
+      coverImage: "/images/chilled-vibes.jpg",
+    },
+    {
+      id: "12",
+      title: "Sunset Meditation",
+      artist: "Zen Masters",
+      url: "/music/sunset-meditation.mp3",
+      coverImage: "/images/relaxing-piano.jpg",
+    },
   ]
 
   const upbeatTracks: Track[] = [
@@ -64,6 +99,93 @@ const MusicPlayer = () => {
       artist: "Digital Beats",
       url: "/music/electronic-future.mp3",
       coverImage: "/images/lofi-study-beats.jpg",
+    },
+    {
+      id: "13",
+      title: "Funky Groove",
+      artist: "Funk Masters",
+      url: "/music/funky-groove.mp3",
+      coverImage: "/images/chilled-vibes.jpg",
+    },
+    {
+      id: "14",
+      title: "Energetic Pop",
+      artist: "Pop Collective",
+      url: "/music/energetic-pop.mp3",
+      coverImage: "/images/lofi-study-beats.jpg",
+    },
+    {
+      id: "15",
+      title: "Hip Hop Beats",
+      artist: "Urban Rhythms",
+      url: "/music/hip-hop-beats.mp3",
+      coverImage: "/images/chilled-vibes.jpg",
+    },
+    {
+      id: "16",
+      title: "Dance Floor Anthem",
+      artist: "Electronic Vibes",
+      url: "/music/dance-floor-anthem.mp3",
+      coverImage: "/images/lofi-study-beats.jpg",
+    },
+    {
+      id: "17",
+      title: "Rock Energy",
+      artist: "Rock Collective",
+      url: "/music/rock-energy.mp3",
+      coverImage: "/images/chilled-vibes.jpg",
+    },
+    {
+      id: "18",
+      title: "Latin Fiesta",
+      artist: "Tropical Sounds",
+      url: "/music/latin-fiesta.mp3",
+      coverImage: "/images/lofi-study-beats.jpg",
+    },
+  ]
+
+  const dinnerJazz: Track[] = [
+    {
+      id: "19",
+      title: "Smooth Dinner Jazz",
+      artist: "Jazz Ensemble",
+      url: "/music/smooth-dinner-jazz.mp3",
+      coverImage: "/images/chilled-vibes.jpg",
+    },
+    {
+      id: "20",
+      title: "Elegant Piano Lounge",
+      artist: "Piano Masters",
+      url: "/music/elegant-piano-lounge.mp3",
+      coverImage: "/images/relaxing-piano.jpg",
+    },
+    {
+      id: "21",
+      title: "Sophisticated Saxophone",
+      artist: "Sax Collective",
+      url: "/music/sophisticated-saxophone.mp3",
+      coverImage: "/images/chilled-vibes.jpg",
+    },
+    {
+      id: "22",
+      title: "Vintage Swing",
+      artist: "Swing Orchestra",
+      url: "/music/vintage-swing.mp3",
+      coverImage: "/images/lofi-study-beats.jpg",
+    },
+    {
+      id: "23",
+      title: "Bossa Nova Nights",
+      artist: "Brazilian Sounds",
+      url: "/music/bossa-nova-nights.mp3",
+      coverImage: "/images/relaxing-piano.jpg",
+    },
+    {
+      id: "24",
+      title: "Cocktail Hour Blues",
+      artist: "Blues Society",
+      url: "/music/cocktail-hour-blues.mp3",
+      coverImage: "/images/chilled-vibes.jpg",
     },
   ]
 
@@ -285,17 +407,17 @@ const MusicPlayer = () => {
           {/* Playlist Switch */}
           <div className="flex items-center space-x-2 ml-auto">
             <button
-              className={`text-white text-xs px-4 py-2 rounded-full transition-all duration-300 ${
+              className={`text-white text-xs px-3 py-2 rounded-full transition-all duration-300 ${
                 currentPlaylist === chillLofi 
                   ? "bg-gradient-to-r from-gold-foil to-amber-500 text-black font-medium shadow-md" 
                   : "hover:text-gold-foil border border-gray-600 hover:border-gold-foil"
               }`}
               onClick={() => handlePlaylistSwitch(chillLofi)}
             >
-              Chill Lofi
+              Chill
             </button>
             <button
-              className={`text-white text-xs px-4 py-2 rounded-full transition-all duration-300 ${
+              className={`text-white text-xs px-3 py-2 rounded-full transition-all duration-300 ${
                 currentPlaylist === upbeatTracks 
                   ? "bg-gradient-to-r from-gold-foil to-amber-500 text-black font-medium shadow-md" 
                   : "hover:text-gold-foil border border-gray-600 hover:border-gold-foil"
@@ -303,6 +425,16 @@ const MusicPlayer = () => {
               onClick={() => handlePlaylistSwitch(upbeatTracks)}
             >
               Upbeat
+            </button>
+            <button
+              className={`text-white text-xs px-3 py-2 rounded-full transition-all duration-300 ${
+                currentPlaylist === dinnerJazz 
+                  ? "bg-gradient-to-r from-gold-foil to-amber-500 text-black font-medium shadow-md" 
+                  : "hover:text-gold-foil border border-gray-600 hover:border-gold-foil"
+              }`}
+              onClick={() => handlePlaylistSwitch(dinnerJazz)}
+            >
+              Jazz
             </button>
           </div>
         </div>

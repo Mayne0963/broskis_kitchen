@@ -50,6 +50,9 @@ const Navbar: React.FC = () => {
           <Link href="/events" className={`nav-link ${pathname === "/events" ? "nav-link-active" : ""}`}>
             Events
           </Link>
+          <Link href="/radio" className={`nav-link ${pathname === "/radio" ? "nav-link-active" : ""}`}>
+            Radio
+          </Link>
           <Link href="/rewards" className={`nav-link ${pathname === "/rewards" ? "nav-link-active" : ""}`}>
             Rewards
           </Link>
@@ -60,7 +63,7 @@ const Navbar: React.FC = () => {
             Contact
           </Link>
           <a 
-            href="https://otw-chi.vercel.app" 
+            href="http://localhost:3000" 
             target="_blank" 
             rel="noopener noreferrer" 
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300 border-2 border-red-500 hover:border-red-400"
@@ -136,6 +139,13 @@ const Navbar: React.FC = () => {
             onClick={() => setMobileMenuOpen(false)}
           >
             Events
+          </Link>
+          <Link
+            href="/radio"
+            className={`py-2 hover:text-gold-foil transition-colors duration-300 flex items-center ${pathname === "/radio" ? "text-gold-foil font-bold" : ""}`}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Radio
           </Link>
           <Link
             href="/rewards"

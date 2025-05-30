@@ -88,6 +88,18 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
     ctx.fill()
   }
 
+  // Function to calculate which segment the wheel lands on
+  const calculateWinningSegment = (finalAngle: number): number => {
+    const segmentAngle = 360 / segments.length
+    // Normalize the angle to 0-360 range
+    const normalizedAngle = ((finalAngle % 360) + 360) % 360
+    // The pointer is at the top (0 degrees), so we need to account for that
+    // Since the wheel rotates clockwise, we calculate from the top
+    const pointerAngle = (360 - normalizedAngle) % 360
+    const segmentIndex = Math.floor(pointerAngle / segmentAngle) % segments.length
+    return segmentIndex
+  }
+
   // Function to handle the spinning animation
   const spinTheWheel = () => {
     if (!canSpin || isSpinning) return
@@ -95,18 +107,18 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
     setIsSpinning(true)
     setResult(null)
 
-    // Determine a random segment to land on
-    const randomSegmentIndex = Math.floor(Math.random() * segments.length)
-    const points = segments[randomSegmentIndex]
-    setFinalPoints(points)
-
-    // Calculate the exact stop angle based on the segment
-    const segmentAngle = 360 / segments.length
-    const targetRotation = 360 * 5 - (randomSegmentIndex * segmentAngle + segmentAngle / 2)
-    setTargetAngle(targetRotation)
+    // Generate random spin: 3-7 full rotations plus random angle
+    const minRotations = 3
+    const maxRotations = 7
+    const randomRotations = Math.random() * (maxRotations - minRotations) + minRotations
+    const randomAngle = Math.random() * 360
+    const totalRotation = randomRotations * 360 + randomAngle
+    
+    const finalAngle = spinAngle + totalRotation
+    setTargetAngle(finalAngle)
 
     // Animation duration
-    const animationDuration = 5000 // 5 seconds
+    const animationDuration = 4000 // 4 seconds
 
     // Easing function for smooth deceleration
     const easeOutCubic = (t: number): number => {
@@ -119,11 +131,11 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
     const animate = (timestamp: number) => {
       if (!start) start = timestamp
       const progress = timestamp - start
-      const time = Math.min(progress / animationDuration, 1) // Ensure time doesn't exceed 1
+      const time = Math.min(progress / animationDuration, 1)
       const easedTime = easeOutCubic(time)
 
       // Calculate the new angle
-      const newAngle = startAngle + (targetRotation - startAngle) * easedTime
+      const newAngle = startAngle + (totalRotation * easedTime)
       setSpinAngle(newAngle)
 
       // Redraw the wheel
@@ -135,9 +147,16 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
       if (time < 1) {
         requestAnimationFrame(animate)
       } else {
+        // Calculate the winning segment based on final position
+        const winningSegmentIndex = calculateWinningSegment(newAngle)
+        const points = segments[winningSegmentIndex]
+        
+        setFinalPoints(points)
         setIsSpinning(false)
         setResult(points)
         setCanSpin(false)
+        
+        console.log(`Wheel stopped at angle: ${newAngle}, Winning segment: ${winningSegmentIndex}, Points: ${points}`)
       }
     }
 

@@ -5,7 +5,10 @@ import type React from "react"
 import { useState } from "react"
 import { FaTimes, FaGift, FaCheck, FaExclamationTriangle } from "react-icons/fa"
 import { useRewards } from "../../lib/context/RewardsContext"
+import { useAuth } from "../../lib/context/AuthContext"
+import { createCoupon } from "../../lib/services/couponService"
 import type { Reward } from "../../types/reward"
+import type { Coupon } from "../../lib/services/couponService"
 
 interface RedeemModalProps {
   reward: Reward
@@ -15,9 +18,10 @@ interface RedeemModalProps {
 
 const RedeemModal: React.FC<RedeemModalProps> = ({ reward, userPoints, onClose }) => {
   const { redeemPoints } = useRewards()
+  const { user } = useAuth()
   const [step, setStep] = useState(1)
   const [isRedeeming, setIsRedeeming] = useState(false)
-  const [redemptionCode, setRedemptionCode] = useState("")
+  const [coupon, setCoupon] = useState<Coupon | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   // Check if user has enough points
@@ -30,16 +34,23 @@ const RedeemModal: React.FC<RedeemModalProps> = ({ reward, userPoints, onClose }
       return
     }
 
+    if (!user) {
+      setError("You must be logged in to redeem rewards.")
+      return
+    }
+
     setIsRedeeming(true)
     setError(null)
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      // Create a unique coupon for this reward
+      const newCoupon = await createCoupon(reward, user.id)
+      
+      if (!newCoupon) {
+        throw new Error('Failed to create coupon')
+      }
 
-      // Generate a random redemption code
-      const code = Math.random().toString(36).substring(2, 10).toUpperCase()
-      setRedemptionCode(code)
+      setCoupon(newCoupon)
 
       // Deduct points
       redeemPoints(reward.pointsRequired)
@@ -170,19 +181,19 @@ const RedeemModal: React.FC<RedeemModalProps> = ({ reward, userPoints, onClose }
               </p>
 
               <div className="bg-[#111111] p-6 rounded-lg mb-6">
-                <h4 className="text-sm text-gray-400 mb-2">Your Redemption Code</h4>
+                <h4 className="text-sm text-gray-400 mb-2">Your Coupon Code</h4>
                 <div className="bg-black p-3 rounded border border-gold-foil">
-                  <span className="text-2xl font-mono font-bold text-gold-foil tracking-wider">{redemptionCode}</span>
+                  <span className="text-2xl font-mono font-bold text-gold-foil tracking-wider">{coupon?.code}</span>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">Present this code at checkout to redeem your reward.</p>
+                <p className="text-xs text-gray-500 mt-2">Present this code at checkout to redeem your reward. This is a single-use coupon.</p>
               </div>
 
-              {reward.expirationDays && (
+              {coupon && (
                 <div className="bg-[#111111] p-4 rounded-md mb-6">
                   <p className="text-sm text-gray-300">
                     <FaExclamationTriangle className="inline-block mr-2 text-citrus-orange" />
-                    This reward must be used by{" "}
-                    {new Date(Date.now() + reward.expirationDays * 24 * 60 * 60 * 1000).toLocaleDateString("en-US", {
+                    This coupon expires on{" "}
+                    {coupon.expiresAt.toLocaleDateString("en-US", {
                       month: "long",
                       day: "numeric",
                       year: "numeric",

@@ -15,7 +15,9 @@ const firebaseConfig = {
 
 // Check if Firebase is properly configured
 const isFirebaseConfigured = process.env.NEXT_PUBLIC_FIREBASE_API_KEY && 
-  process.env.NEXT_PUBLIC_FIREBASE_API_KEY !== "your-firebase-api-key"
+  process.env.NEXT_PUBLIC_FIREBASE_API_KEY !== "your-firebase-api-key" &&
+  process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID &&
+  process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID !== "your-project-id"
 
 // Initialize Firebase only if properly configured
 let app: FirebaseApp | null = null

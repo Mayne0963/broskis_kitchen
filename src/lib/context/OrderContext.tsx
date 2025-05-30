@@ -3,7 +3,15 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { toast } from '@/hooks/use-toast'
 import { Order, OrderStatus, OrderContextType } from '@/types/order'
-import { submitOrderToOTW } from '@/lib/services/otw-integration'
+import { 
+  saveOrder, 
+  getOrderById, 
+  getUserOrders, 
+  updateOrderStatus as updateOrderStatusService, 
+  cancelOrder as cancelOrderService, 
+  trackOrder as trackOrderService 
+} from '@/lib/services/orderService'
+import { useAuth } from './AuthContext'
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined)
 
@@ -24,20 +32,7 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
   const [orders, setOrders] = useState<Order[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  // Generate unique order ID
-  const generateOrderId = (): string => {
-    const timestamp = Date.now().toString(36)
-    const randomStr = Math.random().toString(36).substring(2, 8)
-    return `ORD-${timestamp}-${randomStr}`.toUpperCase()
-  }
-
-  // Calculate delivery fee based on order total and distance
-  const calculateDeliveryFee = (subtotal: number, orderType: 'delivery' | 'pickup'): number => {
-    if (orderType === 'pickup') return 0
-    if (subtotal >= 50) return 0 // Free delivery over $50
-    return 4.99 // Standard delivery fee
-  }
+  const { user } = useAuth()
 
   // Create a new order
   const createOrder = async (orderData: Omit<Order, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
@@ -45,82 +40,39 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
     setError(null)
 
     try {
-      const orderId = generateOrderId()
-      const deliveryFee = calculateDeliveryFee(orderData.subtotal, orderData.orderType)
-      
-      const newOrder: Order = {
+      const orderDataWithUser = {
         ...orderData,
-        id: orderId,
-        deliveryFee,
-        total: orderData.subtotal + orderData.tax + deliveryFee,
-        status: 'pending',
-        createdAt: new Date(),
-        updatedAt: new Date()
+        userId: user?.id || 'guest'
+      }
+      
+      const orderId = await saveOrder(orderDataWithUser)
+      
+      // Get the created order to add to state
+      const createdOrder = await getOrderById(orderId)
+      if (createdOrder) {
+        setOrders(prev => [createdOrder, ...prev])
+        setCurrentOrder(createdOrder)
       }
 
-      // In a real app, this would be an API call
-      // For now, we'll simulate the API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-
-      // Add to orders list
-      setOrders(prev => [newOrder, ...prev])
-      setCurrentOrder(newOrder)
-
-      // Save to localStorage for persistence
-      const savedOrders = JSON.parse(localStorage.getItem('orders') || '[]')
-      savedOrders.unshift(newOrder)
-      localStorage.setItem('orders', JSON.stringify(savedOrders))
-
-      // Submit to OTW if it's a delivery order
-      if (newOrder.orderType === 'delivery') {
-        try {
-          const otwResult = await submitOrderToOTW(newOrder)
-          if (otwResult.success) {
-            console.log('Order successfully submitted to OTW:', otwResult.otw_order_id)
-            // Store OTW order ID for tracking
-            const updatedOrder = { ...newOrder, otwOrderId: otwResult.otw_order_id }
-            setCurrentOrder(updatedOrder)
-            
-            toast({
-              title: "Order placed successfully!",
-              description: `Your order #${orderId} has been confirmed and sent to OTW for delivery.`,
-              duration: 5000,
-            })
-          } else {
-            console.warn('Failed to submit order to OTW:', otwResult.error)
-            toast({
-              title: "Order placed successfully!",
-              description: `Your order #${orderId} has been confirmed. Delivery will be handled internally.`,
-              duration: 5000,
-            })
-          }
-        } catch (error) {
-          console.error('Error submitting to OTW:', error)
-          toast({
-            title: "Order placed successfully!",
-            description: `Your order #${orderId} has been confirmed. Delivery will be handled internally.`,
-            duration: 5000,
-          })
-        }
-      } else {
-        toast({
-          title: "Order placed successfully!",
-          description: `Your order #${orderId} has been confirmed for pickup.`,
-          duration: 5000,
-        })
-      }
-
-      return orderId
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to create order'
-      setError(errorMessage)
       toast({
-        title: "Order failed",
-        description: errorMessage,
-        variant: "destructive",
+        title: 'Order placed successfully!',
+        description: `Your order #${orderId} has been placed and is being processed.`,
         duration: 5000,
       })
-      throw err
+
+      return orderId
+    } catch (error) {
+      console.error('Failed to create order:', error)
+      setError('Failed to create order. Please try again.')
+      
+      toast({
+        title: 'Order failed',
+        description: 'There was an error placing your order. Please try again.',
+        variant: 'destructive',
+        duration: 5000,
+      })
+      
+      throw error
     } finally {
       setIsLoading(false)
     }
@@ -128,102 +80,111 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
 
   // Update order status
   const updateOrderStatus = async (orderId: string, status: OrderStatus): Promise<void> => {
-    setIsLoading(true)
-    setError(null)
-
     try {
-      // In a real app, this would be an API call
-      await new Promise(resolve => setTimeout(resolve, 500))
-
+      await updateOrderStatusService(orderId, status)
+      
+      // Update local state
       setOrders(prev => prev.map(order => 
         order.id === orderId 
           ? { ...order, status, updatedAt: new Date() }
           : order
       ))
-
+      
       if (currentOrder?.id === orderId) {
         setCurrentOrder(prev => prev ? { ...prev, status, updatedAt: new Date() } : null)
       }
-
-      // Update localStorage
-      const savedOrders = JSON.parse(localStorage.getItem('orders') || '[]')
-      const updatedOrders = savedOrders.map((order: Order) => 
-        order.id === orderId 
-          ? { ...order, status, updatedAt: new Date().toISOString() }
-          : order
-      )
-      localStorage.setItem('orders', JSON.stringify(updatedOrders))
-
+      
       toast({
-        title: "Order updated",
-        description: `Order status changed to ${status}`,
+        title: 'Order updated',
+        description: `Order #${orderId} status updated to ${status}`,
         duration: 3000,
       })
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to update order'
-      setError(errorMessage)
-      throw err
-    } finally {
-      setIsLoading(false)
+    } catch (error) {
+      console.error('Failed to update order status:', error)
+      toast({
+        title: 'Update failed',
+        description: 'Failed to update order status',
+        variant: 'destructive',
+        duration: 3000,
+      })
     }
   }
 
-  // Get specific order
+  // Get order by ID
   const getOrder = async (orderId: string): Promise<Order | null> => {
-    setIsLoading(true)
-    setError(null)
-
     try {
-      // In a real app, this would be an API call
-      await new Promise(resolve => setTimeout(resolve, 300))
-
-      const order = orders.find(o => o.id === orderId)
-      if (!order) {
-        // Try to find in localStorage
-        const savedOrders = JSON.parse(localStorage.getItem('orders') || '[]')
-        const savedOrder = savedOrders.find((o: Order) => o.id === orderId)
-        return savedOrder || null
-      }
-      return order
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to get order'
-      setError(errorMessage)
+      return await getOrderById(orderId)
+    } catch (error) {
+      console.error('Failed to get order:', error)
       return null
-    } finally {
-      setIsLoading(false)
     }
   }
 
   // Get user orders
-  const getUserOrders = async (userId?: string): Promise<Order[]> => {
-    setIsLoading(true)
-    setError(null)
-
+  const getUserOrdersData = async (userId?: string): Promise<Order[]> => {
     try {
-      // In a real app, this would be an API call
-      await new Promise(resolve => setTimeout(resolve, 500))
-
-      if (userId) {
-        return orders.filter(order => order.userId === userId)
-      }
-      return orders
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to get orders'
-      setError(errorMessage)
+      const userOrders = await getUserOrders(userId || user?.id)
+      setOrders(userOrders)
+      return userOrders
+    } catch (error) {
+      console.error('Failed to get user orders:', error)
       return []
-    } finally {
-      setIsLoading(false)
     }
   }
 
   // Cancel order
   const cancelOrder = async (orderId: string): Promise<void> => {
-    await updateOrderStatus(orderId, 'cancelled')
+    try {
+      await cancelOrderService(orderId)
+      
+      // Update local state
+      setOrders(prev => prev.map(order => 
+        order.id === orderId 
+          ? { ...order, status: 'cancelled' as OrderStatus, updatedAt: new Date() }
+          : order
+      ))
+      
+      if (currentOrder?.id === orderId) {
+        setCurrentOrder(prev => prev ? { ...prev, status: 'cancelled' as OrderStatus, updatedAt: new Date() } : null)
+      }
+      
+      toast({
+        title: 'Order cancelled',
+        description: `Order #${orderId} has been cancelled`,
+        duration: 3000,
+      })
+    } catch (error) {
+      console.error('Failed to cancel order:', error)
+      toast({
+        title: 'Cancellation failed',
+        description: 'Failed to cancel order',
+        variant: 'destructive',
+        duration: 3000,
+      })
+    }
   }
 
-  // Track order (same as get order for now)
+  // Track order
   const trackOrder = async (orderId: string): Promise<Order | null> => {
-    return await getOrder(orderId)
+    try {
+      const trackedOrder = await trackOrderService(orderId)
+      
+      if (trackedOrder) {
+        // Update local state with latest tracking info
+        setOrders(prev => prev.map(order => 
+          order.id === orderId ? trackedOrder : order
+        ))
+        
+        if (currentOrder?.id === orderId) {
+          setCurrentOrder(trackedOrder)
+        }
+      }
+      
+      return trackedOrder
+    } catch (error) {
+      console.error('Failed to track order:', error)
+      return null
+    }
   }
 
   // Clear current order
@@ -231,24 +192,13 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
     setCurrentOrder(null)
   }
 
-  // Load orders from localStorage on mount
+  // Load user orders on mount and when user changes
   useEffect(() => {
-    try {
-      const savedOrders = localStorage.getItem('orders')
-      if (savedOrders) {
-        const parsedOrders = JSON.parse(savedOrders).map((order: { createdAt: string; updatedAt: string }) => ({
-          ...order,
-          createdAt: new Date(order.createdAt),
-          updatedAt: new Date(order.updatedAt)
-        }))
-        setOrders(parsedOrders)
-      }
-    } catch (err) {
-      console.error('Failed to load orders from localStorage:', err)
+    if (user) {
+      getUserOrdersData(user.id)
     }
-  }, [])
-
-  const value: OrderContextType = {
+  }, [user])
+  const contextValue: OrderContextType = {
     currentOrder,
     orders,
     isLoading,
@@ -256,14 +206,14 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
     createOrder,
     updateOrderStatus,
     getOrder,
-    getUserOrders,
+    getUserOrders: getUserOrdersData,
     cancelOrder,
     trackOrder,
     clearCurrentOrder
   }
 
   return (
-    <OrderContext.Provider value={value}>
+    <OrderContext.Provider value={contextValue}>
       {children}
     </OrderContext.Provider>
   )
