@@ -1,0 +1,509 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Urban Classy Color Palette */
+  --color-deep-black: #111111;
+  --color-deeper-black: #1A1A1A;
+  --color-muted-gold: #C1272D;
+  --color-harvest-gold: #B8860B;
+  --color-subtle-red: #C1272D;
+
+  /* Text Colors */
+  --color-soft-white: #E5E5E5;
+  --color-soft-gray: #CCCCCC;
+  --color-text-primary: var(--color-soft-white);
+  --color-text-secondary: var(--color-soft-gray);
+
+  /* Functional Colors */
+  --color-background: var(--color-deep-black);
+  --color-surface: var(--color-deeper-black);
+  --color-border: var(--color-muted-gold);
+  --color-accent: var(--color-muted-gold);
+  --color-hover: var(--color-harvest-gold);
+
+  /* Legacy variables for compatibility */
+  --foreground-rgb: 229, 229, 229;
+  --background-start-rgb: 17, 17, 17;
+  --background-end-rgb: 26, 26, 26;
+  --primary: var(--color-muted-gold);
+  --secondary: var(--color-harvest-gold);
+  --surface: var(--color-deeper-black);
+  --background: var(--color-deep-black);
+  --text: var(--color-soft-white);
+}
+
+body {
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  font-weight: 500;
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s forwards;
+  opacity: 0;
+}
+
+.animate-delay-100 {
+  animation-delay: 0.1s;
+}
+
+.animate-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animate-delay-300 {
+  animation-delay: 0.3s;
+}
+
+.animate-delay-400 {
+  animation-delay: 0.4s;
+}
+
+@layer components {
+  /* Button Styles - Urban Classy */
+  .btn-primary {
+    @apply bg-[#C1272D];
+    @apply text-black;
+    @apply font-bold;
+    @apply py-3;
+    @apply px-6;
+    @apply rounded-lg;
+    @apply shadow-lg;
+    @apply hover:scale-[1.03];
+    @apply hover:shadow-xl;
+    @apply transition-all;
+    @apply duration-300;
+    @apply border-2;
+    @apply border-[#C1272D];
+  }
+
+  .btn-secondary {
+    @apply bg-[#1A1A1A];
+    @apply text-[#C1272D];
+    @apply font-bold;
+    @apply py-3;
+    @apply px-6;
+    @apply rounded-lg;
+    @apply border-2;
+    @apply border-[#C1272D];
+    @apply hover:scale-[1.03];
+    @apply hover:border-[#B8860B];
+    @apply hover:text-[#B8860B];
+    @apply transition-all;
+    @apply duration-300;
+  }
+
+  .btn-outline {
+    @apply border-2;
+    @apply border-[#C1272D];
+    @apply text-[#C1272D];
+    @apply font-bold;
+    @apply py-3;
+    @apply px-6;
+    @apply rounded-lg;
+    @apply bg-transparent;
+    @apply hover:bg-[#C1272D];
+    @apply hover:bg-opacity-10;
+    @apply hover:scale-[1.03];
+    @apply hover:border-[#B8860B];
+    @apply hover:text-[#B8860B];
+    @apply transition-all;
+    @apply duration-300;
+  }
+
+  /* Card Styles - Urban Classy */
+  .card {
+    @apply bg-[#1A1A1A];
+    @apply rounded-lg;
+    @apply border;
+    @apply border-[#C1272D];
+    @apply p-6;
+    @apply shadow-lg;
+    @apply hover:shadow-xl;
+    @apply transition-all;
+    @apply duration-300;
+  }
+
+  /* Feature Card Styles - Urban Classy */
+  .feature-card {
+    @apply card;
+    @apply flex;
+    @apply flex-col;
+    @apply items-center;
+    @apply text-center;
+    @apply p-8;
+    @apply transition-all;
+    @apply duration-300;
+    @apply bg-[#111111];
+  }
+
+  .feature-card:hover {
+    @apply transform;
+    @apply scale-[1.03];
+    @apply shadow-xl;
+    @apply border-[#B8860B];
+  }
+
+  /* Menu Card Styles - Urban Classy */
+  .menu-card {
+    @apply bg-[#1A1A1A];
+    @apply rounded-lg;
+    @apply overflow-hidden;
+    @apply shadow-lg;
+    @apply border;
+    @apply border-[#C1272D];
+    @apply transition-all;
+    @apply duration-300;
+  }
+
+  .menu-card:hover {
+    @apply transform;
+    @apply scale-[1.03];
+    @apply shadow-xl;
+    @apply border-[#B8860B];
+  }
+
+  /* Form Styles - Urban Classy */
+  .input {
+    @apply bg-[#1A1A1A];
+    @apply border;
+    @apply border-[#C1272D];
+    @apply rounded-lg;
+    @apply px-4;
+    @apply py-3;
+    @apply text-[#E5E5E5];
+    @apply focus:outline-none;
+    @apply focus:ring-2;
+    @apply focus:ring-[#B8860B];
+    @apply focus:border-[#B8860B];
+    @apply transition-all;
+    @apply duration-300;
+  }
+
+  /* Typography - Urban Classy Bold Sans-Serif */
+  .heading-xl {
+    @apply text-4xl;
+    @apply md:text-5xl;
+    @apply lg:text-6xl;
+    @apply font-black;
+    font-family: 'Arial Black', 'Segoe UI Black', sans-serif;
+    @apply text-[#E5E5E5];
+    @apply leading-tight;
+  }
+
+  .heading-lg {
+    @apply text-3xl;
+    @apply md:text-4xl;
+    @apply font-black;
+    font-family: 'Arial Black', 'Segoe UI Black', sans-serif;
+    @apply text-[#E5E5E5];
+    @apply leading-tight;
+  }
+
+  .heading-md {
+    @apply text-2xl;
+    @apply md:text-3xl;
+    @apply font-black;
+    font-family: 'Arial Black', 'Segoe UI Black', sans-serif;
+    @apply text-[#E5E5E5];
+    @apply leading-tight;
+  }
+
+  .heading-sm {
+    @apply text-xl;
+    @apply md:text-2xl;
+    @apply font-black;
+    font-family: 'Arial Black', 'Segoe UI Black', sans-serif;
+    @apply text-[#E5E5E5];
+    @apply leading-tight;
+  }
+
+  /* Color Utility Classes - Urban Classy Palette */
+  .text-gold {
+    @apply text-[#C1272D];
+  }
+
+  .text-gold-foil {
+    @apply text-[#C1272D];
+  }
+
+  .text-harvest-gold {
+    @apply text-[#B8860B];
+  }
+
+  .text-soft-white {
+    @apply text-[#E5E5E5];
+  }
+
+  .text-soft-gray {
+    @apply text-[#CCCCCC];
+  }
+
+  .bg-gold {
+    @apply bg-[#C1272D];
+  }
+
+  .bg-gold-foil {
+    @apply bg-[#C1272D];
+  }
+
+  .bg-harvest-gold {
+    @apply bg-[#B8860B];
+  }
+
+  .bg-deep-black {
+    @apply bg-[#111111];
+  }
+
+  .bg-deeper-black {
+    @apply bg-[#1A1A1A];
+  }
+
+  /* Special Text Effects - Urban Classy */
+  .graffiti-text {
+    @apply font-black;
+    @apply text-transparent;
+    @apply bg-clip-text;
+    @apply bg-gradient-to-r;
+    @apply from-[#C1272D];
+    @apply to-[#B8860B];
+    font-family: 'Arial Black', 'Segoe UI Black', sans-serif;
+  }
+
+  .gritty-shadow {
+    text-shadow: 2px 2px 0px rgba(193, 39, 45, 0.6), 4px 4px 0px rgba(184, 134, 11, 0.4);
+  }
+
+  /* Navigation Styles - Urban Classy */
+  .nav-link {
+    @apply relative;
+    @apply px-4;
+    @apply py-2;
+    @apply text-[#CCCCCC];
+    @apply hover:text-[#C1272D];
+    @apply transition-all;
+    @apply duration-300;
+    @apply font-medium;
+  }
+
+  .nav-link::after {
+    content: "";
+    @apply absolute;
+    @apply bottom-0;
+    @apply left-0;
+    @apply w-0;
+    @apply h-0.5;
+    @apply bg-[#C1272D];
+    @apply transition-all;
+    @apply duration-300;
+  }
+
+  .nav-link:hover::after {
+    @apply w-full;
+    @apply bg-[#B8860B];
+  }
+
+  .nav-link-active {
+    @apply text-[#C1272D];
+    @apply font-bold;
+  }
+
+  .nav-link-active::after {
+    content: "";
+    @apply absolute;
+    @apply bottom-0;
+    @apply left-0;
+    @apply w-full;
+    @apply h-0.5;
+    @apply bg-[#C1272D];
+  }
+
+  /* Mobile Menu Styles */
+  .mobile-menu {
+    @apply max-h-0;
+    @apply overflow-hidden;
+    @apply transition-all;
+    @apply duration-300;
+    @apply ease-in-out;
+  }
+
+  .mobile-menu.open {
+    @apply max-h-[500px];
+  }
+
+  /* Cart Styles */
+  .cart-dropdown {
+    @apply transform-gpu;
+    @apply origin-top-right;
+    @apply transition-all;
+    @apply duration-200;
+    @apply ease-in-out;
+  }
+
+  .cart-item {
+    @apply transition-colors;
+    @apply duration-200;
+  }
+
+  .cart-item:hover {
+    @apply bg-opacity-5;
+    @apply bg-white;
+  }
+
+  /* Button Animation */
+  .btn {
+    @apply relative;
+    @apply overflow-hidden;
+    @apply transition-all;
+    @apply duration-300;
+  }
+
+  .btn::after {
+    content: "";
+    @apply absolute;
+    @apply inset-0;
+    @apply w-full;
+    @apply h-full;
+    @apply bg-gradient-to-r;
+    @apply from-transparent;
+    @apply via-white;
+    @apply to-transparent;
+    @apply opacity-0;
+    @apply transition-opacity;
+    @apply duration-500;
+  }
+
+  .btn:hover::after {
+    @apply opacity-20;
+    animation: shimmer 1.5s infinite;
+  }
+
+  /* Hero Section Styles - Urban Classy with Logo */
+  .hero-section {
+    @apply relative;
+    @apply h-[80vh];
+    @apply flex;
+    @apply items-center;
+    @apply justify-center;
+    @apply overflow-hidden;
+    @apply bg-[#111111];
+  }
+
+  .hero-content {
+    @apply relative;
+    @apply z-20;
+    @apply text-center;
+    @apply px-4;
+  }
+
+  .hero-background {
+    @apply absolute;
+    @apply inset-0;
+    @apply bg-gradient-to-br;
+    @apply from-[#111111];
+    @apply via-[#1A1A1A];
+    @apply to-[#111111];
+    @apply z-0;
+  }
+
+  .hero-logo {
+    @apply absolute;
+    @apply inset-0;
+    @apply flex;
+    @apply items-center;
+    @apply justify-center;
+    @apply z-10;
+    @apply opacity-20;
+  }
+
+  .hero-logo svg {
+    @apply w-96;
+    @apply h-96;
+    @apply max-w-[50vw];
+    @apply max-h-[50vh];
+  }
+}
+
+/* Utility classes - Urban Classy */
+.text-shadow {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.glass-effect {
+  background: rgba(26, 26, 26, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(193, 39, 45, 0.3);
+}
+
+.badge {
+  @apply inline-block;
+  @apply px-3;
+  @apply py-1;
+  @apply text-xs;
+  @apply font-bold;
+  @apply rounded-full;
+  @apply uppercase;
+  @apply tracking-wide;
+}
+
+.badge-new {
+  @apply bg-[#C1272D];
+  @apply text-black;
+}
+
+.badge-popular {
+  @apply bg-[#B8860B];
+  @apply text-black;
+}
+
+/* Shimmer animation */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Pulse animation for hero CTA */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(193, 39, 45, 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(193, 39, 45, 0);
+  }
+}
+
+.btn-pulse {
+  animation: pulse 2s infinite;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
