@@ -9,7 +9,7 @@ function Page() {
       <section className="hero-section">
         <div className="hero-background"></div>
         <div className="hero-logo">
-          <Image src="/images/broskis.png" alt="Broski's Kitchen Logo" width={400} height={300} priority />
+          <Image src="/images/Broski’s Kitchen-Transparent-Gold.png" alt="Broski's Kitchen Logo" width={400} height={300} priority />
         </div>
         <div className="container mx-auto px-4 hero-content">
           <h1 className="heading-xl mb-6 text-soft-white animate-fade-in gritty-shadow">Broski&apos;s Kitchen</h1>
