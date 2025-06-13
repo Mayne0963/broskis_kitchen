@@ -404,11 +404,12 @@ body {
     @apply justify-center;
     @apply overflow-hidden;
     @apply bg-[#111111];
+    @apply pt-20;
   }
 
   .hero-content {
     @apply relative;
-    @apply z-20;
+    @apply z-30;
     @apply text-center;
     @apply px-4;
   }
@@ -416,11 +417,22 @@ body {
   .hero-background {
     @apply absolute;
     @apply inset-0;
-    @apply bg-gradient-to-br;
-    @apply from-[#111111];
-    @apply via-[#1A1A1A];
-    @apply to-[#111111];
     @apply z-0;
+    background-image: url('/images/Broski’s Kitchen-Transparent-Gold.png');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .hero-background::before {
+    content: '';
+    @apply absolute;
+    @apply inset-0;
+    @apply bg-gradient-to-br;
+    @apply from-[#111111]/70;
+    @apply via-[#1A1A1A]/50;
+    @apply to-[#111111]/70;
+    @apply z-10;
   }
 
   .hero-logo {
@@ -429,8 +441,9 @@ body {
     @apply flex;
     @apply items-center;
     @apply justify-center;
-    @apply z-10;
+    @apply z-20;
     @apply opacity-20;
+    @apply mt-16;
   }
 
   .hero-logo svg {
