@@ -7,10 +7,10 @@ function Page() {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="hero-section">
+        <div className="hero-background"></div>
         <div className="absolute inset-0 z-0">
           <Image src="/images/Broski's Kitchen-Transparent-Gold.png" alt="Broski's Kitchen" fill className="object-cover hero-image" priority />
         </div>
-        <div className="hero-background"></div>
         <div className="container mx-auto px-4 hero-content">
           <h1 className="heading-xl mb-6 text-soft-white animate-fade-in gritty-shadow">Broski&apos;s Kitchen</h1>
           <p className="text-xl md:text-2xl text-soft-gray mb-8 animate-fade-in animate-delay-200">
