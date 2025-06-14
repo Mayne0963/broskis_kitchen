@@ -1,4 +1,5 @@
 'use client'
+
 import Image from "next/image"
 import Link from "next/link"
 import { FaUtensils, FaMapMarkerAlt, FaCalendarAlt, FaGift } from "react-icons/fa"
