@@ -557,7 +557,7 @@ body {
     @apply absolute;
     @apply inset-0;
     @apply z-0;
-    background-image: url("/images/Broski's-Kitchen-Transparent-Gold.png");
+    background-image: url("images/Broski’s Kitchen-Transparent-Gold.png");
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;

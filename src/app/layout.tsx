@@ -9,6 +9,9 @@ import { Providers } from "../lib/context/Providers"
 import { OrderProvider } from "../lib/context/OrderContext"
 import MusicPlayer from "../components/layout/MusicPlayer"
 import ChatBot from "../components/chat/ChatBot"
+import ErrorBoundary from "../components/common/ErrorBoundary"
+import ChunkErrorHandler from "../components/common/ChunkErrorHandler"
+import { Toaster } from "react-hot-toast"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -25,15 +28,28 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} bg-black text-white min-h-screen flex flex-col`}>
-        <Providers>
-          <OrderProvider>
-            <Navbar />
-            <main className="flex-grow">{children}</main>
-            <Footer />
-            <MusicPlayer />
-            <ChatBot />
-          </OrderProvider>
-        </Providers>
+        <ErrorBoundary>
+           <ChunkErrorHandler />
+           <Providers>
+             <OrderProvider>
+               <Navbar />
+               <main className="flex-grow">{children}</main>
+               <Footer />
+               <MusicPlayer />
+               <ChatBot />
+               <Toaster
+                 position="top-right"
+                 toastOptions={{
+                   duration: 4000,
+                   style: {
+                     background: '#1f2937',
+                     color: '#fff',
+                   },
+                 }}
+               />
+             </OrderProvider>
+           </Providers>
+         </ErrorBoundary>
       </body>
     </html>
   )
