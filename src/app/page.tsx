@@ -71,24 +71,17 @@ function Page() {
       </section>
 
       {/* Specialty Section */}
-      <section className="py-20 bg-charcoal-black">
+      <section className="py-20 bg-charcoal-black overflow-hidden">
         <div className="container mx-auto px-4">
           <h2 className="heading-lg mb-12 text-center text-soft-white">
             <span className="graffiti-text">Specialty</span>
           </h2>
-          <div className="specialty-carousel-container relative">
-            <button className="carousel-nav carousel-nav-prev" onClick={() => {
-              const container = document.querySelector('.specialty-carousel');
-              container.scrollBy({ left: -320, behavior: 'smooth' });
-            }}>
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <div className="specialty-carousel">
-              <div className="specialty-card carousel-item animate-slide-in-left">
+          <div className="infinite-scroll-container">
+            <div className="infinite-scroll-track">
+              {/* First set of items */}
+              <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/images/boosie-sweet-heat-sauce.jpg" alt="Boosie Sweet Heat Sauce" fill className="object-cover rounded-lg" />
+                  <Image src="/images/1000009121.png" alt="Boosie Sweet Heat Sauce" fill className="object-cover rounded-lg" />
                 </div>
                 <h3 className="specialty-title mb-2">Boosie Sweet Heat Sauce</h3>
                 <p className="text-soft-gray mb-4">Smooth, saucy, and slightly savage. Our signature sweet heat sauce that brings the perfect balance of flavor and fire.</p>
@@ -99,9 +92,9 @@ function Page() {
                   </Link>
                 </div>
               </div>
-              <div className="specialty-card carousel-item animate-slide-in-left animate-delay-100">
+              <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/images/lotus-cheesecake.jpg" alt="Lotus Cheesecake" fill className="object-cover rounded-lg" />
+                  <Image src="/images/1000009265.png" alt="Lotus Cheesecake" fill className="object-cover rounded-lg" />
                 </div>
                 <h3 className="specialty-title mb-2">Lotus Cheesecake</h3>
                 <p className="text-soft-gray mb-4">Decadent golden brown cheesecake infused with Lotus cookie crumbles, crafted with premium ingredients.</p>
@@ -112,9 +105,9 @@ function Page() {
                   </Link>
                 </div>
               </div>
-              <div className="specialty-card carousel-item animate-slide-in-left animate-delay-200">
+              <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/images/chocolate-cupcake.jpg" alt="Chocolate Cupcake" fill className="object-cover rounded-lg" />
+                  <Image src="/images/1000008496.webp" alt="Chocolate Cupcake" fill className="object-cover rounded-lg" />
                 </div>
                 <h3 className="specialty-title mb-2">Chocolate Cupcake</h3>
                 <p className="text-soft-gray mb-4">Rich chocolate cupcake with dark chocolate drizzle, made with premium cocoa and artisanal craftsmanship.</p>
@@ -125,9 +118,9 @@ function Page() {
                   </Link>
                 </div>
               </div>
-              <div className="specialty-card carousel-item animate-slide-in-left animate-delay-300">
+              <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/images/badazz-seasoning.jpg" alt="Broski's Badazz Seasoning" fill className="object-cover rounded-lg" />
+                  <Image src="/images/1000008447.webp" alt="Broski's Badazz Seasoning" fill className="object-cover rounded-lg" />
                 </div>
                 <h3 className="specialty-title mb-2">Broski's Badazz Seasoning</h3>
                 <p className="text-soft-gray mb-4">Our signature blend of premium spices and herbs, the secret behind Broski's legendary flavor profile.</p>
@@ -138,7 +131,7 @@ function Page() {
                   </Link>
                 </div>
               </div>
-              <div className="specialty-card carousel-item animate-slide-in-left animate-delay-400">
+              <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
                   <Image src="/images/truffle-fries.jpg" alt="Truffle Fries" fill className="object-cover rounded-lg" />
                 </div>
@@ -151,7 +144,86 @@ function Page() {
                   </Link>
                 </div>
               </div>
-              <div className="specialty-card carousel-item animate-slide-in-left animate-delay-500">
+              <div className="specialty-card scroll-item">
+                <div className="relative h-48 mb-4">
+                  <Image src="/images/wagyu-sandwich.jpg" alt="Wagyu Sandwich" fill className="object-cover rounded-lg" />
+                </div>
+                <h3 className="specialty-title mb-2">Wagyu Sandwich</h3>
+                <p className="text-soft-gray mb-4">Premium Wagyu beef sandwich with artisanal bread and gourmet toppings, the ultimate luxury dining experience.</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-gold-foil font-bold text-xl">$28</span>
+                  <Link href="/menu" className="specialty-btn">
+                    View Details
+                  </Link>
+                </div>
+              </div>
+              {/* Duplicate set for seamless loop */}
+              <div className="specialty-card scroll-item">
+                <div className="relative h-48 mb-4">
+                  <Image src="/images/boosie-sweet-heat-sauce.jpg" alt="Boosie Sweet Heat Sauce" fill className="object-cover rounded-lg" />
+                </div>
+                <h3 className="specialty-title mb-2">Boosie Sweet Heat Sauce</h3>
+                <p className="text-soft-gray mb-4">Smooth, saucy, and slightly savage. Our signature sweet heat sauce that brings the perfect balance of flavor and fire.</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-gold-foil font-bold text-xl">$12</span>
+                  <Link href="/menu" className="specialty-btn">
+                    View Details
+                  </Link>
+                </div>
+              </div>
+              <div className="specialty-card scroll-item">
+                <div className="relative h-48 mb-4">
+                  <Image src="/images/lotus-cheesecake.jpg" alt="Lotus Cheesecake" fill className="object-cover rounded-lg" />
+                </div>
+                <h3 className="specialty-title mb-2">Lotus Cheesecake</h3>
+                <p className="text-soft-gray mb-4">Decadent golden brown cheesecake infused with Lotus cookie crumbles, crafted with premium ingredients.</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-gold-foil font-bold text-xl">$12</span>
+                  <Link href="/menu" className="specialty-btn">
+                    View Details
+                  </Link>
+                </div>
+              </div>
+              <div className="specialty-card scroll-item">
+                <div className="relative h-48 mb-4">
+                  <Image src="/images/chocolate-cupcake.jpg" alt="Chocolate Cupcake" fill className="object-cover rounded-lg" />
+                </div>
+                <h3 className="specialty-title mb-2">Chocolate Cupcake</h3>
+                <p className="text-soft-gray mb-4">Rich chocolate cupcake with dark chocolate drizzle, made with premium cocoa and artisanal craftsmanship.</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-gold-foil font-bold text-xl">$6</span>
+                  <Link href="/menu" className="specialty-btn">
+                    View Details
+                  </Link>
+                </div>
+              </div>
+              <div className="specialty-card scroll-item">
+                <div className="relative h-48 mb-4">
+                  <Image src="/images/badazz-seasoning.jpg" alt="Broski's Badazz Seasoning" fill className="object-cover rounded-lg" />
+                </div>
+                <h3 className="specialty-title mb-2">Broski's Badazz Seasoning</h3>
+                <p className="text-soft-gray mb-4">Our signature blend of premium spices and herbs, the secret behind Broski's legendary flavor profile.</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-gold-foil font-bold text-xl">$15</span>
+                  <Link href="/menu" className="specialty-btn">
+                    View Details
+                  </Link>
+                </div>
+              </div>
+              <div className="specialty-card scroll-item">
+                <div className="relative h-48 mb-4">
+                  <Image src="/images/truffle-fries.jpg" alt="Truffle Fries" fill className="object-cover rounded-lg" />
+                </div>
+                <h3 className="specialty-title mb-2">Truffle Fries</h3>
+                <p className="text-soft-gray mb-4">Crispy golden fries elevated with premium truffle oil and parmesan, a luxurious twist on a classic favorite.</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-gold-foil font-bold text-xl">$14</span>
+                  <Link href="/menu" className="specialty-btn">
+                    View Details
+                  </Link>
+                </div>
+              </div>
+              <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
                   <Image src="/images/wagyu-sandwich.jpg" alt="Wagyu Sandwich" fill className="object-cover rounded-lg" />
                 </div>
@@ -165,14 +237,6 @@ function Page() {
                 </div>
               </div>
             </div>
-            <button className="carousel-nav carousel-nav-next" onClick={() => {
-              const container = document.querySelector('.specialty-carousel');
-              container.scrollBy({ left: 320, behavior: 'smooth' });
-            }}>
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
           </div>
         </div>
       </section>

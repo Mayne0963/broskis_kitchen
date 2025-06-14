@@ -698,67 +698,37 @@ body {
   }
 }
 
-/* Specialty Section Styles */
-.specialty-carousel-container {
-  @apply relative;
-  @apply overflow-hidden;
+/* Infinite Scroll Wheel Styles */
+.infinite-scroll-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
 }
 
-.specialty-carousel {
-  @apply flex;
-  @apply gap-6;
-  @apply overflow-x-auto;
-  @apply scroll-smooth;
-  @apply pb-4;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  padding: 0 60px;
+.infinite-scroll-track {
+  display: flex;
+  gap: 1.5rem;
+  animation: infiniteScroll 30s linear infinite;
+  width: calc(300px * 12 + 1.5rem * 11); /* 12 items with gaps */
 }
 
-.specialty-carousel::-webkit-scrollbar {
-  display: none;
+.scroll-item {
+  flex: 0 0 300px;
+  min-width: 300px;
 }
 
-.carousel-item {
-  @apply flex-none;
-  width: 300px;
+@keyframes infiniteScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-300px * 6 - 1.5rem * 5)); /* Move by 6 items */
+  }
 }
 
-.carousel-nav {
-  @apply absolute;
-  @apply top-1/2;
-  @apply transform;
-  @apply -translate-y-1/2;
-  @apply z-10;
-  @apply bg-deep-black;
-  @apply border-2;
-  @apply rounded-full;
-  @apply w-12;
-  @apply h-12;
-  @apply flex;
-  @apply items-center;
-  @apply justify-center;
-  @apply transition-all;
-  @apply duration-300;
-  @apply hover:scale-110;
-  border-color: rgba(183, 152, 90, 0.5);
-  color: #B7985A;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-
-.carousel-nav:hover {
-  background: linear-gradient(135deg, #B7985A 0%, #D2BA6A 100%);
-  color: #000000;
-  border-color: #D2BA6A;
-  box-shadow: 0 6px 20px rgba(183, 152, 90, 0.4);
-}
-
-.carousel-nav-prev {
-  @apply left-4;
-}
-
-.carousel-nav-next {
-  @apply right-4;
+/* Pause animation on hover */
+.infinite-scroll-container:hover .infinite-scroll-track {
+  animation-play-state: paused;
 }
 
 .specialty-card {
