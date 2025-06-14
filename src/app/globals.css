@@ -83,24 +83,36 @@ body {
 @layer components {
   /* Button Styles - Regal Gold Gradient */
   .btn-primary {
-    background: linear-gradient(135deg, #B7985A 0%, #D2BA6A 100%);
+    background: linear-gradient(135deg, #D2BA6A 0%, #E6C875 100%);
     @apply text-black;
-    @apply font-semibold;
-    @apply py-3;
-    @apply px-8;
-    border-radius: 6px;
-    @apply shadow-lg;
-    @apply hover:shadow-xl;
+    @apply font-bold;
+    @apply py-4;
+    @apply px-10;
+    border-radius: 8px;
     @apply transition-all;
     @apply duration-300;
-    @apply border-0;
-    box-shadow: 0 4px 15px rgba(183, 152, 90, 0.3);
+    border: 2px solid #B7985A;
+    /* Balanced shadows for clean contrast */
+    box-shadow: 
+      0 4px 15px rgba(183, 152, 90, 0.4),
+      0 2px 6px rgba(0, 0, 0, 0.2),
+      0 0 0 1px rgba(183, 152, 90, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    /* Subtle text shadow for definition */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
   }
 
   .btn-primary:hover {
-    background: linear-gradient(135deg, #A08749 0%, #C1A959 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(183, 152, 90, 0.4);
+    background: linear-gradient(135deg, #E6C875 0%, #F0D285 100%);
+    transform: translateY(-3px);
+    border-color: #D2BA6A;
+    box-shadow: 
+      0 8px 35px rgba(183, 152, 90, 0.7),
+      0 4px 15px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(183, 152, 90, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
 
   .btn-secondary {
@@ -129,24 +141,38 @@ body {
 
   .btn-outline {
     @apply border-2;
-    border-color: #B7985A;
-    color: #B7985A;
-    @apply font-semibold;
-    @apply py-3;
-    @apply px-8;
-    border-radius: 6px;
-    @apply bg-transparent;
+    border-color: #D2BA6A;
+    color: #E6C875;
+    @apply font-bold;
+    @apply py-4;
+    @apply px-10;
+    border-radius: 8px;
     @apply transition-all;
     @apply duration-300;
     position: relative;
     overflow: hidden;
+    /* Semi-transparent background for balanced contrast */
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    box-shadow: 
+      0 3px 12px rgba(0, 0, 0, 0.3),
+      0 1px 4px rgba(0, 0, 0, 0.2),
+      0 0 0 1px rgba(183, 152, 90, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    /* Soft text shadow for clean readability */
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
   }
 
   .btn-outline:hover {
-    background: rgba(183, 152, 90, 0.1);
-    border-color: #D2BA6A;
-    color: #D2BA6A;
-    box-shadow: 0 0 15px rgba(183, 152, 90, 0.2);
+    background: rgba(183, 152, 90, 0.2);
+    border-color: #E6C875;
+    color: #F0D285;
+    box-shadow: 
+      0 6px 30px rgba(183, 152, 90, 0.4),
+      0 3px 12px rgba(0, 0, 0, 0.4),
+      0 0 0 1px rgba(183, 152, 90, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
   }
 
   /* Card Styles - Regal Gold Gradient */
@@ -311,11 +337,27 @@ body {
   }
 
   .text-soft-white {
-    color: #F0EDE8;
+    color: #F8F5F0;
+    /* Soft outer glow for clean text separation */
+    text-shadow: 
+      0 0 8px rgba(0, 0, 0, 0.8),
+      0 2px 4px rgba(0, 0, 0, 0.6),
+      0 0 16px rgba(0, 0, 0, 0.4);
+    /* Thin text stroke for definition */
+    -webkit-text-stroke: 1px rgba(0, 0, 0, 0.7);
+    font-weight: 700;
   }
 
   .text-soft-gray {
-    color: #BFB8A5;
+    color: #D0C7B4;
+    /* Soft outer glow for clean text separation */
+    text-shadow: 
+      0 0 6px rgba(0, 0, 0, 0.7),
+      0 1px 3px rgba(0, 0, 0, 0.5),
+      0 0 12px rgba(0, 0, 0, 0.3);
+    /* Thin text stroke for definition */
+    -webkit-text-stroke: 0.8px rgba(0, 0, 0, 0.6);
+    font-weight: 600;
   }
 
   .text-burgundy {
@@ -358,7 +400,14 @@ body {
   }
 
   .gritty-shadow {
-    text-shadow: 0 2px 8px rgba(183, 152, 90, 0.3), 0 4px 16px rgba(0, 0, 0, 0.4);
+    /* Soft outer glow with subtle gold accent */
+    text-shadow: 
+      0 0 10px rgba(0, 0, 0, 0.8),
+      0 2px 4px rgba(0, 0, 0, 0.6),
+      0 0 20px rgba(0, 0, 0, 0.4),
+      0 0 30px rgba(183, 152, 90, 0.2);
+    /* Thin text stroke for clean definition */
+    -webkit-text-stroke: 1.2px rgba(0, 0, 0, 0.6);
   }
 
   .elegant-glow {
@@ -472,42 +521,57 @@ body {
     animation: shimmer 1.5s infinite;
   }
 
-  /* Hero Section Styles - Regal Gold Gradient with Logo */
+  /* Hero Section Styles - Ultimate Readability Enhancement */
   .hero-section {
     @apply relative;
-    @apply h-[80vh];
+    @apply h-[85vh];
     @apply flex;
     @apply items-center;
     @apply justify-center;
     @apply overflow-hidden;
     background-color: #000000;
-    background: radial-gradient(ellipse at center, rgba(183, 152, 90, 0.05) 0%, rgba(0, 0, 0, 1) 70%);
-    @apply pt-20;
+    background: radial-gradient(ellipse at center, rgba(183, 152, 90, 0.05) 0%, rgba(0, 0, 0, 1) 60%);
+    @apply pt-24;
   }
 
   .hero-content {
     @apply relative;
-    @apply z-30;
+    @apply z-50;
     @apply text-center;
-    @apply px-4;
+    @apply px-8;
+    @apply py-16;
+    @apply max-w-4xl;
+    @apply mx-auto;
+    /* Semi-transparent blur overlay for text readability while preserving logo visibility */
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 20px;
+    backdrop-filter: blur(8px) saturate(1.2);
+    border: 1px solid rgba(183, 152, 90, 0.15);
+    box-shadow: 
+      0 4px 20px rgba(0, 0, 0, 0.3),
+      0 0 0 1px rgba(183, 152, 90, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
 
   .hero-background {
     @apply absolute;
     @apply inset-0;
     @apply z-0;
-    background-image: url("/images/Broski's Kitchen-Transparent-Gold.png");
+    background-image: url("/images/Broski's-Kitchen-Transparent-Gold.png");
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.15;
+    opacity: 0.3;
+    /* Enhanced logo visibility with subtle glow */
+    filter: drop-shadow(0 0 30px rgba(183, 152, 90, 0.4)) brightness(1.1);
   }
 
   .hero-background::before {
     content: '';
     @apply absolute;
     @apply inset-0;
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(10, 10, 10, 0.6) 50%, rgba(0, 0, 0, 0.8) 100%);
+    /* Subtle vignette for gentle focus while preserving logo visibility */
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.3) 60%, rgba(0, 0, 0, 0.6) 100%);
     @apply z-10;
   }
 
@@ -528,6 +592,62 @@ body {
     @apply h-96;
     @apply max-w-[50vw];
     @apply max-h-[50vh];
+  }
+
+  /* Enhanced hero image styling */
+  .hero-image {
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 0 40px rgba(183, 152, 90, 0.5)) brightness(1.15) contrast(1.1);
+  }
+
+  /* New Hero Section Styles - Image Above, Content Below */
+  .hero-section-new {
+    @apply relative;
+    @apply w-full;
+    background-color: #000000;
+    background: radial-gradient(ellipse at center, rgba(183, 152, 90, 0.05) 0%, rgba(0, 0, 0, 1) 60%);
+    margin-top: 80px;
+  }
+
+  .hero-image-container {
+    @apply relative;
+    @apply w-full;
+    height: 60vh;
+    @apply min-h-[400px];
+    @apply max-h-[600px];
+    @apply flex;
+    @apply items-center;
+    @apply justify-center;
+    @apply overflow-hidden;
+    @apply pt-24;
+    background: radial-gradient(ellipse at center, rgba(183, 152, 90, 0.08) 0%, rgba(0, 0, 0, 0.95) 70%);
+  }
+
+  .hero-content-below {
+    @apply relative;
+    @apply w-full;
+    @apply py-16;
+    @apply text-center;
+    background-color: #000000;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 1) 100%);
+  }
+
+  .hero-content-below .container {
+    @apply max-w-4xl;
+  }
+
+  /* Button pulse animation for hero CTA */
+  .btn-pulse {
+    animation: pulse-glow 2s infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 4px 20px rgba(183, 152, 90, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    50% {
+      box-shadow: 0 4px 25px rgba(183, 152, 90, 0.6), 0 2px 12px rgba(0, 0, 0, 0.4), 0 0 30px rgba(183, 152, 90, 0.3);
+    }
   }
 }
 
@@ -612,7 +732,7 @@ body {
 
 /* Responsive improvements */
 @media (max-width: 768px) {
-  .container {
+  . {
     padding-left: 1rem;
     padding-right: 1rem;
   }

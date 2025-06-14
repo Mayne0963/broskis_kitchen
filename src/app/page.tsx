@@ -6,23 +6,26 @@ function Page() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-background"></div>
-        <div className="absolute inset-0 z-0">
-          <Image src="/images/Broski's Kitchen-Transparent-Gold.png" alt="Broski's Kitchen" fill className="object-cover hero-image" priority />
+      <section className="hero-section-new">
+        {/* Hero Image Container */}
+        <div className="hero-image-container">
+          <Image src="/images/Broski’s Kitchen-Transparent-Gold.png" alt="Broski's Kitchen" fill className="object-contain hero-image" priority />
         </div>
-        <div className="container mx-auto px-4 hero-content">
-          <h1 className="heading-xl mb-6 text-soft-white animate-fade-in gritty-shadow">Broski&apos;s Kitchen</h1>
-          <p className="text-xl md:text-2xl text-soft-gray mb-8 animate-fade-in animate-delay-200">
-            Luxury Street Gourmet – Where Flavor Meets Culture
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in animate-delay-400">
-            <Link href="/menu" className="btn-primary btn-pulse">
-              View Menu
-            </Link>
-            <Link href="/locations" className="btn-outline">
-              Find Location
-            </Link>
+        
+        {/* Hero Content Below Image */}
+        <div className="hero-content-below">
+          <div className="container mx-auto px-4">
+            <p className="text-xl md:text-2xl lg:text-3xl text-soft-gray mb-10 animate-fade-in animate-delay-200 max-w-3xl mx-auto" style={{lineHeight: '1.4'}}>
+              Luxury Street Gourmet – Where Flavor Meets Culture
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-6 animate-fade-in animate-delay-400">
+              <Link href="/menu" className="btn-primary btn-pulse text-lg">
+                View Menu
+              </Link>
+              <Link href="/locations" className="btn-outline text-lg">
+                Find Location
+              </Link>
+            </div>
           </div>
         </div>
       </section>
