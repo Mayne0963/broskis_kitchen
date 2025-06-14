@@ -1,3 +1,4 @@
+'use client'
 import Image from "next/image"
 import Link from "next/link"
 import { FaUtensils, FaMapMarkerAlt, FaCalendarAlt, FaGift } from "react-icons/fa"
@@ -69,52 +70,109 @@ function Page() {
         </div>
       </section>
 
-      {/* Featured Menu Section */}
+      {/* Specialty Section */}
       <section className="py-20 bg-charcoal-black">
         <div className="container mx-auto px-4">
           <h2 className="heading-lg mb-12 text-center text-soft-white">
-            Featured <span className="graffiti-text">Menu</span>
+            <span className="graffiti-text">Specialty</span>
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="menu-card animate-fade-in">
-              <div className="relative h-48 mb-4">
-                <Image src="/images/signature-burger.jpg" alt="Signature Burger" fill className="object-cover rounded-lg" />
+          <div className="specialty-carousel-container relative">
+            <button className="carousel-nav carousel-nav-prev" onClick={() => {
+              const container = document.querySelector('.specialty-carousel');
+              container.scrollBy({ left: -320, behavior: 'smooth' });
+            }}>
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <div className="specialty-carousel">
+              <div className="specialty-card carousel-item animate-slide-in-left">
+                <div className="relative h-48 mb-4">
+                  <Image src="/images/boosie-sweet-heat-sauce.jpg" alt="Boosie Sweet Heat Sauce" fill className="object-cover rounded-lg" />
+                </div>
+                <h3 className="specialty-title mb-2">Boosie Sweet Heat Sauce</h3>
+                <p className="text-soft-gray mb-4">Smooth, saucy, and slightly savage. Our signature sweet heat sauce that brings the perfect balance of flavor and fire.</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-gold-foil font-bold text-xl">$12</span>
+                  <Link href="/menu" className="specialty-btn">
+                    View Details
+                  </Link>
+                </div>
               </div>
-              <h3 className="heading-sm mb-2 text-soft-white">Signature Broski Burger</h3>
-              <p className="text-soft-gray mb-4">Our premium beef patty with special sauce, aged cheddar, and crispy onions.</p>
-              <div className="flex justify-between items-center">
-                <span className="text-gold-foil font-bold text-xl">$18</span>
-                <Link href="/menu" className="btn-outline text-sm">
-                  View Details
-                </Link>
+              <div className="specialty-card carousel-item animate-slide-in-left animate-delay-100">
+                <div className="relative h-48 mb-4">
+                  <Image src="/images/lotus-cheesecake.jpg" alt="Lotus Cheesecake" fill className="object-cover rounded-lg" />
+                </div>
+                <h3 className="specialty-title mb-2">Lotus Cheesecake</h3>
+                <p className="text-soft-gray mb-4">Decadent golden brown cheesecake infused with Lotus cookie crumbles, crafted with premium ingredients.</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-gold-foil font-bold text-xl">$12</span>
+                  <Link href="/menu" className="specialty-btn">
+                    View Details
+                  </Link>
+                </div>
+              </div>
+              <div className="specialty-card carousel-item animate-slide-in-left animate-delay-200">
+                <div className="relative h-48 mb-4">
+                  <Image src="/images/chocolate-cupcake.jpg" alt="Chocolate Cupcake" fill className="object-cover rounded-lg" />
+                </div>
+                <h3 className="specialty-title mb-2">Chocolate Cupcake</h3>
+                <p className="text-soft-gray mb-4">Rich chocolate cupcake with dark chocolate drizzle, made with premium cocoa and artisanal craftsmanship.</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-gold-foil font-bold text-xl">$6</span>
+                  <Link href="/menu" className="specialty-btn">
+                    View Details
+                  </Link>
+                </div>
+              </div>
+              <div className="specialty-card carousel-item animate-slide-in-left animate-delay-300">
+                <div className="relative h-48 mb-4">
+                  <Image src="/images/badazz-seasoning.jpg" alt="Broski's Badazz Seasoning" fill className="object-cover rounded-lg" />
+                </div>
+                <h3 className="specialty-title mb-2">Broski's Badazz Seasoning</h3>
+                <p className="text-soft-gray mb-4">Our signature blend of premium spices and herbs, the secret behind Broski's legendary flavor profile.</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-gold-foil font-bold text-xl">$15</span>
+                  <Link href="/menu" className="specialty-btn">
+                    View Details
+                  </Link>
+                </div>
+              </div>
+              <div className="specialty-card carousel-item animate-slide-in-left animate-delay-400">
+                <div className="relative h-48 mb-4">
+                  <Image src="/images/truffle-fries.jpg" alt="Truffle Fries" fill className="object-cover rounded-lg" />
+                </div>
+                <h3 className="specialty-title mb-2">Truffle Fries</h3>
+                <p className="text-soft-gray mb-4">Crispy golden fries elevated with premium truffle oil and parmesan, a luxurious twist on a classic favorite.</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-gold-foil font-bold text-xl">$14</span>
+                  <Link href="/menu" className="specialty-btn">
+                    View Details
+                  </Link>
+                </div>
+              </div>
+              <div className="specialty-card carousel-item animate-slide-in-left animate-delay-500">
+                <div className="relative h-48 mb-4">
+                  <Image src="/images/wagyu-sandwich.jpg" alt="Wagyu Sandwich" fill className="object-cover rounded-lg" />
+                </div>
+                <h3 className="specialty-title mb-2">Wagyu Sandwich</h3>
+                <p className="text-soft-gray mb-4">Premium Wagyu beef sandwich with artisanal bread and gourmet toppings, the ultimate luxury dining experience.</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-gold-foil font-bold text-xl">$28</span>
+                  <Link href="/menu" className="specialty-btn">
+                    View Details
+                  </Link>
+                </div>
               </div>
             </div>
-            <div className="menu-card animate-fade-in animate-delay-100">
-              <div className="relative h-48 mb-4">
-                <Image src="/images/truffle-fries.jpg" alt="Truffle Fries" fill className="object-cover rounded-lg" />
-              </div>
-              <h3 className="heading-sm mb-2 text-soft-white">Truffle Parmesan Fries</h3>
-              <p className="text-soft-gray mb-4">Hand-cut fries with truffle oil, parmesan, and fresh herbs.</p>
-              <div className="flex justify-between items-center">
-                <span className="text-gold-foil font-bold text-xl">$12</span>
-                <Link href="/menu" className="btn-outline text-sm">
-                  View Details
-                </Link>
-              </div>
-            </div>
-            <div className="menu-card animate-fade-in animate-delay-200">
-              <div className="relative h-48 mb-4">
-                <Image src="/images/craft-cocktail.jpg" alt="Craft Cocktail" fill className="object-cover rounded-lg" />
-              </div>
-              <h3 className="heading-sm mb-2 text-soft-white">Craft Cocktails</h3>
-              <p className="text-soft-gray mb-4">Artisanal cocktails with premium spirits and house-made mixers.</p>
-              <div className="flex justify-between items-center">
-                <span className="text-gold-foil font-bold text-xl">$14</span>
-                <Link href="/menu" className="btn-outline text-sm">
-                  View Details
-                </Link>
-              </div>
-            </div>
+            <button className="carousel-nav carousel-nav-next" onClick={() => {
+              const container = document.querySelector('.specialty-carousel');
+              container.scrollBy({ left: 320, behavior: 'smooth' });
+            }}>
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
           </div>
         </div>
       </section>

@@ -698,6 +698,154 @@ body {
   }
 }
 
+/* Specialty Section Styles */
+.specialty-carousel-container {
+  @apply relative;
+  @apply overflow-hidden;
+}
+
+.specialty-carousel {
+  @apply flex;
+  @apply gap-6;
+  @apply overflow-x-auto;
+  @apply scroll-smooth;
+  @apply pb-4;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 0 60px;
+}
+
+.specialty-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-item {
+  @apply flex-none;
+  width: 300px;
+}
+
+.carousel-nav {
+  @apply absolute;
+  @apply top-1/2;
+  @apply transform;
+  @apply -translate-y-1/2;
+  @apply z-10;
+  @apply bg-deep-black;
+  @apply border-2;
+  @apply rounded-full;
+  @apply w-12;
+  @apply h-12;
+  @apply flex;
+  @apply items-center;
+  @apply justify-center;
+  @apply transition-all;
+  @apply duration-300;
+  @apply hover:scale-110;
+  border-color: rgba(183, 152, 90, 0.5);
+  color: #B7985A;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.carousel-nav:hover {
+  background: linear-gradient(135deg, #B7985A 0%, #D2BA6A 100%);
+  color: #000000;
+  border-color: #D2BA6A;
+  box-shadow: 0 6px 20px rgba(183, 152, 90, 0.4);
+}
+
+.carousel-nav-prev {
+  @apply left-4;
+}
+
+.carousel-nav-next {
+  @apply right-4;
+}
+
+.specialty-card {
+  @apply bg-deep-black;
+  @apply p-6;
+  @apply rounded-lg;
+  @apply transition-all;
+  @apply duration-300;
+  @apply hover:transform;
+  @apply hover:scale-105;
+  border: 2px solid rgba(183, 152, 90, 0.3);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(183, 152, 90, 0.1);
+  background: linear-gradient(145deg, rgba(0, 0, 0, 0.95) 0%, rgba(20, 20, 20, 0.98) 100%);
+}
+
+.specialty-card:hover {
+  border-color: rgba(183, 152, 90, 0.6);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5), 0 6px 20px rgba(183, 152, 90, 0.2);
+}
+
+/* Slide-in animation from left */
+@keyframes slideInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.8s ease-out forwards;
+}
+
+.specialty-title {
+  @apply text-xl;
+  @apply font-bold;
+  @apply mb-2;
+  background: linear-gradient(135deg, #D2BA6A 0%, #B7985A 30%, #F4E4A6 60%, #B7985A 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gold-foil-shimmer 3s ease-in-out infinite;
+  text-shadow: 0 2px 4px rgba(183, 152, 90, 0.3);
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+@keyframes gold-foil-shimmer {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.specialty-btn {
+  @apply inline-block;
+  @apply px-4;
+  @apply py-2;
+  @apply text-sm;
+  @apply font-semibold;
+  @apply rounded-lg;
+  @apply transition-all;
+  @apply duration-300;
+  @apply text-center;
+  background: transparent;
+  color: #B7985A;
+  border: 2px solid #B7985A;
+  text-decoration: none;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.specialty-btn:hover {
+  background: linear-gradient(135deg, #B7985A 0%, #D2BA6A 100%);
+  color: #000000;
+  border-color: #D2BA6A;
+  box-shadow: 0 4px 15px rgba(183, 152, 90, 0.4);
+  transform: translateY(-2px);
+}
+
 /* Pulse animation for hero CTA - Regal Gold Gradient */
 @keyframes pulse {
   0%, 100% {
