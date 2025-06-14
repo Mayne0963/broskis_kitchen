@@ -1,8 +1,9 @@
-'use client'
+"use client";
 
-import Image from "next/image"
-import Link from "next/link"
-import { FaUtensils, FaMapMarkerAlt, FaCalendarAlt, FaGift } from "react-icons/fa"
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { FaUtensils, FaMapMarkerAlt, FaCalendarAlt, FaGift } from "react-icons/fa";
 
 function Page() {
   return (
@@ -11,7 +12,7 @@ function Page() {
       <section className="hero-section-new">
         {/* Hero Image Container */}
         <div className="hero-image-container">
-          <Image src="/images/Broski’s Kitchen-Transparent-Gold.png" alt="Broski's Kitchen" fill className="object-contain hero-image" priority />
+          <Image src="/images/Broski's Kitchen-Transparent-Gold.png" alt="Broski's Kitchen" fill className="object-contain hero-image" priority />
         </div>
         
         {/* Hero Content Below Image */}
@@ -131,6 +132,7 @@ function Page() {
                     View Details
                   </Link>
                 </div>
+              </div>
               {/* Duplicate set for seamless loop */}
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
@@ -209,7 +211,7 @@ function Page() {
         </div>
       </section>
     </div>
-  )
+  );
 }
 
-export default Page
+export default Page;
