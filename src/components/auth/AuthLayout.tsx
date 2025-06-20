@@ -9,7 +9,7 @@ interface AuthLayoutProps {
   subtitle: string
 }
 
-const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitle }) => {
+export default function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Left Side - Branding */}
@@ -49,5 +49,3 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitle }) =>
     </div>
   )
 }
-
-export default AuthLayout

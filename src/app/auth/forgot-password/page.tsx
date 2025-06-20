@@ -12,7 +12,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react'
 import { useAuth } from '@/lib/context/AuthContext'
-import { AuthLayout } from '@/components/auth/AuthLayout'
+import AuthLayout from '@/components/auth/AuthLayout'
 
 const forgotPasswordSchema = z.object({
   email: z.string().email('Please enter a valid email address')
@@ -50,18 +50,12 @@ export default function ForgotPasswordPage() {
 
   if (isSuccess) {
     return (
-      <AuthLayout>
+      <AuthLayout title="Check Your Email" subtitle="If that email exists, we've sent reset instructions to your inbox.">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
               <CheckCircle className="w-6 h-6 text-green-600" />
             </div>
-            <CardTitle className="text-2xl font-bold text-[var(--color-rich-black)]">
-              Check Your Email
-            </CardTitle>
-            <CardDescription className="text-gray-600">
-              If that email exists, we've sent reset instructions to your inbox.
-            </CardDescription>
           </CardHeader>
           
           <CardContent className="space-y-4">
@@ -93,15 +87,9 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <AuthLayout>
+    <AuthLayout title="Forgot Password?" subtitle="Enter your email address and we'll send you a link to reset your password.">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-[var(--color-rich-black)]">
-            Forgot Password?
-          </CardTitle>
-          <CardDescription className="text-gray-600">
-            Enter your email address and we'll send you a link to reset your password.
-          </CardDescription>
         </CardHeader>
         
         <CardContent>

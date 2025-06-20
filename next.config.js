@@ -9,13 +9,9 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Disable static export for pages that require runtime
+  // Use standalone output for better API route support
   trailingSlash: false,
-  output: 'export',
-  distDir: 'out',
-  experimental: {
-    missingSuspenseWithCSRBailout: false,
-  },
+  output: 'standalone',
   // Webpack configuration to help prevent chunk loading errors
   webpack: (config, { dev, isServer }) => {
     // Optimize chunk splitting for better loading reliability

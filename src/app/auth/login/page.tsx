@@ -13,7 +13,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Eye, EyeOff, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/lib/context/AuthContext'
-import { AuthLayout } from '@/components/auth/AuthLayout'
+import AuthLayout from '@/components/auth/AuthLayout'
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton'
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -55,16 +56,8 @@ export default function LoginPage() {
   }
 
   return (
-    <AuthLayout>
+    <AuthLayout title="Welcome Back" subtitle="Sign in to your Broski's Kitchen account">
       <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-[var(--color-rich-black)]">
-            Welcome Back
-          </CardTitle>
-          <CardDescription className="text-gray-600">
-            Sign in to your Broski's Kitchen account
-          </CardDescription>
-        </CardHeader>
         
         <CardContent>
           <Form {...form}>
@@ -152,6 +145,21 @@ export default function LoginPage() {
               </Button>
             </form>
           </Form>
+
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+              </div>
+            </div>
+            
+            <div className="mt-6">
+              <GoogleSignInButton text="Sign in with Google" />
+            </div>
+          </div>
 
           <div className="mt-6 text-center text-sm text-gray-600">
             Don't have an account?{' '}

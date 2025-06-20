@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app"
-import { getAuth, onAuthStateChanged, Auth, User } from "firebase/auth"
+import { getAuth, onAuthStateChanged, Auth, User, GoogleAuthProvider } from "firebase/auth"
 import { getFirestore, doc, setDoc, getDoc, Timestamp, Firestore } from "firebase/firestore"
 import { getStorage, FirebaseStorage } from "firebase/storage"
 
@@ -72,7 +72,7 @@ export const getLocalUser = () => {
 export const onAuthStateChange = (callback: (user: User | null) => void) => {
   if (!auth) {
     // If Firebase is not configured, use local fallback
-    callback(getLocalUser() as User | null)
+    callback(getLocalUser() as unknown as User | null)
     return () => {} // Return empty unsubscribe function
   }
   
@@ -82,7 +82,7 @@ export const onAuthStateChange = (callback: (user: User | null) => void) => {
       callback(user)
     } else {
       // If no user, use local fallback
-      callback(getLocalUser() as User | null)
+      callback(getLocalUser() as unknown as User | null)
     }
   })
 
@@ -126,8 +126,11 @@ export const getUserDocument = async (uid: string) => {
   if (!db) return null
   
   try {
-    const userRef = doc(db, 'users', uid)
-    const userSnap = await getDoc(userRef)
+    if (!db) {
+       throw new Error('Firestore is not configured')
+     }
+     const userRef = doc(db, 'users', uid)
+     const userSnap = await getDoc(userRef)
     
     if (userSnap.exists()) {
       return userSnap.data()
@@ -148,6 +151,9 @@ export const storeVerificationStatus = async (userId: string, isVerified: boolea
       const expiryDate = new Date()
       expiryDate.setDate(expiryDate.getDate() + expiryDays)
 
+      if (!db) {
+        throw new Error('Firestore is not configured')
+      }
       await setDoc(doc(db, "verifications", userId), {
         verified: isVerified,
         timestamp: Timestamp.now(),
@@ -186,6 +192,9 @@ export const getVerificationStatus = async (userId: string) => {
   try {
     // Only attempt to get from Firestore if it's not a local fallback user
     if (!userId.startsWith("local-")) {
+      if (!db) {
+        throw new Error('Firestore is not configured')
+      }
       const docRef = doc(db, "verifications", userId)
       const docSnap = await getDoc(docRef)
 
@@ -247,4 +256,13 @@ export const getVerificationStatus = async (userId: string) => {
   }
 }
 
-export { app, auth, db, storage, isFirebaseConfigured }
+// Configure Google Auth Provider
+let googleProvider: GoogleAuthProvider | null = null
+if (isFirebaseConfigured && auth) {
+  googleProvider = new GoogleAuthProvider()
+  googleProvider.setCustomParameters({
+    prompt: 'select_account'
+  })
+}
+
+export { app, auth, db, storage, isFirebaseConfigured, googleProvider }

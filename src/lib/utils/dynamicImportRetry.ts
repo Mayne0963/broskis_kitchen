@@ -21,7 +21,7 @@ export async function dynamicImportWithRetry<T>(
 ): Promise<T> {
   const { maxRetries = 3, delay = 1000, backoff = true } = options;
   
-  let lastError: Error;
+  let lastError: Error = new Error('Unknown error');
   
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
@@ -50,19 +50,16 @@ export async function dynamicImportWithRetry<T>(
 }
 
 /**
- * Creates a retry wrapper for a specific dynamic import
- * @param importPath - The module path to import
+ * Creates a retry wrapper for a specific dynamic import using Next.js dynamic()
+ * @param importFn - Static import function
  * @param options - Retry configuration options
  * @returns Function that returns the import promise with retry logic
  */
 export function createRetryImport<T>(
-  importPath: string,
+  importFn: () => Promise<T>,
   options: RetryOptions = {}
 ) {
-  return () => dynamicImportWithRetry<T>(
-    () => import(importPath) as Promise<T>,
-    options
-  );
+  return () => dynamicImportWithRetry<T>(importFn, options);
 }
 
 /**

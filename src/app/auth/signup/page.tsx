@@ -13,8 +13,10 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react'
 import { useAuth } from '@/lib/context/AuthContext'
-import { PasswordStrengthMeter } from '@/components/auth/PasswordStrengthMeter'
-import { AuthLayout } from '@/components/auth/AuthLayout'
+import PasswordStrengthMeter from '@/components/auth/PasswordStrengthMeter'
+import AuthLayout from '@/components/auth/AuthLayout'
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton'
+import { checkPasswordStrength } from '@/lib/utils/validation'
 
 const signupSchema = z.object({
   displayName: z.string().min(2, 'Name must be at least 2 characters').optional(),
@@ -73,18 +75,12 @@ export default function SignUpPage() {
 
   if (success) {
     return (
-      <AuthLayout>
+      <AuthLayout title="Account Created!" subtitle="Please check your email to verify your account">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
-            <CardTitle className="text-2xl font-bold text-[var(--color-rich-black)]">
-              Account Created!
-            </CardTitle>
-            <CardDescription className="text-gray-600">
-              Please check your email to verify your account
-            </CardDescription>
           </CardHeader>
           
           <CardContent className="text-center space-y-4">
@@ -119,16 +115,8 @@ export default function SignUpPage() {
   }
 
   return (
-    <AuthLayout>
+    <AuthLayout title="Create Account" subtitle="Join Broski's Kitchen today">
       <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-[var(--color-rich-black)]">
-            Create Account
-          </CardTitle>
-          <CardDescription className="text-gray-600">
-            Join Broski's Kitchen today
-          </CardDescription>
-        </CardHeader>
         
         <CardContent>
           <Form {...form}>
@@ -202,7 +190,7 @@ export default function SignUpPage() {
                         </button>
                       </div>
                     </FormControl>
-                    {field.value && <PasswordStrengthMeter password={field.value} />}
+                    {field.value && <PasswordStrengthMeter strength={checkPasswordStrength(field.value)} />}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -254,6 +242,21 @@ export default function SignUpPage() {
               </Button>
             </form>
           </Form>
+
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+              </div>
+            </div>
+            
+            <div className="mt-6">
+              <GoogleSignInButton text="Sign up with Google" />
+            </div>
+          </div>
 
           <div className="mt-6 text-center text-sm text-gray-600">
             Already have an account?{' '}

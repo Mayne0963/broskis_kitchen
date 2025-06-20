@@ -7,7 +7,7 @@ import { ArrowLeft, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import AuthLayout from '../../../components/auth/AuthLayout'
+import AuthLayout from '@/components/auth/AuthLayout'
 import { validateEmail } from '../../../lib/utils/validation'
 import { useAuth } from '@/lib/context/AuthContext'
 import { toast } from '@/hooks/use-toast'
@@ -59,16 +59,12 @@ export default function ResetPasswordPage() {
 
   if (emailSent) {
     return (
-      <AuthLayout>
+      <AuthLayout title="Check Your Email" subtitle={`We've sent a password reset link to ${email}`}>
         <div className="w-full max-w-md mx-auto">
           <div className="text-center mb-8">
             <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
               <Mail className="w-8 h-8 text-green-600" />
             </div>
-            <h1 className="text-2xl font-bold text-white mb-2">Check Your Email</h1>
-            <p className="text-gray-300">
-              We've sent a password reset link to <strong>{email}</strong>
-            </p>
           </div>
 
           <div className="space-y-4">
@@ -97,13 +93,9 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <AuthLayout>
+    <AuthLayout title="Reset Password" subtitle="Enter your email address and we'll send you a link to reset your password.">
       <div className="w-full max-w-md mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-white mb-2">Reset Password</h1>
-          <p className="text-gray-300">
-            Enter your email address and we'll send you a link to reset your password.
-          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">

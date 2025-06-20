@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
-import { auth, db } from "../services/firebase"
+import { auth, db, googleProvider } from "../services/firebase"
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -11,6 +11,7 @@ import {
   onAuthStateChanged,
   updateProfile,
   getIdToken,
+  signInWithPopup,
 } from "firebase/auth"
 import { doc, setDoc, getDoc, updateDoc, Timestamp } from "firebase/firestore"
 import { toast } from "@/hooks/use-toast"
@@ -46,17 +47,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (authUser) {
         try {
           // Get user data from Firestore
-          const userDoc = await getDoc(doc(db, 'users', authUser.uid))
-          const userData = userDoc.data()
-          
-          const appUser: User = {
-            id: authUser.uid,
-            name: userData?.name || authUser.displayName || "User",
-            email: authUser.email || "",
-            emailVerified: authUser.emailVerified,
-            role: userData?.role || 'customer',
+          if (db) {
+            const userDoc = await getDoc(doc(db, 'users', authUser.uid))
+            const userData = userDoc.data()
+            
+            const appUser: User = {
+              id: authUser.uid,
+              name: userData?.name || authUser.displayName || "User",
+              email: authUser.email || "",
+              emailVerified: authUser.emailVerified,
+              role: userData?.role || 'user',
+            }
+            setUser(appUser)
+          } else {
+            // Fallback when Firestore is not available
+            const appUser: User = {
+              id: authUser.uid,
+              name: authUser.displayName || "User",
+              email: authUser.email || "",
+              emailVerified: authUser.emailVerified,
+              role: 'user',
+            }
+            setUser(appUser)
           }
-          setUser(appUser)
         } catch (error) {
           console.error('Error fetching user data:', error)
           // Fallback to Firebase user data
@@ -65,7 +78,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             name: authUser.displayName || "User",
             email: authUser.email || "",
             emailVerified: authUser.emailVerified,
-            role: 'customer',
+            role: 'user',
           }
           setUser(appUser)
         }
@@ -151,7 +164,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           errorMessage = "Network error. Please check your connection and try again."
           break
         default:
-          errorMessage = error.message || "Invalid email or password"
+          errorMessage = (error as Error).message || "Invalid email or password"
       }
       
       toast({
@@ -223,11 +236,92 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           errorMessage = "Network error. Please check your connection and try again."
           break
         default:
-          errorMessage = error.message || "Failed to create account"
+          errorMessage = (error as Error).message || "Failed to create account"
       }
       
       toast({
         title: "Signup Failed",
+        description: errorMessage,
+        variant: "destructive",
+      })
+      return false
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const signInWithGoogle = async (): Promise<boolean> => {
+    if (!auth || !db || !googleProvider) {
+      toast({
+        title: "Authentication Error",
+        description: "Google sign-in not available - Firebase not configured",
+        variant: "destructive",
+      })
+      return false
+    }
+    try {
+      setIsLoading(true)
+      const result = await signInWithPopup(auth, googleProvider)
+      const user = result.user
+
+      // Check if user document exists in Firestore
+      const userDoc = await getDoc(doc(db, 'users', user.uid))
+      
+      if (!userDoc.exists()) {
+        // Create user document for new Google users
+        await setDoc(doc(db, 'users', user.uid), {
+          name: user.displayName || 'Google User',
+          email: user.email || '',
+          role: 'customer',
+          createdAt: Timestamp.now(),
+          updatedAt: Timestamp.now(),
+        })
+      }
+
+      // Create session cookie
+      const idToken = await getIdToken(user)
+      const response = await fetch('/api/auth/session-login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ idToken }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create session')
+      }
+      
+      toast({
+        title: "Welcome to Broski's Kitchen!",
+        description: "You've successfully signed in with Google.",
+      })
+      return true
+    } catch (error: unknown) {
+      console.error("Google sign-in error:", error)
+      let errorMessage = "Failed to sign in with Google"
+      
+      // Handle specific Firebase error codes
+      const firebaseError = error as { code?: string }
+      switch (firebaseError.code) {
+        case 'auth/popup-closed-by-user':
+          errorMessage = "Sign-in was cancelled. Please try again."
+          break
+        case 'auth/popup-blocked':
+          errorMessage = "Pop-up was blocked by your browser. Please allow pop-ups and try again."
+          break
+        case 'auth/network-request-failed':
+          errorMessage = "Network error. Please check your connection and try again."
+          break
+        case 'auth/too-many-requests':
+          errorMessage = "Too many requests. Please try again later."
+          break
+        default:
+          errorMessage = (error as Error).message || "Failed to sign in with Google"
+      }
+      
+      toast({
+        title: "Google Sign-In Failed",
         description: errorMessage,
         variant: "destructive",
       })
@@ -303,7 +397,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           errorMessage = "Network error. Please check your connection and try again."
           break
         default:
-          errorMessage = error.message || "Failed to send password reset email"
+          errorMessage = (error as Error).message || "Failed to send password reset email"
       }
       
       toast({
@@ -345,7 +439,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           errorMessage = "Network error. Please check your connection and try again."
           break
         default:
-          errorMessage = error.message || "Failed to send verification email"
+          errorMessage = (error as Error).message || "Failed to send verification email"
       }
       
       toast({
@@ -365,6 +459,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         isAuthenticated: !!user,
         login,
         signup,
+        signInWithGoogle,
         logout,
         resetPassword,
         resendEmailVerification,
