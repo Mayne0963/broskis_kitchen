@@ -34,13 +34,14 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   useEffect(() => {
     if (!auth || !db) {
       // If Firebase is not configured, user remains null
       setUser(null)
       setIsLoading(false)
-      return
+
     }
     
     const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
@@ -91,6 +92,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     return () => unsubscribe()
   }, [])
+
+  useEffect(() => {
+    setIsAuthenticated(!!user)
+  }, [user])
 
   const login = async (email: string, password: string): Promise<boolean> => {
     if (!auth || !db) {
@@ -199,29 +204,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Send email verification
       await sendEmailVerification(userCredential.user)
 
-      // Save user data to Firestore
+      // Create user document in Firestore
       await setDoc(doc(db, 'users', userCredential.user.uid), {
         name,
         email,
-        role: 'customer',
+        role: 'user',
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
       })
 
       toast({
-        title: "Account Created Successfully",
-        description: "Please check your email to verify your account before signing in.",
+        title: "Signup Successful",
+        description: "Account created! Please verify your email address.",
       })
       return true
     } catch (error: unknown) {
       console.error("Signup error:", error)
-      let errorMessage = "Failed to create account"
-      
-      // Handle specific Firebase error codes
+      let errorMessage = "Failed to create account."
+
       const firebaseError = error as { code?: string }
       switch (firebaseError.code) {
         case 'auth/email-already-in-use':
-          errorMessage = "An account with this email already exists. Please sign in instead."
+          errorMessage = "This email address is already in use. Please log in or use a different email."
           break
         case 'auth/invalid-email':
           errorMessage = "Please enter a valid email address."
@@ -236,9 +240,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           errorMessage = "Network error. Please check your connection and try again."
           break
         default:
-          errorMessage = (error as Error).message || "Failed to create account"
+          errorMessage = (error as Error).message || "Failed to create account."
       }
-      
+
       toast({
         title: "Signup Failed",
         description: errorMessage,
@@ -250,11 +254,99 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
-  const signInWithGoogle = async (): Promise<boolean> => {
-    if (!auth || !db || !googleProvider) {
+  const resetPassword = async (email: string): Promise<boolean> => {
+    if (!auth) {
       toast({
         title: "Authentication Error",
-        description: "Google sign-in not available - Firebase not configured",
+        description: "Firebase not configured - password reset disabled",
+        variant: "destructive",
+      })
+      return false
+    }
+    try {
+      await sendPasswordResetEmail(auth, email)
+      toast({
+        title: "Password Reset Email Sent",
+        description: "Please check your inbox for instructions to reset your password.",
+      })
+      return true
+    } catch (error: unknown) {
+      console.error("Password reset error:", error)
+      let errorMessage = "Failed to send password reset email."
+
+      const firebaseError = error as { code?: string }
+      switch (firebaseError.code) {
+        case 'auth/invalid-email':
+          errorMessage = "Please enter a valid email address."
+          break
+        case 'auth/user-not-found':
+          errorMessage = "No account found with this email address."
+          break
+        case 'auth/network-request-failed':
+          errorMessage = "Network error. Please check your connection and try again."
+          break
+        default:
+          errorMessage = (error as Error).message || "Failed to send password reset email."
+      }
+
+      toast({
+        title: "Password Reset Failed",
+        description: errorMessage,
+        variant: "destructive",
+      })
+      return false
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const logout = async (): Promise<void> => {
+    if (!auth) {
+      toast({
+        title: "Authentication Error",
+        description: "Firebase not configured - logout disabled",
+        variant: "destructive",
+      })
+      return
+    }
+    try {
+      await signOut(auth)
+      // Clear session cookie
+      await fetch('/api/auth/session-logout', { method: 'POST' })
+      toast({
+        title: "Logged Out",
+        description: "You have been successfully logged out.",
+      })
+      return
+    } catch (error: unknown) {
+      console.error("Logout error:", error)
+      let errorMessage = "Failed to log out."
+
+      const firebaseError = error as { code?: string }
+      switch (firebaseError.code) {
+        case 'auth/network-request-failed':
+          errorMessage = "Network error. Please check your connection and try again."
+          break
+        default:
+          errorMessage = (error as Error).message || "Failed to log out."
+      }
+
+      toast({
+        title: "Logout Failed",
+        description: errorMessage,
+        variant: "destructive",
+      })
+      return
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const signInWithGoogle = async (): Promise<boolean> => {
+    if (!auth || !googleProvider) {
+      toast({
+        title: "Authentication Error",
+        description: "Firebase or Google Provider not configured - Google Sign-In disabled",
         variant: "destructive",
       })
       return false
@@ -264,19 +356,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const result = await signInWithPopup(auth, googleProvider)
       const user = result.user
 
-      // Check if user document exists in Firestore
-      const userDoc = await getDoc(doc(db, 'users', user.uid))
-      
-      if (!userDoc.exists()) {
-        // Create user document for new Google users
-        await setDoc(doc(db, 'users', user.uid), {
-          name: user.displayName || 'Google User',
-          email: user.email || '',
-          role: 'customer',
-          createdAt: Timestamp.now(),
-          updatedAt: Timestamp.now(),
-        })
-      }
+      // Create or update user document in Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        name: user.displayName,
+        email: user.email,
+        role: 'user',
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
+      }, { merge: true })
 
       // Create session cookie
       const idToken = await getIdToken(user)
@@ -291,35 +378,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (!response.ok) {
         throw new Error('Failed to create session')
       }
-      
+
       toast({
-        title: "Welcome to Broski's Kitchen!",
-        description: "You've successfully signed in with Google.",
+        title: "Google Sign-In Successful",
+        description: "Welcome to Broski's Kitchen!",
       })
       return true
     } catch (error: unknown) {
-      console.error("Google sign-in error:", error)
-      let errorMessage = "Failed to sign in with Google"
-      
-      // Handle specific Firebase error codes
+      console.error("Google Sign-In error:", error)
+      let errorMessage = "Failed to sign in with Google."
+
       const firebaseError = error as { code?: string }
       switch (firebaseError.code) {
         case 'auth/popup-closed-by-user':
-          errorMessage = "Sign-in was cancelled. Please try again."
+          errorMessage = "Google Sign-In popup closed. Please try again."
           break
-        case 'auth/popup-blocked':
-          errorMessage = "Pop-up was blocked by your browser. Please allow pop-ups and try again."
+        case 'auth/cancelled-popup-request':
+          errorMessage = "Google Sign-In popup already open. Please wait."
+          break
+        case 'auth/operation-not-allowed':
+          errorMessage = "Google Sign-In is not enabled. Please contact support."
           break
         case 'auth/network-request-failed':
           errorMessage = "Network error. Please check your connection and try again."
           break
-        case 'auth/too-many-requests':
-          errorMessage = "Too many requests. Please try again later."
-          break
         default:
-          errorMessage = (error as Error).message || "Failed to sign in with Google"
+          errorMessage = (error as Error).message || "Failed to sign in with Google."
       }
-      
+
       toast({
         title: "Google Sign-In Failed",
         description: errorMessage,
@@ -331,140 +417,64 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
-  const logout = async (): Promise<void> => {
-    if (!auth || !db) {
-      // For local users, just clear the user state
-      setUser(null)
-      toast({
-        title: "Logged Out",
-        description: "You have been logged out",
-      })
-      return
-    }
-    try {
-      // Clear session cookie first
-      await fetch('/api/auth/session-logout', {
-        method: 'POST',
-      })
-      
-      // Then sign out from Firebase
-      await signOut(auth)
-      toast({
-        title: "Logged Out",
-        description: "You have been logged out successfully",
-      })
-    } catch (error: unknown) {
-      console.error("Logout error:", error)
-      const errorMessage = error instanceof Error ? error.message : "Failed to logout"
-      toast({
-        title: "Logout Error",
-        description: errorMessage,
-        variant: "destructive",
-      })
-    }
-  }
-
-  const resetPassword = async (email: string): Promise<boolean> => {
-    if (!auth || !db) {
-      toast({
-        title: "Password Reset Error",
-        description: "Firebase not configured - password reset disabled",
-        variant: "destructive",
-      })
-      return false
-    }
-    try {
-      await sendPasswordResetEmail(auth, email)
-      toast({
-        title: "Password Reset Email Sent",
-        description: "Check your email for password reset instructions",
-      })
-      return true
-    } catch (error: unknown) {
-      console.error("Password reset error:", error)
-      let errorMessage = "Failed to send password reset email"
-      
-      // Handle specific Firebase error codes
-      const firebaseError = error as { code?: string }
-      switch (firebaseError.code) {
-        case 'auth/invalid-email':
-          errorMessage = "Please enter a valid email address."
-          break
-        case 'auth/user-not-found':
-          errorMessage = "No account found with this email address."
-          break
-        case 'auth/network-request-failed':
-          errorMessage = "Network error. Please check your connection and try again."
-          break
-        default:
-          errorMessage = (error as Error).message || "Failed to send password reset email"
-      }
-      
-      toast({
-        title: "Password Reset Failed",
-        description: errorMessage,
-        variant: "destructive",
-      })
-      return false
-    }
-  }
-  
   const resendEmailVerification = async (): Promise<boolean> => {
     if (!auth || !auth.currentUser) {
       toast({
-        title: "Verification Error",
-        description: "You must be logged in to resend verification email",
+        title: "Authentication Error",
+        description: "No authenticated user found to resend verification email.",
         variant: "destructive",
       })
       return false
     }
     try {
+      setIsLoading(true)
       await sendEmailVerification(auth.currentUser)
       toast({
         title: "Verification Email Sent",
-        description: "Please check your email to verify your account",
+        description: "A new verification email has been sent to your inbox.",
       })
       return true
     } catch (error: unknown) {
-      console.error("Email verification error:", error)
-      let errorMessage = "Failed to send verification email"
-      
-      // Handle specific Firebase error codes
+      console.error("Resend email verification error:", error)
+      let errorMessage = "Failed to resend verification email."
+
       const firebaseError = error as { code?: string }
       switch (firebaseError.code) {
         case 'auth/too-many-requests':
-          errorMessage = "Too many requests. Please try again later."
+          errorMessage = "Too many requests. Please wait a moment before trying again."
           break
         case 'auth/network-request-failed':
           errorMessage = "Network error. Please check your connection and try again."
           break
         default:
-          errorMessage = (error as Error).message || "Failed to send verification email"
+          errorMessage = (error as Error).message || "Failed to resend verification email."
       }
-      
+
       toast({
-        title: "Verification Email Failed",
+        title: "Resend Verification Failed",
         description: errorMessage,
         variant: "destructive",
       })
       return false
+    } finally {
+      setIsLoading(false)
     }
   }
 
+  const value = {
+    user,
+    isLoading,
+    isAuthenticated,
+    login,
+    signup,
+    resetPassword,
+    logout,
+    signInWithGoogle,
+    resendEmailVerification,
+  }
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isLoading,
-        isAuthenticated: !!user,
-        login,
-        signup,
-        signInWithGoogle,
-        logout,
-        resetPassword,
-        resendEmailVerification,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   )

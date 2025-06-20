@@ -1,39 +1,54 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app"
+import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app"
+import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app"
 import { getAuth, onAuthStateChanged, Auth, User, GoogleAuthProvider } from "firebase/auth"
 import { getFirestore, doc, setDoc, getDoc, Timestamp, Firestore } from "firebase/firestore"
 import { getStorage, FirebaseStorage } from "firebase/storage"
+import { toast } from "sonner"
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "demo-api-key",
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "demo-project.firebaseapp.com",
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "demo-project",
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "demo-project.appspot.com",
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "123456789",
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:123456789:web:demo",
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "G-DEMO",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 }
 
-// Check if Firebase is properly configured
-const isFirebaseConfigured = process.env.NEXT_PUBLIC_FIREBASE_API_KEY && 
-  process.env.NEXT_PUBLIC_FIREBASE_API_KEY !== "your-firebase-api-key" &&
-  process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID &&
-  process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID !== "your-project-id"
+// Validate Firebase environment variables at runtime
+const requiredConfigKeys = [
+  "apiKey",
+  "authDomain",
+  "projectId",
+  "storageBucket",
+  "messagingSenderId",
+  "appId",
+]
 
-// Initialize Firebase only if properly configured
-let app: FirebaseApp | null = null
-let auth: Auth | null = null
-let db: Firestore | null = null
-let storage: FirebaseStorage | null = null
-
-if (isFirebaseConfigured) {
-  try {
-    app = !getApps().length ? initializeApp(firebaseConfig) : getApp()
-    auth = getAuth(app)
-    db = getFirestore(app)
-    storage = getStorage(app)
-  } catch (error) {
-    console.warn("Firebase initialization failed:", error)
+for (const key of requiredConfigKeys) {
+  if (!firebaseConfig[key as keyof typeof firebaseConfig]) {
+    const errorMessage = `Missing Firebase environment variable: NEXT_PUBLIC_FIREBASE_${key.toUpperCase()}`
+    toast.error(errorMessage)
+    throw new Error(errorMessage)
   }
+}
+
+let app: FirebaseApp
+let auth: Auth
+let db: Firestore
+let storage: FirebaseStorage
+
+try {
+  app = !getApps().length ? initializeApp(firebaseConfig as Record<string, string>) : getApp()
+  auth = getAuth(app)
+  db = getFirestore(app)
+  storage = getStorage(app)
+} catch (error: any) {
+  console.error("Firebase initialization failed:", error)
+  toast.error(`Failed to initialize Firebase: ${error.message || "Unknown error"}`)
+  throw new Error("Failed to initialize Firebase. Check your environment variables and network connection.")
+}
 }
 
 // Generate a local user ID instead of using anonymous authentication
@@ -78,11 +93,17 @@ export const onAuthStateChange = (callback: (user: User | null) => void) => {
   
   // First check if there's a signed-in user
   const unsubscribe = onAuthStateChanged(auth, (user) => {
-    if (user) {
-      callback(user)
-    } else {
-      // If no user, use local fallback
-      callback(getLocalUser() as unknown as User | null)
+    try {
+      if (user) {
+        callback(user)
+      } else {
+        // If no user, use local fallback
+        callback(getLocalUser() as unknown as User | null)
+      }
+    } catch (error: any) {
+      console.error('Error in onAuthStateChanged callback:', error)
+      toast.error(`Authentication state error: ${error.message || "Unknown error"}`)
+      callback(null) // Ensure callback is called even on error
     }
   })
 
@@ -99,7 +120,10 @@ export const onAuthStateChangedWrapper = (callback: (user: User | null) => void)
 }
 
 export const createUserDocument = async (user: { uid: string; email?: string; displayName?: string; }) => {
-  if (!db) return null
+  if (!db) {
+    toast.error("Firestore is not initialized.")
+    return null
+  }
   
   try {
     const userRef = doc(db, 'users', user.uid)
@@ -113,32 +137,35 @@ export const createUserDocument = async (user: { uid: string; email?: string; di
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
       })
+      toast.success("User profile created successfully!")
     }
     
     return userRef
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating user document:', error)
+    toast.error(`Failed to create user profile: ${error.message || "Unknown error"}`)
     return null
   }
 }
 
 export const getUserDocument = async (uid: string) => {
-  if (!db) return null
+  if (!db) {
+    toast.error("Firestore is not initialized.")
+    return null
+  }
   
   try {
-    if (!db) {
-       throw new Error('Firestore is not configured')
-     }
-     const userRef = doc(db, 'users', uid)
-     const userSnap = await getDoc(userRef)
+    const userRef = doc(db, 'users', uid)
+    const userSnap = await getDoc(userRef)
     
     if (userSnap.exists()) {
       return userSnap.data()
     }
     
     return null
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error getting user document:', error)
+    toast.error(`Failed to get user document: ${error.message || "Unknown error"}`)
     return null
   }
 }
@@ -171,8 +198,9 @@ export const storeVerificationStatus = async (userId: string, isVerified: boolea
     }
 
     return true
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error storing verification status:", error)
+    toast.error(`Failed to store verification status: ${error.message || "Unknown error"}`)
 
     // Fallback to localStorage
     if (typeof window !== "undefined") {
@@ -187,72 +215,31 @@ export const storeVerificationStatus = async (userId: string, isVerified: boolea
   }
 }
 
-// Get verification status with fallback from localStorage
-export const getVerificationStatus = async (userId: string) => {
+export const getVerificationStatus = async (userId: string): Promise<boolean | null> => {
+  if (userId === 'local-fallback-user') {
+    console.warn('Skipping Firestore read for local fallback user.')
+    return null
+  }
+
+  if (!db) {
+    toast.error("Firestore is not initialized.")
+    return null
+  }
+
   try {
-    // Only attempt to get from Firestore if it's not a local fallback user
-    if (!userId.startsWith("local-")) {
-      if (!db) {
-        throw new Error('Firestore is not configured')
-      }
-      const docRef = doc(db, "verifications", userId)
-      const docSnap = await getDoc(docRef)
+    const verificationDocRef = doc(db, 'verifications', userId)
+    const docSnap = await getDoc(verificationDocRef)
 
-      if (docSnap.exists()) {
-        const data = docSnap.data()
-        const now = new Date()
-        const expiryDate = data.expiryDate.toDate()
-
-        // Check if verification has expired
-        if (now > expiryDate) {
-          return false
-        }
-
-        return data.verified
-      }
+    if (docSnap.exists()) {
+      const data = docSnap.data()
+      return data.isVerified
+    } else {
+      return null
     }
-
-    // Fallback to localStorage
-    if (typeof window !== "undefined") {
-      const verified = localStorage.getItem("ageVerified")
-      const expiryStr = localStorage.getItem("ageVerifiedExpiry")
-
-      if (verified && expiryStr) {
-        const now = new Date()
-        const expiryDate = new Date(expiryStr)
-
-        // Check if verification has expired
-        if (now > expiryDate) {
-          return false
-        }
-
-        return verified === "true"
-      }
-    }
-
-    return false
-  } catch (error) {
-    console.error("Error getting verification status:", error)
-
-    // Fallback to localStorage
-    if (typeof window !== "undefined") {
-      const verified = localStorage.getItem("ageVerified")
-      const expiryStr = localStorage.getItem("ageVerifiedExpiry")
-
-      if (verified && expiryStr) {
-        const now = new Date()
-        const expiryDate = new Date(expiryStr)
-
-        // Check if verification has expired
-        if (now > expiryDate) {
-          return false
-        }
-
-        return verified === "true"
-      }
-    }
-
-    return false
+  } catch (error: any) {
+    console.error('Error getting verification status:', error)
+    toast.error(`Failed to get verification status: ${error.message || "Unknown error"}`)
+    return null
   }
 }
 
