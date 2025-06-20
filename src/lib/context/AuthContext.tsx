@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
-import { auth, db } from "../services/firebase"
+import { auth, db } from "../firebase"
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -10,21 +10,11 @@ import {
   sendEmailVerification,
   onAuthStateChanged,
   updateProfile,
+  getIdToken,
 } from "firebase/auth"
-import { doc, setDoc, getDoc, Timestamp } from "firebase/firestore"
+import { doc, setDoc, getDoc, updateDoc, Timestamp } from "firebase/firestore"
 import { toast } from "@/hooks/use-toast"
-import type { User } from "@/types"
-
-interface AuthContextType {
-  user: User | null
-  isLoading: boolean
-  isAuthenticated: boolean
-  login: (email: string, password: string) => Promise<boolean>
-  signup: (name: string, email: string, password: string) => Promise<boolean>
-  logout: () => Promise<void>
-  resetPassword: (email: string) => Promise<boolean>
-  resendEmailVerification: () => Promise<boolean>
-}
+import type { User, AuthContextType } from "@/types"
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
@@ -109,8 +99,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           description: "Please verify your email address before signing in. Check your inbox for a verification link.",
           variant: "destructive",
         })
-        await signOut(auth) // Sign out the user
+        // Don't sign out, let them verify their email
         return false
+      }
+      
+      // Create session cookie
+      const idToken = await getIdToken(userCredential.user)
+      const response = await fetch('/api/auth/session-login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ idToken }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create session')
       }
       
       toast({
@@ -244,6 +248,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return
     }
     try {
+      // Clear session cookie first
+      await fetch('/api/auth/session-logout', {
+        method: 'POST',
+      })
+      
+      // Then sign out from Firebase
       await signOut(auth)
       toast({
         title: "Logged Out",

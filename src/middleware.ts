@@ -1,25 +1,61 @@
-import { NextResponse } from "next/server"
-import type { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
+import { getSessionCookie } from "./lib/auth/session"
 
-export function middleware(request: NextRequest) {
-  // Get the pathname
+// Protected routes that require authentication
+const protectedRoutes = [
+  '/dashboard',
+  '/orders',
+  '/account',
+  '/profile'
+]
+
+// Public-only routes that redirect authenticated users
+const publicOnlyRoutes = [
+  '/auth/login',
+  '/auth/signup',
+  '/auth/forgot-password'
+]
+
+export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
+  const url = request.nextUrl.clone()
 
-  // If you need to use the Google Maps API key in middleware,
-  // use the server-only environment variable
-  // const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY
+  // Check authentication status
+  const user = await getSessionCookie()
+  const isAuthenticated = !!user
+  const isEmailVerified = user?.emailVerified || false
 
-  // Only apply to infused menu paths
+  // Handle protected routes
+  if (protectedRoutes.some(route => path.startsWith(route))) {
+    if (!isAuthenticated) {
+      url.pathname = '/auth/login'
+      url.searchParams.set('redirect', path)
+      return NextResponse.redirect(url)
+    }
+    
+    if (!isEmailVerified) {
+      url.pathname = '/auth/verify-email'
+      return NextResponse.redirect(url)
+    }
+  }
+
+  // Handle public-only routes
+  if (publicOnlyRoutes.some(route => path === route)) {
+    if (isAuthenticated && isEmailVerified) {
+      const redirectTo = request.nextUrl.searchParams.get('redirect') || '/dashboard'
+      url.pathname = redirectTo
+      url.searchParams.delete('redirect')
+      return NextResponse.redirect(url)
+    }
+  }
+
+  // Add security headers for infused menu
   if (path.startsWith("/infused-menu")) {
-    // Add security headers
     const response = NextResponse.next()
-
-    // Add security headers
     response.headers.set("X-Frame-Options", "DENY")
     response.headers.set("X-Content-Type-Options", "nosniff")
     response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers.set("Permissions-Policy", "camera=self")
-
     return response
   }
 
@@ -27,5 +63,14 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/infused-menu/:path*"],
+  matcher: [
+    '/dashboard/:path*',
+    '/orders/:path*', 
+    '/account/:path*',
+    '/profile/:path*',
+    '/auth/login',
+    '/auth/signup',
+    '/auth/forgot-password',
+    '/infused-menu/:path*'
+  ],
 }

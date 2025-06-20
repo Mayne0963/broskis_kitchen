@@ -1,166 +1,166 @@
-"use client"
+'use client'
 
-import type React from "react"
+import { useState } from 'react'
+import Link from 'next/link'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react'
+import { useAuth } from '@/lib/context/AuthContext'
+import { AuthLayout } from '@/components/auth/AuthLayout'
 
-import { useState } from "react"
-import Link from "next/link"
-import { FaEnvelope, FaArrowLeft } from "react-icons/fa"
-import AuthLayout from "../../../components/auth/AuthLayout"
-import { validateEmail } from "../../../lib/utils/validation"
-import { useAuth } from "../../../lib/context/AuthContext"
-import { toast } from "@/hooks/use-toast"
+const forgotPasswordSchema = z.object({
+  email: z.string().email('Please enter a valid email address')
+})
+
+type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>
 
 export default function ForgotPasswordPage() {
-  const { resetPassword } = useAuth()
-  const [email, setEmail] = useState("")
-  const [errors, setErrors] = useState<{ email?: string; general?: string }>({})
   const [isLoading, setIsLoading] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const { resetPassword } = useAuth()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    // Reset errors
-    setErrors({})
-
-    // Validate email
-    if (!validateEmail(email)) {
-      setErrors({ email: "Please enter a valid email address" })
-      return
+  const form = useForm<ForgotPasswordFormValues>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: {
+      email: ''
     }
+  })
 
-    // Submit reset request
+  const onSubmit = async (values: ForgotPasswordFormValues) => {
     setIsLoading(true)
-
+    
     try {
-      const success = await resetPassword(email)
-
-      if (success) {
-        setIsSubmitted(true)
-        toast({
-          title: "Reset link sent",
-          description: "Check your email for instructions to reset your password",
-          duration: 5000,
-        })
-      } else {
-        setErrors({
-          general: "Failed to send reset link. Please check your email and try again.",
-        })
-      }
+      await resetPassword(values.email)
+      setIsSuccess(true)
     } catch (error) {
-      console.error("Password reset error:", error)
-      setErrors({
-        general: "An error occurred. Please try again later.",
+      console.error('Password reset error:', error)
+      form.setError('root', {
+        message: 'An error occurred while sending the reset email. Please try again.'
       })
     } finally {
       setIsLoading(false)
     }
   }
 
-  return (
-    <AuthLayout title="Forgot Password" subtitle="Enter your email to reset your password">
-      {isSubmitted ? (
-        <div className="text-center">
-          <div className="bg-emerald-green bg-opacity-20 text-emerald-green p-6 rounded-md mb-6 animate-fade-in">
-            <h3 className="text-lg font-medium mb-2">Reset Link Sent</h3>
-            <p>
-              We've sent a password reset link to <strong>{email}</strong>. Please check your email and follow the
-              instructions to reset your password.
-            </p>
-          </div>
-
-          <p className="text-sm text-gray-400 mb-6">
-            Didn't receive an email? Check your spam folder or request another reset link.
-          </p>
-
-          <div className="flex flex-col space-y-4">
-            <button
-              type="button"
-              className="btn-outline"
-              onClick={() => {
-                setEmail("")
-                setIsSubmitted(false)
-              }}
+  if (isSuccess) {
+    return (
+      <AuthLayout>
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-4 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+              <CheckCircle className="w-6 h-6 text-green-600" />
+            </div>
+            <CardTitle className="text-2xl font-bold text-[var(--color-rich-black)]">
+              Check Your Email
+            </CardTitle>
+            <CardDescription className="text-gray-600">
+              If that email exists, we've sent reset instructions to your inbox.
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent className="space-y-4">
+            <div className="text-sm text-gray-600 text-center">
+              <p>Didn't receive the email? Check your spam folder or try again.</p>
+            </div>
+            
+            <Button 
+              onClick={() => setIsSuccess(false)}
+              variant="outline"
+              className="w-full"
             >
-              Try another email
-            </button>
-
-            <Link href="/auth/login" className="text-gold-foil hover:underline flex items-center justify-center gap-2">
-              <FaArrowLeft size={12} /> Back to login
-            </Link>
-          </div>
-        </div>
-      ) : (
-        <>
-          {errors.general && (
-            <div className="bg-blood-red bg-opacity-20 text-blood-red p-4 rounded-md mb-6 animate-fade-in">
-              {errors.general}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaEnvelope className="text-gray-500" />
-                </div>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className={`input pl-10 w-full ${errors.email ? "border-blood-red" : "border-[#333333]"}`}
-                  placeholder="your@email.com"
-                  required
-                />
-              </div>
-              {errors.email && <p className="mt-1 text-sm text-blood-red">{errors.email}</p>}
-            </div>
-
-            <button type="submit" className="btn-primary w-full flex justify-center items-center" disabled={isLoading}>
-              {isLoading ? (
-                <span className="flex items-center">
-                  <svg
-                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-black"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  Sending...
-                </span>
-              ) : (
-                "Send Reset Link"
-              )}
-            </button>
-
+              Try Again
+            </Button>
+            
             <div className="text-center">
-              <Link
-                href="/auth/login"
-                className="text-gold-foil hover:underline flex items-center justify-center gap-2"
+              <Link 
+                href="/auth/login" 
+                className="inline-flex items-center text-sm text-[var(--color-harvest-gold)] hover:underline"
               >
-                <FaArrowLeft size={12} /> Back to login
+                <ArrowLeft className="w-4 h-4 mr-1" />
+                Back to Login
               </Link>
             </div>
-          </form>
-        </>
-      )}
+          </CardContent>
+        </Card>
+      </AuthLayout>
+    )
+  }
+
+  return (
+    <AuthLayout>
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold text-[var(--color-rich-black)]">
+            Forgot Password?
+          </CardTitle>
+          <CardDescription className="text-gray-600">
+            Enter your email address and we'll send you a link to reset your password.
+          </CardDescription>
+        </CardHeader>
+        
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {form.formState.errors.root && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
+                </Alert>
+              )}
+
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="email"
+                        placeholder="you@broski.com"
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button 
+                type="submit" 
+                className="w-full bg-[var(--color-harvest-gold)] hover:bg-[var(--color-harvest-gold)]/90 text-[var(--color-rich-black)] font-medium"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <div className="w-4 h-4 mr-2 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    Sending Reset Link...
+                  </>
+                ) : (
+                  'Send Reset Link'
+                )}
+              </Button>
+            </form>
+          </Form>
+
+          <div className="mt-6 text-center">
+            <Link 
+              href="/auth/login" 
+              className="inline-flex items-center text-sm text-[var(--color-harvest-gold)] hover:underline"
+            >
+              <ArrowLeft className="w-4 h-4 mr-1" />
+              Back to Login
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
     </AuthLayout>
   )
 }

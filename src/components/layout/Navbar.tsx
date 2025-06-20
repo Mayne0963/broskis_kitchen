@@ -60,18 +60,15 @@ const Navbar: React.FC = () => {
             Menu
           </Link>
           <Link href="/infused-menu" className={`nav-link ${pathname === "/infused-menu" ? "nav-link-active" : ""}`}>
-            Infused Menu
+            Infused Menu - Coming Soon
           </Link>
           <Link href="/locations" className={`nav-link ${pathname === "/locations" ? "nav-link-active" : ""}`}>
             Locations
           </Link>
           <Link href="/events" className={`nav-link ${pathname === "/events" ? "nav-link-active" : ""}`}>
               Events
-            </Link>
-            <Link href="/music" className={`nav-link ${pathname === "/music" ? "nav-link-active" : ""}`}>
-              Music
-            </Link>
-            <Link href="/rewards" className={`nav-link ${pathname === "/rewards" ? "nav-link-active" : ""}`}>
+          </Link>
+          <Link href="/rewards" className={`nav-link ${pathname === "/rewards" ? "nav-link-active" : ""}`}>
             Rewards
           </Link>
           <Link href="/shop" className={`nav-link ${pathname === "/shop" ? "nav-link-active" : ""}`}>
