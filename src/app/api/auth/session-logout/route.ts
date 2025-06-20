@@ -1,36 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { getAuth } from 'firebase-admin/auth'
-import { initializeApp, getApps, cert } from 'firebase-admin/app'
+import { adminAuth } from '@/lib/firebaseAdmin'
 
-// Initialize Firebase Admin SDK
-if (!getApps().length) {
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
-  
-  if (!privateKey || !process.env.FIREBASE_CLIENT_EMAIL || !process.env.FIREBASE_PROJECT_ID) {
-    console.error('Missing Firebase Admin SDK configuration')
-  } else {
-    initializeApp({
-      credential: cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: privateKey,
-      }),
-    })
-  }
-}
-
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const sessionCookie = cookieStore.get('session')?.value
 
     if (sessionCookie) {
       try {
         // Verify and revoke the session
-        const auth = getAuth()
-        const decodedClaims = await auth.verifySessionCookie(sessionCookie)
-        await auth.revokeRefreshTokens(decodedClaims.uid)
+    const auth = adminAuth()
+    if (!auth) {
+      return NextResponse.json(
+        { error: 'Firebase Admin not initialized' },
+        { status: 500 }
+      )
+    }
+    
+    const decodedClaims = await auth.verifySessionCookie(sessionCookie, true)
+    await auth.revokeRefreshTokens(decodedClaims.uid)
       } catch (error) {
         // Session might be invalid, but we still want to clear the cookie
         console.warn('Error revoking session:', error)
@@ -38,18 +27,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Clear the session cookie
-    cookieStore.set('session', '', {
+    const response = new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    })
+    
+    response.cookies.set('session', '', {
       maxAge: 0,
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/'
     })
-
-    return NextResponse.json(
-      { success: true },
-      { status: 200 }
-    )
+    
+    return response
   } catch (error) {
     console.error('Session logout error:', error)
     return NextResponse.json(

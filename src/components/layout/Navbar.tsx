@@ -78,7 +78,7 @@ const Navbar: React.FC = () => {
             Contact
           </Link>
           <a 
-            href="http://localhost:3000" 
+            href="otw-chi.vercel.app" 
             target="_blank" 
             rel="noopener noreferrer" 
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300 border-2 border-red-500 hover:border-red-400"

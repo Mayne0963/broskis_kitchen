@@ -1,23 +1,5 @@
 import { cookies } from 'next/headers'
-import { getAuth } from 'firebase-admin/auth'
-import { initializeApp, getApps, cert } from 'firebase-admin/app'
-
-// Initialize Firebase Admin SDK
-if (!getApps().length) {
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
-  
-  if (!privateKey || !process.env.FIREBASE_CLIENT_EMAIL || !process.env.FIREBASE_PROJECT_ID) {
-    console.error('Missing Firebase Admin SDK configuration')
-  } else {
-    initializeApp({
-      credential: cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: privateKey,
-      }),
-    })
-  }
-}
+import { adminAuth } from '@/lib/firebaseAdmin'
 
 export interface SessionUser {
   uid: string
@@ -27,16 +9,23 @@ export interface SessionUser {
   role?: string
 }
 
-export async function getSessionCookie(): Promise<SessionUser | null> {
+// Full session verification for API routes (Node.js Runtime)
+export async function getSessionCookie(): Promise<DecodedIdToken | null> {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const sessionCookie = cookieStore.get('session')?.value
 
     if (!sessionCookie) {
       return null
     }
 
-    const auth = getAuth()
+    // Use firebase-admin for full verification in Node.js runtime
+    const auth = adminAuth()
+    if (!auth) {
+      console.error('Firebase Admin not initialized')
+      return null
+    }
+    
     const decodedClaims = await auth.verifySessionCookie(sessionCookie, true)
 
     return {
@@ -47,7 +36,7 @@ export async function getSessionCookie(): Promise<SessionUser | null> {
       role: decodedClaims.role || 'customer'
     }
   } catch (error) {
-    console.error('Session verification error:', error)
+    console.error('Error verifying session cookie:', error)
     return null
   }
 }

@@ -70,17 +70,74 @@ export const getLocalUser = () => {
 
 // Listen for auth state changes with local fallback
 export const onAuthStateChange = (callback: (user: User | null) => void) => {
+  if (!auth) {
+    // If Firebase is not configured, use local fallback
+    callback(getLocalUser() as User | null)
+    return () => {} // Return empty unsubscribe function
+  }
+  
   // First check if there's a signed-in user
   const unsubscribe = onAuthStateChanged(auth, (user) => {
     if (user) {
       callback(user)
     } else {
       // If no user, use local fallback
-      callback(getLocalUser())
+      callback(getLocalUser() as User | null)
     }
   })
 
   return unsubscribe
+}
+
+export const onAuthStateChangedWrapper = (callback: (user: User | null) => void) => {
+  if (auth) {
+    return onAuthStateChanged(auth, callback)
+  }
+  // If Firebase is not configured, call callback with null immediately
+  callback(null)
+  return () => {} // Return empty unsubscribe function
+}
+
+export const createUserDocument = async (user: { uid: string; email?: string; displayName?: string; }) => {
+  if (!db) return null
+  
+  try {
+    const userRef = doc(db, 'users', user.uid)
+    const userSnap = await getDoc(userRef)
+    
+    if (!userSnap.exists()) {
+      await setDoc(userRef, {
+        uid: user.uid,
+        email: user.email || null,
+        displayName: user.displayName || null,
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now()
+      })
+    }
+    
+    return userRef
+  } catch (error) {
+    console.error('Error creating user document:', error)
+    return null
+  }
+}
+
+export const getUserDocument = async (uid: string) => {
+  if (!db) return null
+  
+  try {
+    const userRef = doc(db, 'users', uid)
+    const userSnap = await getDoc(userRef)
+    
+    if (userSnap.exists()) {
+      return userSnap.data()
+    }
+    
+    return null
+  } catch (error) {
+    console.error('Error getting user document:', error)
+    return null
+  }
 }
 
 // Store verification status with fallback to localStorage

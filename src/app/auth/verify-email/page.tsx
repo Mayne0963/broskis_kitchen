@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Mail, CheckCircle, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/lib/context/AuthContext'
-import { toast } from 'sonner'
+import { toast, Toaster } from 'sonner'
 
 export default function VerifyEmailPage() {
   const [isResending, setIsResending] = useState(false)
@@ -50,8 +50,10 @@ export default function VerifyEmailPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[var(--color-harvest-gold)]/10 to-[var(--color-rich-black)]/5 p-4">
-      <Card className="w-full max-w-md">
+    <>
+      <Toaster position="top-center" richColors />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[var(--color-harvest-gold)]/10 to-[var(--color-rich-black)]/5 p-4">
+        <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 w-16 h-16 bg-[var(--color-harvest-gold)]/10 rounded-full flex items-center justify-center">
             <Mail className="w-8 h-8 text-[var(--color-harvest-gold)]" />
@@ -115,7 +117,8 @@ export default function VerifyEmailPage() {
             <p>Check your spam folder or try resending.</p>
           </div>
         </CardContent>
-      </Card>
-    </div>
+        </Card>
+      </div>
+    </>
   )
 }

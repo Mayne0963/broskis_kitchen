@@ -1,24 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { getAuth } from 'firebase-admin/auth'
-import { initializeApp, getApps, cert } from 'firebase-admin/app'
-
-// Initialize Firebase Admin SDK
-if (!getApps().length) {
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
-  
-  if (!privateKey || !process.env.FIREBASE_CLIENT_EMAIL || !process.env.FIREBASE_PROJECT_ID) {
-    console.error('Missing Firebase Admin SDK configuration')
-  } else {
-    initializeApp({
-      credential: cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: privateKey,
-      }),
-    })
-  }
-}
+import { adminAuth } from '@/lib/firebaseAdmin'
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,7 +14,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify the ID token
-    const auth = getAuth()
+    const auth = adminAuth()
+    if (!auth) {
+      return NextResponse.json(
+        { error: 'Firebase Admin not initialized' },
+        { status: 500 }
+      )
+    }
+    
     const decodedToken = await auth.verifyIdToken(idToken)
 
     // Check if email is verified
@@ -48,27 +37,16 @@ export async function POST(request: NextRequest) {
     const sessionCookie = await auth.createSessionCookie(idToken, { expiresIn })
 
     // Set the session cookie
-    const cookieStore = cookies()
-    cookieStore.set('session', sessionCookie, {
+    const response = NextResponse.json({ success: true })
+    response.cookies.set('session', sessionCookie, {
       maxAge: expiresIn,
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/'
     })
-
-    return NextResponse.json(
-      { 
-        success: true,
-        user: {
-          uid: decodedToken.uid,
-          email: decodedToken.email,
-          emailVerified: decodedToken.email_verified,
-          name: decodedToken.name || decodedToken.email?.split('@')[0]
-        }
-      },
-      { status: 200 }
-    )
+    
+    return response
   } catch (error) {
     console.error('Session login error:', error)
     return NextResponse.json(

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getSessionCookie } from "./lib/auth/session"
+import { getSessionCookieForMiddleware } from "./lib/auth/middlewareSession"
 
 // Protected routes that require authentication
 const protectedRoutes = [
@@ -21,7 +21,7 @@ export async function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
 
   // Check authentication status
-  const user = await getSessionCookie()
+  const user = getSessionCookieForMiddleware()
   const isAuthenticated = !!user
   const isEmailVerified = user?.emailVerified || false
 
