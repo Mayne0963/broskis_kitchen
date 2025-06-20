@@ -1,6 +1,4 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app"
-import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app"
-import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app"
 import { getAuth, onAuthStateChanged, Auth, User, GoogleAuthProvider } from "firebase/auth"
 import { getFirestore, doc, setDoc, getDoc, Timestamp, Firestore } from "firebase/firestore"
 import { getStorage, FirebaseStorage } from "firebase/storage"
@@ -38,17 +36,18 @@ let app: FirebaseApp
 let auth: Auth
 let db: Firestore
 let storage: FirebaseStorage
+let isFirebaseConfigured = false
 
 try {
   app = !getApps().length ? initializeApp(firebaseConfig as Record<string, string>) : getApp()
   auth = getAuth(app)
   db = getFirestore(app)
   storage = getStorage(app)
+  isFirebaseConfigured = true
 } catch (error: any) {
   console.error("Firebase initialization failed:", error)
   toast.error(`Failed to initialize Firebase: ${error.message || "Unknown error"}`)
   throw new Error("Failed to initialize Firebase. Check your environment variables and network connection.")
-}
 }
 
 // Generate a local user ID instead of using anonymous authentication
