@@ -60,7 +60,7 @@ const Navbar: React.FC = () => {
             Menu
           </Link>
           <Link href="/infused-menu" className={`nav-link ${pathname === "/infused-menu" ? "nav-link-active" : ""}`}>
-            Infused Menu - Coming Soon
+            Infused Menu
           </Link>
           <Link href="/locations" className={`nav-link ${pathname === "/locations" ? "nav-link-active" : ""}`}>
             Locations
@@ -94,39 +94,12 @@ const Navbar: React.FC = () => {
           <CartDropdown />
 
           {user ? (
-            <div className="relative" ref={dropdownRef}>
-              <button 
-                className="btn-outline flex items-center gap-2"
-                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-              >
-                <FaUser /> {user.name.split(" ")[0]}
-              </button>
-              <div className={`absolute right-0 mt-2 w-48 bg-[#1A1A1A] rounded-md shadow-lg py-1 z-50 border border-[#333333] ${userDropdownOpen ? 'block' : 'hidden'}`}>
-                <Link 
-                  href="/profile" 
-                  className="block px-4 py-2 text-sm text-white hover:bg-[#333333]"
-                  onClick={() => setUserDropdownOpen(false)}
-                >
-                  Profile
-                </Link>
-                <Link 
-                  href="/orders" 
-                  className="block px-4 py-2 text-sm text-white hover:bg-[#333333]"
-                  onClick={() => setUserDropdownOpen(false)}
-                >
-                  Order History
-                </Link>
-                <button
-                  onClick={async () => {
-                    await logout()
-                    setUserDropdownOpen(false)
-                  }}
-                  className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#333333]"
-                >
-                  Logout
-                </button>
-              </div>
-            </div>
+            <Link 
+              href="/profile" 
+              className="btn-outline flex items-center gap-2"
+            >
+              <FaUser /> {user.name.split(" ")[0]}
+            </Link>
           ) : (
             <Link href="/auth/login" className="btn-outline flex items-center gap-2">
               <FaUser /> Login
@@ -147,12 +120,12 @@ const Navbar: React.FC = () => {
             Menu
           </Link>
           <Link
-            href="/infused-menu"
-            className={`py-2 hover:text-gold-foil transition-colors duration-300 flex items-center ${pathname === "/infused-menu" ? "text-gold-foil font-bold" : ""}`}
+              href="/infused-menu"
+              className={`py-2 hover:text-gold-foil transition-colors duration-300 flex items-center ${pathname === "/infused-menu" ? "text-gold-foil font-bold" : ""}`}
             onClick={() => setMobileMenuOpen(false)}
-          >
-            <span className="badge badge-new mr-2">NEW</span> Infused Menu
-          </Link>
+            >
+              Infused Menu
+            </Link>
           <Link
             href="/locations"
             className={`py-2 hover:text-gold-foil transition-colors duration-300 flex items-center ${pathname === "/locations" ? "text-gold-foil font-bold" : ""}`}
