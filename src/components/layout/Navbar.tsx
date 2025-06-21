@@ -60,7 +60,7 @@ const Navbar: React.FC = () => {
             Menu
           </Link>
           <Link href="/infused-menu" className={`nav-link ${pathname === "/infused-menu" ? "nav-link-active" : ""}`}>
-            Infused Menu
+            Infused Menu - Coming Soon
           </Link>
           <Link href="/locations" className={`nav-link ${pathname === "/locations" ? "nav-link-active" : ""}`}>
             Locations
@@ -94,12 +94,39 @@ const Navbar: React.FC = () => {
           <CartDropdown />
 
           {user ? (
-            <Link 
-              href="/profile" 
-              className="btn-outline flex items-center gap-2"
-            >
-              <FaUser /> {user.name.split(" ")[0]}
-            </Link>
+            <div className="relative" ref={dropdownRef}>
+              <button 
+                className="btn-outline flex items-center gap-2"
+                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+              >
+                <FaUser /> {user.name.split(" ")[0]}
+              </button>
+              <div className={`absolute right-0 mt-2 w-48 bg-[#1A1A1A] rounded-md shadow-lg py-1 z-50 border border-[#333333] ${userDropdownOpen ? 'block' : 'hidden'}`}>
+                <Link 
+                  href="/profile" 
+                  className="block px-4 py-2 text-sm text-white hover:bg-[#333333]"
+                  onClick={() => setUserDropdownOpen(false)}
+                >
+                  Profile
+                </Link>
+                <Link 
+                  href="/orders" 
+                  className="block px-4 py-2 text-sm text-white hover:bg-[#333333]"
+                  onClick={() => setUserDropdownOpen(false)}
+                >
+                  Order History
+                </Link>
+                <button
+                  onClick={async () => {
+                    await logout()
+                    setUserDropdownOpen(false)
+                  }}
+                  className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#333333]"
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
           ) : (
             <Link href="/auth/login" className="btn-outline flex items-center gap-2">
               <FaUser /> Login
