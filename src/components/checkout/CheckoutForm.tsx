@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useCart } from '../../lib/context/CartContext'
 import { useOrder } from '../../lib/context/OrderContext'
 import { useAuth } from '../../lib/context/AuthContext'
+import { useRewards } from '../../lib/context/RewardsContext'
 import { OrderFormData, DeliveryAddress, PaymentInfo } from '../../types/order'
 import { toast } from '../../components/ui/use-toast'
 import { FaCreditCard, FaLock, FaMapMarkerAlt, FaClock, FaPhone, FaEnvelope } from 'react-icons/fa'
@@ -19,6 +20,10 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
   const { items, subtotal, tax, total, clearCart } = useCart()
   const { createOrder, isLoading } = useOrder()
   const { user } = useAuth()
+  const { points } = useRewards()
+  
+  // Check if user has premium status (Gold tier = 1000+ points)
+  const isPremiumUser = points >= 1000
   
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState<OrderFormData>({
@@ -30,6 +35,13 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
   })
   
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  // Reset payment method to card if non-premium user has cash selected
+  useEffect(() => {
+    if (!isPremiumUser && formData.paymentMethod === 'cash') {
+      setFormData(prev => ({ ...prev, paymentMethod: 'card' }))
+    }
+  }, [isPremiumUser, formData.paymentMethod])
 
   // Pickup locations
   const pickupLocations = [
@@ -125,7 +137,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
     setFormData(prev => ({
       ...prev,
       [parent]: {
-        ...prev[parent as keyof OrderFormData],
+        ...(prev[parent] as any),
         [field]: value
       }
     }))
@@ -354,7 +366,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
           {/* Payment Method */}
           <div className="bg-[#1A1A1A] p-6 rounded-lg border border-[#333333]">
             <h3 className="text-lg font-semibold mb-4">Payment Method</h3>
-            <div className="grid grid-cols-2 gap-4">
+            <div className={`grid gap-4 ${isPremiumUser ? 'grid-cols-2' : 'grid-cols-1'}`}>
               <button
                 type="button"
                 onClick={() => updateFormData('paymentMethod', 'card')}
@@ -367,19 +379,30 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
                 <FaCreditCard className="mx-auto mb-2 text-xl" />
                 <div className="font-medium">Credit Card</div>
               </button>
-              <button
-                type="button"
-                onClick={() => updateFormData('paymentMethod', 'cash')}
-                className={`p-4 rounded-lg border-2 transition-colors ${
-                  formData.paymentMethod === 'cash'
-                    ? 'border-gold-foil bg-gold-foil bg-opacity-10'
-                    : 'border-[#333333] hover:border-[#555555]'
-                }`}
-              >
-                <div className="mx-auto mb-2 text-xl">💵</div>
-                <div className="font-medium">Cash {formData.orderType === 'delivery' ? 'on Delivery' : 'on Pickup'}</div>
-              </button>
+              {isPremiumUser && (
+                <button
+                  type="button"
+                  onClick={() => updateFormData('paymentMethod', 'cash')}
+                  className={`p-4 rounded-lg border-2 transition-colors ${
+                    formData.paymentMethod === 'cash'
+                      ? 'border-gold-foil bg-gold-foil bg-opacity-10'
+                      : 'border-[#333333] hover:border-[#555555]'
+                  }`}
+                >
+                  <div className="mx-auto mb-2 text-xl">💵</div>
+                  <div className="font-medium">Cash {formData.orderType === 'delivery' ? 'on Delivery' : 'on Pickup'}</div>
+                  <div className="text-xs text-gold-foil mt-1">Premium Only</div>
+                </button>
+              )}
             </div>
+            {!isPremiumUser && (
+              <div className="mt-4 p-3 bg-[#111111] border border-[#333333] rounded-lg">
+                <p className="text-sm text-gray-400">
+                  💎 <span className="text-gold-foil font-medium">Cash on Delivery</span> is available for Gold tier members (1000+ points).
+                  <br />Upgrade your membership to unlock this payment option!
+                </p>
+              </div>
+            )}
           </div>
 
           // In the CheckoutForm component, replace the credit card form section with:
@@ -395,11 +418,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
               handleSubmit(paymentIntentId)
             }}
             onPaymentError={(error) => {
-              toast({
-                title: 'Payment Error',
-                description: error,
-                variant: 'destructive',
-              })
+              console.error('Payment Error:', error)
             }}
             disabled={isLoading}
             orderMetadata={{
@@ -506,7 +525,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
               Back
             </button>
             <button
-              onClick={handleSubmit}
+              onClick={() => handleSubmit()}
               disabled={isLoading}
               className="flex-1 btn-primary disabled:opacity-50"
             >
