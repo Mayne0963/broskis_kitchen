@@ -132,7 +132,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to create session')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to create session')
       }
       
       toast({
@@ -142,12 +143,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return true
     } catch (error: unknown) {
       console.error("Login error:", error)
-      let errorMessage = "Invalid email or password"
+      let errorMessage = "An unexpected error occurred."
+      
+      if (error instanceof Error) {
+        errorMessage = error.message
+      }
+
+      toast({
+        title: "Login Error",
+        description: errorMessage,
+        variant: "destructive",
+      })
       
       // Handle specific Firebase error codes
       const firebaseError = error as { code?: string }
       switch (firebaseError.code) {
         case 'auth/invalid-email':
+        case 'auth/invalid-credential':
           errorMessage = "Please enter a valid email address."
           break
         case 'auth/user-disabled':

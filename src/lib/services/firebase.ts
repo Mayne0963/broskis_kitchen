@@ -180,7 +180,7 @@ export const getUserDocument = async (uid: string) => {
   } catch (error: any) {
     console.error('Error getting user document:', error)
     toast.error(`Failed to get user document: ${error.message || "Unknown error"}`)
-    return null
+    return false
   }
 }
 
@@ -229,15 +229,15 @@ export const storeVerificationStatus = async (userId: string, isVerified: boolea
   }
 }
 
-export const getVerificationStatus = async (userId: string): Promise<boolean | null> => {
+export const getVerificationStatus = async (userId: string): Promise<boolean> => {
   if (userId === 'local-fallback-user') {
     console.warn('Skipping Firestore read for local fallback user.')
-    return null
+    return false
   }
 
   if (!db) {
     toast.error("Firestore is not initialized.")
-    return null
+    return false
   }
 
   try {
@@ -248,14 +248,15 @@ export const getVerificationStatus = async (userId: string): Promise<boolean | n
       const data = docSnap.data()
       return data.isVerified
     } else {
-      return null
+      return false
     }
   } catch (error: any) {
     console.error('Error getting verification status:', error)
     toast.error(`Failed to get verification status: ${error.message || "Unknown error"}`)
-    return null
+    return false
   }
 }
+
 
 // Configure Google Auth Provider
 let googleProvider: GoogleAuthProvider | null = null
