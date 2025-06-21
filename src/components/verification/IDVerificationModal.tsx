@@ -105,6 +105,11 @@ const IDVerificationModal: React.FC<IDVerificationModalProps> = ({ onClose, onSu
         }),
       })
 
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(`HTTP ${response.status}: ${errorText || 'Verification request failed'}`)
+      }
+
       const result = await response.json()
 
       if (result.success) {

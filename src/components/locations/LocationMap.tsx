@@ -22,6 +22,13 @@ const LocationMap: React.FC<LocationMapProps> = ({ locations, selectedLocation, 
       try {
         // Check if maps are available without exposing API key
         const response = await fetch("/api/maps")
+        
+        if (!response.ok) {
+          console.error(`Maps API check failed: HTTP ${response.status}`)
+          setMapAvailable(false)
+          return
+        }
+        
         const data = await response.json()
         setMapAvailable(data.hasApiKey)
       } catch (error) {

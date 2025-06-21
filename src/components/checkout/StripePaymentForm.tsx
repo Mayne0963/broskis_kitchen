@@ -56,6 +56,11 @@ function PaymentForm({
           }),
         })
 
+        if (!response.ok) {
+          const errorText = await response.text()
+          throw new Error(`HTTP ${response.status}: ${errorText || 'Payment intent creation failed'}`)
+        }
+
         const data = await response.json()
 
         if (data.error) {
@@ -173,6 +178,11 @@ export default function StripePaymentForm(props: StripePaymentFormProps) {
             currency: 'usd',
           }),
         })
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          throw new Error(`HTTP ${response.status}: ${errorText || 'Payment intent creation failed'}`)
+        }
 
         const data = await response.json()
         if (data.clientSecret) {

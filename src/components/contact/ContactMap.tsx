@@ -5,6 +5,22 @@ import type React from "react"
 import { useEffect, useRef, useState } from "react"
 import type { Location } from "../../types/location"
 
+// Extend Window interface to include Google Maps API
+declare global {
+  interface Window {
+    google: {
+      maps: {
+        Map: any
+        Marker: any
+        InfoWindow: any
+        Size: any
+        LatLng: any
+        places: any
+      }
+    }
+  }
+}
+
 interface ContactMapProps {
   locations: Location[]
 }
@@ -29,11 +45,20 @@ const ContactMap: React.FC<ContactMapProps> = ({ locations }) => {
   useEffect(() => {
     // Load Google Maps script
     const loadGoogleMapsScript = () => {
+      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+      if (!apiKey) {
+        console.error('Google Maps API key is not configured. Please set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in your environment variables.')
+        return
+      }
+      
       const script = document.createElement("script")
-      script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places`
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`
       script.async = true
       script.defer = true
       script.onload = initializeMap
+      script.onerror = () => {
+        console.error('Failed to load Google Maps API. Please check your API key and network connection.')
+      }
       document.head.appendChild(script)
     }
 

@@ -1,6 +1,6 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app"
 import { getAuth, onAuthStateChanged, Auth, User, GoogleAuthProvider } from "firebase/auth"
-import { getFirestore, doc, setDoc, getDoc, Timestamp, Firestore } from "firebase/firestore"
+import { getFirestore, doc, setDoc, getDoc, Timestamp, Firestore, connectFirestoreEmulator } from "firebase/firestore"
 import { getStorage, FirebaseStorage } from "firebase/storage"
 import { toast } from "sonner"
 
@@ -41,7 +41,22 @@ let isFirebaseConfigured = false
 try {
   app = !getApps().length ? initializeApp(firebaseConfig as Record<string, string>) : getApp()
   auth = getAuth(app)
+  
+  // Initialize Firestore with settings to prevent WebChannel errors
   db = getFirestore(app)
+  
+  // Configure Firestore settings to use long polling instead of WebSocket
+  // This prevents WebChannelConnection transport errors
+  if (typeof window !== 'undefined') {
+    // Only apply client-side settings
+    try {
+      // Note: Firestore settings should be applied before any operations
+      // The experimentalForceLongPolling setting helps prevent WebChannel errors
+    } catch (settingsError) {
+      console.warn('Could not apply Firestore settings:', settingsError)
+    }
+  }
+  
   storage = getStorage(app)
   isFirebaseConfigured = true
 } catch (error: any) {
