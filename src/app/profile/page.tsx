@@ -15,7 +15,7 @@ import { FaUser, FaEnvelope, FaCalendar, FaSignOutAlt, FaEdit, FaSave, FaTimes }
 import { toast } from "@/hooks/use-toast"
 import { updateProfile } from "firebase/auth"
 import { doc, updateDoc } from "firebase/firestore"
-import { db } from "@/lib/firebase"
+import { db } from "../../lib/services/firebase"
 
 const profileSchema = z.object({
   displayName: z.string().min(2, "Name must be at least 2 characters")
