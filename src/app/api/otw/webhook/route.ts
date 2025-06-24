@@ -41,7 +41,7 @@ function mapOTWStatusToBroskiStatus(otwEventType: string): OrderStatus {
     case 'driver_assigned':
       return 'preparing'
     case 'driver_pickup':
-      return 'out_for_delivery'
+      return 'out-for-delivery'
     case 'order_delivered':
       return 'delivered'
     case 'order_cancelled':

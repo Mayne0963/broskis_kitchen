@@ -4,14 +4,14 @@ import { headers } from 'next/headers'
 import { updateOrderStatus } from '@/lib/services/orderService'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-06-20',
+  apiVersion: '2025-02-24.acacia',
 })
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!
 
 export async function POST(request: NextRequest) {
   const body = await request.text()
-  const headersList = headers()
+  const headersList = await headers()
   const sig = headersList.get('stripe-signature')!
 
   let event: Stripe.Event

@@ -292,7 +292,7 @@ export const trackOrder = async (orderId: string): Promise<Order | null> => {
             newStatus = 'ready'
             break
           case 'out_for_delivery':
-            newStatus = 'out_for_delivery'
+            newStatus = 'out-for-delivery'
             break
           case 'delivered':
             newStatus = 'delivered'

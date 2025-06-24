@@ -8,6 +8,7 @@ import { FaTimes, FaExclamationTriangle } from "react-icons/fa"
 
 interface AgeVerificationModalProps {
   onClose: () => void
+  onSuccess?: () => void
 }
 
 const AgeVerificationModal: React.FC<AgeVerificationModalProps> = ({ onClose }) => {
@@ -32,7 +33,7 @@ const AgeVerificationModal: React.FC<AgeVerificationModalProps> = ({ onClose }) 
     { value: "12", label: "December" },
   ]
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!month || !year) {

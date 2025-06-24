@@ -103,6 +103,13 @@ const Navbar: React.FC = () => {
               </button>
               <div className={`absolute right-0 mt-2 w-48 bg-[#1A1A1A] rounded-md shadow-lg py-1 z-50 border border-[#333333] ${userDropdownOpen ? 'block' : 'hidden'}`}>
                 <Link 
+                  href="/dashboard" 
+                  className="block px-4 py-2 text-sm text-white hover:bg-[#333333]"
+                  onClick={() => setUserDropdownOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <Link 
                   href="/profile" 
                   className="block px-4 py-2 text-sm text-white hover:bg-[#333333]"
                   onClick={() => setUserDropdownOpen(false)}
@@ -222,7 +229,7 @@ const Navbar: React.FC = () => {
           {user ? (
             <div className="pt-4 border-t border-[#333333] mt-2 space-y-2">
               <Link
-                href="/profile"
+                href="/sign-in"
                 className="block py-2 hover:text-gold-foil transition-colors duration-300"
                 onClick={() => setMobileMenuOpen(false)}
               >

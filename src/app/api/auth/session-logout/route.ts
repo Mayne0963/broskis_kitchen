@@ -27,9 +27,8 @@ export async function POST() {
     }
 
     // Clear the session cookie
-    const response = new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
+    const response = NextResponse.json({ success: true }, {
+      status: 200
     })
     
     response.cookies.set('session', '', {

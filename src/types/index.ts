@@ -18,6 +18,7 @@ export interface AuthContextType {
   logout: () => Promise<void>
   resetPassword: (email: string) => Promise<boolean>
   resendEmailVerification: () => Promise<boolean>
+  sendVerificationEmail: () => Promise<void>
 }
 
 // Cart types

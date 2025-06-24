@@ -82,7 +82,7 @@ function convertToOTWOrder(order: Order): OTWOrder {
       quantity: item.quantity,
       price: item.price,
       special_instructions: item.customizations ? 
-        Object.values(item.customizations)
+        Object.values(item.customizations ?? {})
           .flat()
           .map(c => c.name)
           .join(', ') : undefined
