@@ -5,7 +5,7 @@ const PrivacyPage = () => {
     <div className="bg-background text-foreground min-h-screen">
       <main className="pt-16 pb-20 container mx-auto px-4 space-y-12 max-w-4xl">
         {/* Page Title */}
-        <header className="space-y-2">
+        <header className="space-y-2 text center">
           <h1 className="text-4xl font-bold">Privacy Statement</h1>
           <p className="text-sm text-muted">Last updated: July 12, 2025</p>
         </header>
