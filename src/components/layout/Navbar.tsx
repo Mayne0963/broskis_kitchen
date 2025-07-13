@@ -41,8 +41,8 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <nav className="fixed top-0 w-full bg-opacity-90 backdrop-blur-md bg-matte-black text-white p-4 z-50 shadow-lg border-b border-[#333333]">
-      <div className="container mx-auto flex justify-between items-center">
+      <nav className="fixed top-0 w-full bg-opacity-90 backdrop-blur-md bg-matte-black text-white h-20 z-50 shadow-lg border-b border-[#333333]">
+      <div className="container mx-auto flex justify-between items-center h-full px-4">
         <Link href="/" className="text-2xl font-bold graffiti-text hover:text-white transition-colors duration-300">
           Broski&apos;s Kitchen
         </Link>
@@ -266,7 +266,7 @@ const Navbar: React.FC = () => {
         </div>
       </div>
       </nav>
-      <EmailVerificationBanner className="fixed top-[72px] left-0 right-0 z-40 mx-4" />
+      <EmailVerificationBanner className="fixed top-20 left-0 right-0 z-40 mx-4" />
     </>
   )
 }

@@ -1,116 +1,183 @@
-import React from 'react'
+import React from 'react';
 
 const PrivacyPage = () => {
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">Privacy Statement for Broskis Kitchen</h1>
-      <p>Last updated: July 12, 2025</p>
-      <p>I. Introduction
-Your privacy matters. This Privacy Statement ("Statement") describes how Broskis Kitchen LLC ("Broskis Kitchen," "we," "us") collects, uses, stores, shares, and otherwise processes personal information of our customers who visit our restaurants, use our websites or mobile apps ("Online Services"), or otherwise interact with us.
+    <div className="bg-background text-foreground min-h-screen">
+      <main className="pt-16 pb-20 container mx-auto px-4 space-y-12 max-w-4xl">
+        {/* Page Title */}
+        <header className="space-y-2">
+          <h1 className="text-4xl font-bold">Privacy Statement</h1>
+          <p className="text-sm text-muted">Last updated: July 12, 2025</p>
+        </header>
 
-If you reside outside the United States, please visit the country-specific section of our website for any local addenda.
+        {/* I. Introduction */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold">I. Introduction</h2>
+          <p className="leading-relaxed">
+            Your privacy matters. This Privacy Statement (“Statement”) describes how Broskis Kitchen LLC
+            (“Broskis Kitchen,” “we,” “us”) collects, uses, stores, shares, and otherwise processes
+            personal information of our customers who visit our restaurants, use our websites or mobile apps
+            (“Online Services”), or otherwise interact with us.
+          </p>
+          <p className="leading-relaxed">
+            If you reside outside the United States, please visit the country-specific section of our
+            website for local addenda.
+          </p>
+        </section>
 
-II. Information We Collect & Process
+        {/* II. Information We Collect & Process */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold">II. Information We Collect &amp; Process</h2>
 
-We collect information you provide directly, information collected automatically, and information from third-party sources.
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-xl font-medium">A. Information You Provide</h3>
+              <ul className="list-disc list-inside mt-2 leading-relaxed space-y-1">
+                <li><strong>Contact &amp; profile data:</strong> name, email, phone, address, birthday</li>
+                <li><strong>Payment &amp; transaction data:</strong> card details, order history</li>
+                <li><strong>Account credentials:</strong> usernames, passwords</li>
+                <li><strong>Preferences &amp; feedback:</strong> liked products, survey responses</li>
+              </ul>
+            </div>
 
-A. Information You Provide
+            <div>
+              <h3 className="text-xl font-medium">B. Information Collected Automatically</h3>
+              <ul className="list-disc list-inside mt-2 leading-relaxed space-y-1">
+                <li>IP address, browser &amp; OS data</li>
+                <li>App &amp; website usage (pages, clicks, session lengths)</li>
+                <li>Location data (if enabled)</li>
+                <li>Cookies, web beacons, pixels (see Section VI)</li>
+              </ul>
+            </div>
 
-* Contact & profile data: name, email, phone, address, birthday when you register, participate in promotions, or contact support.
-* Payment & transaction data: payment card details and order history.
-* Account credentials: usernames, passwords.
-* Preferences & feedback: products you like, survey responses.
+            <div>
+              <h3 className="text-xl font-medium">C. Information from Third Parties</h3>
+              <p className="mt-2 leading-relaxed">
+                We supplement our data with information from payment processors, analytics providers,
+                marketing partners, and public sources.
+              </p>
+            </div>
+          </div>
+        </section>
 
-B. Information Collected Automatically
+        {/* III. How We Use Your Information */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold">III. How We Use Your Information</h2>
+          <ul className="list-decimal list-inside mt-2 leading-relaxed space-y-1">
+            <li>Provide &amp; improve Online Services, process orders, manage accounts</li>
+            <li>Communicate updates, marketing offers, and support</li>
+            <li>Personalize your experience &amp; recommendations</li>
+            <li>Analyze trends, usage &amp; business analytics</li>
+            <li>Ensure security, prevent fraud &amp; comply with legal obligations</li>
+            <li>Develop new products, services &amp; AI-driven features</li>
+          </ul>
+        </section>
 
-* Device & usage data: IP address, browser type, OS, device identifiers.
-* App & website activity: pages viewed, clicks, session duration.
-* Location data: if you enable GPS or Wi-Fi location sharing.
-* Cookies & tracking: cookies, web beacons, pixels (see Section VI).
+        {/* IV. How We Share Your Information */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold">IV. How We Share Your Information</h2>
+          <ul className="list-disc list-inside mt-2 leading-relaxed space-y-1">
+            <li>Subsidiaries &amp; affiliates</li>
+            <li>Service providers (payment, delivery, analytics, marketing)</li>
+            <li>Third parties in business transactions (sale or merger)</li>
+            <li>Legal authorities when required by law</li>
+          </ul>
+          <p className="mt-2 leading-relaxed">
+            <strong>Note:</strong> We do <em>not</em> sell your personal information for monetary gain.
+          </p>
+        </section>
 
-C. Information from Third Parties
-We may supplement our data with information from payment processors, analytics providers, marketing partners, and public sources.
+        {/* V. Your Choices & Rights */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold">V. Your Choices &amp; Rights</h2>
+          <ul className="list-disc list-inside mt-2 leading-relaxed space-y-1">
+            <li>Access, correct, or delete your personal data</li>
+            <li>Restrict or object to certain processing</li>
+            <li>Opt out of marketing communications</li>
+            <li>Withdraw consent where processing is consent-based</li>
+          </ul>
+          <p className="mt-2 leading-relaxed">
+            Manage preferences in your account settings or contact us at{' '}
+            <a href="mailto:privacy@broskiskitchen.com" className="text-amber-400 hover:underline">
+              privacy@broskiskitchen.com
+            </a>.
+          </p>
+        </section>
 
----
+        {/* VI. Cookies & Tracking */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold">VI. Cookies &amp; Tracking Technologies</h2>
+          <p className="leading-relaxed">
+            We use cookies &amp; similar tech to operate and optimize our Online Services, remember
+            preferences, and tailor marketing. Categories include:
+          </p>
+          <ul className="list-disc list-inside mt-2 leading-relaxed space-y-1">
+            <li>Strictly necessary (core functionality)</li>
+            <li>Performance (analytics)</li>
+            <li>Functional (enhancements)</li>
+            <li>Advertising (targeted ads)</li>
+          </ul>
+          <p className="mt-2 leading-relaxed">
+            Manage cookie settings via your browser or our cookie consent tool.
+          </p>
+        </section>
 
-III. How We Use Your Information
-We use personal information to:
+        {/* VII. Security & Retention */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold">VII. Security &amp; Retention</h2>
+          <p className="leading-relaxed">
+            We implement industry-standard measures to protect your data and retain it only as long
+            as necessary to fulfill the described purposes and comply with laws.
+          </p>
+        </section>
 
-1. Provide and improve Online Services, process orders, and manage accounts.
-2. Communicate updates, marketing offers, and customer support.
-3. Personalize your experience and recommend products.
-4. Analyze trends, usage, and for business analytics.
-5. Ensure security, prevent fraud, and comply with legal obligations.
-6. Develop new products, services, and AI-driven features.
+        {/* VIII. International Transfers */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold">VIII. International Data Transfers</h2>
+          <p className="leading-relaxed">
+            When transferring data across borders, we use safeguards such as Standard Contractual Clauses.
+          </p>
+        </section>
 
----
+        {/* IX. Children’s Privacy */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold">IX. Children’s Privacy</h2>
+          <p className="leading-relaxed">
+            Our services are not directed to children under 16, and we do not knowingly collect their data.
+            If you believe we have, contact{' '}
+            <a href="mailto:privacy@broskiskitchen.com" className="text-amber-400 hover:underline">
+              privacy@broskiskitchen.com
+            </a>.
+          </p>
+        </section>
 
-IV. How We Share Your Information
-We may share information with:
+        {/* X. Changes */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold">X. Changes to This Statement</h2>
+          <p className="leading-relaxed">
+            We may update this Statement—material changes will be posted here or communicated via email.
+          </p>
+        </section>
 
-* Subsidiaries and affiliates.
-* Service providers (payment processors, delivery partners, analytics, marketing).
-* Third parties in connection with a business transaction (sale or merger).
-* Legal authorities when required by law.
-
-We do not sell your personal information for monetary gain.
-
----
-
-V. Your Choices & Rights
-Depending on your jurisdiction, you may have rights to:
-
-* Access, correct, or delete your personal data.
-* Restrict or object to certain processing.
-* Opt out of marketing communications.
-* Withdraw consent where processing is consent-based.
-
-You can manage preferences in your account settings or by contacting [privacy@broskiskitchen.com](mailto:privacy@broskiskitchen.com).
-
----
-
-VI. Cookies & Tracking Technologies
-We use cookies and similar technologies to operate and optimize our Online Services, remember preferences, and tailor marketing. Categories:
-
-* Strictly necessary (required for basic functionality).
-* Performance (analytics).
-* Functional (enhanced features).
-* Advertising (targeted ads).
-
-You can manage cookie settings via your browser or our cookie consent tool.
-
----
-
-VII. Security & Retention
-We implement industry-standard technical and organizational measures to protect your data. We retain personal data only as long as necessary to fulfill the purposes described and to comply with legal requirements.
-
----
-
-VIII. International Data Transfers
-If we transfer data outside your country, we use appropriate safeguards (e.g., Standard Contractual Clauses).
-
----
-
-IX. Children’s Privacy
-Our Online Services are not directed to children under 16. We do not knowingly collect data from them. If you believe we have collected data from a child under 16, contact us at [privacy@broskiskitchen.com](mailto:privacy@broskiskitchen.com).
-
----
-
-X. Changes to This Statement
-We may update this Statement. We will notify you by posting the updated date on this page or via email if material changes occur.
-
----
-
-XI. Contact Us
-For privacy questions, or to exercise your rights, email [privacy@broskiskitchen.com](mailto:privacy@broskiskitchen.com) or mail:
-
-Broskis Kitchen LLC
-Privacy Office
-123 Flavor Street
-Fort Wayne, IN 46802
-</p>
+        {/* XI. Contact */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold">XI. Contact Us</h2>
+          <p className="leading-relaxed">
+            For questions or to exercise your rights, email{' '}
+            <a href="mailto:privacy@broskiskitchen.com" className="text-amber-400 hover:underline">
+              privacy@broskiskitchen.com
+            </a>, or write to:
+          </p>
+          <address className="not-italic leading-relaxed">
+            Broskis Kitchen LLC<br />
+            Privacy Office<br />
+            123 Flavor Street<br />
+            Fort Wayne, IN 46802
+          </address>
+        </section>
+      </main>
     </div>
-  )
-}
+  );
+};
 
-export default PrivacyPage
+export default PrivacyPage;

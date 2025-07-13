@@ -1,33 +1,110 @@
-import React from 'react'
+import React from 'react';
 
 const AccessibilityPage = () => {
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">Digital Accessibility at Broskis Kitchen</h1>
-      <p>At Broskis Kitchen, we build legacies—and we build them for everyone. Our digital spaces follow the World Wide Web Consortium’s (W3C) Web Content Accessibility Guidelines (WCAG) to ensure that no soul is left behind in the order of Earth. We constantly test our sites and apps with real-deal assistive tech (screen readers, switch devices, voice control, etc.) and real users who know that hustle.
+    <div className="bg-background text-foreground min-h-screen">
+      <main className="pt-16 pb-20 container mx-auto px-4 space-y-12 max-w-4xl">
+        {/* Title */}
+        <header className="space-y-2 text-center">
+          <h1 className="text-4xl font-bold">Digital Accessibility</h1>
+          <p className="text-sm text-muted">Broskis Kitchen is built for everyone</p>
+        </header>
 
-If you or someone you ride with has trouble navigating our online menus, placing an order, or engaging with any Broskis Kitchen channel, holler at us at accessibility@broskiskitchen.com. In your message, drop:
+        {/* I. Digital Accessibility Commitment */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold">I. Our Accessibility Commitment</h2>
+          <p className="leading-relaxed">
+            At Broskis Kitchen, we build legacies—and we build them for all. Our digital
+            experiences adhere to the W3C’s Web Content Accessibility Guidelines (WCAG). We
+            continually test our sites and apps with real assistive technology (screen readers,
+            switch devices, voice control) and with users who rely on these tools every day.
+          </p>
+        </section>
 
-Your contact info
-The web address or screen where you hit a roadblock
-A quick note on what assistive gear or tech you were using
-Note: This inbox is strictly for accessibility issues. For any other feedback—flames, props, or general inquiries—slide over to our main Customer Service page, and our crew will get back to you.
+        {/* II. How to Request Assistance */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold">II. How to Request Assistance</h2>
+          <p className="leading-relaxed">
+            If you or someone you assist encounters difficulty navigating our menus, placing an
+            order, or engaging with any Broskis Kitchen channel, please contact our Digital
+            Accessibility team at{' '}
+            <a
+              href="mailto:accessibility@broskiskitchen.com"
+              className="text-amber-400 hover:underline"
+            >
+              accessibility@broskiskitchen.com
+            </a>
+            . In your message, include:
+          </p>
+          <ul className="list-disc list-inside leading-relaxed space-y-1">
+            <li>Your contact information</li>
+            <li>The web address or app screen where you experienced an issue</li>
+            <li>The assistive technology or device you were using</li>
+          </ul>
+          <p className="leading-relaxed text-muted">
+            Note: This inbox is monitored solely for accessibility issues. For other feedback,
+            please visit our Customer Service page.
+          </p>
+        </section>
 
-Inclusive Ordering, Broskis Style
-We’re on a mission to feed body and soul—no exceptions. Whether you roll up on the Broskis Kitchen app, tap in on our website, lock in your order at the counter, or drive up for that soul-food pickup, we’ve optimized every lane:
+        {/* III. Inclusive Ordering */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold">III. Inclusive Ordering</h2>
+          <p className="leading-relaxed">
+            Whether you order via the Broskis Kitchen app, website, in-store counter, or drive-thru,
+            we offer accessible options:
+          </p>
+          <ul className="list-disc list-inside leading-relaxed space-y-1">
+            <li>
+              <strong>Accessible App & Site:</strong> Screen-reader friendly, full keyboard
+              navigation, and high-contrast mode.
+            </li>
+            <li>
+              <strong>Kiosk-Free Counter:</strong> If you prefer not to use touchscreens, our crew
+              will take your order directly.
+            </li>
+            <li>
+              <strong>Drive-Thru Support:</strong> For speech or hearing disabilities, pull up to
+              the window and we’ll assist you.
+            </li>
+          </ul>
+        </section>
 
-Accessible App & Site: Screen-reader friendly, full keyboard navigation, and high-contrast mode so menus pop for every eye.
-Kiosk-Free Counter: No touchscreens? No problem. Hit the counter, and our crew’s got your back.
-Drive-Thru Support: Speech or hearing disability? Pull up, drop your order, and we’ll handle the rest.
-Alternate Menu Formats:
-Large-print menus you can grab in-store
-Picture-based guides for quick visual picks
-Audio menu option through our app’s “Listen Mode”
-Heads-up: We capture video at our pick-up windows and cooking lines for service-level insights, tech R&D, and safety. Dive into our Recording Notice FAQ on the site for details.
+        {/* IV. Alternate Menu Formats */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold">IV. Alternate Menu Formats</h2>
+          <ul className="list-disc list-inside leading-relaxed space-y-1">
+            <li>Large-print menus available in-store upon request</li>
+            <li>Picture-based guides for quick visual ordering</li>
+            <li>Audio menu via our app’s “Listen Mode”</li>
+          </ul>
+        </section>
 
-At Broskis Kitchen, our creed is clear: build systems that uplift every member of the tribe. If you hit any snags, we’re here to decode and elevate.</p>
+        {/* V. Recording Notice */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold">V. Recording Notice</h2>
+          <p className="leading-relaxed">
+            We capture video at pickup windows and in cooking areas for service improvement,
+            technology R&amp;D, and safety compliance. For details, see our Recording Notice FAQ.
+          </p>
+        </section>
+
+        {/* Footer */}
+        <footer className="mt-12 border-t pt-6 text-center">
+          <p className="leading-relaxed">
+            If you encounter barriers, we’re here to decode and elevate. Reach out anytime at{' '}
+            <a
+              href="mailto:accessibility@broskiskitchen.com"
+              className="text-amber-400 hover:underline"
+            >
+              accessibility@broskiskitchen.com
+            </a>
+            .
+          </p>
+        </footer>
+      </main>
     </div>
-  )
-}
+  );
+};
 
-export default AccessibilityPage
+export default AccessibilityPage;
