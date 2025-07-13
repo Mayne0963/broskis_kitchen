@@ -1,7 +1,15 @@
+"use client"
+
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { FaFacebook, FaTwitter, FaInstagram, FaYoutube } from "react-icons/fa"
 
 const Footer = () => {
+  const [currentYear, setCurrentYear] = useState<number | null>(null)
+
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear())
+  }, [])
   return (
     <footer className="bg-black text-white py-10">
       <div className="container mx-auto px-4">
@@ -116,7 +124,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; {new Date().getFullYear()} Broski&apos;s Kitchen. All rights reserved.</p>
+          <p>&copy; {currentYear || 2024} Broski&apos;s Kitchen. All rights reserved.</p>
         </div>
       </div>
     </footer>

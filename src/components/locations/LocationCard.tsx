@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import { useState, useEffect } from "react"
 
 import { FaMapMarkerAlt, FaPhone, FaClock, FaChevronRight } from "react-icons/fa"
 import type { Location } from "@/types/location"
@@ -12,6 +13,10 @@ interface LocationCardProps {
 }
 
 const LocationCard: React.FC<LocationCardProps> = ({ location, isSelected, onSelect }) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [status, setStatus] = useState("Loading...")
+  const [todayHours, setTodayHours] = useState("Loading...")
+
   // Determine if the location is currently open
   const getCurrentStatus = () => {
     const now = new Date()
@@ -21,7 +26,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isSelected, onSel
     const todayHours = location.hours.find((h) => h.day === day)
 
     if (!todayHours || todayHours.hours === "Closed") {
-      return { isOpen: false, status: "Closed" }
+      return { isOpen: false, status: "Closed", hours: "Closed" }
     }
 
     // Parse hours like "11:00 AM - 10:00 PM"
@@ -39,13 +44,18 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isSelected, onSel
     const closeTime = parseTimeStr(closeStr)
 
     if (currentHour >= openTime && currentHour < closeTime) {
-      return { isOpen: true, status: "Open Now" }
+      return { isOpen: true, status: "Open Now", hours: todayHours.hours }
     } else {
-      return { isOpen: false, status: "Closed" }
+      return { isOpen: false, status: "Closed", hours: todayHours.hours }
     }
   }
 
-  const { isOpen, status } = getCurrentStatus()
+  useEffect(() => {
+    const { isOpen, status, hours } = getCurrentStatus()
+    setIsOpen(isOpen)
+    setStatus(status)
+    setTodayHours(hours)
+  }, [location.hours])
 
   return (
     <div
@@ -84,10 +94,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isSelected, onSel
             <FaClock className="text-gold-foil mt-1 mr-2 flex-shrink-0" />
             <div className="text-gray-300 text-sm">
               <p className="font-medium">Today's Hours:</p>
-              <p>
-                {location.hours.find((h) => h.day === new Date().toLocaleDateString("en-US", { weekday: "long" }))
-                  ?.hours || "Closed"}
-              </p>
+              <p>{todayHours}</p>
             </div>
           </div>
         </div>

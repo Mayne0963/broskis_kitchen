@@ -2,22 +2,28 @@
 
 import type React from "react"
 
-import { useState } from "react"
-import { useAgeVerification } from "../../lib/context/AgeVerificationContext"
-import { FaTimes, FaExclamationTriangle } from "react-icons/fa"
+import { useState, useEffect } from "react"
+import { FaTimes } from "react-icons/fa"
+import { toast } from "@/hooks/use-toast"
 
 interface AgeVerificationModalProps {
+  isOpen: boolean
   onClose: () => void
-  onSuccess?: () => void
+  onVerify: (dob: Date) => void
 }
 
-const AgeVerificationModal: React.FC<AgeVerificationModalProps> = ({ onClose }) => {
-  const { verifyAge, isVerifying, error } = useAgeVerification()
+const AgeVerificationModal: React.FC<AgeVerificationModalProps> = ({ isOpen, onClose, onVerify }) => {
   const [month, setMonth] = useState("")
+  const [day, setDay] = useState("")
   const [year, setYear] = useState("")
+  const [currentYear, setCurrentYear] = useState(2024)
+  const [years, setYears] = useState<number[]>([])
 
-  const currentYear = new Date().getFullYear()
-  const years = Array.from({ length: 100 }, (_, i) => currentYear - i)
+  useEffect(() => {
+    const year = new Date().getFullYear()
+    setCurrentYear(year)
+    setYears(Array.from({ length: 100 }, (_, i) => year - i))
+  }, [])
   const months = [
     { value: "1", label: "January" },
     { value: "2", label: "February" },

@@ -19,9 +19,17 @@ export default function EventsPage() {
   const [showDetailModal, setShowDetailModal] = useState(false)
   const [showRegistrationModal, setShowRegistrationModal] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
+  const [currentDate, setCurrentDate] = useState<Date | null>(null)
+
+  // Set current date on client side
+  useEffect(() => {
+    setCurrentDate(new Date())
+  }, [])
 
   // Filter events based on search query, category, location, and time frame
   useEffect(() => {
+    if (!currentDate) return
+    
     let filtered = [...events]
 
     // Filter by search query
@@ -46,11 +54,10 @@ export default function EventsPage() {
     }
 
     // Filter by time frame
-    const now = new Date()
     if (timeFrame === "upcoming") {
-      filtered = filtered.filter((event) => new Date(event.date) >= now)
+      filtered = filtered.filter((event) => new Date(event.date) >= currentDate)
     } else if (timeFrame === "past") {
-      filtered = filtered.filter((event) => new Date(event.date) < now)
+      filtered = filtered.filter((event) => new Date(event.date) < currentDate)
     }
 
     // Sort by date
@@ -61,7 +68,7 @@ export default function EventsPage() {
     })
 
     setFilteredEvents(filtered)
-  }, [searchQuery, selectedCategory, selectedLocation, timeFrame])
+  }, [searchQuery, selectedCategory, selectedLocation, timeFrame, currentDate])
 
   // Handle event selection
   const handleEventSelect = (event: Event) => {
@@ -177,13 +184,14 @@ export default function EventsPage() {
 
       {/* Featured Event Section (only show for upcoming events) */}
       {timeFrame === "upcoming" &&
-        events.filter((event) => event.featured && new Date(event.date) >= new Date()).length > 0 && (
+        currentDate &&
+        events.filter((event) => event.featured && new Date(event.date) >= currentDate).length > 0 && (
           <section className="py-12 bg-black">
             <div className="container mx-auto px-4">
               <h2 className="text-2xl font-bold mb-8 text-center">Featured Event</h2>
 
               {events
-                .filter((event) => event.featured && new Date(event.date) >= new Date())
+                .filter((event) => event.featured && new Date(event.date) >= currentDate)
                 .slice(0, 1)
                 .map((event) => (
                   <div

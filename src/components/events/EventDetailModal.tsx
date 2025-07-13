@@ -2,6 +2,7 @@
 
 import type React from "react"
 
+import { useState, useEffect } from "react"
 import {
   FaCalendarAlt,
   FaClock,
@@ -23,6 +24,12 @@ interface EventDetailModalProps {
 }
 
 const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, categoryName, onClose, onRegister }) => {
+  const [isPast, setIsPast] = useState(false)
+
+  useEffect(() => {
+    setIsPast(new Date(event.date) < new Date())
+  }, [event.date])
+
   // Format date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -36,9 +43,6 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, categoryName
 
   // Check if event is sold out
   const isSoldOut = event.capacity <= event.registered
-
-  // Check if event is in the past
-  const isPast = new Date(event.date) < new Date()
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-80">
