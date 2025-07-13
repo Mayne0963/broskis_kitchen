@@ -4,8 +4,8 @@ const PrivacyPage = () => {
   return (
     <div className="bg-background text-foreground min-h-screen">
       <main className="pt-16 pb-20 container mx-auto px-4 space-y-12 max-w-4xl">
-        {/* Page Title */}
-        <header className="space-y-2 text center">
+        {/* Page Header */}
+        <header className="space-y-2 text-center">
           <h1 className="text-4xl font-bold">Privacy Statement</h1>
           <p className="text-sm text-muted">Last updated: July 12, 2025</p>
         </header>
@@ -26,10 +26,10 @@ const PrivacyPage = () => {
         </section>
 
         {/* II. Information We Collect & Process */}
-        <section className="space-y-4">
+        <section className="space-y-6">
           <h2 className="text-2xl font-semibold">II. Information We Collect &amp; Process</h2>
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div>
               <h3 className="text-xl font-medium">A. Information You Provide</h3>
               <ul className="list-disc list-inside mt-2 leading-relaxed space-y-1">
@@ -39,7 +39,6 @@ const PrivacyPage = () => {
                 <li><strong>Preferences &amp; feedback:</strong> liked products, survey responses</li>
               </ul>
             </div>
-
             <div>
               <h3 className="text-xl font-medium">B. Information Collected Automatically</h3>
               <ul className="list-disc list-inside mt-2 leading-relaxed space-y-1">
@@ -49,7 +48,6 @@ const PrivacyPage = () => {
                 <li>Cookies, web beacons, pixels (see Section VI)</li>
               </ul>
             </div>
-
             <div>
               <h3 className="text-xl font-medium">C. Information from Third Parties</h3>
               <p className="mt-2 leading-relaxed">
@@ -159,14 +157,14 @@ const PrivacyPage = () => {
           </p>
         </section>
 
-        {/* XI. Contact */}
-        <section className="space-y-4">
-          <h2 className="text-2xl font-semibold">XI. Contact Us</h2>
+        {/* Footer Contact */}
+        <footer className="mt-12 border-t pt-6 text-center">
           <p className="leading-relaxed">
             For questions or to exercise your rights, email{' '}
             <a href="mailto:privacy@broskiskitchen.com" className="text-amber-400 hover:underline">
               privacy@broskiskitchen.com
-            </a>, or write to:
+            </a>
+            , or write to:
           </p>
           <address className="not-italic leading-relaxed">
             Broskis Kitchen LLC<br />
@@ -174,7 +172,7 @@ const PrivacyPage = () => {
             123 Flavor Street<br />
             Fort Wayne, IN 46802
           </address>
-        </section>
+        </footer>
       </main>
     </div>
   );
