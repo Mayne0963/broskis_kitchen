@@ -1,4 +1,15 @@
-# Google Sign-In Session Creation Fix
+# Google Sign-In Fix: "Failed to create session" Error
+
+## Problem
+
+When attempting to sign in with Google using `signIn('google')`, the browser console logged the following error:
+
+```
+[Error] Google Sign-In error: – Error: Failed to create session
+Error: Failed to create session
+    at (anonymous) (vendors-*.js:…)
+    at (anonymous) (common-*.js:…)
+```
 
 ## Problem Diagnosed
 
