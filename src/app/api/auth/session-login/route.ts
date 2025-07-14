@@ -24,8 +24,9 @@ export async function POST(request: NextRequest) {
     
     const decodedToken = await auth.verifyIdToken(idToken)
 
-    // Check if email is verified
-    if (!decodedToken.email_verified) {
+    // Check if email is verified (skip for Google OAuth users as they are pre-verified)
+    const isGoogleUser = decodedToken.firebase?.sign_in_provider === 'google.com'
+    if (!decodedToken.email_verified && !isGoogleUser) {
       return NextResponse.json(
         { error: 'Email not verified' },
         { status: 403 }
@@ -49,8 +50,21 @@ export async function POST(request: NextRequest) {
     return response
   } catch (error) {
     console.error('Session login error:', error)
+    
+    // Provide more specific error messages for debugging
+    let errorMessage = 'Failed to create session'
+    if (error instanceof Error) {
+      if (error.message.includes('Firebase Admin not initialized')) {
+        errorMessage = 'Firebase Admin SDK not properly configured'
+      } else if (error.message.includes('Invalid ID token')) {
+        errorMessage = 'Invalid authentication token'
+      } else if (error.message.includes('Token expired')) {
+        errorMessage = 'Authentication token expired'
+      }
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to create session' },
+      { error: errorMessage },
       { status: 500 }
     )
   }
