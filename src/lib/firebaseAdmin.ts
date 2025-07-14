@@ -33,22 +33,10 @@ function initializeFirebaseAdmin() {
   }
 }
 
-// Lazy initialization
-function getAdminAuth() {
-  if (!adminAuth) {
-    const { auth } = initializeFirebaseAdmin()
-    adminAuth = auth
-  }
-  return adminAuth
-}
+// Remove lazy initialization functions
+// Initialize immediately at module level
+const { auth, app } = initializeFirebaseAdmin();
 
-function getAdminApp() {
-  if (!adminApp) {
-    const { app } = initializeFirebaseAdmin()
-    adminApp = app
-  }
-  return adminApp
-}
-
-// Export the admin instances with lazy initialization
-export { getAdminAuth as adminAuth, getAdminApp as adminApp }
+// Export functions that return the initialized instances
+export const adminAuth = () => auth;
+export const adminApp = () => app;
