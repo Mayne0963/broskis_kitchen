@@ -241,9 +241,19 @@ export const getVerificationStatus = async (userId: string): Promise<boolean> =>
   }
 
   try {
-    // Force token refresh before accessing Firestore
+    // Wait for authentication state to stabilize and ensure fresh token
     if (auth.currentUser) {
-      await getIdToken(auth.currentUser, true); // Force refresh the token
+      // Wait a brief moment for auth state to fully stabilize after sign-in
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Force token refresh to ensure we have valid permissions
+      await getIdToken(auth.currentUser, true);
+      
+      // Additional wait to ensure token propagation to Firestore
+      await new Promise(resolve => setTimeout(resolve, 200));
+    } else {
+      // No authenticated user, return false
+      return false;
     }
     
     const verificationDocRef = doc(db, 'verifications', userId);

@@ -47,6 +47,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
       if (authUser) {
         try {
+          // Brief delay to ensure auth state stabilization after sign-in
+          await new Promise(resolve => setTimeout(resolve, 300));
+          
           // Get user data from Firestore
           if (db) {
             const userDoc = await getDoc(doc(db, 'users', authUser.uid))

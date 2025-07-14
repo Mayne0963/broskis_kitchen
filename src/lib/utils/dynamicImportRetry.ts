@@ -103,34 +103,24 @@ export function setupChunkErrorHandler(): void {
   if (typeof window !== 'undefined') {
     // Store a flag to prevent multiple reloads in quick succession
     let reloadPending = false;
+    let reloadTimeout: NodeJS.Timeout | null = null;
     
     const handleChunkError = (error: Error) => {
       if (isChunkLoadError(error) && !reloadPending) {
         console.error('Chunk loading error detected:', error);
         reloadPending = true;
         
-        // Use a more subtle approach for auth-related chunks
-        // Check if the error is related to layout chunks
-        const isLayoutChunk = error.message.includes('layout-') || 
-                             error.message.includes('app-');
-        
-        if (isLayoutChunk) {
-          console.log('Auth-related chunk error detected, attempting recovery...');
-          // For layout chunks, try to recover without a full page reload first
-          setTimeout(() => {
-            // If we're still on the page after timeout, do a soft reload
-            window.location.reload();
-          }, 1500);
-        } else {
-          // For other chunks, use the existing confirmation approach
-          const shouldReload = confirm(
-            'The application needs to reload due to an update. Click OK to refresh the page.'
-          );
-          
-          if (shouldReload) {
-            window.location.reload();
-          }
+        // Clear any existing timeout to debounce multiple errors
+        if (reloadTimeout) {
+          clearTimeout(reloadTimeout);
         }
+        
+        // Debounced auto-reload for all chunk errors to ensure seamless recovery
+        console.log('Chunk error handler initialized - auto-reloading in 2 seconds...');
+        reloadTimeout = setTimeout(() => {
+          console.log('Auto-reloading page to recover from chunk error');
+          window.location.reload();
+        }, 2000);
       }
     };
     
