@@ -1,10 +1,6 @@
 import { initializeApp, getApps, getApp, cert } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
 
-// Initialize Firebase Admin SDK
-let adminAuth: any = null
-let adminApp: any = null
-
 function initializeFirebaseAdmin() {
   if (getApps().length > 0) {
     return { auth: getAuth(), app: getApp() }
