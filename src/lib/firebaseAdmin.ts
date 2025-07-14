@@ -6,9 +6,7 @@ export function initializeFirebaseAdmin() {
     return { auth: getAuth(getApp()), app: getApp() }
   }
 
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/
-/g, '
-')
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\n/g, '\n')
 
   if (!privateKey || !process.env.FIREBASE_CLIENT_EMAIL || !process.env.FIREBASE_PROJECT_ID) {
     console.warn('Firebase Admin SDK configuration missing - some features may not work')
