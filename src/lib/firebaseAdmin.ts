@@ -1,20 +1,16 @@
 import { initializeApp, getApps, getApp, cert } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
 
-@@ -2,10 +2,10 @@
-  import { getAuth } from 'firebase-admin/auth'
-  
-- function initializeFirebaseAdmin() {
-+ export function initializeFirebaseAdmin() {
-    if (getApps().length > 0) {
--     return { auth: getAuth(), app: getApp() }
-+     return { auth: getAuth(getApp()), app: getApp() }
-    }
-  
--   const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\n/g, '\n')
-+   const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\n/g, '\n')
-    
-    if (!privateKey || !process.env.FIREBASE_CLIENT_EMAIL || !process.env.FIREBASE_PROJECT_ID) {
+export function initializeFirebaseAdmin() {
+  if (getApps().length > 0) {
+    return { auth: getAuth(getApp()), app: getApp() }
+  }
+
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/
+/g, '
+')
+
+  if (!privateKey || !process.env.FIREBASE_CLIENT_EMAIL || !process.env.FIREBASE_PROJECT_ID) {
     console.warn('Firebase Admin SDK configuration missing - some features may not work')
     return { auth: null, app: null }
   }
@@ -24,7 +20,7 @@ import { getAuth } from 'firebase-admin/auth'
       credential: cert({
         projectId: process.env.FIREBASE_PROJECT_ID,
         clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: privateKey,
+        privateKey,
       }),
     })
     console.log('Firebase Admin SDK initialized successfully')
