@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app"
-import { getAuth, onAuthStateChanged, Auth, User, GoogleAuthProvider } from "firebase/auth"
+import { getAuth, onAuthStateChanged, Auth, User, GoogleAuthProvider, getIdToken } from "firebase/auth"
 import { getFirestore, doc, setDoc, getDoc, Timestamp, Firestore, connectFirestoreEmulator } from "firebase/firestore"
 import { getStorage, FirebaseStorage } from "firebase/storage"
 import { toast } from "sonner"

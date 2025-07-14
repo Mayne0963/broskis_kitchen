@@ -509,6 +509,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     signInWithGoogle,
     resendEmailVerification,
+    sendVerificationEmail: resendEmailVerification,
   }
 
   return (
