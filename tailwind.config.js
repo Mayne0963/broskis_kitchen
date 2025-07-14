@@ -17,6 +17,7 @@ module.exports = {
         "royal-purple": "var(--color-royal-purple)",
         "citrus-orange": "var(--color-citrus-orange)",
         "ai-blue": "var(--color-ai-blue)",
+        "harvest-gold": "var(--color-harvest-gold)",
 
         // Legacy colors for compatibility
         primary: "var(--primary)",

@@ -1,113 +1,40 @@
-"use client"
+import { PaymentMethods } from '@/components/dashboard/PaymentMethods';
+import { SavedAddresses } from '@/components/dashboard/SavedAddresses';
+import { PaymentHistory } from '@/components/dashboard/PaymentHistory';
+import { OrderHistory } from '@/components/dashboard/OrderHistory';
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { useAuth } from "../../lib/context/AuthContext"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { FaHome, FaChevronRight, FaUser, FaShoppingCart, FaGift, FaMusic } from "react-icons/fa"
+export default async function DashboardPage() {
+  // TODO: Fetch real data from API endpoints (e.g., await fetch('/api/user/payment-methods'))
+  // Replace with actual fetching logic in production
+  const paymentMethods = [
+    { id: 'card1', type: 'Visa', last4: '1234', expiry: '12/25' },
+    { id: 'wallet1', type: 'Apple Pay', last4: 'N/A', expiry: 'N/A' },
+  ];
 
-export default function DashboardPage() {
-  const { user, isLoading } = useAuth()
-  const router = useRouter()
+  const addresses = [
+    { id: 'addr1', label: 'Home', street: '123 Main St', city: 'Anytown', state: 'CA', zip: '12345' },
+    { id: 'addr2', label: 'Work', street: '456 Office Blvd', city: 'Busytown', state: 'NY', zip: '67890' },
+  ];
 
-  useEffect(() => {
-    if (!isLoading && !user) {
-      router.push("/auth")
-    }
-  }, [user, isLoading, router])
+  const paymentHistory = [
+    { id: 'pay1', date: '2023-10-01', amount: 45.99, method: 'Visa ****1234', status: 'Completed' },
+    { id: 'pay2', date: '2023-09-15', amount: 32.50, method: 'Apple Pay', status: 'Refunded' },
+  ];
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#1A1A1A] text-white">
-        <p>Loading dashboard...</p>
-      </div>
-    )
-  }
-
-  if (!user) {
-    return null // Should be redirected by useEffect
-  }
+  const orderHistory = [
+    { id: 'ord1', date: '2023-10-01', items: 'Burger x1, Fries x1', total: 25.99 },
+    { id: 'ord2', date: '2023-09-15', items: 'Sandwich x2', total: 19.98 },
+  ];
 
   return (
-    <div className="min-h-screen bg-[#1A1A1A] text-white">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header Bar with Breadcrumbs */}
-        <div className="mb-8 flex items-center justify-between">
-          <div className="flex items-center space-x-2 text-sm text-gray-400">
-            <Link href="/" className="flex items-center hover:text-gold-500">
-              <FaHome className="mr-1" /> Home
-            </Link>
-            <FaChevronRight className="h-3 w-3" />
-            <span>Dashboard</span>
-          </div>
-          <h1 className="text-3xl font-bold text-gold-500">My Dashboard</h1>
-        </div>
-
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {/* Profile Card */}
-          <Card className="bg-gray-800 text-white shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-gold-500">Profile Overview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="mb-2">Welcome, {user.name || user.email}!</p>
-              <p className="mb-4 text-sm text-gray-400">Manage your personal information.</p>
-              <Button asChild className="w-full bg-gold-600 hover:bg-gold-700">
-                <Link href="/profile">
-                  <FaUser className="mr-2" /> View Profile
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Orders Card */}
-          <Card className="bg-gray-800 text-white shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-gold-500">My Orders</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="mb-4 text-sm text-gray-400">Track your recent orders and view order history.</p>
-              <Button asChild className="w-full bg-gold-600 hover:bg-gold-700">
-                <Link href="/orders">
-                  <FaShoppingCart className="mr-2" /> View Orders
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Rewards Card */}
-          <Card className="bg-gray-800 text-white shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-gold-500">My Rewards</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="mb-4 text-sm text-gray-400">Check your loyalty points and redeem rewards.</p>
-              <Button asChild className="w-full bg-gold-600 hover:bg-gold-700">
-                <Link href="/rewards">
-                  <FaGift className="mr-2" /> View Rewards
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Music Card (Example of another section) */}
-          <Card className="bg-gray-800 text-white shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-gold-500">My Music</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="mb-4 text-sm text-gray-400">Explore your saved music and playlists.</p>
-              <Button asChild className="w-full bg-gold-600 hover:bg-gold-700">
-                <Link href="/music">
-                  <FaMusic className="mr-2" /> Go to Music
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+    <div className="min-h-screen bg-[#1A1A1A] p-4 md:p-8 text-white">
+      <h1 className="text-3xl font-bold mb-6 text-center text-[var(--color-harvest-gold)]">User Dashboard</h1>
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+        <PaymentMethods methods={paymentMethods} />
+        <SavedAddresses addresses={addresses} />
+        <PaymentHistory history={paymentHistory} />
+        <OrderHistory orders={orderHistory} />
       </div>
     </div>
-  )
+  );
 }
