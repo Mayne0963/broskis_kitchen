@@ -361,13 +361,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         description: "Firebase or Google Provider not configured - Google Sign-In disabled",
         variant: "destructive",
       })
-      return false
+      return false;
     }
     try {
-      setIsLoading(true)
-      const result = await signInWithPopup(auth, googleProvider)
-      const user = result.user
-
+      setIsLoading(true);
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+  
       // Create or update user document in Firestore
       await setDoc(doc(db, 'users', user.uid), {
         name: user.displayName,
@@ -375,59 +375,82 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         role: 'user',
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
-      }, { merge: true })
-
-      // Create session cookie
-      const idToken = await getIdToken(user)
-      const response = await fetch('/api/auth/session-login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ idToken }),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to create session')
+      }, { merge: true });
+  
+      // Create session cookie with retry logic
+      let sessionCreated = false;
+      let retryCount = 0;
+      const maxRetries = 3;
+      
+      while (!sessionCreated && retryCount < maxRetries) {
+        try {
+          // Force token refresh before getting ID token
+          const idToken = await getIdToken(user, true);
+          
+          const response = await fetch('/api/auth/session-login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ idToken }),
+          });
+  
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to create session');
+          }
+          
+          sessionCreated = true;
+        } catch (sessionError) {
+          console.warn(`Session creation attempt ${retryCount + 1} failed:`, sessionError);
+          retryCount++;
+          
+          if (retryCount >= maxRetries) {
+            throw sessionError;
+          }
+          
+          // Wait before retrying
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
       }
-
+  
       toast({
         title: "Google Sign-In Successful",
         description: "Welcome to Broski's Kitchen!",
-      })
-      return true
+      });
+      return true;
     } catch (error: unknown) {
-      console.error("Google Sign-In error:", error)
-      let errorMessage = "Failed to sign in with Google."
-
-      const firebaseError = error as { code?: string }
+      console.error("Google Sign-In error:", error);
+      let errorMessage = "Failed to sign in with Google.";
+  
+      const firebaseError = error as { code?: string };
       switch (firebaseError.code) {
         case 'auth/popup-closed-by-user':
-          errorMessage = "Google Sign-In popup closed. Please try again."
-          break
+          errorMessage = "Google Sign-In popup closed. Please try again.";
+          break;
         case 'auth/cancelled-popup-request':
-          errorMessage = "Google Sign-In popup already open. Please wait."
-          break
+          errorMessage = "Google Sign-In popup already open. Please wait.";
+          break;
         case 'auth/operation-not-allowed':
-          errorMessage = "Google Sign-In is not enabled. Please contact support."
-          break
+          errorMessage = "Google Sign-In is not enabled. Please contact support.";
+          break;
         case 'auth/network-request-failed':
-          errorMessage = "Network error. Please check your connection and try again."
-          break
+          errorMessage = "Network error. Please check your connection and try again.";
+          break;
         default:
-          errorMessage = (error as Error).message || "Failed to sign in with Google."
+          errorMessage = (error as Error).message || "Failed to sign in with Google.";
       }
-
+  
       toast({
         title: "Google Sign-In Failed",
         description: errorMessage,
         variant: "destructive",
-      })
-      return false
+      });
+      return false;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const resendEmailVerification = async (): Promise<boolean> => {
     if (!auth || !auth.currentUser) {

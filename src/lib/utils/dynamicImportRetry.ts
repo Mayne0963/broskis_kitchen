@@ -101,32 +101,50 @@ export function isChunkLoadError(error: Error): boolean {
  */
 export function setupChunkErrorHandler(): void {
   if (typeof window !== 'undefined') {
-    window.addEventListener('error', (event) => {
-      if (isChunkLoadError(event.error)) {
-        console.error('Chunk loading error detected:', event.error);
+    // Store a flag to prevent multiple reloads in quick succession
+    let reloadPending = false;
+    
+    const handleChunkError = (error: Error) => {
+      if (isChunkLoadError(error) && !reloadPending) {
+        console.error('Chunk loading error detected:', error);
+        reloadPending = true;
         
-        // Show user-friendly message
-        const shouldReload = confirm(
-          'The application needs to reload due to an update. Click OK to refresh the page.'
-        );
+        // Use a more subtle approach for auth-related chunks
+        // Check if the error is related to layout chunks
+        const isLayoutChunk = error.message.includes('layout-') || 
+                             error.message.includes('app-');
         
-        if (shouldReload) {
-          window.location.reload();
+        if (isLayoutChunk) {
+          console.log('Auth-related chunk error detected, attempting recovery...');
+          // For layout chunks, try to recover without a full page reload first
+          setTimeout(() => {
+            // If we're still on the page after timeout, do a soft reload
+            window.location.reload();
+          }, 1500);
+        } else {
+          // For other chunks, use the existing confirmation approach
+          const shouldReload = confirm(
+            'The application needs to reload due to an update. Click OK to refresh the page.'
+          );
+          
+          if (shouldReload) {
+            window.location.reload();
+          }
         }
+      }
+    };
+    
+    window.addEventListener('error', (event) => {
+      if (event.error) handleChunkError(event.error);
+    });
+    
+    window.addEventListener('unhandledrejection', (event) => {
+      if (event.reason) {
+        handleChunkError(event.reason);
+        event.preventDefault();
       }
     });
     
-    // Handle unhandled promise rejections
-    window.addEventListener('unhandledrejection', (event) => {
-      if (event.reason && isChunkLoadError(event.reason)) {
-        console.error('Unhandled chunk loading error:', event.reason);
-        event.preventDefault(); // Prevent the error from being logged to console
-        
-        // Optionally reload the page
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
-      }
-    });
+    console.log('Chunk error handler initialized');
   }
 }

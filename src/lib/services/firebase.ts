@@ -231,29 +231,44 @@ export const storeVerificationStatus = async (userId: string, isVerified: boolea
 
 export const getVerificationStatus = async (userId: string): Promise<boolean> => {
   if (userId === 'local-fallback-user') {
-    console.warn('Skipping Firestore read for local fallback user.')
-    return false
+    console.warn('Skipping Firestore read for local fallback user.');
+    return false;
   }
 
-  if (!db) {
-    toast.error("Firestore is not initialized.")
-    return false
+  if (!db || !auth) {
+    toast.error("Firestore is not initialized.");
+    return false;
   }
 
   try {
-    const verificationDocRef = doc(db, 'verifications', userId)
-    const docSnap = await getDoc(verificationDocRef)
+    // Force token refresh before accessing Firestore
+    if (auth.currentUser) {
+      await getIdToken(auth.currentUser, true); // Force refresh the token
+    }
+    
+    const verificationDocRef = doc(db, 'verifications', userId);
+    const docSnap = await getDoc(verificationDocRef);
 
     if (docSnap.exists()) {
-      const data = docSnap.data()
-      return data.isVerified
+      const data = docSnap.data();
+      return data.isVerified;
     } else {
-      return false
+      return false;
     }
   } catch (error: any) {
-    console.error('Error getting verification status:', error)
-    toast.error(`Failed to get verification status: ${error.message || "Unknown error"}`)
-    return false
+    console.error('Error getting verification status:', error);
+    
+    // Check for localStorage fallback on permission errors
+    if (error.code === 'permission-denied' && typeof window !== 'undefined') {
+      const storedValue = localStorage.getItem('ageVerified');
+      if (storedValue) {
+        console.log('Using localStorage fallback for verification status');
+        return storedValue === 'true';
+      }
+    }
+    
+    toast.error(`Failed to get verification status: ${error.message || "Unknown error"}`);
+    return false;
   }
 }
 
