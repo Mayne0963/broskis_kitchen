@@ -1,8 +1,12 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { adminAuth } from '@/lib/firebaseAdmin'
 
 export async function POST() {
+  if (process.env.NEXT_PHASE === 'phase-production-build') {
+    return NextResponse.json({});
+  }
   try {
     const cookieStore = await cookies()
     const sessionCookie = cookieStore.get('session')?.value

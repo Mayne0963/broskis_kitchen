@@ -1,8 +1,12 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { adminAuth } from '@/lib/firebaseAdmin'
 
 export async function POST(request: NextRequest) {
+  if (process.env.NEXT_PHASE === 'phase-production-build') {
+    return NextResponse.json({});
+  }
   try {
     const { idToken } = await request.json();
 
@@ -44,7 +48,7 @@ export async function POST(request: NextRequest) {
       return response;
     } catch (error: unknown) {
       console.error('Session login error:', error);
-      if (error instanceof Error && error.code && (error.code as string).startsWith('auth/')) {
+      if (error instanceof Error && 'code' in error && typeof error.code === 'string' && error.code.startsWith('auth/')) {
         return NextResponse.json({ error: error.message }, { status: 401 });
       }
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
