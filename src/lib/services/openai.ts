@@ -1,9 +1,6 @@
 import OpenAI from "openai"
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+
 
 interface VerificationResult {
   success: boolean
@@ -22,6 +19,15 @@ interface VerificationResult {
  */
 export async function verifyIDWithAI(idImage: string, selfieImage: string): Promise<VerificationResult> {
   try {
+    // Check if API key is configured
+    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your-openai-api-key' || process.env.OPENAI_API_KEY === 'sk-your-actual-openai-api-key-here') {
+      console.error('OpenAI API key is not configured properly')
+      return { success: false, message: "I'm currently unable to process your request because my AI services are not properly configured. Please contact support or try again later." }
+    }
+
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    })
     // Step 1: Analyze the ID document
     const idAnalysisResponse = await openai.chat.completions.create({
       model: "gpt-4-vision-preview",

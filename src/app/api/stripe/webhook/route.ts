@@ -3,16 +3,28 @@ import Stripe from 'stripe'
 import { headers } from 'next/headers'
 import { updateOrderStatus } from '@/lib/services/orderService'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-02-24.acacia',
-})
 
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!
 
 export async function POST(request: NextRequest) {
   const body = await request.text()
   const headersList = await headers()
   const sig = headersList.get('stripe-signature')!
+
+  if (!process.env.STRIPE_SECRET_KEY) {
+    console.error('Stripe secret key is missing')
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+  }
+
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2025-02-24.acacia',
+  })
+
+  if (!process.env.STRIPE_WEBHOOK_SECRET) {
+    console.error('Stripe webhook secret is missing')
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+  }
+
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET
 
   let event: Stripe.Event
 

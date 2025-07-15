@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -8,6 +8,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Mail, CheckCircle, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/lib/context/AuthContext'
 import { toast, Toaster } from 'sonner'
+
+export const dynamic = 'force-dynamic'
 
 export default function VerifyEmailPage() {
   const [isResending, setIsResending] = useState(false)
@@ -40,14 +42,14 @@ export default function VerifyEmailPage() {
   }
 
   const handleCheckVerification = () => {
-    // Refresh the page to check if email is now verified
-    window.location.reload()
+    router.refresh()
   }
 
-  if (!user) {
-    router.push('/auth/login')
-    return null
-  }
+  useEffect(() => {
+    if (!user) {
+      router.push('/auth/login')
+    }
+  }, [user, router])
 
   return (
     <>
@@ -62,7 +64,7 @@ export default function VerifyEmailPage() {
             Verify Your Email
           </CardTitle>
           <CardDescription className="text-gray-600">
-            We've sent a verification link to <strong>{user.email}</strong>
+            We've sent a verification link to <strong>{user?.email}</strong>
           </CardDescription>
         </CardHeader>
         

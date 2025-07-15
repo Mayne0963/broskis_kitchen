@@ -2,14 +2,7 @@ import OpenAI from "openai"
 import { vectorStore } from "../utils/vectorStore"
 
 // Initialize OpenAI client with the provided API key
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
 
-// Check if API key is properly configured
-if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your-openai-api-key' || process.env.OPENAI_API_KEY === 'sk-your-actual-openai-api-key-here') {
-  console.warn('⚠️  OpenAI API key is not properly configured. Please set OPENAI_API_KEY in your .env.local file.')
-}
 
 // System prompt template
 const SYSTEM_PROMPT = `You are BroskiBot, the AI assistant for Broski's Kitchen, a luxury street gourmet restaurant.
@@ -30,6 +23,10 @@ export async function generateChatResponse(messages: { role: string; text: strin
       console.error('OpenAI API key is not configured properly')
       return "I'm currently unable to process your request because my AI services are not properly configured. Please contact support or try again later."
     }
+
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    })
 
     // Search for relevant content
     const searchResults = vectorStore.search(query)
