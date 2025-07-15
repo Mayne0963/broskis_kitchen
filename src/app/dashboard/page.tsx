@@ -1,7 +1,9 @@
-import { PaymentMethods } from '@/components/dashboard/PaymentMethods';
-import { SavedAddresses } from '@/components/dashboard/SavedAddresses';
-import { PaymentHistory } from '@/components/dashboard/PaymentHistory';
-import { OrderHistory } from '@/components/dashboard/OrderHistory';
+"use client";
+
+import { PaymentMethods } from '../../components/dashboard/PaymentMethods';
+import { SavedAddresses } from '../../components/dashboard/SavedAddresses';
+import { PaymentHistory } from '../../components/dashboard/PaymentHistory';
+import { OrderHistory } from '../../components/dashboard/OrderHistory';
 
 export default async function DashboardPage() {
   // TODO: Fetch real data from API endpoints (e.g., await fetch('/api/user/payment-methods'))
