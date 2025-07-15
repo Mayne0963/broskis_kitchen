@@ -14,20 +14,16 @@ export const adminAuth = () => {
 
   if (!getApps().length) {
     const rawKey = process.env.FIREBASE_PRIVATE_KEY;
-    if (!rawKey) {
-      throw new Error('FIREBASE_PRIVATE_KEY env var is missing');
-    }
-    const privateKey = rawKey.replace(/\n/g, '\n');
-
     const projectId = process.env.FIREBASE_PROJECT_ID;
-    if (!projectId) {
-      throw new Error('FIREBASE_PROJECT_ID env var is missing');
-    }
-
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-    if (!clientEmail) {
-      throw new Error('FIREBASE_CLIENT_EMAIL env var is missing');
+
+    if (!rawKey || !projectId || !clientEmail) {
+      throw new Error(
+        'Missing Firebase Admin SDK environment variables. Ensure FIREBASE_PRIVATE_KEY, FIREBASE_PROJECT_ID, and FIREBASE_CLIENT_EMAIL are set.'
+      );
     }
+    // Replace escaped newlines with actual newlines
+    const privateKey = rawKey.replace(/\n/g, '\n');
 
     initializeApp({
       credential: cert({
