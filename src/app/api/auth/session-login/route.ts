@@ -15,14 +15,6 @@ export async function POST(request: NextRequest) {
 
     // Verify the ID token
     const auth = adminAuth();
-    if (!auth) {
-      console.error('Firebase Admin SDK not initialized. Check environment variables.');
-      return NextResponse.json(
-        { error: 'Firebase Admin not initialized. Check server logs for details.' },
-        { status: 500 }
-      );
-    }
-    
     try {
       const decodedToken = await auth.verifyIdToken(idToken);
 
@@ -40,7 +32,7 @@ export async function POST(request: NextRequest) {
       const sessionCookie = await auth.createSessionCookie(idToken, { expiresIn });
 
       // Set the session cookie
-      const response = NextResponse.json({ success: true });
+      const response = NextResponse.json({ success: true }, { status: 200 });
       response.cookies.set('session', sessionCookie, {
         maxAge: expiresIn,
         httpOnly: true,
@@ -50,15 +42,12 @@ export async function POST(request: NextRequest) {
       });
       
       return response;
-    } catch (tokenError) {
-      console.error('Token verification error:', tokenError);
-      if (tokenError instanceof Error && tokenError.message.includes('auth/id-token-expired')) {
-        return NextResponse.json(
-          { error: 'Authentication token expired' },
-          { status: 401 }
-        );
+    } catch (error: unknown) {
+      console.error('Session login error:', error);
+      if (error instanceof Error && error.code && (error.code as string).startsWith('auth/')) {
+        return NextResponse.json({ error: error.message }, { status: 401 });
       }
-      throw tokenError; // Re-throw for the outer catch block
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
   } catch (error) {
     console.error('Session login error:', error);
