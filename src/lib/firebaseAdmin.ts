@@ -23,7 +23,7 @@ export const adminAuth = () => {
       );
     }
     // Replace escaped newlines with actual newlines
-    const privateKey = rawKey.replace(/\n/g, '\n');
+    const privateKey = rawKey.replace(/\\n/g, "\n");
 
     initializeApp({
       credential: cert({
