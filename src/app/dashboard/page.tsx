@@ -1,32 +1,65 @@
 "use client";
 
-import { PaymentMethods } from '../../components/dashboard/PaymentMethods';
-import { SavedAddresses } from '../../components/dashboard/SavedAddresses';
-import { PaymentHistory } from '../../components/dashboard/PaymentHistory';
-import { OrderHistory } from '../../components/dashboard/OrderHistory';
+import { PaymentMethods } from "../../components/dashboard/PaymentMethods";
+import { SavedAddresses } from "../../components/dashboard/SavedAddresses";
+import { PaymentHistory } from "../../components/dashboard/PaymentHistory";
+import { OrderHistory } from "../../components/dashboard/OrderHistory";
+import { useEffect, useState } from "react";
+import { useAuth } from "../../lib/context/AuthContext"; // Assuming AuthContext provides user info
 
-export default async function DashboardPage() {
-  // TODO: Fetch real data from API endpoints (e.g., await fetch('/api/user/payment-methods'))
-  // Replace with actual fetching logic in production
-  const paymentMethods = [
-    { id: 'card1', type: 'Visa', last4: '1234', expiry: '12/25' },
-    { id: 'wallet1', type: 'Apple Pay', last4: 'N/A', expiry: 'N/A' },
-  ];
+export default function DashboardPage() {
+  const { currentUser } = useAuth();
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [addresses, setAddresses] = useState([]);
+  const [paymentHistory, setPaymentHistory] = useState([]);
+  const [orderHistory, setOrderHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const addresses = [
-    { id: 'addr1', label: 'Home', street: '123 Main St', city: 'Anytown', state: 'CA', zip: '12345' },
-    { id: 'addr2', label: 'Work', street: '456 Office Blvd', city: 'Busytown', state: 'NY', zip: '67890' },
-  ];
+  useEffect(() => {
+    async function fetchData() {
+      if (!currentUser || !currentUser.uid) {
+        setLoading(false);
+        return;
+      }
 
-  const paymentHistory = [
-    { id: 'pay1', date: '2023-10-01', amount: 45.99, method: 'Visa ****1234', status: 'Completed' },
-    { id: 'pay2', date: '2023-09-15', amount: 32.50, method: 'Apple Pay', status: 'Refunded' },
-  ];
+      try {
+        // Fetch Order History
+        const ordersRes = await fetch(`/api/orders?userId=${currentUser.uid}`);
+        if (!ordersRes.ok) {
+          throw new Error(`HTTP error! status: ${ordersRes.status}`);
+        }
+        const ordersData = await ordersRes.json();
+        setOrderHistory(ordersData.orders || []);
 
-  const orderHistory = [
-    { id: 'ord1', date: '2023-10-01', items: 'Burger x1, Fries x1', total: 25.99 },
-    { id: 'ord2', date: '2023-09-15', items: 'Sandwich x2', total: 19.98 },
-  ];
+        // TODO: Implement API endpoints for payment methods, saved addresses, and payment history
+        // For now, using placeholder data or empty arrays
+        setPaymentMethods([]); // Replace with actual fetch from /api/payment-methods
+        setAddresses([]); // Replace with actual fetch from /api/addresses
+        setPaymentHistory([]); // Replace with actual fetch from /api/payment-history
+
+      } catch (error: any) {
+        console.error("Error fetching dashboard data:", error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, [currentUser]);
+
+  if (loading) {
+    return <div className="min-h-screen bg-[#1A1A1A] p-4 md:p-8 text-white text-center">Loading dashboard data...</div>;
+  }
+
+  if (error) {
+    return <div className="min-h-screen bg-[#1A1A1A] p-4 md:p-8 text-white text-center text-red-500">Error: {error}</div>;
+  }
+
+  if (!currentUser) {
+    return <div className="min-h-screen bg-[#1A1A1A] p-4 md:p-8 text-white text-center">Please log in to view your dashboard.</div>;
+  }
 
   return (
     <div className="min-h-screen bg-[#1A1A1A] p-4 md:p-8 text-white">
