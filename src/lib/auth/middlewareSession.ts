@@ -10,9 +10,9 @@ export interface SessionUser {
 
 // Lightweight session parsing for middleware (Edge Runtime)
 // This function only does basic JWT parsing without firebase-admin
-export function getSessionCookieForMiddleware(): SessionUser | null {
+export async function getSessionCookieForMiddleware(): Promise<SessionUser | null> {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const sessionCookie = cookieStore.get('session')?.value
 
     if (!sessionCookie) {

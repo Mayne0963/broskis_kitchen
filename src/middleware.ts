@@ -21,7 +21,7 @@ export async function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
 
   // Check authentication status
-  const user = getSessionCookieForMiddleware()
+  const user = await getSessionCookieForMiddleware()
   const isAuthenticated = !!user
   const isEmailVerified = user?.emailVerified || false
 
