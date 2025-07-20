@@ -501,6 +501,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const value = {
     user,
+    currentUser: user, // Explicitly add currentUser to the value object
     isLoading,
     isAuthenticated,
     login,
