@@ -9,7 +9,7 @@ import { infusedMenuItems } from "../../data/menu-data"
 
 export default function InfusedMenuPage() {
   const [selectedCategory, setSelectedCategory] = useState("all")
-  const [showComingSoon, setShowComingSoon] = useState(true)
+  const [showComingSoon] = useState(true) // Always show disclaimer
 
   // Get unique categories
   const categories = [
@@ -26,14 +26,12 @@ export default function InfusedMenuPage() {
       ? infusedMenuItems
       : infusedMenuItems.filter((item) => item.category === selectedCategory)
 
-  const handleCloseOverlay = () => {
-    setShowComingSoon(false)
-  }
+  // Removed close functionality to keep disclaimer always open
 
   return (
     <div className="min-h-screen relative">
-      {/* Coming Soon Overlay */}
-      {showComingSoon && <ComingSoonOverlay onClose={handleCloseOverlay} />}
+      {/* Coming Soon Overlay - Always Visible */}
+      {showComingSoon && <ComingSoonOverlay onClose={() => {}} />}
 
       {/* Main Content (Blurred when Coming Soon is shown) */}
       <div className={`${showComingSoon ? "blur-sm" : ""} transition-all duration-300`}>

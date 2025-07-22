@@ -243,7 +243,7 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
         <div className="mt-4">
           {result ? (
             <div className="text-center">
-              <p className="text-2xl font-bold text-gold-foil mb-2">🎉 Congratulations! 🎉</p>
+              <p className="text-2xl font-bold text-gold-foil mb-2">&#127881; Congratulations! &#127881;</p>
               <p className="text-lg text-white">You won {result} points!</p>
               <button className="btn-primary w-full mt-4" onClick={handleClaim}>
                 Claim Points

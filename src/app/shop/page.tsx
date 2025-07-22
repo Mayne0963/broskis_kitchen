@@ -86,7 +86,7 @@ export default function ShopPage() {
       <section className="relative h-[40vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
-            src="/images/merch-hero.jpg"
+            src="/images/hero-bg.jpg"
             alt="Broski's Kitchen Merchandise"
             fill
             className="object-cover"
@@ -284,7 +284,7 @@ export default function ShopPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="aspect-square relative rounded-lg overflow-hidden">
                 <Image
-                  src="/images/merch-about-1.jpg"
+                  src="/images/menu-1.jpg"
                   alt="Broski's Kitchen Merchandise"
                   fill
                   className="object-cover"
@@ -292,7 +292,7 @@ export default function ShopPage() {
               </div>
               <div className="aspect-square relative rounded-lg overflow-hidden">
                 <Image
-                  src="/images/merch-about-2.jpg"
+                  src="/images/menu-2.jpg"
                   alt="Broski's Kitchen Merchandise"
                   fill
                   className="object-cover"
@@ -300,7 +300,7 @@ export default function ShopPage() {
               </div>
               <div className="aspect-square relative rounded-lg overflow-hidden">
                 <Image
-                  src="/images/merch-about-3.jpg"
+                  src="/images/menu-3.jpg"
                   alt="Broski's Kitchen Merchandise"
                   fill
                   className="object-cover"
@@ -308,7 +308,7 @@ export default function ShopPage() {
               </div>
               <div className="aspect-square relative rounded-lg overflow-hidden">
                 <Image
-                  src="/images/merch-about-4.jpg"
+                  src="/images/hero-bg.jpg"
                   alt="Broski's Kitchen Merchandise"
                   fill
                   className="object-cover"

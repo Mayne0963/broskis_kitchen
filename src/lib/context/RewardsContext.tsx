@@ -94,26 +94,23 @@ export const RewardsProvider: React.FC<RewardsProviderProps> = ({ children }) =>
     const newHistoryItem: RewardHistory = {
       id: `history-${Date.now()}`,
       date: new Date().toISOString(),
-      type: "earned",
+      action: "earned",
       points: amount,
-      description: `Earned ${amount} points`,
     }
 
     setHistory((prevHistory) => [newHistoryItem, ...prevHistory])
   }
 
   const redeemReward = (reward: Reward): boolean => {
-    if (points >= reward.points) {
-      setPoints((prevPoints) => prevPoints - reward.points)
+    if (points >= reward.pointsRequired) {
+      setPoints((prevPoints) => prevPoints - reward.pointsRequired)
 
       // Add to history
       const newHistoryItem: RewardHistory = {
         id: `history-${Date.now()}`,
         date: new Date().toISOString(),
-        type: "redeemed",
-        points: -reward.points,
-        description: `Redeemed ${reward.name}`,
-        reward: reward,
+        action: "redeemed",
+        points: -reward.pointsRequired,
       }
 
       setHistory((prevHistory) => [newHistoryItem, ...prevHistory])

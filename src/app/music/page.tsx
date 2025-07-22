@@ -47,7 +47,7 @@ const MusicPage = () => {
           <div className="bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-xl p-6 border border-blue-500/30">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">🎵</span>
+                <span className="text-2xl">&#127925;</span>
               </div>
               <h3 className="text-xl font-bold text-white mb-3">Chill Vibes</h3>
               <p className="text-gray-300 text-sm">
@@ -59,7 +59,7 @@ const MusicPage = () => {
           <div className="bg-gradient-to-br from-orange-500/20 to-red-600/20 rounded-xl p-6 border border-orange-500/30">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">🎸</span>
+                <span className="text-2xl">&#127928;</span>
               </div>
               <h3 className="text-xl font-bold text-white mb-3">Upbeat Energy</h3>
               <p className="text-gray-300 text-sm">
@@ -71,7 +71,7 @@ const MusicPage = () => {
           <div className="bg-gradient-to-br from-green-500/20 to-teal-600/20 rounded-xl p-6 border border-green-500/30">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">🎷</span>
+                <span className="text-2xl">&#127927;</span>
               </div>
               <h3 className="text-xl font-bold text-white mb-3">Jazz Collection</h3>
               <p className="text-gray-300 text-sm">

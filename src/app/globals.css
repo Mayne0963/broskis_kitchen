@@ -567,7 +567,7 @@ main {
     @apply absolute;
     @apply inset-0;
     @apply z-0;
-    background-image: url("/images/Broski's Kitchen-Transparent-Gold.png");
+    background-image: url("images/Broskis Kitchen-Transparent-Gold.png");
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
@@ -858,10 +858,46 @@ main {
   animation: goldShimmer 2s infinite;
 }
 
+/* Additional gradient utilities */
+.bg-gradient-radial {
+  background: radial-gradient(ellipse at center, var(--tw-gradient-stops));
+}
+
+.bg-charcoal-black {
+  background-color: #1a1a1a;
+}
+
+/* Enhanced hero image styling with floating animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.hero-image {
+  animation: float 6s ease-in-out infinite;
+}
+
 /* Responsive improvements */
 @media (max-width: 768px) {
   .container {
     padding-left: 1rem;
     padding-right: 1rem;
+  }
+  
+  .hero-image-container {
+    height: 50vh;
+    min-height: 300px;
+  }
+  
+  .heading-xl {
+    font-size: 2.5rem;
+  }
+  
+  .hero-content-below {
+    padding: 2rem 0;
   }
 }

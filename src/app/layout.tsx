@@ -10,6 +10,7 @@ import MusicPlayer from "../components/layout/MusicPlayer"
 import ChatBot from "../components/chat/ChatBot"
 import ErrorBoundary from "../components/common/ErrorBoundary"
 import ChunkErrorHandler from "../components/common/ChunkErrorHandler"
+import CookieConsent from "../components/gdpr/CookieConsent"
 import { Toaster } from "react-hot-toast"
 import { playfair, montserrat } from "./fonts"
 
@@ -45,6 +46,7 @@ export default function RootLayout({
                    },
                  }}
                />
+               <CookieConsent />
              </OrderProvider>
            </Providers>
          </ErrorBoundary>

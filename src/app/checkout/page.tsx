@@ -1,86 +1,133 @@
-"use client"
+import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
+import CheckoutClient from '@/components/checkout/CheckoutClient'
 
-import React, { useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { useCart } from "../../lib/context/CartContext"
-import CheckoutForm from "../../components/checkout/CheckoutForm"
-import { FaArrowLeft, FaShoppingBag, FaCheck } from "react-icons/fa"
-
-export default function CheckoutPage() {
-  const router = useRouter()
-  const { items, subtotal, tax, total } = useCart()
-  const [orderComplete, setOrderComplete] = useState(false)
-  const [orderId, setOrderId] = useState<string | null>(null)
-
-  const handleOrderComplete = (newOrderId: string) => {
-    setOrderId(newOrderId)
-    setOrderComplete(true)
+// Mock function to get cart data - replace with actual implementation
+async function getCartData(userId: string) {
+  // TODO: Replace with actual API call to get cart data
+  return {
+    items: [
+      {
+        id: '1',
+        name: 'Broski Burger Deluxe',
+        description: 'Wagyu beef, truffle aioli, aged cheddar',
+        price: 24.99,
+        quantity: 2,
+        image: 'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=gourmet_burger_with_wagyu_beef_truffle_aioli_aged_cheddar_restaurant_photography&image_size=square',
+        customizations: ['Extra cheese', 'No pickles']
+      },
+      {
+        id: '2',
+        name: 'Truffle Fries',
+        description: 'Hand-cut fries with truffle oil and parmesan',
+        price: 12.99,
+        quantity: 1,
+        image: 'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=truffle_fries_hand_cut_parmesan_gourmet_food_photography&image_size=square',
+        customizations: []
+      }
+    ],
+    subtotal: 62.97,
+    tax: 5.67,
+    deliveryFee: 3.99,
+    total: 72.63
   }
+}
 
-  // Redirect if cart is empty
-  if (items.length === 0 && !orderComplete) {
+// Mock function to get user addresses - replace with actual implementation
+async function getUserAddresses(userId: string) {
+  // TODO: Replace with actual API call
+  return [
+    {
+      id: '1',
+      type: 'home',
+      street: '123 Main St',
+      city: 'San Francisco',
+      state: 'CA',
+      zipCode: '94102',
+      isDefault: true
+    },
+    {
+      id: '2',
+      type: 'work',
+      street: '456 Market St',
+      city: 'San Francisco',
+      state: 'CA',
+      zipCode: '94105',
+      isDefault: false
+    }
+  ]
+}
+
+// Mock function to get user payment methods - replace with actual implementation
+async function getPaymentMethods(userId: string) {
+  // TODO: Replace with actual API call
+  return [
+    {
+      id: '1',
+      type: 'card',
+      last4: '4242',
+      brand: 'visa',
+      expiryMonth: 12,
+      expiryYear: 2025,
+      isDefault: true
+    },
+    {
+      id: '2',
+      type: 'card',
+      last4: '5555',
+      brand: 'mastercard',
+      expiryMonth: 8,
+      expiryYear: 2026,
+      isDefault: false
+    }
+  ]
+}
+
+export default async function CheckoutPage() {
+  const cookieStore = cookies()
+  const sessionCookie = cookieStore.get('session')
+  
+  if (!sessionCookie) {
+    redirect('/login?redirect=/checkout')
+  }
+  
+  // TODO: Verify session and get user ID
+  const userId = 'mock-user-id' // Replace with actual user ID from session
+  
+  try {
+    const [cartData, addresses, paymentMethods] = await Promise.all([
+      getCartData(userId),
+      getUserAddresses(userId),
+      getPaymentMethods(userId)
+    ])
+    
     return (
-      <div className="min-h-screen py-20">
-        <div className="container mx-auto px-4 max-w-2xl text-center">
-          <FaShoppingBag className="mx-auto text-6xl text-gray-400 mb-4" />
-          <h1 className="text-2xl font-bold mb-4">Your cart is empty</h1>
-          <p className="text-gray-400 mb-8">Add some items to your cart before checking out.</p>
-          <Link href="/menu" className="bg-gold-foil text-black px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-colors">
-            Browse Menu
-          </Link>
+      <div className="min-h-screen bg-[var(--color-rich-black)] py-8">
+        <div className="container mx-auto px-4">
+          <CheckoutClient 
+            cartData={cartData}
+            addresses={addresses}
+            paymentMethods={paymentMethods}
+            userId={userId}
+          />
+        </div>
+      </div>
+    )
+  } catch (error) {
+    console.error('Failed to load checkout data:', error)
+    return (
+      <div className="min-h-screen bg-[var(--color-rich-black)] flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-white mb-4">Unable to Load Checkout</h1>
+          <p className="text-gray-400 mb-6">Please try again or contact support if the problem persists.</p>
+          <a 
+            href="/cart" 
+            className="bg-[var(--color-harvest-gold)] text-black px-6 py-3 rounded-lg font-semibold hover:bg-[var(--color-harvest-gold)]/90 transition-colors"
+          >
+            Return to Cart
+          </a>
         </div>
       </div>
     )
   }
-
-  // Order success page
-  if (orderComplete && orderId) {
-    return (
-      <div className="min-h-screen py-20">
-        <div className="container mx-auto px-4 max-w-2xl text-center">
-          <div className="bg-[#1A1A1A] rounded-lg border border-[#333333] p-8">
-            <FaCheck className="mx-auto text-6xl text-emerald-green mb-6" />
-            <h1 className="text-3xl font-bold mb-4">Order Confirmed!</h1>
-            <p className="text-gray-400 mb-6">
-              Thank you for your order. We've received your payment and are preparing your food.
-            </p>
-            <div className="bg-[#111111] rounded-lg p-4 mb-6">
-              <p className="text-sm text-gray-400 mb-2">Order Number</p>
-              <p className="text-xl font-bold text-gold-foil">{orderId}</p>
-            </div>
-            <div className="space-y-4">
-              <Link
-                href={`/orders`}
-                className="block bg-gold-foil text-black px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-colors"
-              >
-                Track Your Order
-              </Link>
-              <Link
-                href="/menu"
-                className="block border border-gold-foil text-gold-foil px-6 py-3 rounded-lg font-semibold hover:bg-gold-foil hover:text-black transition-colors"
-              >
-                Continue Shopping
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="min-h-screen py-20">
-      <div className="container mx-auto px-4 max-w-6xl">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Checkout</h1>
-          <Link href="/cart" className="text-gold-foil hover:underline flex items-center">
-            <FaArrowLeft className="mr-2" /> Back to Cart
-          </Link>
-        </div>
-        
-        <CheckoutForm onOrderComplete={handleOrderComplete} />
-      </div>
-    </div>
-  )
 }

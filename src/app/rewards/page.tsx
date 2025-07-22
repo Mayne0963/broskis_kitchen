@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { useAuth } from "../../lib/context/AuthContext"
 import { useRewards } from "../../lib/context/RewardsContext"
 import { rewards } from "../../data/rewards-data"
@@ -63,10 +64,12 @@ export default function RewardsPage() {
       <section className="relative h-[40vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0 bg-black">
           <div className="absolute inset-0 bg-gradient-to-r from-black to-transparent opacity-70 z-10"></div>
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: "url('/images/rewards-hero.jpg')" }}
-          ></div>
+          <Image 
+            src="https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=luxury%20rewards%20program%20golden%20coins%20exclusive%20benefits%20premium%20loyalty%20program%20elegant%20design&image_size=landscape_16_9" 
+            alt="Rewards Program" 
+            fill 
+            className="object-cover" 
+          />
         </div>
         <div className="container mx-auto px-4 z-10 text-center">
           <h1 className="heading-xl mb-4 text-white gritty-shadow">Rewards Program</h1>

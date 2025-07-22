@@ -84,11 +84,25 @@ export interface MediaPlayerContextType {
   nextTrack: () => void
   previousTrack: () => void
   setVolume: (volume: number) => void
+  setPlaylistTracks: (tracks: Track[]) => void
   addToPlaylist: (track: Track) => void
   removeFromPlaylist: (id: string) => void
 }
 
 // Rewards types
+export interface Reward {
+  id: string
+  name: string
+  description: string
+  pointsRequired: number
+  category: string
+  categoryName: string
+  image: string
+  tierRequired?: "bronze" | "silver" | "gold"
+  expirationDays?: number
+  featured?: boolean
+}
+
 export interface RewardHistory {
   id: string
   date: string
@@ -107,8 +121,10 @@ export interface RewardsContextType {
 
 // Chat types
 export interface ChatMessage {
+  id: string
   role: "user" | "assistant"
   text: string
+  timestamp: Date
 }
 
 export interface ChatContextType {

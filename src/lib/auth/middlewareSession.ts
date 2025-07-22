@@ -14,6 +14,7 @@ export async function getSessionCookieForMiddleware(): Promise<SessionUser | nul
   try {
     const cookieStore = await cookies()
     const sessionCookie = cookieStore.get('session')?.value
+    console.log('Middleware: Session cookie:', sessionCookie ? 'exists' : 'missing');
 
     if (!sessionCookie) {
       return null
@@ -22,7 +23,11 @@ export async function getSessionCookieForMiddleware(): Promise<SessionUser | nul
     // Basic JWT payload extraction (not cryptographically verified)
     // This is only for route protection in middleware
     try {
-      const payload = JSON.parse(atob(sessionCookie.split('.')[1]))
+      console.log('Middleware: Attempting to parse JWT payload');
+      const payloadBase64 = sessionCookie.split('.')[1];
+      console.log('Middleware: Payload base64:', payloadBase64 ? 'exists' : 'missing');
+      const payload = JSON.parse(atob(payloadBase64))
+      console.log('Middleware: Payload parsed successfully:', !!payload);
       return {
         uid: payload.uid,
         email: payload.email || '',
@@ -30,7 +35,8 @@ export async function getSessionCookieForMiddleware(): Promise<SessionUser | nul
         name: payload.name || payload.email?.split('@')[0],
         role: payload.role || 'customer'
       }
-    } catch {
+    } catch (error) {
+      console.error('Middleware: Error parsing payload:', error);
       return null
     }
   } catch (error) {

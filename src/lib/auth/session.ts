@@ -14,6 +14,7 @@ export async function getSessionCookie(): Promise<DecodedIdToken | null> {
   try {
     const cookieStore = await cookies()
     const sessionCookie = cookieStore.get('session')?.value
+    console.log('Session cookie value:', sessionCookie ? 'exists' : 'missing');
 
     if (!sessionCookie) {
       return null
@@ -21,12 +22,15 @@ export async function getSessionCookie(): Promise<DecodedIdToken | null> {
 
     // Use firebase-admin for full verification in Node.js runtime
     const auth = adminAuth()
+    console.log('Admin auth initialized:', !!auth);
     if (!auth) {
       console.error('Firebase Admin not initialized')
       return null
     }
     
+    console.log('Verifying session cookie...');
     const decodedClaims = await auth.verifySessionCookie(sessionCookie, true)
+    console.log('Verification successful:', !!decodedClaims);
 
     return {
       uid: decodedClaims.uid,

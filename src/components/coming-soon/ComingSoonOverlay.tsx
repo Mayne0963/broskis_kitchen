@@ -34,9 +34,11 @@ const ComingSoonOverlay: React.FC<ComingSoonOverlayProps> = ({ onClose }) => {
           You must be 21 or older to access our infused menu when available. Available only in locations where legal.
         </p>
 
-        <button onClick={onClose} className="btn-primary mt-6">
-          Close
-        </button>
+        <div className="mt-6 text-center">
+          <p className="text-xs text-gray-600">
+            This disclaimer will remain visible for compliance purposes.
+          </p>
+        </div>
       </div>
     </div>
   )

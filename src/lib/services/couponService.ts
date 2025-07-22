@@ -45,7 +45,7 @@ export const createCoupon = async (
       expiresAt: Timestamp.fromDate(expiresAt)
     }
 
-    if (isFirebaseConfigured() && db) {
+    if (isFirebaseConfigured && db) {
       try {
         const docRef = await addDoc(collection(db, 'coupons'), couponData)
         
@@ -101,7 +101,7 @@ export const useCoupon = async (
   orderId: string
 ): Promise<{ success: boolean; coupon?: Coupon; error?: string }> => {
   try {
-    if (isFirebaseConfigured() && db) {
+    if (isFirebaseConfigured && db) {
       try {
         const couponsRef = collection(db, 'coupons')
         const q = query(couponsRef, where('code', '==', code))
@@ -141,14 +141,14 @@ export const useCoupon = async (
         await updateDoc(doc(db, 'coupons', couponDoc.id), {
           isUsed: true,
           usedAt: Timestamp.now(),
-          orderIds: [...coupon.orderIds, orderId]
+          orderIds: [...(coupon.orderIds || []), orderId]
         })
 
         const updatedCoupon: Coupon = {
           ...coupon,
           isUsed: true,
           usedAt: new Date(),
-          orderIds: [...coupon.orderIds, orderId]
+          orderIds: [...(coupon.orderIds || []), orderId]
         }
 
         console.log('Coupon used successfully in Firebase:', code)
@@ -211,7 +211,7 @@ export const useCoupon = async (
 // Get user's coupons
 export const getUserCoupons = async (userId: string): Promise<Coupon[]> => {
   try {
-    if (isFirebaseConfigured() && db) {
+    if (isFirebaseConfigured && db) {
       try {
         const couponsRef = collection(db, 'coupons')
         const q = query(couponsRef, where('userId', '==', userId))
@@ -264,7 +264,7 @@ export const validateCoupon = async (
   code: string
 ): Promise<{ valid: boolean; coupon?: Coupon; error?: string }> => {
   try {
-    if (isFirebaseConfigured() && db) {
+    if (isFirebaseConfigured && db) {
       try {
         const couponsRef = collection(db, 'coupons')
         const q = query(couponsRef, where('code', '==', code))

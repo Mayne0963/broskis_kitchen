@@ -17,7 +17,7 @@ export const menuItems = [
     name: "Luxury Burger",
     description: "Premium beef patty with truffle aioli, aged cheddar, and caramelized onions on a brioche bun.",
     price: 18.99,
-    image: "/images/menu-1.jpg",
+    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=luxury%20gourmet%20burger%20with%20truffle%20aioli%20aged%20cheddar%20caramelized%20onions%20brioche%20bun%20premium%20beef%20patty&image_size=square_hd",
     category: "burgers",
     popular: true,
     dietary: {
@@ -32,7 +32,7 @@ export const menuItems = [
     name: "Gourmet Street Tacos",
     description: "Three street-style tacos with premium fillings and house-made salsas.",
     price: 14.99,
-    image: "/images/menu-3.jpg",
+    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=gourmet%20street%20tacos%20premium%20fillings%20house%20made%20salsas%20luxury%20presentation&image_size=square_hd",
     category: "tacos",
     popular: true,
     dietary: {
@@ -47,7 +47,7 @@ export const menuItems = [
     name: "Truffle Parmesan Fries",
     description: "Hand-cut fries tossed with truffle oil, parmesan cheese, and fresh herbs.",
     price: 9.99,
-    image: "/images/truffle-fries.jpg",
+    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=truffle%20parmesan%20fries%20hand%20cut%20golden%20crispy%20fresh%20herbs%20gourmet%20side%20dish&image_size=square_hd",
     category: "sides",
     dietary: {
       dairyFree: false,
@@ -61,7 +61,7 @@ export const menuItems = [
     name: "Wagyu Beef Sandwich",
     description: "Thinly sliced wagyu beef with horseradish cream, arugula, and caramelized onions on artisan bread.",
     price: 22.99,
-    image: "/images/wagyu-sandwich.jpg",
+    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=wagyu%20beef%20sandwich%20thinly%20sliced%20horseradish%20cream%20arugula%20artisan%20bread%20luxury%20sandwich&image_size=square_hd",
     category: "sandwiches",
     popular: true,
     dietary: {
@@ -77,7 +77,7 @@ export const menuItems = [
     description:
       "Plant-based patty with vegan truffle aioli, dairy-free cheese, and caramelized onions on a vegan brioche bun.",
     price: 17.99,
-    image: "/images/vegan-burger.jpg",
+    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=luxury%20vegan%20burger%20plant%20based%20patty%20vegan%20truffle%20aioli%20dairy%20free%20cheese%20vegan%20brioche&image_size=square_hd",
     category: "burgers",
     new: true,
     dietary: {
@@ -92,7 +92,7 @@ export const menuItems = [
     name: "Buffalo Cauliflower",
     description: "Crispy cauliflower florets tossed in buffalo sauce, served with vegan ranch dressing.",
     price: 13.99,
-    image: "/images/buffalo-cauliflower.jpg",
+    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=buffalo%20cauliflower%20crispy%20florets%20buffalo%20sauce%20vegan%20ranch%20dressing%20appetizer&image_size=square_hd",
     category: "sides",
     dietary: {
       dairyFree: true,
@@ -106,7 +106,7 @@ export const menuItems = [
     name: "Lobster Tacos",
     description: "Butter-poached lobster, avocado crema, mango salsa, and micro greens on corn tortillas.",
     price: 24.99,
-    image: "/images/lobster-tacos.jpg",
+    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=lobster%20tacos%20butter%20poached%20lobster%20avocado%20crema%20mango%20salsa%20corn%20tortillas%20luxury%20seafood&image_size=square_hd",
     category: "tacos",
     new: true,
     dietary: {
@@ -121,7 +121,7 @@ export const menuItems = [
     name: "24K Gold Cheesecake",
     description: "New York style cheesecake topped with edible 24K gold leaf and berry compote.",
     price: 14.99,
-    image: "/images/gold-cheesecake.jpg",
+    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=24k%20gold%20cheesecake%20new%20york%20style%20edible%20gold%20leaf%20berry%20compote%20luxury%20dessert&image_size=square_hd",
     category: "desserts",
     popular: true,
     dietary: {
@@ -136,7 +136,7 @@ export const menuItems = [
     name: "Korean Gochujang Wings",
     description: "Crispy wings glazed with sweet and spicy gochujang sauce, topped with sesame seeds and green onions.",
     price: 15.99,
-    image: "/images/korean-wings.jpg",
+    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=korean%20gochujang%20wings%20crispy%20sweet%20spicy%20glaze%20sesame%20seeds%20green%20onions&image_size=square_hd",
     category: "wings",
     dietary: {
       dairyFree: true,
@@ -151,7 +151,7 @@ export const menuItems = [
     description:
       "House-made tortilla chips topped with premium beef, queso, guacamole, pico de gallo, jalapeños, and sour cream.",
     price: 16.99,
-    image: "/images/loaded-nachos.jpg",
+    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=luxury%20loaded%20nachos%20house%20made%20tortilla%20chips%20premium%20beef%20queso%20guacamole%20pico%20de%20gallo&image_size=square_hd",
     category: "sides",
     popular: true,
     dietary: {
@@ -167,7 +167,7 @@ export const menuItems = [
     description:
       "Premium beef patty topped with sautéed wild mushrooms, truffle butter, and Swiss cheese on a brioche bun.",
     price: 19.99,
-    image: "/images/mushroom-burger.jpg",
+    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=truffle%20mushroom%20burger%20premium%20beef%20patty%20sauteed%20wild%20mushrooms%20truffle%20butter%20swiss%20cheese%20brioche&image_size=square_hd",
     category: "burgers",
     dietary: {
       dairyFree: false,
@@ -181,7 +181,7 @@ export const menuItems = [
     name: "Blackened Fish Tacos",
     description: "Blackened mahi-mahi with cabbage slaw, chipotle crema, and pickled red onions on corn tortillas.",
     price: 16.99,
-    image: "/images/fish-tacos.jpg",
+    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=blackened%20fish%20tacos%20mahi%20mahi%20cabbage%20slaw%20chipotle%20crema%20pickled%20red%20onions%20corn%20tortillas&image_size=square_hd",
     category: "tacos",
     dietary: {
       dairyFree: false,

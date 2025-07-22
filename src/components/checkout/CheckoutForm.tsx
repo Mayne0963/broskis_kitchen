@@ -389,7 +389,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
                       : 'border-[#333333] hover:border-[#555555]'
                   }`}
                 >
-                  <div className="mx-auto mb-2 text-xl">💵</div>
+                  <div className="mx-auto mb-2 text-xl">&#128181;</div>
                   <div className="font-medium">Cash {formData.orderType === 'delivery' ? 'on Delivery' : 'on Pickup'}</div>
                   <div className="text-xs text-gold-foil mt-1">Premium Only</div>
                 </button>
@@ -398,7 +398,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
             {!isPremiumUser && (
               <div className="mt-4 p-3 bg-[#111111] border border-[#333333] rounded-lg">
                 <p className="text-sm text-gray-400">
-                  💎 <span className="text-gold-foil font-medium">Cash on Delivery</span> is available for Gold tier members (1000+ points).
+                  &#128142; <span className="text-gold-foil font-medium">Cash on Delivery</span> is available for Gold tier members (1000+ points).
                   <br />Upgrade your membership to unlock this payment option!
                 </p>
               </div>

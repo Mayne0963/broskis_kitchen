@@ -7,7 +7,7 @@ import { useMediaPlayer } from "../../lib/context/MediaPlayerContext"
 import type { Track } from "../../types"
 
 const MusicPlayer = () => {
-  const { isPlaying, currentTrack, playTrack, pauseTrack, nextTrack, previousTrack, volume, setVolume } =
+  const { isPlaying, currentTrack, playTrack, pauseTrack, nextTrack, previousTrack, volume, setVolume, setPlaylistTracks } =
     useMediaPlayer()
   const audioRef = useRef<HTMLAudioElement>(null)
 
@@ -197,13 +197,26 @@ const MusicPlayer = () => {
 
   useEffect(() => {
     setCurrentPlaylist(chillLofi);
+    setPlaylistTracks(chillLofi);
+    // Auto-start background music with the first track from chill playlist
+    if (chillLofi.length > 0 && !currentTrack) {
+      // Small delay to ensure component is fully mounted
+      const timer = setTimeout(() => {
+        playTrack(chillLofi[0]);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   // Sync audio element with context state
   useEffect(() => {
     if (audioRef.current) {
       if (isPlaying) {
-        audioRef.current.play().catch(console.error)
+        // Handle autoplay restrictions gracefully
+        audioRef.current.play().catch((error) => {
+          console.log('Autoplay prevented by browser:', error);
+          // If autoplay fails, we'll wait for user interaction
+        });
       } else {
         audioRef.current.pause()
       }
@@ -233,8 +246,15 @@ if (audioRef && audioRef.current) {
 
   const handlePlaylistSwitch = (playlist: Track[]) => {
     setCurrentPlaylist(playlist)
+    setPlaylistTracks(playlist)
     if (isPlaying) {
       pauseTrack()
+    }
+    // Auto-start the first track of the new playlist
+    if (playlist.length > 0) {
+      setTimeout(() => {
+        playTrack(playlist[0]);
+      }, 500);
     }
   }
 
@@ -453,6 +473,8 @@ if (audioRef && audioRef.current) {
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={handleLoadedMetadata}
             onEnded={handleTrackEnd}
+            preload="auto"
+            loop={isRepeating}
           />
         )}
       </div>

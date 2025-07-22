@@ -2,11 +2,11 @@
 
 import type React from "react"
 import { useState } from "react"
-import { FaTimes, FaSpinner, FaLock, FaUserPlus } from "react-icons/fa"
+import { FaTimes, FaSpinner, FaLock, FaUserPlus, FaGift, FaCheck, FaExclamationTriangle } from "react-icons/fa"
 import { useAuth } from "../../lib/context/AuthContext"
 import { useRewards } from "../../lib/context/RewardsContext"
 import { createCoupon } from "../../lib/services/couponService"
-import type { Reward } from "@/types"
+import type { Reward } from "@/types/reward"
 import Link from "next/link"
 
 interface RedeemModalProps {
@@ -24,7 +24,7 @@ const RedeemModal: React.FC<RedeemModalProps> = ({ reward, userPoints, onClose }
   const [couponCode, setCouponCode] = useState<string | null>(null)
 
   const isAuthenticated = !!user
-  const hasEnoughPoints = userPoints >= reward.pointsCost
+  const hasEnoughPoints = userPoints >= reward.pointsRequired
 
   // Handle redemption
   const handleRedeem = async () => {
@@ -49,13 +49,13 @@ const RedeemModal: React.FC<RedeemModalProps> = ({ reward, userPoints, onClose }
         throw new Error('Failed to create coupon')
       }
 
-      setCoupon(newCoupon)
+      setCouponCode(newCoupon.code)
 
       // Deduct points
       redeemPoints(reward.pointsRequired)
 
-      // Show success step
-      setStep(2)
+      // Show success
+      setSuccess(true)
     } catch (err) {
       console.error("Redemption error:", err)
       setError("An error occurred during redemption. Please try again.")
@@ -68,7 +68,7 @@ const RedeemModal: React.FC<RedeemModalProps> = ({ reward, userPoints, onClose }
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-80">
       <div className="bg-[#1A1A1A] rounded-lg shadow-xl w-full max-w-md overflow-hidden animate-fade-in">
         <div className="relative p-6 border-b border-[#333333]">
-          <h2 className="text-xl font-bold pr-8">{step === 1 ? "Redeem Reward" : "Redemption Successful"}</h2>
+          <h2 className="text-xl font-bold pr-8">{success ? "Redemption Successful" : "Redeem Reward"}</h2>
           <button
             onClick={onClose}
             className="absolute top-6 right-6 text-gray-400 hover:text-white"
@@ -98,7 +98,26 @@ const RedeemModal: React.FC<RedeemModalProps> = ({ reward, userPoints, onClose }
                 </Link>
               </div>
             </div>
-          ) : step === 1 ? (
+          ) : success ? (
+            <div className="text-center">
+              <div className="w-16 h-16 bg-emerald-green bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FaCheck className="text-emerald-green text-2xl" />
+              </div>
+              <h3 className="text-xl font-bold mb-4">Reward Redeemed!</h3>
+              <p className="text-gray-300 mb-6">
+                You've successfully redeemed {reward.name} for {reward.pointsRequired} points.
+              </p>
+              {couponCode && (
+                <div className="bg-[#111111] p-4 rounded-md mb-6">
+                  <p className="text-sm text-gray-300 mb-2">Your coupon code:</p>
+                  <p className="text-lg font-bold text-gold-foil">{couponCode}</p>
+                </div>
+              )}
+              <button className="btn-primary w-full" onClick={onClose}>
+                Close
+              </button>
+            </div>
+          ) : (
             <>
               <div className="flex items-center mb-6">
                 <div className="w-20 h-20 bg-cover bg-center rounded-md overflow-hidden flex-shrink-0 mr-4">
@@ -187,46 +206,6 @@ const RedeemModal: React.FC<RedeemModalProps> = ({ reward, userPoints, onClose }
                 </button>
               </div>
             </>
-          ) : (
-            <div className="text-center">
-              <div className="w-16 h-16 bg-emerald-green bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FaCheck className="text-emerald-green text-2xl" />
-              </div>
-
-              <h3 className="text-xl font-bold mb-4">Reward Redeemed!</h3>
-              <p className="text-gray-300 mb-6">
-                You've successfully redeemed {reward.name} for {reward.pointsRequired} points.
-              </p>
-
-              <div className="bg-[#111111] p-6 rounded-lg mb-6">
-                <h4 className="text-sm text-gray-400 mb-2">Your Coupon Code</h4>
-                <div className="bg-black p-3 rounded border border-gold-foil">
-                  <span className="text-2xl font-mono font-bold text-gold-foil tracking-wider">{coupon?.code}</span>
-                </div>
-                <p className="text-xs text-gray-500 mt-2">Present this code at checkout to redeem your reward. This is a single-use coupon.</p>
-              </div>
-
-              {coupon && (
-                <div className="bg-[#111111] p-4 rounded-md mb-6">
-                  <p className="text-sm text-gray-300">
-                    <FaExclamationTriangle className="inline-block mr-2 text-citrus-orange" />
-                    This coupon expires on{" "}
-                    {coupon.expiresAt.toLocaleDateString("en-US", {
-                      month: "long",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                    .
-                  </p>
-                </div>
-              )}
-
-              <div className="flex gap-3">
-                <button className="btn-primary w-full" onClick={onClose}>
-                  Done
-                </button>
-              </div>
-            </div>
           )}
         </div>
       </div>

@@ -19,6 +19,10 @@ export const MediaPlayerProvider: React.FC<{ children: ReactNode }> = ({ childre
   const playTrack = (track: Track) => {
     setCurrentTrack(track)
     setIsPlaying(true)
+    // Add track to playlist if not already there
+    if (!playlist.some((t) => t.id === track.id)) {
+      setPlaylist((current) => [...current, track])
+    }
   }
 
   // Pause the current track
@@ -61,6 +65,11 @@ export const MediaPlayerProvider: React.FC<{ children: ReactNode }> = ({ childre
     setVolumeState(Math.max(0, Math.min(1, newVolume)))
   }
 
+  // Set the entire playlist
+  const setPlaylistTracks = (tracks: Track[]) => {
+    setPlaylist(tracks)
+  }
+
   // Add a track to the playlist
   const addToPlaylist = (track: Track) => {
     // Check if track already exists in playlist
@@ -97,6 +106,7 @@ export const MediaPlayerProvider: React.FC<{ children: ReactNode }> = ({ childre
         nextTrack,
         previousTrack,
         setVolume,
+        setPlaylistTracks,
         addToPlaylist,
         removeFromPlaylist,
       }}

@@ -78,7 +78,7 @@ export async function verifyIDWithAI(idImage: string, selfieImage: string): Prom
     const isAuthentic = authenticityResponse.choices[0].message.content?.trim().toUpperCase() === "YES"
 
     // Step 3: Extract DOB and check if over 21
-    let dob = null
+    let dob: string | undefined = undefined
     let isOver21 = false
 
     // Extract DOB using regex (looking for YYYY-MM-DD format)

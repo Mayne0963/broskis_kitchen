@@ -19,6 +19,9 @@ const Navbar: React.FC = () => {
   const pathname = usePathname()
   const { user, logout } = useAuth()
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [lastScrollY, setLastScrollY] = useState(0)
+  const [isVisible, setIsVisible] = useState(true)
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -39,9 +42,33 @@ const Navbar: React.FC = () => {
     }
   }, [])
 
+  // Handle scroll behavior
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      
+      // Set scrolled state
+      setIsScrolled(currentScrollY > 10)
+      
+      // Hide/show navbar based on scroll direction
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setIsVisible(false)
+      } else {
+        setIsVisible(true)
+      }
+      
+      setLastScrollY(currentScrollY)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [lastScrollY])
+
   return (
     <>
-      <nav className="fixed top-0 w-full bg-opacity-90 backdrop-blur-md bg-matte-black text-white h-20 z-50 shadow-lg border-b border-[#333333]">
+      <nav className={`fixed top-0 w-full bg-black text-white h-20 z-50 shadow-lg border-b border-[#333333] transition-transform duration-300 ${
+        isVisible ? 'translate-y-0' : '-translate-y-full'
+      }`}>
       <div className="container mx-auto flex justify-between items-center h-full px-4">
         <Link href="/" className="text-2xl font-bold graffiti-text hover:text-white transition-colors duration-300">
           Broski&apos;s Kitchen

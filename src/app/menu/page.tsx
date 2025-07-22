@@ -151,7 +151,7 @@ export default function MenuPage() {
       {/* Hero Section */}
       <section className="relative h-[40vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <Image src="/images/menu-hero.jpg" alt="Broski's Kitchen Menu" fill className="object-cover" priority />
+          <Image src="https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=luxury%20street%20food%20kitchen%20with%20gourmet%20dishes%20and%20premium%20ingredients%20modern%20urban%20style&image_size=landscape_16_9" alt="Broski's Kitchen Menu" fill className="object-cover" priority />
           <div className="absolute inset-0 bg-black bg-opacity-60"></div>
         </div>
         <div className="container mx-auto px-4 z-10 text-center">

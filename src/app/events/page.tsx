@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import { FaSearch, FaCalendarAlt, FaFilter, FaMapMarkerAlt, FaClock, FaTicketAlt } from "react-icons/fa"
 import EventCard from "../../components/events/EventCard"
 import EventFilter from "../../components/events/EventFilter"
@@ -89,10 +90,12 @@ export default function EventsPage() {
       <section className="relative h-[40vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0 bg-black">
           <div className="absolute inset-0 bg-gradient-to-r from-black to-transparent opacity-70 z-10"></div>
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: "url('/images/events-hero.jpg')" }}
-          ></div>
+          <Image 
+            src="https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=luxury%20restaurant%20events%20chef%20workshops%20exclusive%20tastings%20special%20dining%20experiences%20elegant%20atmosphere&image_size=landscape_16_9" 
+            alt="Events & Experiences" 
+            fill 
+            className="object-cover" 
+          />
         </div>
         <div className="container mx-auto px-4 z-10 text-center">
           <h1 className="heading-xl mb-4 text-white gritty-shadow">Events & Experiences</h1>
