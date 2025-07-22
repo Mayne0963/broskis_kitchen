@@ -189,11 +189,15 @@ const MusicPlayer = () => {
     },
   ]
 
-  const [currentPlaylist, setCurrentPlaylist] = useState(chillLofi)
+  const [currentPlaylist, setCurrentPlaylist] = useState<Track[] | null>(null);
   const [isShuffled, setIsShuffled] = useState(false)
   const [isRepeating, setIsRepeating] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
+
+  useEffect(() => {
+    setCurrentPlaylist(chillLofi);
+  }, []);
 
   // Sync audio element with context state
   useEffect(() => {
@@ -216,13 +220,15 @@ const MusicPlayer = () => {
   const handlePlayPause = () => {
     if (currentTrack) {
       isPlaying ? pauseTrack() : playTrack(currentTrack)
-    } else {
+    } else if (currentPlaylist) {
       playTrack(currentPlaylist[0])
     }
   }
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setVolume(Number(e.target.value))
+if (audioRef && audioRef.current) {
+  setVolume(Number(e.target.value));
+}
   }
 
   const handlePlaylistSwitch = (playlist: Track[]) => {
@@ -407,8 +413,8 @@ const MusicPlayer = () => {
           {/* Playlist Switch */}
           <div className="flex items-center space-x-2 ml-auto">
             <button
-              className={`text-white text-xs px-3 py-2 rounded-full transition-all duration-300 ${
-                currentPlaylist === chillLofi 
+              className={`text-white text-xs px-3 py-2 rounded-full transition-all duration-300 ${ 
+                currentPlaylist && currentPlaylist === chillLofi 
                   ? "bg-gradient-to-r from-gold-foil to-amber-500 text-black font-medium shadow-md" 
                   : "hover:text-gold-foil border border-gray-600 hover:border-gold-foil"
               }`}
@@ -417,8 +423,8 @@ const MusicPlayer = () => {
               Chill
             </button>
             <button
-              className={`text-white text-xs px-3 py-2 rounded-full transition-all duration-300 ${
-                currentPlaylist === upbeatTracks 
+              className={`text-white text-xs px-3 py-2 rounded-full transition-all duration-300 ${ 
+                currentPlaylist && currentPlaylist === upbeatTracks 
                   ? "bg-gradient-to-r from-gold-foil to-amber-500 text-black font-medium shadow-md" 
                   : "hover:text-gold-foil border border-gray-600 hover:border-gold-foil"
               }`}
@@ -427,8 +433,8 @@ const MusicPlayer = () => {
               Upbeat
             </button>
             <button
-              className={`text-white text-xs px-3 py-2 rounded-full transition-all duration-300 ${
-                currentPlaylist === dinnerJazz 
+              className={`text-white text-xs px-3 py-2 rounded-full transition-all duration-300 ${ 
+                currentPlaylist && currentPlaylist === dinnerJazz 
                   ? "bg-gradient-to-r from-gold-foil to-amber-500 text-black font-medium shadow-md" 
                   : "hover:text-gold-foil border border-gray-600 hover:border-gold-foil"
               }`}

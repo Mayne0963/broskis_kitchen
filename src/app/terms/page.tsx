@@ -14,14 +14,14 @@ const TermsPage = () => {
         <section className="space-y-4">
           <h2 className="text-2xl font-semibold">Important – Please Read Carefully</h2>
           <p className="leading-relaxed">
-            These Terms and Conditions (“Terms”) include an arbitration agreement, jury and
+            These Terms and Conditions ("Terms") include an arbitration agreement, jury and
             class-action waivers, limitations of liability, and other provisions that affect your
             legal rights.
           </p>
           <p className="leading-relaxed">
-            By installing, accessing, or using any of Broskis Kitchen LLC’s online properties
+            By installing, accessing, or using any of Broskis Kitchen LLC's online properties
             (websites, mobile apps, email newsletters, subscriptions, and other digital services),
-            you agree to be bound by these Terms. Broskis Kitchen LLC (“we,” “us”) operates from
+            you agree to be bound by these Terms. Broskis Kitchen LLC ("we," "us") operates from
             [Your Address], Fort Wayne, Indiana.
           </p>
         </section>
@@ -212,7 +212,7 @@ const TermsPage = () => {
           <div className="space-y-4">
             <div>
               <h3 className="text-xl font-medium">Disclaimer</h3>
-              <p className="leading-relaxed">The Online Services are provided “as is,” without warranties.</p>
+              <p className="leading-relaxed">The Online Services are provided "as is," without warranties.</p>
             </div>
 
             <div>

@@ -14,10 +14,10 @@ const PrivacyPage = () => {
         <section className="space-y-4">
           <h2 className="text-2xl font-semibold">I. Introduction</h2>
           <p className="leading-relaxed">
-            Your privacy matters. This Privacy Statement (“Statement”) describes how Broskis Kitchen LLC
-            (“Broskis Kitchen,” “we,” “us”) collects, uses, stores, shares, and otherwise processes
+            Your privacy matters. This Privacy Statement ("Statement") describes how Broskis Kitchen LLC
+            ("Broskis Kitchen," "we," "us") collects, uses, stores, shares, and otherwise processes
             personal information of our customers who visit our restaurants, use our websites or mobile apps
-            (“Online Services”), or otherwise interact with us.
+            ("Online Services"), or otherwise interact with us.
           </p>
           <p className="leading-relaxed">
             If you reside outside the United States, please visit the country-specific section of our
@@ -137,9 +137,9 @@ const PrivacyPage = () => {
           </p>
         </section>
 
-        {/* IX. Children’s Privacy */}
+        {/* IX. Children's Privacy */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-semibold">IX. Children’s Privacy</h2>
+          <h2 className="text-2xl font-semibold">IX. Children's Privacy</h2>
           <p className="leading-relaxed">
             Our services are not directed to children under 16, and we do not knowingly collect their data.
             If you believe we have, contact{' '}
