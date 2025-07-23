@@ -133,8 +133,8 @@ export default function CookieConsent() {
   return (
     <>
       {/* Cookie Banner */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 p-4">
-        <Card className="max-w-4xl mx-auto shadow-lg border-2">
+      <div className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black bg-opacity-50">
+        <Card className="max-w-4xl shadow-lg border-2 bg-black text-white">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0">
@@ -145,7 +145,7 @@ export default function CookieConsent() {
                 <h3 className="text-lg font-semibold mb-2">
                   We use cookies to enhance your experience
                 </h3>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-sm text-gray-300 mb-4">
                   We use essential cookies to make our site work. We'd also like to set optional cookies to help us improve our website and analyze how it's used. We won't set optional cookies unless you enable them.
                 </p>
                 
@@ -179,7 +179,7 @@ export default function CookieConsent() {
                     <Settings className="h-4 w-4 mr-1" />
                     Customize
                   </Button>
-                  <Link href="/privacy" className="text-xs text-blue-600 hover:underline self-center">
+                  <Link href="/privacy" className="text-xs text-blue-400 hover:underline self-center">
                     Privacy Policy
                   </Link>
                 </div>
@@ -201,12 +201,12 @@ export default function CookieConsent() {
       {/* Cookie Settings Modal */}
       {showSettings && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-black text-white border-gray-700">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-xl font-semibold">Cookie Preferences</h2>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-300">
                     Choose which cookies you'd like to accept
                   </p>
                 </div>
@@ -228,10 +228,10 @@ export default function CookieConsent() {
                       <h3 className="font-medium">Essential Cookies</h3>
                       <Badge variant="secondary" className="text-xs">Required</Badge>
                     </div>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-300">
                       These cookies are necessary for the website to function and cannot be switched off. They are usually only set in response to actions made by you which amount to a request for services.
                     </p>
-                    <div className="mt-2 text-xs text-gray-500">
+                    <div className="mt-2 text-xs text-gray-400">
                       Examples: Authentication, security, shopping cart
                     </div>
                   </div>
@@ -251,10 +251,10 @@ export default function CookieConsent() {
                       <h3 className="font-medium">Analytics Cookies</h3>
                       <Badge variant="outline" className="text-xs">Optional</Badge>
                     </div>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-300">
                       These cookies help us understand how visitors interact with our website by collecting and reporting information anonymously.
                     </p>
-                    <div className="mt-2 text-xs text-gray-500">
+                    <div className="mt-2 text-xs text-gray-400">
                       Examples: Google Analytics, page views, user behavior
                     </div>
                   </div>
@@ -274,10 +274,10 @@ export default function CookieConsent() {
                       <h3 className="font-medium">Marketing Cookies</h3>
                       <Badge variant="outline" className="text-xs">Optional</Badge>
                     </div>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-300">
                       These cookies are used to track visitors across websites to display relevant advertisements and measure campaign effectiveness.
                     </p>
-                    <div className="mt-2 text-xs text-gray-500">
+                    <div className="mt-2 text-xs text-gray-400">
                       Examples: Facebook Pixel, Google Ads, retargeting
                     </div>
                   </div>
@@ -297,10 +297,10 @@ export default function CookieConsent() {
                       <h3 className="font-medium">Personalization Cookies</h3>
                       <Badge variant="outline" className="text-xs">Optional</Badge>
                     </div>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-300">
                       These cookies enable enhanced functionality and personalization, such as remembering your preferences and customizing content.
                     </p>
-                    <div className="mt-2 text-xs text-gray-500">
+                    <div className="mt-2 text-xs text-gray-400">
                       Examples: Language preferences, customized recommendations
                     </div>
                   </div>
@@ -326,7 +326,7 @@ export default function CookieConsent() {
               </div>
               
               <div className="mt-4 text-center">
-                <Link href="/privacy" className="text-xs text-blue-600 hover:underline">
+                <Link href="/privacy" className="text-xs text-blue-400 hover:underline">
                   Read our full Privacy Policy
                 </Link>
               </div>

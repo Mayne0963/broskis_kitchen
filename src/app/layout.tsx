@@ -7,7 +7,6 @@ import Footer from "../components/layout/Footer"
 import { Providers } from "../lib/context/Providers"
 import { OrderProvider } from "../lib/context/OrderContext"
 import MusicPlayer from "../components/layout/MusicPlayer"
-import ChatBot from "../components/chat/ChatBot"
 import ErrorBoundary from "../components/common/ErrorBoundary"
 import ChunkErrorHandler from "../components/common/ChunkErrorHandler"
 import CookieConsent from "../components/gdpr/CookieConsent"
@@ -35,7 +34,6 @@ export default function RootLayout({
                <main className="flex-grow pt-20">{children}</main>
                <Footer />
                <MusicPlayer />
-               <ChatBot />
                <Toaster
                  position="top-right"
                  toastOptions={{

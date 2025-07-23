@@ -15,7 +15,10 @@ export const products: Product[] = [
     description:
       "Our signature t-shirt featuring the iconic Broski's Kitchen logo. Made from premium cotton for ultimate comfort.",
     price: 29.99,
-    images: ["/images/shop/classic-logo-tee.jpg", "/images/shop/classic-logo-tee-2.jpg"],
+    images: [
+      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Broski's%20Kitchen%20signature%20t-shirt%20premium%20cotton%20ultimate%20comfort&image_size=square_hd",
+      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Broski's%20Kitchen%20signature%20t-shirt%20premium%20cotton%20ultimate%20comfort&image_size=square_hd",
+    ],
     category: "apparel",
     categoryName: "Apparel",
     featured: true,
@@ -36,7 +39,10 @@ export const products: Product[] = [
     description:
       "Stay warm in style with our graffiti-inspired hoodie. Features a street art design exclusive to Broski's Kitchen.",
     price: 59.99,
-    images: ["/images/shop/premium-hoodie.jpg", "/images/shop/premium-hoodie-2.jpg"],
+    images: [
+      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Broski's%20Kitchen%20graffiti%20style%20hoodie%20premium%20cotton%20street%20art%20design%20exclusive%20to%20Broski's%20Kitchen&image_size=square_hd",
+      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Broski's%20Kitchen%20graffiti%20style%20hoodie%20premium%20cotton%20street%20art%20design%20exclusive%20to%20Broski's%20Kitchen&image_size=square_hd",
+    ],
     category: "apparel",
     categoryName: "Apparel",
     featured: true,
@@ -56,7 +62,10 @@ export const products: Product[] = [
     description:
       "Our premium snapback cap featuring embroidered Broski's Kitchen logo. One size fits most with adjustable strap.",
     price: 34.99,
-    images: ["/images/shop/snapback-cap.jpg", "/images/shop/snapback-cap-2.jpg"],
+    images: [
+      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Broski's%20Kitchen%20luxury%20snapback%20cap%20premium%20cotton%20embroidered%20Broski's%20Kitchen%20logo%20one%20size%20fits%20most%20with%20adjustable%20strap&image_size=square_hd",
+      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Broski's%20Kitchen%20luxury%20snapback%20cap%20premium%20cotton%20embroidered%20Broski's%20Kitchen%20logo%20one%20size%20fits%20most%20with%20adjustable%20strap&image_size=square_hd",
+    ],
     category: "headwear",
     categoryName: "Headwear",
     bestseller: true,
@@ -73,7 +82,10 @@ export const products: Product[] = [
     name: "Embroidered Beanie",
     description: "Keep your head warm with our stylish beanie featuring an embroidered Broski's Kitchen logo.",
     price: 24.99,
-    images: ["/images/shop/beanie.jpg", "/images/shop/beanie-2.jpg"],
+    images: [
+      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Broski's%20Kitchen%20embroidered%20beanie%20stylish%20keep%20your%20head%20warm%20with%20our%20stylish%20beanie%20featuring%20an%20embroidered%20Broski's%20Kitchen%20logo&image_size=square_hd",
+      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Broski's%20Kitchen%20embroidered%20beanie%20stylish%20keep%20your%20head%20warm%20with%20our%20stylish%20beanie%20featuring%20an%20embroidered%20Broski's%20Kitchen%20logo&image_size=square_hd",
+    ],
     category: "headwear",
     categoryName: "Headwear",
     sizes: ["One Size"],
@@ -92,7 +104,10 @@ export const products: Product[] = [
       "Double-walled stainless steel tumbler keeps your drinks hot or cold for hours. Features our signature logo.",
     price: 32.99,
     compareAtPrice: 39.99,
-    images: ["/images/shop/insulated-tumbler.jpg", "/images/shop/insulated-tumbler-2.jpg"],
+    images: [
+      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=blackened%20fish%20tacos%20mahi%20mahi%20cabbage%20slaw%20chipotle%20crema%20pickled%20red%20onions%20corn%20tortillas&image_size=square_hd",
+      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=blackened%20fish%20tacos%20mahi%20mahi%20cabbage%20slaw%20chipotle%20crema%20pickled%20red%20onions%20corn%20tortillas&image_size=square_hd",
+    ],
     category: "drinkware",
     categoryName: "Drinkware",
     featured: true,
@@ -111,7 +126,10 @@ export const products: Product[] = [
     description:
       "Start your day right with our ceramic mug featuring the Broski's Kitchen logo. Holds 12oz of your favorite beverage.",
     price: 18.99,
-    images: ["/images/shop/ceramic-mug.jpg", "/images/shop/ceramic-mug-2.jpg"],
+    images: [
+      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=blackened%20fish%20tacos%20mahi%20mahi%20cabbage%20slaw%20chipotle%20crema%20pickled%20red%20onions%20corn%20tortillas&image_size=square_hd",
+      "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=blackened%20fish%20tacos%20mahi%20mahi%20cabbage%20slaw%20chipotle%20crema%20pickled%20red%20onions%20corn%20tortillas&image_size=square_hd",
+    ],
     category: "drinkware",
     categoryName: "Drinkware",
     colors: [

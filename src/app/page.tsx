@@ -12,7 +12,7 @@ function Page() {
       <section className="hero-section-new">
         {/* Hero Image Container */}
         <div className="hero-image-container">
-          <Image src="images/Broskis Kitchen-Transparent-Gold.png" alt="Broski's Kitchen" fill className="object-contain hero-image"/>
+          <Image src="/Users/carltonmayne/broskiskitchenfinal (5)/public/images/Broski’s Kitchen-Transparent-Gold.png" alt="Broski's Kitchen" fill className="object-contain hero-image" priority />
         </div>
         
         {/* Hero Content Below Image */}

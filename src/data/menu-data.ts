@@ -199,7 +199,7 @@ export const infusedMenuItems = [
     name: "Infused Wings",
     description: "Crispy chicken wings tossed in our signature sauce with a special infusion.",
     price: 16.99,
-    image: "/images/menu-2.jpg",
+    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=infused%20wings%20crispy%20chicken%20wings%20special%20infusion&image_size=square_hd",
     category: "wings",
     infused: true,
     dietary: {
@@ -214,7 +214,7 @@ export const infusedMenuItems = [
     name: "Infused Chocolate Brownie",
     description: "Rich chocolate brownie with a special infusion, topped with gold flakes.",
     price: 12.99,
-    image: "/images/infused-brownie.jpg",
+    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Infused%20chocolate%20brownie%20rich%20chocolate%20special%20infusion%20gold%20flakes&image_size=square_hd",
     category: "desserts",
     infused: true,
     new: true,
@@ -230,7 +230,7 @@ export const infusedMenuItems = [
     name: "Infused Luxury Margarita",
     description: "Premium tequila, fresh lime juice, agave nectar, and a special infusion with gold rim.",
     price: 15.99,
-    image: "/images/infused-margarita.jpg",
+    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Infused%20luxury%20margarita%20premium%20tequila%20fresh%20lime%20juice%20agave%20nectar%20special%20infusion%20gold%20rim&image_size=square_hd",
     category: "drinks",
     infused: true,
     dietary: {
@@ -245,7 +245,7 @@ export const infusedMenuItems = [
     name: "Infused Luxury Chocolate Bar",
     description: "Premium dark chocolate with a special infusion, sea salt, and gold flakes.",
     price: 18.99,
-    image: "/images/infused-chocolate.jpg",
+    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Infused%20luxury%20chocolate%20bar%20premium%20dark%20chocolate%20special%20infusion%20sea%20salt%20gold%20flakes&image_size=square_hd",
     category: "desserts",
     infused: true,
     dietary: {

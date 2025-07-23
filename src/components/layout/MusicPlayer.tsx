@@ -304,180 +304,183 @@ if (audioRef && audioRef.current) {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 w-full bg-gradient-to-r from-[#0F0F0F] to-[#1A1A1A] border-t border-[#333333] p-4 z-50 shadow-lg">
-      <div className="container mx-auto max-w-6xl">
-        {/* Progress Bar */}
-        {currentTrack && (
-          <div className="flex items-center mb-3 text-xs text-gray-400">
-            <span className="w-10 text-right font-medium">{formatTime(currentTime)}</span>
-            <div className="relative flex-1 mx-3">
-              <div className="h-1 bg-gray-700 rounded-full w-full"></div>
-              <div 
-                className="absolute top-0 left-0 h-1 bg-gradient-to-r from-gold-foil to-amber-400 rounded-full" 
-                style={{ width: `${(currentTime / (duration || 1)) * 100}%` }}
-              ></div>
-              <input
-                type="range"
-                min="0"
-                max={duration || 0}
-                value={currentTime}
-                onChange={handleSeek}
-                className="absolute top-0 left-0 w-full h-1 opacity-0 cursor-pointer"
-              />
-            </div>
-            <span className="w-10 font-medium">{formatTime(duration)}</span>
-          </div>
-        )}
-        
-        <div className="flex flex-wrap md:flex-nowrap items-center justify-between gap-4">
-          {/* Track Info */}
-          <div className="flex items-center flex-1 min-w-[200px]">
-            {currentTrack && currentTrack.coverImage ? (
-              <div className="relative w-14 h-14 mr-4 rounded-lg overflow-hidden shadow-md group">
-                <img
-                  src={currentTrack.coverImage || "/placeholder.svg"}
-                  alt={currentTrack.title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+    <div className="hidden">
+      {/* Hidden UI - Music plays in background without visual controls */}
+      <div className="fixed bottom-0 left-0 w-full bg-gradient-to-r from-[#0F0F0F] to-[#1A1A1A] border-t border-[#333333] p-4 z-50 shadow-lg">
+        <div className="container mx-auto max-w-6xl">
+          {/* Progress Bar */}
+          {currentTrack && (
+            <div className="flex items-center mb-3 text-xs text-gray-400">
+              <span className="w-10 text-right font-medium">{formatTime(currentTime)}</span>
+              <div className="relative flex-1 mx-3">
+                <div className="h-1 bg-gray-700 rounded-full w-full"></div>
+                <div 
+                  className="absolute top-0 left-0 h-1 bg-gradient-to-r from-gold-foil to-amber-400 rounded-full" 
+                  style={{ width: `${(currentTime / (duration || 1)) * 100}%` }}
+                ></div>
+                <input
+                  type="range"
+                  min="0"
+                  max={duration || 0}
+                  value={currentTime}
+                  onChange={handleSeek}
+                  className="absolute top-0 left-0 w-full h-1 opacity-0 cursor-pointer"
                 />
-                {isPlaying && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
-                    <div className="flex space-x-1">
-                      <span className="w-1 h-6 bg-gold-foil animate-[soundbar_1s_ease-in-out_infinite]" style={{animationDelay: '0.2s'}}></span>
-                      <span className="w-1 h-4 bg-gold-foil animate-[soundbar_0.8s_ease-in-out_infinite]" style={{animationDelay: '0s'}}></span>
-                      <span className="w-1 h-8 bg-gold-foil animate-[soundbar_1.2s_ease-in-out_infinite]" style={{animationDelay: '0.4s'}}></span>
+              </div>
+              <span className="w-10 font-medium">{formatTime(duration)}</span>
+            </div>
+          )}
+          
+          <div className="flex flex-wrap md:flex-nowrap items-center justify-between gap-4">
+            {/* Track Info */}
+            <div className="flex items-center flex-1 min-w-[200px]">
+              {currentTrack && currentTrack.coverImage ? (
+                <div className="relative w-14 h-14 mr-4 rounded-lg overflow-hidden shadow-md group">
+                  <img
+                    src={currentTrack.coverImage || "/placeholder.svg"}
+                    alt={currentTrack.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  {isPlaying && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
+                      <div className="flex space-x-1">
+                        <span className="w-1 h-6 bg-gold-foil animate-[soundbar_1s_ease-in-out_infinite]" style={{animationDelay: '0.2s'}}></span>
+                        <span className="w-1 h-4 bg-gold-foil animate-[soundbar_0.8s_ease-in-out_infinite]" style={{animationDelay: '0s'}}></span>
+                        <span className="w-1 h-8 bg-gold-foil animate-[soundbar_1.2s_ease-in-out_infinite]" style={{animationDelay: '0.4s'}}></span>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
+              ) : (
+                <div className="w-14 h-14 mr-4 rounded-lg bg-gray-800 flex items-center justify-center shadow-md">
+                  <FaPlay className="text-gray-600" size={20} />
+                </div>
+              )}
+              <div className="min-w-0">
+                <p className="text-white font-bold truncate text-base">
+                  {currentTrack ? currentTrack.title : "No track selected"}
+                </p>
+                <p className="text-gray-400 text-sm truncate">
+                  {currentTrack ? currentTrack.artist : ""}
+                </p>
               </div>
-            ) : (
-              <div className="w-14 h-14 mr-4 rounded-lg bg-gray-800 flex items-center justify-center shadow-md">
-                <FaPlay className="text-gray-600" size={20} />
+            </div>
+
+            {/* Main Controls */}
+            <div className="flex items-center justify-center space-x-3 md:space-x-4">
+              <button 
+                onClick={toggleShuffle} 
+                className={`text-white hover:text-gold-foil transition-colors p-2 opacity-80 hover:opacity-100 ${
+                  isShuffled ? 'text-gold-foil' : ''
+                }`}
+                aria-label="Toggle shuffle"
+              >
+                <FaRandom size={14} />
+              </button>
+              <button 
+                onClick={previousTrack} 
+                className="text-white hover:text-gold-foil transition-colors p-2 opacity-80 hover:opacity-100"
+                aria-label="Previous track"
+              >
+                <FaBackward size={16} />
+              </button>
+              <button 
+                onClick={handlePlayPause} 
+                className="text-white hover:text-gold-foil transition-all p-4 bg-gradient-to-br from-gold-foil to-amber-600 hover:from-amber-500 hover:to-gold-foil rounded-full shadow-lg transform hover:scale-105 active:scale-95"
+                aria-label={isPlaying ? "Pause" : "Play"}
+              >
+                {isPlaying ? <FaPause size={18} /> : <FaPlay size={18} className="ml-1" />}
+              </button>
+              <button 
+                onClick={nextTrack} 
+                className="text-white hover:text-gold-foil transition-colors p-2 opacity-80 hover:opacity-100"
+                aria-label="Next track"
+              >
+                <FaForward size={16} />
+              </button>
+              <button 
+                onClick={toggleRepeat} 
+                className={`text-white hover:text-gold-foil transition-colors p-2 opacity-80 hover:opacity-100 ${
+                  isRepeating ? 'text-gold-foil' : ''
+                }`}
+                aria-label="Toggle repeat"
+              >
+                <FaRedoAlt size={14} />
+              </button>
+            </div>
+
+            {/* Volume Control */}
+            <div className="flex items-center space-x-2">
+              <FaVolumeDown className="text-white opacity-80" size={14} />
+              <div className="relative w-24 h-6 flex items-center">
+                <div className="h-1 bg-gray-700 rounded-full w-full"></div>
+                <div 
+                  className="absolute top-[10px] left-0 h-1 bg-gradient-to-r from-gold-foil to-amber-400 rounded-full" 
+                  style={{ width: `${volume * 100}%` }}
+                ></div>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={volume}
+                  onChange={handleVolumeChange}
+                  className="absolute top-0 left-0 w-full h-6 opacity-0 cursor-pointer"
+                  aria-label="Volume control"
+                />
               </div>
-            )}
-            <div className="min-w-0">
-              <p className="text-white font-bold truncate text-base">
-                {currentTrack ? currentTrack.title : "No track selected"}
-              </p>
-              <p className="text-gray-400 text-sm truncate">
-                {currentTrack ? currentTrack.artist : ""}
-              </p>
+              <FaVolumeUp className="text-white opacity-80" size={14} />
             </div>
-          </div>
 
-          {/* Main Controls */}
-          <div className="flex items-center justify-center space-x-3 md:space-x-4">
-            <button 
-              onClick={toggleShuffle} 
-              className={`text-white hover:text-gold-foil transition-colors p-2 opacity-80 hover:opacity-100 ${
-                isShuffled ? 'text-gold-foil' : ''
-              }`}
-              aria-label="Toggle shuffle"
-            >
-              <FaRandom size={14} />
-            </button>
-            <button 
-              onClick={previousTrack} 
-              className="text-white hover:text-gold-foil transition-colors p-2 opacity-80 hover:opacity-100"
-              aria-label="Previous track"
-            >
-              <FaBackward size={16} />
-            </button>
-            <button 
-              onClick={handlePlayPause} 
-              className="text-white hover:text-gold-foil transition-all p-4 bg-gradient-to-br from-gold-foil to-amber-600 hover:from-amber-500 hover:to-gold-foil rounded-full shadow-lg transform hover:scale-105 active:scale-95"
-              aria-label={isPlaying ? "Pause" : "Play"}
-            >
-              {isPlaying ? <FaPause size={18} /> : <FaPlay size={18} className="ml-1" />}
-            </button>
-            <button 
-              onClick={nextTrack} 
-              className="text-white hover:text-gold-foil transition-colors p-2 opacity-80 hover:opacity-100"
-              aria-label="Next track"
-            >
-              <FaForward size={16} />
-            </button>
-            <button 
-              onClick={toggleRepeat} 
-              className={`text-white hover:text-gold-foil transition-colors p-2 opacity-80 hover:opacity-100 ${
-                isRepeating ? 'text-gold-foil' : ''
-              }`}
-              aria-label="Toggle repeat"
-            >
-              <FaRedoAlt size={14} />
-            </button>
-          </div>
-
-          {/* Volume Control */}
-          <div className="flex items-center space-x-2">
-            <FaVolumeDown className="text-white opacity-80" size={14} />
-            <div className="relative w-24 h-6 flex items-center">
-              <div className="h-1 bg-gray-700 rounded-full w-full"></div>
-              <div 
-                className="absolute top-[10px] left-0 h-1 bg-gradient-to-r from-gold-foil to-amber-400 rounded-full" 
-                style={{ width: `${volume * 100}%` }}
-              ></div>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={volume}
-                onChange={handleVolumeChange}
-                className="absolute top-0 left-0 w-full h-6 opacity-0 cursor-pointer"
-                aria-label="Volume control"
-              />
+            {/* Playlist Switch */}
+            <div className="flex items-center space-x-2 ml-auto">
+              <button
+                className={`text-white text-xs px-3 py-2 rounded-full transition-all duration-300 ${ 
+                  currentPlaylist && currentPlaylist === chillLofi 
+                    ? "bg-gradient-to-r from-gold-foil to-amber-500 text-black font-medium shadow-md" 
+                    : "hover:text-gold-foil border border-gray-600 hover:border-gold-foil"
+                }`}
+                onClick={() => handlePlaylistSwitch(chillLofi)}
+              >
+                Chill
+              </button>
+              <button
+                className={`text-white text-xs px-3 py-2 rounded-full transition-all duration-300 ${ 
+                  currentPlaylist && currentPlaylist === upbeatTracks 
+                    ? "bg-gradient-to-r from-gold-foil to-amber-500 text-black font-medium shadow-md" 
+                    : "hover:text-gold-foil border border-gray-600 hover:border-gold-foil"
+                }`}
+                onClick={() => handlePlaylistSwitch(upbeatTracks)}
+              >
+                Upbeat
+              </button>
+              <button
+                className={`text-white text-xs px-3 py-2 rounded-full transition-all duration-300 ${ 
+                  currentPlaylist && currentPlaylist === dinnerJazz 
+                    ? "bg-gradient-to-r from-gold-foil to-amber-500 text-black font-medium shadow-md" 
+                    : "hover:text-gold-foil border border-gray-600 hover:border-gold-foil"
+                }`}
+                onClick={() => handlePlaylistSwitch(dinnerJazz)}
+              >
+                Jazz
+              </button>
             </div>
-            <FaVolumeUp className="text-white opacity-80" size={14} />
-          </div>
-
-          {/* Playlist Switch */}
-          <div className="flex items-center space-x-2 ml-auto">
-            <button
-              className={`text-white text-xs px-3 py-2 rounded-full transition-all duration-300 ${ 
-                currentPlaylist && currentPlaylist === chillLofi 
-                  ? "bg-gradient-to-r from-gold-foil to-amber-500 text-black font-medium shadow-md" 
-                  : "hover:text-gold-foil border border-gray-600 hover:border-gold-foil"
-              }`}
-              onClick={() => handlePlaylistSwitch(chillLofi)}
-            >
-              Chill
-            </button>
-            <button
-              className={`text-white text-xs px-3 py-2 rounded-full transition-all duration-300 ${ 
-                currentPlaylist && currentPlaylist === upbeatTracks 
-                  ? "bg-gradient-to-r from-gold-foil to-amber-500 text-black font-medium shadow-md" 
-                  : "hover:text-gold-foil border border-gray-600 hover:border-gold-foil"
-              }`}
-              onClick={() => handlePlaylistSwitch(upbeatTracks)}
-            >
-              Upbeat
-            </button>
-            <button
-              className={`text-white text-xs px-3 py-2 rounded-full transition-all duration-300 ${ 
-                currentPlaylist && currentPlaylist === dinnerJazz 
-                  ? "bg-gradient-to-r from-gold-foil to-amber-500 text-black font-medium shadow-md" 
-                  : "hover:text-gold-foil border border-gray-600 hover:border-gold-foil"
-              }`}
-              onClick={() => handlePlaylistSwitch(dinnerJazz)}
-            >
-              Jazz
-            </button>
           </div>
         </div>
-
-        {/* Audio Element */}
-        {currentTrack && (
-          <audio 
-            ref={audioRef} 
-            src={currentTrack.url} 
-            onTimeUpdate={handleTimeUpdate}
-            onLoadedMetadata={handleLoadedMetadata}
-            onEnded={handleTrackEnd}
-            preload="auto"
-            loop={isRepeating}
-          />
-        )}
       </div>
+
+      {/* Audio Element - This remains functional for background music */}
+      {currentTrack && (
+        <audio 
+          ref={audioRef} 
+          src={currentTrack.url} 
+          onTimeUpdate={handleTimeUpdate}
+          onLoadedMetadata={handleLoadedMetadata}
+          onEnded={handleTrackEnd}
+          preload="auto"
+          loop={isRepeating}
+        />
+      )}
     </div>
   )
 }
