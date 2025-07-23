@@ -65,10 +65,11 @@ export default function RewardsPage() {
         <div className="absolute inset-0 z-0 bg-black">
           <div className="absolute inset-0 bg-gradient-to-r from-black to-transparent opacity-70 z-10"></div>
           <Image 
-            src="https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=luxury%20rewards%20program%20golden%20coins%20exclusive%20benefits%20premium%20loyalty%20program%20elegant%20design&image_size=landscape_16_9" 
+            src="/images/rewards-hero.jpg" 
             alt="Rewards Program" 
             fill 
             className="object-cover" 
+            priority
           />
         </div>
         <div className="container mx-auto px-4 z-10 text-center">

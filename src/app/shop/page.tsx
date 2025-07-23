@@ -86,8 +86,8 @@ export default function ShopPage() {
       <section className="relative h-[40vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
-            src="/images/hero-bg.jpg"
-            alt="Broski's Kitchen Merchandise"
+            src="/images/shopHero.jpg"
+            alt="Shop Hero"
             fill
             className="object-cover"
             priority

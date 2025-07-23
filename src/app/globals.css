@@ -571,9 +571,6 @@ main {
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.3;
-    /* Enhanced logo visibility with subtle glow */
-    filter: drop-shadow(0 0 30px rgba(183, 152, 90, 0.4)) brightness(1.1);
   }
 
   .hero-background::before {
