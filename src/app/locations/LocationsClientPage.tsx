@@ -141,7 +141,14 @@ export default function LocationsClientPage({ locations }: LocationsClientPagePr
                     {location.hours && (
                       <div className="flex items-center text-gray-400 mb-4">
                         <FaClock className="mr-2" />
-                        <span className="text-sm">{location.hours}</span>
+                        <div className="text-sm">
+                          <div className="font-semibold mb-1">Hours:</div>
+                          {location.hours.map((schedule: any, index: number) => (
+                            <div key={index} className="text-xs">
+                              {schedule.day}: {schedule.hours}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
 

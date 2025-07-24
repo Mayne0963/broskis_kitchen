@@ -2,6 +2,9 @@ import { headers } from "next/headers";
 import { getSessionCookie } from "@/lib/auth/session";
 import DashboardClient from "@/components/dashboard/DashboardClient";
 
+// Force dynamic rendering since we use cookies
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardPage() {
   const session = await getSessionCookie();
 
