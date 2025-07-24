@@ -37,7 +37,7 @@ function Page() {
       <section className="hero-section-new">
         {/* Hero Image Container */}
         <div className="hero-image-container">
-          <Image src="/images/broskis-kitchen-transparent-gold.png" alt="Broski's Kitchen" fill className="object-contain  hero-image" priority />
+          <Image src="public/images/broskis-kitchen-transparent-gold.png" alt="Broski's Kitchen" fill className="object-contain  hero-image" priority />
         </div>
         
         {/* Hero Content Below Image */}
