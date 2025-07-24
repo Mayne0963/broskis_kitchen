@@ -79,13 +79,15 @@ export const createCoupon = async (
       expiresAt
     }
 
-    const existingCoupons = JSON.parse(localStorage.getItem('coupons') || '[]')
-    existingCoupons.push({
-      ...coupon,
-      createdAt: coupon.createdAt.toISOString(),
-      expiresAt: coupon.expiresAt.toISOString()
-    })
-    localStorage.setItem('coupons', JSON.stringify(existingCoupons))
+    if (typeof window !== 'undefined') {
+      const existingCoupons = JSON.parse(localStorage.getItem('coupons') || '[]')
+      existingCoupons.push({
+        ...coupon,
+        createdAt: coupon.createdAt.toISOString(),
+        expiresAt: coupon.expiresAt.toISOString()
+      })
+      localStorage.setItem('coupons', JSON.stringify(existingCoupons))
+    }
 
     console.log('Coupon created in localStorage:', coupon.code)
     return coupon
@@ -159,6 +161,10 @@ export const useCoupon = async (
     }
 
     // Fallback to localStorage
+    if (typeof window === 'undefined') {
+      return { success: false, error: 'Storage not available' }
+    }
+
     const existingCoupons = JSON.parse(localStorage.getItem('coupons') || '[]')
     const couponIndex = existingCoupons.findIndex((c: Coupon) => c.code === code)
 
@@ -241,6 +247,10 @@ export const getUserCoupons = async (userId: string): Promise<Coupon[]> => {
     }
 
     // Fallback to localStorage
+    if (typeof window === 'undefined') {
+      return []
+    }
+
     const existingCoupons = JSON.parse(localStorage.getItem('coupons') || '[]')
     const userCoupons = existingCoupons
       .filter((c: Coupon) => c.userId === userId)
@@ -307,6 +317,10 @@ export const validateCoupon = async (
     }
 
     // Fallback to localStorage
+    if (typeof window === 'undefined') {
+      return { valid: false, error: 'Storage not available' }
+    }
+
     const existingCoupons = JSON.parse(localStorage.getItem('coupons') || '[]')
     const couponData = existingCoupons.find((c: Coupon) => c.code === code)
 

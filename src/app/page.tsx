@@ -37,7 +37,7 @@ function Page() {
       <section className="hero-section-new">
         {/* Hero Image Container */}
         <div className="hero-image-container">
-          <Image src="/images/broskis-kitchen-transparent-gold.png" alt="Broski's Kitchen" fill className="object-contain hero-image" priority />
+          <Image src="/images/broskis-kitchen-transparent-gold.png" alt="Broski's Kitchen" fill className="object-contain  hero-image" priority />
         </div>
         
         {/* Hero Content Below Image */}
@@ -47,7 +47,7 @@ function Page() {
               Welcome to <span className="graffiti-text elegant-glow">Broski&apos;s Kitchen</span>
             </h1>
             <p className="text-xl md:text-2xl lg:text-3xl text-soft-gray mb-10 animate-fade-in animate-delay-200 max-w-3xl mx-auto text-center" style={{lineHeight: '1.4'}}>
-              Luxury Street Gourmet – Where Flavor Meets Culture
+              Luxury Street Gourmet - Where Flavor Meets Culture
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-6 animate-fade-in animate-delay-400">
               <Link href="/menu" className="btn-primary btn-pulse text-lg transform hover:scale-105 transition-transform duration-300">
