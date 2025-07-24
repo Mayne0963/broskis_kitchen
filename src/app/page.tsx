@@ -37,7 +37,12 @@ function Page() {
       <section className="hero-section-new">
         {/* Hero Image Container */}
         <div className="hero-image-container">
-          <Image src="public/images/broskis-kitchen-transparent-gold.png" alt="Broski's Kitchen" fill className="object-contain  hero-image" priority />
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 h-full">
+            {/* Broski's Kitchen Logo */}
+            <div className="relative w-full md:w-1/2 h-64 md:h-80">
+              <Image src="/images/Untitled design-4.png" alt="Broski's Kitchen" fill className="object-contain hero-image" priority />
+            </div>
+          </div>
         </div>
         
         {/* Hero Content Below Image */}
@@ -59,17 +64,6 @@ function Page() {
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Boosie Wings Banner Section */}
-      <section className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden">
-        <Image 
-          src="/images/boosie-wings-homepage-banner.jpg" 
-          alt="Boosie Wings - Drenched in Boosie Sauce" 
-          fill 
-          className="object-cover object-center" 
-          priority
-        />
       </section>
 
       {/* Features Section */}
