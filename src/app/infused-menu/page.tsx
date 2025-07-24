@@ -38,7 +38,7 @@ export default function InfusedMenuPage() {
         {/* Hero Section */}
         <section className="relative h-[50vh] min-h-[400px]">
           <div className="absolute inset-0 z-0">
-            <Image src="/images/infused-menu-hero.jpg" alt="Infused Menu" fill className="object-cover" priority />
+            <Image src="/images/infused-menu-hero.svg" alt="Infused Menu" fill className="object-cover" priority />
             <div className="absolute inset-0 bg-black bg-opacity-60"></div>
           </div>
           <div className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-center items-center text-center">

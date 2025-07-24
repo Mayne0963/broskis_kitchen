@@ -91,7 +91,7 @@ export default function EventsPage() {
         <div className="absolute inset-0 z-0 bg-black">
           <div className="absolute inset-0 bg-gradient-to-r from-black to-transparent opacity-70 z-10"></div>
           <Image 
-            src="https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=luxury%20restaurant%20events%20chef%20workshops%20exclusive%20tastings%20special%20dining%20experiences%20elegant%20atmosphere&image_size=landscape_16_9" 
+            src="https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=broskis%20kitchen%20restaurant%20events%20chef%20workshops%20exclusive%20tastings%20special%20dining%20experiences%20elegant%20atmosphere&image_size=landscape_16_9" 
             alt="Events & Experiences" 
             fill 
             className="object-cover" 

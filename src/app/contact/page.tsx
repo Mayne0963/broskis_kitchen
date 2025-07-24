@@ -71,7 +71,7 @@ export default function ContactPage() {
           <div className="absolute inset-0 bg-gradient-to-r from-black to-transparent opacity-70 z-10"></div>
           <div
             className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: "url('/images/contact-hero.jpg')" }}
+            style={{ backgroundImage: "url('/images/contact-hero.svg')" }}
           ></div>
         </div>
         <div className="container mx-auto px-4 z-10 text-center">

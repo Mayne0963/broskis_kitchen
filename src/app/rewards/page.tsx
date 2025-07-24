@@ -65,7 +65,7 @@ export default function RewardsPage() {
         <div className="absolute inset-0 z-0 bg-black">
           <div className="absolute inset-0 bg-gradient-to-r from-black to-transparent opacity-70 z-10"></div>
           <Image 
-            src="/images/rewards-hero.jpg" 
+            src="/images/rewards-hero.svg" 
             alt="Rewards Program" 
             fill 
             className="object-cover" 

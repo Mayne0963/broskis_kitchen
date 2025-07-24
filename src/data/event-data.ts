@@ -199,7 +199,7 @@ export const events: Event[] = [
       name: "Chicago River North",
     },
     category: "workshop",
-    image: "/images/event-past-2.jpg",
+    image: "/images/event-past-2.svg",
     price: 95,
     capacity: 25,
     registered: 25,

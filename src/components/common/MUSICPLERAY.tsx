@@ -59,7 +59,7 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
           title: 'Peaceful Piano',
           artist: 'Ambient Sounds',
           url: '/music/peaceful-piano.mp3',
-          coverImage: '/images/relaxing-piano.jpg',
+          coverImage: '/images/relaxing-piano.svg',
           genre: 'Ambient',
           duration: 240
         },
@@ -68,7 +68,7 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
           title: 'Ambient Nature',
           artist: 'Nature Sounds',
           url: '/music/ambient-nature.mp3',
-          coverImage: '/images/relaxing-piano.jpg',
+          coverImage: '/images/relaxing-piano.svg',
           genre: 'Ambient',
           duration: 300
         },
@@ -77,7 +77,7 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
           title: 'Ambient Relaxing',
           artist: 'Zen Masters',
           url: '/music/ambient-relaxing.mp3',
-          coverImage: '/images/relaxing-piano.jpg',
+          coverImage: '/images/relaxing-piano.svg',
           genre: 'Ambient',
           duration: 320
         }
@@ -112,7 +112,7 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
           title: 'Upbeat Acoustic',
           artist: 'Acoustic Vibes',
           url: '/music/upbeat-acoustic.mp3',
-          coverImage: '/images/chilled-vibes.jpg',
+          coverImage: '/images/chilled-vibes.svg',
           genre: 'Acoustic',
           duration: 210
         }
@@ -129,7 +129,7 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
           title: 'Jazzy Abstract',
           artist: 'Creative Commons',
           url: '/music/jazzy-abstract.mp3',
-          coverImage: '/images/chilled-vibes.jpg',
+          coverImage: '/images/chilled-vibes.svg',
           genre: 'Jazz',
           duration: 200
         },
@@ -138,7 +138,7 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
           title: 'Smooth Jazz',
           artist: 'Jazz Collective',
           url: '/music/smooth-jazz.mp3',
-          coverImage: '/images/chilled-vibes.jpg',
+          coverImage: '/images/chilled-vibes.svg',
           genre: 'Jazz',
           duration: 280
         }

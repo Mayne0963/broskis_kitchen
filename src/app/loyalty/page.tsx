@@ -787,7 +787,7 @@ export default function LoyaltyPage() {
                   </div>
                   <div className="relative h-64 md:h-auto">
                     <Image
-                      src="/images/loyalty-exclusive-menu.jpg"
+                      src="/images/loyalty-exclusive-menu.svg"
                       alt="Broski's Kitchen Exclusive Menu"
                       fill
                       className="object-cover"

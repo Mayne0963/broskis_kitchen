@@ -95,28 +95,28 @@ export const volunteerTestimonials = [
   {
     name: "Sarah Johnson",
     role: "Kitchen Assistant Volunteer",
-    image: "/images/volunteer-testimonial-1.jpg",
+    image: "/images/volunteer-testimonial-1.svg",
     quote:
       "Volunteering at Broski's Kitchen has been an incredible experience. I've learned so much about food preparation and community service. The staff is supportive and the atmosphere is always positive. It's rewarding to know I'm making a difference while gaining valuable skills.",
   },
   {
     name: "Michael Rodriguez",
     role: "Event Support Volunteer",
-    image: "/images/volunteer-testimonial-2.jpg",
+    image: "/images/volunteer-testimonial-2.svg",
     quote:
       "As a culinary student, volunteering here has given me hands-on experience that complements my education perfectly. I've made great connections and even secured a part-time job through the skills and references I gained as a volunteer.",
   },
   {
     name: "Aisha Patel",
     role: "Community Outreach Volunteer",
-    image: "/images/volunteer-testimonial-3.jpg",
+    image: "/images/volunteer-testimonial-3.svg",
     quote:
       "I started volunteering to give back to my community, but I've received so much more in return. The team at Broski's Kitchen treats volunteers like family, and I've developed friendships that extend beyond my volunteer hours.",
   },
   {
     name: "David Chen",
     role: "Food Distribution Volunteer",
-    image: "/images/volunteer-testimonial-4.jpg",
+    image: "/images/volunteer-testimonial-4.svg",
     quote:
       "Volunteering with the food distribution program has opened my eyes to food insecurity issues in our community. It's gratifying to help provide nutritious meals to those who need them most, and the Broski's Kitchen team makes every shift meaningful and enjoyable.",
   },
