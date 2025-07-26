@@ -1068,7 +1068,7 @@ main {
 
 /* Broski's OTW Gold Button Styling */
 .broski-otw-gold-button {
-  background: linear-gradient(145deg, #D6A356, #FECF66, #F7B940);
+  background: linear-gradient(135deg, #BA8939, #FDCE66, #FFE076, #E0AD53, #FFEF88);
   color: #000000;
   font-weight: bold;
   font-family: 'Montserrat', sans-serif;
@@ -1087,8 +1087,8 @@ main {
 }
 
 .broski-otw-gold-button:hover {
-  background: linear-gradient(145deg, #C5A100, #A98600, #7F6000);
-  color: #000000;
+  background: linear-gradient(135deg, #C5A100, #A98600, #7F6000);
+  color: #FFF8DC;
   transform: scale(1.05);
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
   border-color: #C5A100;

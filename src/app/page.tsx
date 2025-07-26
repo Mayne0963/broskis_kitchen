@@ -74,12 +74,12 @@ function Page() {
             <Image
               src="/images/broskis-gold-logo.png"
               alt="Broski's Kitchen Official Gold Logo"
-              width={280}
-              height={140}
-              className="mx-auto drop-shadow-xl max-w-[280px] h-auto"
+              width={400}
+              height={200}
+              className="mx-auto drop-shadow-2xl max-w-full h-auto"
               priority
               loading="eager"
-              sizes="(max-width: 768px) 250px, 280px"
+              sizes="(max-width: 768px) 300px, 400px"
               style={{ display: 'block' }}
             />
           </motion.div>
@@ -104,12 +104,12 @@ function Page() {
             {/* CAUSE IT'S BADAZZ - Red, All Caps, smaller */}
             <motion.p 
               className="text-xl md:text-2xl lg:text-3xl font-bold text-red-600 uppercase tracking-wide"
-              style={{ color: '#C1272D', fontWeight: 700 }}
+              style={{ color: '#B22222' }}
               animate={{ 
                 textShadow: [
-                  "0 0 5px #C1272D, 0 0 10px #C1272D, 0 0 15px #C1272D",
-                  "0 0 10px #C1272D, 0 0 20px #C1272D, 0 0 30px #C1272D",
-                  "0 0 5px #C1272D, 0 0 10px #C1272D, 0 0 15px #C1272D"
+                  "0 0 5px #B22222, 0 0 10px #B22222, 0 0 15px #B22222",
+                  "0 0 10px #B22222, 0 0 20px #B22222, 0 0 30px #B22222",
+                  "0 0 5px #B22222, 0 0 10px #B22222, 0 0 15px #B22222"
                 ]
               }}
               transition={{ 
@@ -123,7 +123,7 @@ function Page() {
             </motion.p>
           </motion.div>
 
-          {/* Order Now Button - Red Background, White Text */}
+          {/* Order Now Button - Rounded Rectangle, Crimson Red */}
           <motion.div 
             className="mb-16 flex justify-center"
             initial={{ opacity: 0, scale: 0.8 }}
@@ -132,15 +132,15 @@ function Page() {
           >
             <Link 
               href="/menu" 
-              className="inline-block bg-[#C1272D] hover:bg-[#A01F26] text-white font-bold py-[14px] px-[24px] rounded-md transition-all duration-300 transform hover:scale-105 uppercase tracking-wide"
-              style={{ fontFamily: 'sans-serif' }}
+              className="broski-otw-gold-button"
+              style={{ backgroundColor: '#B22222', borderColor: '#B22222' }}
               aria-label="Order Now Button for Boosie Wings"
             >
-              ORDER NOW
+              Order Now
             </Link>
           </motion.div>
 
-          {/* Wings Centerpiece - Boosie Sweet Heat Sauce Image */}
+          {/* Wings Centerpiece - Ultra-realistic wings spread across width */}
           <motion.div 
             className="mb-4 w-full overflow-hidden flex justify-center"
             initial={{ opacity: 0, y: 50 }}
@@ -150,10 +150,10 @@ function Page() {
             <div className="relative w-full max-w-6xl">
               <Image
                 src="/images/boosie-wings.png"
-                alt="Boosie Wings Image"
+                alt="Ultra-realistic Boosie Wings spread across black surface"
                 width={2400}
                 height={900}
-                className="w-full h-auto object-cover drop-shadow-lg rounded-lg"
+                className="w-full h-auto object-cover shadow-2xl rounded-lg"
                 priority
                 loading="eager"
                 sizes="100vw"
