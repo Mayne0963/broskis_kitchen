@@ -149,7 +149,7 @@ function Page() {
           >
             <div className="relative w-full max-w-6xl">
               <Image
-                src="/images/boosie-wings.png"
+                src="public/images/boosie-wings.png"
                 alt="Ultra-realistic Boosie Wings spread across black surface"
                 width={2400}
                 height={900}
