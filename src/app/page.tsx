@@ -149,7 +149,7 @@ function Page() {
           >
             <div className="relative w-full max-w-6xl">
               <Image
-                src="/images/boosie-sweet-heat-sauce.jpg"
+                src="/images/boosie-wings.png"
                 alt="Boosie Wings Image"
                 width={2400}
                 height={900}
