@@ -72,7 +72,7 @@ function Page() {
             transition={{ duration: 1, ease: "easeOut" }}
           >
             <Image
-              src="/images/Broskis-Kitchen-Transparent-Gold.png"
+              src="/images/broskis-gold-logo.png"
               alt="Broski's Kitchen Official Gold Logo"
               width={400}
               height={200}
@@ -149,7 +149,7 @@ function Page() {
           >
             <div className="relative w-full max-w-6xl">
               <Image
-                src="/images/ChatGPT Image Jul 26, 2025 at 01_19_13 AM.png"
+                src="/images/boosie-wings.png"
                 alt="Ultra-realistic Boosie Wings spread across black surface"
                 width={2400}
                 height={900}
