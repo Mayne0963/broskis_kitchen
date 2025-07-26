@@ -3,12 +3,24 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaUtensils, FaMapMarkerAlt, FaCalendarAlt, FaGift } from "react-icons/fa";
+import { FaUtensils, FaMapMarkerAlt, FaCalendarAlt, FaGift, FaFire, FaBars, FaTimes, FaUser, FaShoppingBag, FaPlay, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { usePathname } from "next/navigation";
+import CartDropdown from "../components/cart/CartDropdown";
+import { useCart } from "../lib/context/CartContext";
+import { useAuth } from "../lib/context/AuthContext";
+import { motion, AnimatePresence } from "framer-motion";
+import { useHeroContent } from "../hooks/useHeroContent";
 // Note: Using direct path in Image src instead of import for Next.js compatibility
 
 
 function Page() {
   const [showSaucePopup, setShowSaucePopup] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const { itemCount } = useCart();
+  const pathname = usePathname();
+  const { user, logout } = useAuth();
+  const { heroContent, loading } = useHeroContent();
 
   useEffect(() => {
     // Show popup after 3 seconds
@@ -28,40 +40,184 @@ function Page() {
   }, []);
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen bg-black text-white">
+      {/* Hero Section - Fullscreen */}
+      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
+        {/* Hero Content - Central Vertical Layout */}
+        <div className="relative z-10 text-center px-4 max-w-6xl mx-auto flex flex-col items-center justify-center min-h-screen">
+          {/* Centered Broski's Gold Logo at Top */}
+          <motion.div 
+            className="mb-8"
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+          >
+            <Image
+              src="/images/Untitled design-5.png"
+              alt="Broski's Kitchen Official Gold Logo"
+              width={400}
+              height={200}
+              className="mx-auto drop-shadow-2xl"
+              priority
+              loading="eager"
+              sizes="(max-width: 768px) 300px, 400px"
+            />
+          </motion.div>
 
-      
+          {/* Tagline/Header Stack */}
+          <motion.div 
+            className="mb-8"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
+          >
+            {/* HOME OF THE AWARD-WINNING - Gold, Serif, ALL CAPS */}
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold mb-2 text-[#FFD700] uppercase tracking-wide leading-tight">
+              HOME OF THE AWARD-WINNING
+            </h1>
+             
+            {/* BOOSIE WINGS - Larger, Gold, Bold Serif, ALL CAPS */}
+            <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold mb-4 text-[#FFD700] uppercase tracking-tight leading-none">
+              BOOSIE WINGS
+            </h2>
+             
+            {/* CAUSE IT'S BADAZZ - Red, All Caps, smaller */}
+            <motion.p 
+              className="text-xl md:text-2xl lg:text-3xl font-bold text-[#B22222] uppercase tracking-wide"
+              animate={{ 
+                textShadow: [
+                  "0 0 5px #B22222, 0 0 10px #B22222, 0 0 15px #B22222",
+                  "0 0 10px #B22222, 0 0 20px #B22222, 0 0 30px #B22222",
+                  "0 0 5px #B22222, 0 0 10px #B22222, 0 0 15px #B22222"
+                ]
+              }}
+              transition={{ 
+                duration: 2, 
+                repeat: Infinity, 
+                repeatType: "reverse",
+                ease: "easeInOut"
+              }}
+            >
+              CAUSE IT&apos;S BADAZZ
+            </motion.p>
+          </motion.div>
 
-      
-      {/* Hero Section */}
-      <section className="hero-section-new">
-        {/* Hero Image Container */}
-        <div className="hero-image-container">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 h-full">
-            {/* Broski's Kitchen Logo */}
-            <div className="relative w-full md:w-1/2 h-64 md:h-80">
-              <Image src="/images/Untitled design-4.png" alt="Broski's Kitchen" fill className="object-contain hero-image" priority />
+          {/* Order Now Button - Rounded Rectangle, Crimson Red */}
+          <motion.div 
+            className="mb-16"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.9, ease: "easeOut" }}
+          >
+            <Link 
+              href="/menu" 
+              className="inline-block bg-[#B22222] hover:bg-[#8B1818] text-white font-bold py-4 px-12 text-xl rounded-lg shadow-2xl transform hover:scale-105 hover:shadow-[0_0_30px_rgba(178,34,34,0.6)] transition-all duration-300 border-2 border-[#B22222] hover:border-[#DC143C]"
+              aria-label="Order Now Button for Boosie Wings"
+            >
+              Order Now
+            </Link>
+          </motion.div>
+
+          {/* Wings Centerpiece - Ultra-realistic wings spread across width */}
+          <motion.div 
+            className="mb-12 w-full overflow-hidden"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
+          >
+            <div className="relative w-full flex justify-center">
+              <Image
+                src="/images/ChatGPT Image Jul 25, 2025 at 08_30_15 PM.png"
+                alt="Ultra-realistic Boosie Wings spread across black surface"
+                width={2400}
+                height={900}
+                className="w-full h-auto object-cover shadow-2xl transform"
+                priority
+                loading="eager"
+                sizes="100vw"
+              />
             </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Navigation Bar - Below Hero Section */}
+      <nav className="bg-black border-b-2 border-[#FFD700] py-4">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-center items-center space-x-8 overflow-x-auto">
+            <Link href="/menu" className="text-white hover:text-[#FFD700] hover:border-b-2 hover:border-[#FFD700] transition-all duration-300 font-medium whitespace-nowrap px-2 py-1">
+              Menu
+            </Link>
+            <span className="text-[#FFD700]">|</span>
+            <Link href="/locations" className="text-white hover:text-[#FFD700] hover:border-b-2 hover:border-[#FFD700] transition-all duration-300 font-medium whitespace-nowrap px-2 py-1">
+              Locations
+            </Link>
+            <span className="text-[#FFD700]">|</span>
+            <Link href="/events" className="text-white hover:text-[#FFD700] hover:border-b-2 hover:border-[#FFD700] transition-all duration-300 font-medium whitespace-nowrap px-2 py-1">
+              Events
+            </Link>
+            <span className="text-[#FFD700]">|</span>
+            <Link href="/rewards" className="text-white hover:text-[#FFD700] hover:border-b-2 hover:border-[#FFD700] transition-all duration-300 font-medium whitespace-nowrap px-2 py-1">
+              Rewards
+            </Link>
+            <span className="text-[#FFD700]">|</span>
+            <Link href="/shop" className="text-white hover:text-[#FFD700] hover:border-b-2 hover:border-[#FFD700] transition-all duration-300 font-medium whitespace-nowrap px-2 py-1">
+              Shop
+            </Link>
+            <span className="text-[#FFD700]">|</span>
+            <Link href="/shop" className="text-white hover:text-[#FFD700] hover:border-b-2 hover:border-[#FFD700] transition-all duration-300 font-medium whitespace-nowrap px-2 py-1">
+              Shop
+            </Link>
+            <span className="text-[#FFD700]">|</span>
+            <Link href="/contact" className="text-white hover:text-[#FFD700] hover:border-b-2 hover:border-[#FFD700] transition-all duration-300 font-medium whitespace-nowrap px-2 py-1">
+              Contact
+            </Link>
           </div>
         </div>
-        
-        {/* Hero Content Below Image */}
-        <div className="hero-content-below">
-          <div className="container mx-auto px-4">
-            <h1 className="heading-xl mb-6 animate-fade-in text-center">
-              Welcome to <span className="graffiti-text elegant-glow">Broski&apos;s Kitchen</span>
-            </h1>
-            <p className="text-xl md:text-2xl lg:text-3xl text-soft-gray mb-10 animate-fade-in animate-delay-200 max-w-3xl mx-auto text-center" style={{lineHeight: '1.4'}}>
-              Luxury Street Gourmet - Where Flavor Meets Culture
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-6 animate-fade-in animate-delay-400">
-              <Link href="/menu" className="btn-primary btn-pulse text-lg transform hover:scale-105 transition-transform duration-300">
-                View Menu
+      </nav>
+
+      {/* Welcome Block - Below Hero */}
+      <section className="py-20 bg-black relative overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            {/* Header: WELCOME TO BROSKI'S KITCHEN - Gold, Serif, ALL CAPS, centered */}
+            <motion.h2 
+             className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-[#FFD700] uppercase text-center mb-8"
+             initial={{ opacity: 0, y: 30 }}
+             whileInView={{ opacity: 1, y: 0 }}
+             transition={{ duration: 0.8 }}
+             viewport={{ once: true }}
+           >
+             WELCOME TO BROSKI&apos;S KITCHEN
+           </motion.h2>
+            
+            {/* Subtext: White text with max width readability */}
+            <motion.p 
+              className="text-xl text-white max-w-2xl mx-auto leading-relaxed mb-8" 
+              style={{ maxWidth: '65ch' }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+              viewport={{ once: true }}
+            >
+              Luxury Street Gourmet – where culinary culture meets legacy flavor. From our Boosie Wings to Infused Broski Dust Fries, every plate is served with soul and sauce.
+            </motion.p>
+            
+            {/* CTA Button: Explore Our Menu - Crimson red with white text */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+              viewport={{ once: true }}
+            >
+              <Link 
+                href="/menu" 
+                className="inline-block bg-[#B22222] hover:bg-[#8B1818] text-white font-bold py-4 px-12 text-xl rounded-lg shadow-2xl transform hover:scale-105 hover:shadow-[0_0_30px_rgba(178,34,34,0.6)] transition-all duration-300 border-2 border-[#B22222] hover:border-[#DC143C]"
+                aria-label="Explore Our Menu Button"
+              >
+                Explore Our Menu
               </Link>
-              <Link href="/locations" className="btn-outline text-lg transform hover:scale-105 transition-transform duration-300">
-                Find Location
-              </Link>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -248,6 +404,8 @@ function Page() {
           </div>
         </div>
       </section>
+
+      {/* Close the main div */}
     </div>
   );
 }

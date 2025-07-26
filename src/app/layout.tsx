@@ -2,7 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import "./globals.css"
 import "./chat-animations.css"
-import Navbar from "../components/layout/Navbar"
+import ConditionalNavbar from "../components/layout/ConditionalNavbar"
 import Footer from "../components/layout/Footer"
 import { Providers } from "../lib/context/Providers"
 import { OrderProvider } from "../lib/context/OrderContext"
@@ -27,27 +27,27 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${playfair.variable} ${montserrat.variable} bg-black text-white min-h-screen flex flex-col`}>
         <ErrorBoundary>
-           <ChunkErrorHandler />
-           <Providers>
-             <OrderProvider>
-               <Navbar />
-               <main className="flex-grow pt-20">{children}</main>
-               <Footer />
-               <MusicPlayer />
-               <Toaster
-                 position="top-right"
-                 toastOptions={{
-                   duration: 4000,
-                   style: {
-                     background: '#1f2937',
-                     color: '#fff',
-                   },
-                 }}
-               />
-               <CookieConsent />
-             </OrderProvider>
-           </Providers>
-         </ErrorBoundary>
+          <ChunkErrorHandler />
+          <Providers>
+            <OrderProvider>
+              <ConditionalNavbar />
+              <main className="flex-grow">{children}</main>
+              <Footer />
+              <MusicPlayer />
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  duration: 4000,
+                  style: {
+                    background: '#1f2937',
+                    color: '#fff',
+                  },
+                }}
+              />
+              <CookieConsent />
+            </OrderProvider>
+          </Providers>
+        </ErrorBoundary>
       </body>
     </html>
   )

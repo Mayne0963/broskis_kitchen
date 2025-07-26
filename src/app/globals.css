@@ -100,6 +100,44 @@ main {
   }
 }
 
+@keyframes neonFlicker {
+  0%, 100% {
+    text-shadow: 0 0 5px #A31C1C, 0 0 10px #A31C1C, 0 0 15px #A31C1C;
+  }
+  50% {
+    text-shadow: 0 0 10px #A31C1C, 0 0 20px #A31C1C, 0 0 30px #A31C1C, 0 0 40px #A31C1C;
+  }
+}
+
+@keyframes steamRise {
+  0% {
+    opacity: 0.8;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30px) scale(1.5);
+  }
+}
+
+@keyframes ctaGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(163, 28, 28, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(163, 28, 28, 0.8), 0 0 40px rgba(163, 28, 28, 0.6);
+  }
+}
+
+@keyframes stickyNav {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.8s forwards;
   opacity: 0;
@@ -130,8 +168,87 @@ main {
 }
 
 .animate-delay-400 {
-  animation-delay: 0.4s;
-}
+    animation-delay: 0.4s;
+  }
+
+  .neon-flicker {
+    animation: neonFlicker 2s ease-in-out infinite;
+  }
+
+  .cta-glow {
+    animation: ctaGlow 3s ease-in-out infinite;
+  }
+
+  .sticky-nav {
+    animation: stickyNav 0.3s ease-out;
+  }
+
+  /* Steam Effect Styles */
+  .steam-effect {
+    pointer-events: none;
+  }
+
+  .steam-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    animation: steamRise 2s ease-out infinite;
+  }
+
+  .steam-1 {
+    left: -2px;
+    animation-delay: 0s;
+  }
+
+  .steam-2 {
+    left: 2px;
+    animation-delay: 0.7s;
+  }
+
+  .steam-3 {
+    left: 6px;
+    animation-delay: 1.4s;
+  }
+
+  /* Wing Container Styles */
+  .wing-container {
+    transition: all 0.3s ease;
+  }
+
+  .wing-container:hover {
+    filter: brightness(1.2) saturate(1.3);
+  }
+
+  /* Responsive font sizing with clamp */
+  .hero-title-1 {
+    font-size: clamp(1.25rem, 3.5vw, 2.5rem);
+    line-height: 1.2;
+  }
+
+  .hero-title-2 {
+    font-size: clamp(2rem, 7vw, 4.5rem);
+    line-height: 1.1;
+  }
+
+  .hero-title-3 {
+    font-size: clamp(1.25rem, 3.5vw, 2.5rem);
+    line-height: 1.2;
+  }
+
+  /* Mobile-first responsive design */
+  @media (max-width: 768px) {
+    .wing-container {
+      width: 80px;
+      height: 60px;
+    }
+    
+    .steam-particle {
+      width: 2px;
+      height: 2px;
+    }
+  }
 
 @layer components {
   /* Button Styles - Regal Gold Gradient */

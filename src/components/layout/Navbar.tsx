@@ -92,14 +92,14 @@ const Navbar: React.FC = () => {
           <Link href="/locations" className={`nav-link ${pathname === "/locations" ? "nav-link-active" : ""}`}>
             Locations
           </Link>
-          <Link href="/events" className={`nav-link ${pathname === "/events" ? "nav-link-active" : ""}`}>
-              Events
-          </Link>
           <Link href="/rewards" className={`nav-link ${pathname === "/rewards" ? "nav-link-active" : ""}`}>
             Rewards
           </Link>
           <Link href="/shop" className={`nav-link ${pathname === "/shop" ? "nav-link-active" : ""}`}>
             Shop
+          </Link>
+          <Link href="/catering" className={`nav-link ${pathname === "/catering" ? "nav-link-active" : ""}`}>
+            Catering
           </Link>
           <Link href="/contact" className={`nav-link ${pathname === "/contact" ? "nav-link-active" : ""}`}>
             Contact
@@ -221,6 +221,13 @@ const Navbar: React.FC = () => {
             onClick={() => setMobileMenuOpen(false)}
           >
             Shop
+          </Link>
+          <Link
+            href="/catering"
+            className={`py-2 hover:text-gold-foil transition-colors duration-300 flex items-center ${pathname === "/catering" ? "text-gold-foil font-bold" : ""}`}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Catering
           </Link>
           <Link
             href="/contact"
