@@ -87,11 +87,15 @@ export async function preloadWithRetry<T>(
  * @returns boolean indicating if this was a chunk loading error
  */
 export function isChunkLoadError(error: Error): boolean {
+  if (!error || typeof error !== 'object') {
+    return false;
+  }
+  
   return (
     error.name === 'ChunkLoadError' ||
-    error.message.includes('Loading chunk') ||
-    error.message.includes('Loading CSS chunk') ||
-    error.message.includes('Failed to fetch dynamically imported module')
+    (error.message && error.message.includes('Loading chunk')) ||
+    (error.message && error.message.includes('Loading CSS chunk')) ||
+    (error.message && error.message.includes('Failed to fetch dynamically imported module'))
   );
 }
 

@@ -1038,6 +1038,63 @@ main {
   animation: float 6s ease-in-out infinite;
 }
 
+/* Broski's OTW Gold Button Styling */
+.broski-otw-gold-button {
+  background: linear-gradient(135deg, #BA8939, #FDCE66, #FFE076, #E0AD53, #FFEF88);
+  color: #000000;
+  font-weight: bold;
+  font-family: 'Montserrat', sans-serif;
+  text-transform: uppercase;
+  padding: 12px 30px;
+  border: 2px solid #C5A100;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.broski-otw-gold-button:hover {
+  background: linear-gradient(135deg, #C5A100, #A98600, #7F6000);
+  color: #FFF8DC;
+  transform: scale(1.05);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+  border-color: #C5A100;
+}
+
+/* Optional flame shimmer effect on hover */
+.broski-otw-gold-button:hover::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
+  animation: flameShimmer 1.5s ease-in-out;
+}
+
+@keyframes flameShimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Mobile adjustments for OTW button */
+@media (max-width: 480px) {
+  .broski-otw-gold-button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+
 /* Responsive improvements */
 @media (max-width: 768px) {
   .container {
