@@ -138,14 +138,14 @@ export default function PaymentStep({
               onChange={(e) => handleRewardsToggle(e.target.checked)}
               className="sr-only peer"
             />
-            <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--color-harvest-gold)]"></div>
+            <div className="w-11 h-6 bg-[#FFD700] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--color-harvest-gold)]"></div>
           </label>
         </div>
         
         {checkoutData.useRewards && (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-[#FFD700] mb-2">
                 Points to use (1 point = $0.01)
               </label>
               <div className="flex items-center space-x-4">
@@ -155,19 +155,19 @@ export default function PaymentStep({
                   max={userRewards.maxRedeemable}
                   value={checkoutData.rewardsPoints}
                   onChange={(e) => handleRewardsPointsChange(parseInt(e.target.value))}
-                  className="flex-1 h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
+                  className="flex-1 h-2 bg-[#FFD700] rounded-lg appearance-none cursor-pointer slider"
                 />
                 <div className="text-right min-w-[100px]">
                   <div className="text-[var(--color-harvest-gold)] font-bold">
                     {checkoutData.rewardsPoints.toLocaleString()}
                   </div>
-                  <div className="text-xs text-gray-400">points</div>
+                  <div className="text-xs text-[#FFD700]">points</div>
                 </div>
               </div>
             </div>
             
             <div className="flex items-center justify-between p-3 bg-black/30 rounded-lg">
-              <span className="text-gray-300">Discount Applied</span>
+              <span className="text-[#FFD700]">Discount Applied</span>
               <span className="text-green-400 font-semibold">
                 -${(checkoutData.rewardsPoints * 0.01).toFixed(2)}
               </span>
@@ -192,7 +192,7 @@ export default function PaymentStep({
                   ${
                     checkoutData.selectedPayment?.id === payment.id
                       ? 'border-[var(--color-harvest-gold)] bg-[var(--color-harvest-gold)]/10'
-                      : 'border-gray-600 hover:border-gray-500'
+                      : 'border-[#FFD700] hover:border-[#E6C200]'
                   }
                 `}
               >
@@ -200,7 +200,7 @@ export default function PaymentStep({
                   <div className={`p-2 rounded-lg mr-3 ${
                     checkoutData.selectedPayment?.id === payment.id
                       ? 'bg-[var(--color-harvest-gold)] text-black'
-                      : 'bg-gray-700 text-gray-400'
+                      : 'bg-[#FFD700] text-black'
                   }`}>
                     {getCardIcon(payment.brand)}
                   </div>
@@ -216,7 +216,7 @@ export default function PaymentStep({
                         </span>
                       )}
                     </div>
-                    <p className="text-gray-400 text-sm">
+                    <p className="text-[#FFD700] text-sm">
                       Expires {payment.expiryMonth.toString().padStart(2, '0')}/{payment.expiryYear}
                     </p>
                   </div>
@@ -229,37 +229,37 @@ export default function PaymentStep({
         {/* Add New Payment Method */}
         <button
           onClick={() => setShowNewCardForm(!showNewCardForm)}
-          className="w-full p-4 border-2 border-dashed border-gray-600 rounded-lg hover:border-[var(--color-harvest-gold)] transition-colors text-center"
+          className="w-full p-4 border-2 border-dashed border-[#FFD700] rounded-lg hover:border-[var(--color-harvest-gold)] transition-colors text-center"
         >
-          <Plus className="w-6 h-6 mx-auto mb-2 text-gray-400" />
-          <span className="text-gray-400">Add New Payment Method</span>
+          <Plus className="w-6 h-6 mx-auto mb-2 text-[#FFD700]" />
+          <span className="text-[#FFD700]">Add New Payment Method</span>
         </button>
         
         {/* New Card Form */}
         {showNewCardForm && (
-          <div className="mt-4 p-6 bg-black/30 rounded-lg border border-gray-600">
+          <div className="mt-4 p-6 bg-black/30 rounded-lg border border-[#FFD700]">
             <h4 className="text-white font-semibold mb-4">Add New Card</h4>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Card Number</label>
+                <label className="block text-sm font-medium text-[#FFD700] mb-2">Card Number</label>
                 <input
                   type="text"
                   value={formatCardNumber(newCard.number)}
                   onChange={(e) => setNewCard({ ...newCard, number: e.target.value.replace(/\s/g, '') })}
                   placeholder="1234 5678 9012 3456"
                   maxLength={19}
-                  className="w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-[var(--color-harvest-gold)] focus:outline-none"
+                  className="w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border border-[#FFD700] rounded-lg text-white placeholder-[#FFD700] focus:border-[var(--color-harvest-gold)] focus:outline-none"
                 />
               </div>
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Expiry Month</label>
+                  <label className="block text-sm font-medium text-[#FFD700] mb-2">Expiry Month</label>
                   <select
                     value={newCard.expiryMonth}
                     onChange={(e) => setNewCard({ ...newCard, expiryMonth: e.target.value })}
-                    className="w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border border-gray-600 rounded-lg text-white focus:border-[var(--color-harvest-gold)] focus:outline-none"
+                    className="w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border border-[#FFD700] rounded-lg text-white focus:border-[var(--color-harvest-gold)] focus:outline-none"
                   >
                     <option value="">Month</option>
                     {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
@@ -271,7 +271,7 @@ export default function PaymentStep({
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Expiry Year</label>
+                  <label className="block text-sm font-medium text-[#FFD700] mb-2">Expiry Year</label>
                   <select
                     value={newCard.expiryYear}
                     onChange={(e) => setNewCard({ ...newCard, expiryYear: e.target.value })}
@@ -287,7 +287,7 @@ export default function PaymentStep({
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">CVC</label>
+                  <label className="block text-sm font-medium text-[#FFD700] mb-2">CVC</label>
                   <input
                     type="text"
                     value={newCard.cvc}
@@ -299,7 +299,7 @@ export default function PaymentStep({
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">ZIP Code</label>
+                  <label className="block text-sm font-medium text-[#FFD700] mb-2">ZIP Code</label>
                   <input
                     type="text"
                     value={newCard.zipCode}
@@ -311,7 +311,7 @@ export default function PaymentStep({
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Cardholder Name</label>
+                <label className="block text-sm font-medium text-[#FFD700] mb-2">Cardholder Name</label>
                 <input
                   type="text"
                   value={newCard.name}
@@ -349,7 +349,7 @@ export default function PaymentStep({
                   ${
                     isSelected
                       ? 'border-[var(--color-harvest-gold)] bg-[var(--color-harvest-gold)]/10 text-[var(--color-harvest-gold)]'
-                      : 'border-gray-600 hover:border-gray-500 text-gray-300'
+                      : 'border-[#FFD700] hover:border-[#E6C200] text-[#FFD700]'
                   }
                 `}
               >
@@ -365,9 +365,9 @@ export default function PaymentStep({
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Custom Tip Amount</label>
+          <label className="block text-sm font-medium text-[#FFD700] mb-2">Custom Tip Amount</label>
           <div className="relative">
-            <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#FFD700]" />
             <input
               type="number"
               value={customTip}
@@ -375,7 +375,7 @@ export default function PaymentStep({
               placeholder="0.00"
               min="0"
               step="0.01"
-              className="w-full pl-10 pr-3 py-2 bg-[var(--color-dark-charcoal)] border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-[var(--color-harvest-gold)] focus:outline-none"
+              className="w-full pl-10 pr-3 py-2 bg-[var(--color-dark-charcoal)] border border-[#FFD700] rounded-lg text-white placeholder-[#FFD700] focus:border-[var(--color-harvest-gold)] focus:outline-none"
             />
           </div>
         </div>

@@ -225,7 +225,7 @@ export default function CheckoutClient({
                       ? 'bg-[var(--color-harvest-gold)] border-[var(--color-harvest-gold)] text-black'
                       : isActive
                       ? 'border-[var(--color-harvest-gold)] text-[var(--color-harvest-gold)] bg-[var(--color-harvest-gold)]/10'
-                      : 'border-gray-600 text-gray-400'
+                      : 'border-[#FFD700] text-[#FFD700]'
                   }
                 `}>
                   {isCompleted ? (
@@ -241,7 +241,7 @@ export default function CheckoutClient({
                     ${
                       isCompleted || isActive
                         ? 'text-white'
-                        : 'text-gray-400'
+                        : 'text-[#FFD700]'
                     }
                   `}>
                     {step.title}
@@ -254,7 +254,7 @@ export default function CheckoutClient({
                     ${
                       isCompleted
                         ? 'bg-[var(--color-harvest-gold)]'
-                        : 'bg-gray-600'
+                        : 'bg-[#FFD700]'
                     }
                   `} />
                 )}
@@ -278,11 +278,7 @@ export default function CheckoutClient({
               <button
                 onClick={handlePrevious}
                 disabled={getCurrentStepIndex() === 0}
-                className="
-                  flex items-center px-6 py-3 rounded-lg font-semibold transition-all
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  bg-gray-700 text-white hover:bg-gray-600
-                "
+                className="btn-outline"
               >
                 <ChevronLeft className="w-5 h-5 mr-2" />
                 Previous
@@ -292,11 +288,7 @@ export default function CheckoutClient({
                 <button
                   onClick={handleNext}
                   disabled={!canProceedToNext()}
-                  className="
-                    flex items-center px-6 py-3 rounded-lg font-semibold transition-all
-                    disabled:opacity-50 disabled:cursor-not-allowed
-                    bg-[var(--color-harvest-gold)] text-black hover:bg-[var(--color-harvest-gold)]/90
-                  "
+                  className="btn-primary"
                 >
                   Continue
                   <ChevronRight className="w-5 h-5 ml-2" />
@@ -305,11 +297,7 @@ export default function CheckoutClient({
                 <button
                   onClick={handlePlaceOrder}
                   disabled={isProcessing || !canProceedToNext()}
-                  className="
-                    flex items-center px-8 py-3 rounded-lg font-semibold transition-all
-                    disabled:opacity-50 disabled:cursor-not-allowed
-                    bg-[var(--color-harvest-gold)] text-black hover:bg-[var(--color-harvest-gold)]/90
-                  "
+                  className="btn-primary"
                 >
                   {isProcessing ? (
                     <>

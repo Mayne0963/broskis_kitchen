@@ -190,7 +190,7 @@ export default function LoyaltyPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-                <div className="bg-[#1A1A1A] rounded-lg p-6 border border-[#333333] text-center">
+                <div className="bg-black rounded-lg p-6 border border-[#FFD700] text-center">
                   <div className="w-16 h-16 bg-gold-foil bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
                     <FaGift className="text-gold-foil text-2xl" />
                   </div>
@@ -201,12 +201,12 @@ export default function LoyaltyPage() {
                   </p>
                 </div>
 
-                <div className="bg-[#1A1A1A] rounded-lg p-6 border border-[#333333] text-center">
+                <div className="bg-black rounded-lg p-6 border border-[#FFD700] text-center">
                   <div className="w-16 h-16 bg-gold-foil bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
                     <FaCrown className="text-gold-foil text-2xl" />
                   </div>
                   <h3 className="text-xl font-bold mb-2">Unlock Tiers</h3>
-                  <p className="text-gray-400">
+                  <p className="text-[#FFD700]">
                     Progress through Bronze, Silver, and Gold tiers to unlock increasingly valuable benefits and higher
                     earning rates.
                   </p>
@@ -217,24 +217,24 @@ export default function LoyaltyPage() {
                     <FaStar className="text-gold-foil text-2xl" />
                   </div>
                   <h3 className="text-xl font-bold mb-2">Enjoy Rewards</h3>
-                  <p className="text-gray-400">
+                  <p className="text-[#FFD700]">
                     Redeem your points for free menu items, exclusive experiences, merchandise, and more.
                   </p>
                 </div>
               </div>
 
-              <div className="bg-[#1A1A1A] rounded-lg overflow-hidden shadow-lg border border-[#333333] mb-16">
+              <div className="bg-black rounded-lg overflow-hidden shadow-lg border border-[#FFD700] mb-16">
                 <div className="grid grid-cols-1 md:grid-cols-2">
                   <div className="p-8 flex flex-col justify-center">
                     <h3 className="text-2xl font-bold mb-4">Download Our App</h3>
-                    <p className="text-gray-300 mb-6">
+                    <p className="text-[#FFD700] mb-6">
                       Get the most out of your loyalty membership with our mobile app. Track your points, view available
                       rewards, and access your digital membership card all in one place.
                     </p>
                     <div className="flex flex-wrap gap-4">
                       <a
                         href="#"
-                        className="bg-black text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-900 transition-colors"
+                        className="bg-black text-[#FFD700] px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-[#FFD700] hover:text-black transition-colors border border-[#FFD700]"
                       >
                         <FaApple size={24} />
                         <div>
@@ -276,7 +276,7 @@ export default function LoyaltyPage() {
 
               {!user && (
                 <div className="bg-gradient-to-r from-gold-foil to-blood-red p-1 rounded-lg">
-                  <div className="bg-[#1A1A1A] rounded-lg p-8 text-center">
+                  <div className="bg-black rounded-lg p-8 text-center">
                     <h3 className="text-2xl font-bold mb-4">Ready to Join?</h3>
                     <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
                       Sign up today and start earning points with your very first purchase. Membership is completely
@@ -305,8 +305,8 @@ export default function LoyaltyPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
                 {/* Bronze Tier */}
                 <div
-                  className={`bg-[#1A1A1A] rounded-lg overflow-hidden shadow-lg border ${
-                    userTier.name === "Bronze" ? "border-[#CD7F32]" : "border-[#333333]"
+                  className={`bg-black rounded-lg overflow-hidden shadow-lg border ${
+                    userTier.name === "Bronze" ? "border-[#CD7F32]" : "border-[#FFD700]"
                   }`}
                 >
                   <div className="bg-[#CD7F32] bg-opacity-20 p-6 text-center">
@@ -353,33 +353,33 @@ export default function LoyaltyPage() {
 
                 {/* Silver Tier */}
                 <div
-                  className={`bg-[#1A1A1A] rounded-lg overflow-hidden shadow-lg border ${
-                    userTier.name === "Silver" ? "border-gray-400" : "border-[#333333]"
+                  className={`bg-black rounded-lg overflow-hidden shadow-lg border ${
+                    userTier.name === "Silver" ? "border-[#FFD700]" : "border-[#FFD700]"
                   }`}
                 >
-                  <div className="bg-gray-400 bg-opacity-20 p-6 text-center">
-                    <div className="w-16 h-16 bg-gray-400 bg-opacity-30 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <FaCrown className="text-gray-400 text-2xl" />
+                  <div className="bg-[#FFD700] bg-opacity-20 p-6 text-center">
+                    <div className="w-16 h-16 bg-[#FFD700] bg-opacity-30 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <FaCrown className="text-[#FFD700] text-2xl" />
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-400 mb-1">Silver</h3>
-                    <p className="text-gray-300">500+ Points</p>
+                    <h3 className="text-2xl font-bold text-[#FFD700] mb-1">Silver</h3>
+                    <p className="text-[#FFD700]">500+ Points</p>
                   </div>
                   <div className="p-6">
                     <ul className="space-y-3 mb-6">
                       <li className="flex items-start">
-                        <FaCheck className="text-gray-400 mt-1 mr-2 flex-shrink-0" />
+                        <FaCheck className="text-[#FFD700] mt-1 mr-2 flex-shrink-0" />
                         <span>Earn 1.5 points per $1 spent</span>
                       </li>
                       <li className="flex items-start">
-                        <FaCheck className="text-gray-400 mt-1 mr-2 flex-shrink-0" />
+                        <FaCheck className="text-[#FFD700] mt-1 mr-2 flex-shrink-0" />
                         <span>Priority pickup</span>
                       </li>
                       <li className="flex items-start">
-                        <FaCheck className="text-gray-400 mt-1 mr-2 flex-shrink-0" />
+                        <FaCheck className="text-[#FFD700] mt-1 mr-2 flex-shrink-0" />
                         <span>Exclusive menu items</span>
                       </li>
                       <li className="flex items-start">
-                        <FaCheck className="text-gray-400 mt-1 mr-2 flex-shrink-0" />
+                        <FaCheck className="text-[#FFD700] mt-1 mr-2 flex-shrink-0" />
                         <span>All Bronze benefits</span>
                       </li>
                     </ul>
@@ -388,7 +388,7 @@ export default function LoyaltyPage() {
                         Join Now
                       </Link>
                     ) : userTier.name === "Silver" ? (
-                      <div className="bg-gray-400 bg-opacity-20 text-gray-400 text-center py-2 rounded-md">
+                      <div className="bg-[#FFD700] bg-opacity-20 text-[#FFD700] text-center py-2 rounded-md">
                         Current Tier
                       </div>
                     ) : points >= 500 ? (
@@ -396,15 +396,15 @@ export default function LoyaltyPage() {
                         Tier Unlocked
                       </div>
                     ) : (
-                      <div className="text-center py-2 text-sm text-gray-400">{500 - points} more points to unlock</div>
+                      <div className="text-center py-2 text-sm text-[#FFD700]">{500 - points} more points to unlock</div>
                     )}
                   </div>
                 </div>
 
                 {/* Gold Tier */}
                 <div
-                  className={`bg-[#1A1A1A] rounded-lg overflow-hidden shadow-lg border ${
-                    userTier.name === "Gold" ? "border-gold-foil" : "border-[#333333]"
+                  className={`bg-black rounded-lg overflow-hidden shadow-lg border ${
+                    userTier.name === "Gold" ? "border-gold-foil" : "border-[#FFD700]"
                   }`}
                 >
                   <div className="bg-gold-foil bg-opacity-20 p-6 text-center">

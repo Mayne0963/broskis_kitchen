@@ -96,7 +96,7 @@ export default function ShopPage() {
         </div>
         <div className="container mx-auto px-4 z-10 text-center">
           <h1 className="heading-xl mb-4 text-white gritty-shadow">Official Merch</h1>
-          <p className="text-xl text-gray-200 max-w-2xl mx-auto">
+          <p className="text-xl text-[#FFD700] max-w-2xl mx-auto">
             Rep the brand with our exclusive collection of Broski&apos;s Kitchen apparel and accessories.
           </p>
         </div>
@@ -135,7 +135,7 @@ export default function ShopPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#FFD700]" />
             </div>
 
             {/* Category Filter */}
@@ -159,7 +159,7 @@ export default function ShopPage() {
                 <option value="bestselling">Best Selling</option>
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <FaFilter className="text-gray-400" />
+                <FaFilter className="text-[#FFD700]" />
               </div>
             </div>
 
@@ -171,7 +171,7 @@ export default function ShopPage() {
 
           {/* Advanced Filters */}
           {showFilters && (
-            <div className="mt-6 p-4 bg-[#1A1A1A] rounded-lg border border-[#333333] animate-fade-in">
+            <div className="mt-6 p-4 bg-black rounded-lg border border-[#FFD700] animate-fade-in">
               <h3 className="text-lg font-bold mb-4">Filters</h3>
 
               {/* Price Range */}
@@ -188,7 +188,7 @@ export default function ShopPage() {
                     step="5"
                     value={priceRange[1]}
                     onChange={(e) => setPriceRange([priceRange[0], Number.parseInt(e.target.value)])}
-                    className="w-full h-2 bg-[#333333] rounded-lg appearance-none cursor-pointer"
+                    className="w-full h-2 bg-[#FFD700] rounded-lg appearance-none cursor-pointer"
                   />
                   <span className="text-xs">${priceRange[1]}</span>
                 </div>
@@ -199,19 +199,19 @@ export default function ShopPage() {
                 <h4 className="text-sm font-medium mb-2">Product Status</h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" className="rounded border-[#333333] text-gold-foil focus:ring-gold-foil" />
+                    <input type="checkbox" className="rounded border-[#FFD700] text-gold-foil focus:ring-gold-foil" />
                     <span className="text-sm">New Arrivals</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" className="rounded border-[#333333] text-gold-foil focus:ring-gold-foil" />
+                    <input type="checkbox" className="rounded border-[#FFD700] text-gold-foil focus:ring-gold-foil" />
                     <span className="text-sm">Best Sellers</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" className="rounded border-[#333333] text-gold-foil focus:ring-gold-foil" />
+                    <input type="checkbox" className="rounded border-[#FFD700] text-gold-foil focus:ring-gold-foil" />
                     <span className="text-sm">On Sale</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" className="rounded border-[#333333] text-gold-foil focus:ring-gold-foil" />
+                    <input type="checkbox" className="rounded border-[#FFD700] text-gold-foil focus:ring-gold-foil" />
                     <span className="text-sm">Limited Edition</span>
                   </label>
                 </div>
@@ -226,7 +226,7 @@ export default function ShopPage() {
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl font-bold">All Products</h2>
-            <div className="text-sm text-gray-400">
+            <div className="text-sm text-[#FFD700]">
               {filteredProducts.length} {filteredProducts.length === 1 ? "Product" : "Products"}
             </div>
           </div>
@@ -245,7 +245,7 @@ export default function ShopPage() {
           ) : (
             <div className="text-center py-20">
               <h3 className="text-2xl font-bold mb-4">No products found</h3>
-              <p className="text-gray-400 mb-6">Try adjusting your filters or search query</p>
+              <p className="text-[#FFD700] mb-6">Try adjusting your filters or search query</p>
               <button
                 className="btn-primary"
                 onClick={() => {
@@ -268,15 +268,15 @@ export default function ShopPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-bold mb-6">About Our Merch</h2>
-              <p className="text-gray-300 mb-4">
+              <p className="text-[#FFD700] mb-4">
                 At Broski&apos;s Kitchen, we believe in quality that matches our food. Our merchandise is crafted with
                 premium materials and designed to last, just like the memories you make in our restaurants.
               </p>
-              <p className="text-gray-300 mb-4">
+              <p className="text-[#FFD700] mb-4">
                 Each piece is designed in-house and produced in limited quantities to ensure exclusivity. We partner
                 with sustainable manufacturers who share our values of quality and responsibility.
               </p>
-              <p className="text-gray-300">
+              <p className="text-[#FFD700]">
                 From comfortable tees to stylish accessories, our merch lets you take a piece of the Broski&apos;s
                 experience home with you.
               </p>

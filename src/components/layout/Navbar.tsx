@@ -66,7 +66,7 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <nav className={`fixed top-0 w-full bg-black text-white h-20 z-50 shadow-lg border-b border-[#333333] transition-transform duration-300 ${
+      <nav className={`fixed top-0 w-full bg-black text-white h-20 z-50 shadow-lg border-b border-[#FFD700] transition-transform duration-300 ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}>
       <div className="container mx-auto flex justify-between items-center h-full px-4">
@@ -128,7 +128,7 @@ const Navbar: React.FC = () => {
               >
                 <FaUser /> {user.name.split(" ")[0]}
               </button>
-              <div className={`absolute right-0 mt-2 w-48 bg-[#1A1A1A] rounded-md shadow-lg py-1 z-50 border border-[#333333] ${userDropdownOpen ? 'block' : 'hidden'}`}>
+              <div className={`absolute right-0 mt-2 w-48 bg-black rounded-md shadow-lg py-1 z-50 border border-[#FFD700] ${userDropdownOpen ? 'block' : 'hidden'}`}>
                 <Link 
                   href="/dashboard" 
                   className="block px-4 py-2 text-sm text-white hover:bg-[#333333]"
@@ -170,7 +170,7 @@ const Navbar: React.FC = () => {
       </div>
 
       <div
-        className={`md:hidden mobile-menu ${mobileMenuOpen ? "open" : ""} bg-[#111111] border-t border-[#333333] mt-4`}
+        className={`md:hidden mobile-menu ${mobileMenuOpen ? "open" : ""} bg-black border-t border-[#FFD700] mt-4`}
       >
         <div className="container mx-auto flex flex-col space-y-3 px-4 py-4">
           <Link
@@ -261,7 +261,7 @@ const Navbar: React.FC = () => {
           </Link>
 
           {user ? (
-            <div className="pt-4 border-t border-[#333333] mt-2 space-y-2">
+            <div className="pt-4 border-t border-[#FFD700] mt-2 space-y-2">
               <Link
                 href="/sign-in"
                 className="block py-2 hover:text-gold-foil transition-colors duration-300"
@@ -287,7 +287,7 @@ const Navbar: React.FC = () => {
               </button>
             </div>
           ) : (
-            <div className="pt-4 border-t border-[#333333] mt-2">
+            <div className="pt-4 border-t border-[#FFD700] mt-2">
               <Link
                 href="/auth/login"
                 className="btn-primary w-full flex items-center justify-center gap-2"

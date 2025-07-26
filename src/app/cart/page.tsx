@@ -47,7 +47,7 @@ export default function CartPage() {
         <div className="container mx-auto px-4 max-w-4xl">
           <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
 
-          <div className="bg-[#1A1A1A] rounded-lg p-12 text-center">
+          <div className="bg-black rounded-lg p-12 text-center border border-[#FFD700]">
             <div className="w-20 h-20 bg-[#222222] rounded-full flex items-center justify-center mx-auto mb-6">
               <FaShoppingCart className="text-gray-500 text-3xl" />
             </div>
@@ -70,8 +70,8 @@ export default function CartPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2">
-            <div className="bg-[#1A1A1A] rounded-lg overflow-hidden border border-[#333333]">
-              <div className="p-4 bg-[#111111] border-b border-[#333333] flex justify-between items-center">
+            <div className="bg-black rounded-lg overflow-hidden border border-[#FFD700]">
+              <div className="p-4 bg-black border-b border-[#FFD700] flex justify-between items-center">
                 <h2 className="font-bold">Items ({items.length})</h2>
                 <button onClick={clearCart} className="text-sm text-gray-400 hover:text-blood-red transition-colors">
                   Clear Cart
@@ -119,7 +119,7 @@ export default function CartPage() {
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <div className="flex items-center border border-[#333333] rounded-md">
+                        <div className="flex items-center border border-[#FFD700] rounded-md">
                           <button
                             className="px-2 py-1 text-white hover:bg-[#333333] transition-colors"
                             onClick={() => handleQuantityChange(item.id, item.quantity, -1)}
@@ -158,7 +158,7 @@ export default function CartPage() {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-[#1A1A1A] rounded-lg border border-[#333333] p-6">
+            <div className="bg-black rounded-lg border border-[#FFD700] p-6">
               <h2 className="text-xl font-bold mb-6">Order Summary</h2>
 
               <div className="space-y-4 mb-6">

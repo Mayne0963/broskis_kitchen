@@ -6,23 +6,23 @@
   /* Layout Variables */
   --navbar-height: 5rem;
   
-  /* Regal Gold Gradient Color Palette */
+  /* Hero Section Matching Color Palette */
   --color-true-black: #000000;
-  --color-deep-black: #0A0A0A;
-  --color-gold-light: #D2BA6A;
-  --color-gold-rich: #B7985A;
-  --color-burgundy: #7A1B1B;
+  --color-deep-black: #000000;
+  --color-gold-light: #FFD700;
+  --color-gold-rich: #FFD700;
+  --color-burgundy: #B22222;
 
   /* Text Colors */
-  --color-off-white: #F0EDE8;
-  --color-warm-gray: #BFB8A5;
+  --color-off-white: #FFFFFF;
+  --color-warm-gray: #FFD700;
   --color-text-primary: var(--color-off-white);
   --color-text-secondary: var(--color-warm-gray);
   --color-text-gold: var(--color-gold-rich);
 
   /* Functional Colors */
   --color-background: var(--color-true-black);
-  --color-surface: var(--color-deep-black);
+  --color-surface: var(--color-true-black);
   --color-border: var(--color-gold-rich);
   --color-accent: var(--color-gold-light);
   --color-hover: var(--color-gold-light);
@@ -1021,7 +1021,35 @@ main {
 }
 
 .bg-charcoal-black {
-  background-color: #1a1a1a;
+  background-color: #000000;
+}
+
+/* Black and Gold Theme Utilities */
+.bg-black-gold {
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+}
+
+.text-gold {
+  color: #FFD700;
+}
+
+.text-black-gold {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.border-gold {
+  border-color: #FFD700;
+}
+
+.bg-gold {
+  background-color: #FFD700;
+}
+
+.bg-gold-gradient {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
 }
 
 /* Enhanced hero image styling with floating animation */
@@ -1064,6 +1092,117 @@ main {
   transform: scale(1.05);
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
   border-color: #C5A100;
+}
+
+/* Hero Section Button Styles - Applied Site-wide */
+.btn-primary, .btn-primary:link, .btn-primary:visited {
+  background: linear-gradient(135deg, #BA8939, #FDCE66, #FFE076, #E0AD53, #FFEF88);
+  color: #000000;
+  font-weight: bold;
+  font-family: 'Montserrat', sans-serif;
+  text-transform: uppercase;
+  padding: 12px 30px;
+  border: 2px solid #C5A100;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #C5A100, #A98600, #7F6000);
+  color: #FFF8DC;
+  transform: scale(1.05);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+  border-color: #C5A100;
+}
+
+.btn-secondary, .btn-secondary:link, .btn-secondary:visited {
+  background: #B22222;
+  color: #FFFFFF;
+  font-weight: bold;
+  font-family: 'Montserrat', sans-serif;
+  text-transform: uppercase;
+  padding: 12px 30px;
+  border: 2px solid #B22222;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: #8B1818;
+  color: #FFFFFF;
+  transform: scale(1.05);
+  box-shadow: 0 6px 14px rgba(178, 34, 34, 0.6);
+  border-color: #DC143C;
+}
+
+.btn-outline, .btn-outline:link, .btn-outline:visited {
+  background: transparent;
+  color: #FFD700;
+  font-weight: bold;
+  font-family: 'Montserrat', sans-serif;
+  text-transform: uppercase;
+  padding: 12px 30px;
+  border: 2px solid #FFD700;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.btn-outline:hover {
+  background: linear-gradient(135deg, #BA8939, #FDCE66, #FFE076, #E0AD53, #FFEF88);
+  color: #000000;
+  transform: scale(1.05);
+  box-shadow: 0 6px 14px rgba(255, 215, 0, 0.4);
+  border-color: #C5A100;
+}
+
+/* Button size variants */
+.btn-sm {
+  padding: 8px 20px;
+  font-size: 14px;
+}
+
+.btn-lg {
+  padding: 16px 40px;
+  font-size: 18px;
+}
+
+/* Disabled button state */
+.btn-primary:disabled, .btn-secondary:disabled, .btn-outline:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary:disabled:hover, .btn-secondary:disabled:hover, .btn-outline:disabled:hover {
+  transform: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Optional flame shimmer effect on hover */

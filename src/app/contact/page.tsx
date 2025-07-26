@@ -76,7 +76,7 @@ export default function ContactPage() {
         </div>
         <div className="container mx-auto px-4 z-10 text-center">
           <h1 className="heading-xl mb-4 text-white gritty-shadow">Contact Us</h1>
-          <p className="text-xl text-gray-200 max-w-2xl mx-auto">
+          <p className="text-xl text-[#FFD700] max-w-2xl mx-auto">
             We'd love to hear from you. Reach out with questions, feedback, or to book your next event.
           </p>
         </div>
@@ -96,7 +96,7 @@ export default function ContactPage() {
             <div>
               <h2 className="text-2xl font-bold mb-6">Get in Touch</h2>
 
-              <div className="bg-[#1A1A1A] rounded-lg p-6 border border-[#333333] mb-8">
+              <div className="bg-black rounded-lg p-6 border border-[#FFD700] mb-8">
                 <div className="space-y-6">
                   {/* Headquarters */}
                   <div className="flex items-start">
@@ -105,7 +105,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-bold mb-1">Headquarters</h3>
-                      <address className="not-italic text-gray-300">
+                      <address className="not-italic text-[#FFD700]">
                         420 S Grand Ave
                         <br />
                         Los Angeles, CA 90071
@@ -120,9 +120,9 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-bold mb-1">Phone</h3>
-                      <p className="text-gray-300">Main: (213) 555-1234</p>
-                      <p className="text-gray-300">Catering: (213) 555-5678</p>
-                      <p className="text-gray-300">Delivery: (213) 555-9012</p>
+                      <p className="text-[#FFD700]">Main: (213) 555-1234</p>
+                      <p className="text-[#FFD700]">Catering: (213) 555-5678</p>
+                      <p className="text-[#FFD700]">Delivery: (213) 555-9012</p>
                     </div>
                   </div>
 
@@ -133,9 +133,9 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-bold mb-1">Email</h3>
-                      <p className="text-gray-300">info@broskiskitchen.com</p>
-                      <p className="text-gray-300">catering@broskiskitchen.com</p>
-                      <p className="text-gray-300">events@broskiskitchen.com</p>
+                      <p className="text-[#FFD700]">info@broskiskitchen.com</p>
+                      <p className="text-[#FFD700]">catering@broskiskitchen.com</p>
+                      <p className="text-[#FFD700]">events@broskiskitchen.com</p>
                     </div>
                   </div>
 
@@ -146,8 +146,8 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-bold mb-1">Office Hours</h3>
-                      <p className="text-gray-300">Monday - Friday: 9 AM - 5 PM</p>
-                      <p className="text-gray-300">Saturday - Sunday: Closed</p>
+                      <p className="text-[#FFD700]">Monday - Friday: 9 AM - 5 PM</p>
+                      <p className="text-[#FFD700]">Saturday - Sunday: Closed</p>
                     </div>
                   </div>
                 </div>
@@ -160,7 +160,7 @@ export default function ContactPage() {
                   href="https://facebook.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-[#1A1A1A] p-3 rounded-full hover:bg-gold-foil hover:text-black transition-colors"
+                  className="bg-black p-3 rounded-full hover:bg-[#FFD700] hover:text-black transition-colors border border-[#FFD700]"
                   aria-label="Facebook"
                 >
                   <FaFacebook size={24} />
@@ -169,7 +169,7 @@ export default function ContactPage() {
                   href="https://twitter.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-[#1A1A1A] p-3 rounded-full hover:bg-gold-foil hover:text-black transition-colors"
+                  className="bg-black p-3 rounded-full hover:bg-gold-foil hover:text-black transition-colors border border-[#FFD700]"
                   aria-label="Twitter"
                 >
                   <FaTwitter size={24} />
@@ -195,9 +195,9 @@ export default function ContactPage() {
               </div>
 
               {/* Newsletter Signup */}
-              <div className="bg-[#1A1A1A] rounded-lg p-6 border border-[#333333]">
+              <div className="bg-black rounded-lg p-6 border border-[#FFD700]">
                 <h3 className="text-xl font-bold mb-2">Stay Updated</h3>
-                <p className="text-gray-300 mb-4">Subscribe to our newsletter for the latest updates and offers.</p>
+                <p className="text-[#FFD700] mb-4">Subscribe to our newsletter for the latest updates and offers.</p>
                 <form className="flex flex-col sm:flex-row gap-2">
                   <input type="email" placeholder="Your email address" className="input flex-grow" required />
                   <button type="submit" className="btn-primary whitespace-nowrap">
@@ -231,7 +231,7 @@ export default function ContactPage() {
           <h2 className="text-2xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
           <div className="max-w-3xl mx-auto">
             {faqs.map((faq, index) => (
-              <div key={index} className="mb-4 bg-[#1A1A1A] rounded-lg border border-[#333333] overflow-hidden">
+              <div key={index} className="mb-4 bg-black rounded-lg border border-[#FFD700] overflow-hidden">
                 <button
                   className="w-full p-4 text-left flex justify-between items-center focus:outline-none"
                   onClick={() => toggleFaq(index)}
@@ -249,7 +249,7 @@ export default function ContactPage() {
                     expandedFaq === index ? "max-h-96 opacity-100" : "max-h-0 opacity-0 overflow-hidden"
                   }`}
                 >
-                  <p className="text-gray-300">{faq.answer}</p>
+                  <p className="text-[#FFD700]">{faq.answer}</p>
                 </div>
               </div>
             ))}
@@ -262,7 +262,7 @@ export default function ContactPage() {
         <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/20 to-[#880808]/20 opacity-50"></div>
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h2 className="heading-lg mb-4 gritty-shadow">Ready to Experience Broski's?</h2>
-          <p className="text-gray-300 mb-8 max-w-2xl mx-auto">
+          <p className="text-[#FFD700] mb-8 max-w-2xl mx-auto">
             Visit one of our locations or order online to experience our luxury street gourmet cuisine.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">

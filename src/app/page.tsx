@@ -149,7 +149,7 @@ function Page() {
           >
             <div className="relative w-full max-w-6xl">
               <Image
-                src="boosie-wings.png"
+                src="/images/boosie-wings.png"
                 alt="Ultra-realistic Boosie Wings spread across black surface"
                 width={2400}
                 height={900}
@@ -243,39 +243,39 @@ function Page() {
 
       {/* Features Section */}
       <section className="py-20 bg-[#0A0A0A] relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-yellow-600/5 via-transparent to-red-900/10 opacity-50"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-[#FFD700]/5 via-transparent to-black/10 opacity-50"></div>
         <div className="container mx-auto px-4 relative z-10">
           <h2 className="heading-lg mb-12 text-center">
             Experience <span className="graffiti-text elegant-glow">Broski&apos;s</span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="feature-card animate-fade-in group">
-              <div className="bg-yellow-600 bg-opacity-20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-opacity-40 transition-all duration-300 group-hover:scale-110">
-                <FaUtensils className="text-yellow-600 text-2xl group-hover:text-3xl transition-all duration-300" />
+              <div className="bg-[#FFD700] bg-opacity-20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-opacity-40 transition-all duration-300 group-hover:scale-110">
+                <FaUtensils className="text-[#FFD700] text-2xl group-hover:text-3xl transition-all duration-300" />
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold mb-2 text-white group-hover:text-yellow-600 transition-colors duration-300">Gourmet Menu</h3>
-              <p className="text-gray-300 group-hover:text-white transition-colors duration-300">Explore our luxury street food with both regular and infused options.</p>
+              <h3 className="text-xl md:text-2xl font-semibold mb-2 text-white group-hover:text-[#FFD700] transition-colors duration-300">Gourmet Menu</h3>
+              <p className="text-[#FFD700] group-hover:text-white transition-colors duration-300">Explore our luxury street food with both regular and infused options.</p>
             </div>
             <div className="feature-card animate-fade-in animate-delay-100 group">
-              <div className="bg-yellow-600 bg-opacity-20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-opacity-40 transition-all duration-300 group-hover:scale-110">
-                <FaMapMarkerAlt className="text-yellow-600 text-2xl group-hover:text-3xl transition-all duration-300" />
+              <div className="bg-[#FFD700] bg-opacity-20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-opacity-40 transition-all duration-300 group-hover:scale-110">
+                <FaMapMarkerAlt className="text-[#FFD700] text-2xl group-hover:text-3xl transition-all duration-300" />
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold mb-2 text-white group-hover:text-yellow-600 transition-colors duration-300">Multiple Locations</h3>
-              <p className="text-gray-300 group-hover:text-white transition-colors duration-300">Visit us at our convenient locations throughout the city.</p>
+              <h3 className="text-xl md:text-2xl font-semibold mb-2 text-white group-hover:text-[#FFD700] transition-colors duration-300">Multiple Locations</h3>
+              <p className="text-[#FFD700] group-hover:text-white transition-colors duration-300">Visit us at our convenient locations throughout the city.</p>
             </div>
             <div className="feature-card animate-fade-in animate-delay-200 group">
-              <div className="bg-yellow-600 bg-opacity-20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-opacity-40 transition-all duration-300 group-hover:scale-110">
-                <FaCalendarAlt className="text-yellow-600 text-2xl group-hover:text-3xl transition-all duration-300" />
+              <div className="bg-[#FFD700] bg-opacity-20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-opacity-40 transition-all duration-300 group-hover:scale-110">
+                <FaCalendarAlt className="text-[#FFD700] text-2xl group-hover:text-3xl transition-all duration-300" />
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold mb-2 text-white group-hover:text-yellow-600 transition-colors duration-300">Special Events</h3>
-              <p className="text-gray-300 group-hover:text-white transition-colors duration-300">Join our exclusive tasting events and culinary experiences.</p>
+              <h3 className="text-xl md:text-2xl font-semibold mb-2 text-white group-hover:text-[#FFD700] transition-colors duration-300">Special Events</h3>
+              <p className="text-[#FFD700] group-hover:text-white transition-colors duration-300">Join our exclusive tasting events and culinary experiences.</p>
             </div>
             <div className="feature-card animate-fade-in animate-delay-300 group">
-              <div className="bg-yellow-600 bg-opacity-20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-opacity-40 transition-all duration-300 group-hover:scale-110">
-                <FaGift className="text-yellow-600 text-2xl group-hover:text-3xl transition-all duration-300" />
+              <div className="bg-[#FFD700] bg-opacity-20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-opacity-40 transition-all duration-300 group-hover:scale-110">
+                <FaGift className="text-[#FFD700] text-2xl group-hover:text-3xl transition-all duration-300" />
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold mb-2 text-white group-hover:text-yellow-600 transition-colors duration-300">Rewards Program</h3>
-              <p className="text-gray-300 group-hover:text-white transition-colors duration-300">Earn points with every purchase and unlock exclusive perks.</p>
+              <h3 className="text-xl md:text-2xl font-semibold mb-2 text-white group-hover:text-[#FFD700] transition-colors duration-300">Rewards Program</h3>
+              <p className="text-[#FFD700] group-hover:text-white transition-colors duration-300">Earn points with every purchase and unlock exclusive perks.</p>
             </div>
           </div>
         </div>
@@ -283,11 +283,11 @@ function Page() {
 
       {/* Specialty Section */}
       <section className="py-20 bg-[#0A0A0A] overflow-hidden relative">
-        <div className="absolute inset-0 bg-gradient-to-t from-yellow-600/5 via-transparent to-transparent opacity-70"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#FFD700]/5 via-transparent to-transparent opacity-70"></div>
         <div className="container mx-auto px-4 relative z-10">
           <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center text-white">
-            <span className="text-yellow-600">Specialty</span>
-            <div className="w-24 h-1 bg-gradient-to-r from-yellow-600 to-yellow-600/30 mx-auto mt-4 rounded-full"></div>
+            <span className="text-[#FFD700]">Specialty</span>
+            <div className="w-24 h-1 bg-gradient-to-r from-[#FFD700] to-[#FFD700]/30 mx-auto mt-4 rounded-full"></div>
           </h2>
           <div className="infinite-scroll-container">
             <div className="infinite-scroll-track">
@@ -297,10 +297,10 @@ function Page() {
                   <Image src="/images/1000009121.png" alt="Boosie Sweet Heat Sauce" fill className="object-cover rounded-lg" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Boosie Sweet Heat Sauce</h3>
-                <p className="text-gray-300 mb-4">Smooth, saucy, and slightly savage. Our signature sweet heat sauce that brings the perfect balance of flavor and fire.</p>
+                <p className="text-[#FFD700] mb-4">Smooth, saucy, and slightly savage. Our signature sweet heat sauce that brings the perfect balance of flavor and fire.</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-yellow-600 font-bold text-xl">$12</span>
-                  <Link href="/menu" className="bg-yellow-600 hover:bg-yellow-700 text-black font-bold py-2 px-4 rounded transition-colors duration-300">
+                  <span className="text-[#FFD700] font-bold text-xl">$12</span>
+                  <Link href="/menu" className="bg-[#FFD700] hover:bg-[#E6C200] text-black font-bold py-2 px-4 rounded transition-colors duration-300">
                     View Details
                   </Link>
                 </div>
@@ -310,10 +310,10 @@ function Page() {
                   <Image src="/images/1000009265.png" alt="Lotus Cheesecake" fill className="object-cover rounded-lg" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Lotus Cheesecake</h3>
-                <p className="text-gray-300 mb-4">Decadent golden brown cheesecake infused with Lotus cookie crumbles, crafted with premium ingredients.</p>
+                <p className="text-[#FFD700] mb-4">Decadent golden brown cheesecake infused with Lotus cookie crumbles, crafted with premium ingredients.</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-yellow-600 font-bold text-xl">$12</span>
-                  <Link href="/menu" className="bg-yellow-600 hover:bg-yellow-700 text-black font-bold py-2 px-4 rounded transition-colors duration-300">
+                  <span className="text-[#FFD700] font-bold text-xl">$12</span>
+                  <Link href="/menu" className="bg-[#FFD700] hover:bg-[#E6C200] text-black font-bold py-2 px-4 rounded transition-colors duration-300">
                     View Details
                   </Link>
                 </div>
@@ -323,10 +323,10 @@ function Page() {
                   <Image src="/images/1000008496.webp" alt="Chocolate Cupcake" fill className="object-cover rounded-lg" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Chocolate Cupcake</h3>
-                <p className="text-gray-300 mb-4">Rich chocolate cupcake with dark chocolate drizzle, made with premium cocoa and artisanal craftsmanship.</p>
+                <p className="text-[#FFD700] mb-4">Rich chocolate cupcake with dark chocolate drizzle, made with premium cocoa and artisanal craftsmanship.</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-yellow-600 font-bold text-xl">$6</span>
-                  <Link href="/menu" className="bg-yellow-600 hover:bg-yellow-700 text-black font-bold py-2 px-4 rounded transition-colors duration-300">
+                  <span className="text-[#FFD700] font-bold text-xl">$6</span>
+                  <Link href="/menu" className="bg-[#FFD700] hover:bg-[#E6C200] text-black font-bold py-2 px-4 rounded transition-colors duration-300">
                     View Details
                   </Link>
                 </div>
@@ -336,10 +336,10 @@ function Page() {
                   <Image src="/images/1000008447.webp" alt="Broski's Badazz Seasoning" fill className="object-cover rounded-lg" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Broski's Badazz Seasoning</h3>
-                <p className="text-gray-300 mb-4">Our signature blend of premium spices and herbs, the secret behind Broski's legendary flavor profile.</p>
+                <p className="text-[#FFD700] mb-4">Our signature blend of premium spices and herbs, the secret behind Broski's legendary flavor profile.</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-yellow-600 font-bold text-xl">$15</span>
-                  <Link href="/menu" className="bg-yellow-600 hover:bg-yellow-700 text-black font-bold py-2 px-4 rounded transition-colors duration-300">
+                  <span className="text-[#FFD700] font-bold text-xl">$15</span>
+                  <Link href="/menu" className="bg-[#FFD700] hover:bg-[#E6C200] text-black font-bold py-2 px-4 rounded transition-colors duration-300">
                     View Details
                   </Link>
                 </div>

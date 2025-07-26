@@ -51,11 +51,11 @@ export default function NotifyButton({ dropId, userId }: NotifyButtonProps) {
     <button
       onClick={handleNotifyMe}
       disabled={isNotifying}
-      className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center space-x-2 ${
+      className={`w-full ${
         isSubscribed
-          ? 'bg-green-600 text-white hover:bg-green-700'
-          : 'bg-[var(--color-harvest-gold)] text-black hover:bg-[var(--color-harvest-gold)]/90'
-      } disabled:opacity-50 disabled:cursor-not-allowed`}
+          ? 'btn-secondary'
+          : 'btn-primary'
+      }`}
     >
       {isNotifying ? (
         <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
