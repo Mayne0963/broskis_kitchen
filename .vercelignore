@@ -4,17 +4,6 @@ dist
 .git
 .trae
 .log
-# Exclude large media files to reduce deployment size
-public/music/
-public/images/*.webp
-public/images/*.png
-public/images/*.jpg
-# Keep only essential images
-!public/images/broskis-logo.svg
-!public/images/otw-logo.svg
-!public/images/marker.png
-!public/images/marker-selected.png
-!public/favicon.ico
 # Exclude documentation files
 *.md
 docs/
