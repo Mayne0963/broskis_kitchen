@@ -61,13 +61,13 @@ export default function DropCard({ drop, isActive, userId }: DropCardProps) {
           className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
         {isActive && drop.endsAt && (
-          <div className="absolute top-4 right-4 bg-red-600 text-white px-2 py-1 rounded text-sm font-medium">
+          <div className="absolute top-4 right-4 bg-gold-foil text-black px-2 py-1 rounded text-sm font-medium">
             <Clock className="w-3 h-3 inline mr-1" />
             Limited
           </div>
         )}
         {!isActive && (
-          <div className="absolute top-4 right-4 bg-blue-600 text-white px-2 py-1 rounded text-sm font-medium">
+          <div className="absolute top-4 right-4 bg-harvest-gold text-black px-2 py-1 rounded text-sm font-medium">
             Coming Soon
           </div>
         )}
@@ -153,8 +153,8 @@ export default function DropCard({ drop, isActive, userId }: DropCardProps) {
                 </button>
               </>
             ) : (
-              <div className="text-center py-3 bg-red-600/20 border border-red-600/30 rounded-lg">
-                <span className="text-red-400 font-medium">Sold Out</span>
+              <div className="text-center py-3 bg-gold-foil/20 border border-gold-foil/30 rounded-lg">
+                <span className="text-[var(--color-harvest-gold)] font-medium">Sold Out</span>
               </div>
             )}
           </div>

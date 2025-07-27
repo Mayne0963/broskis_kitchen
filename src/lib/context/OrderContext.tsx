@@ -45,10 +45,22 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
         userId: user?.id || 'anonymous'
       }
       
-      const orderId = await saveOrder(orderDataWithUser)
+      // Use API endpoint for creating orders
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderDataWithUser),
+      })
       
-      // Get the created order to add to state
-      const createdOrder = await getOrderById(orderId)
+      if (!response.ok) {
+        throw new Error(`Failed to create order: ${response.status}`)
+      }
+      
+      const data = await response.json()
+      const createdOrder = data.order
+      
       if (createdOrder) {
         setOrders(prev => [createdOrder, ...prev])
         setCurrentOrder(createdOrder)
@@ -56,23 +68,48 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
 
       toast({
         title: 'Order placed successfully!',
-        description: `Your order #${orderId} has been placed and is being processed.`,
+        description: `Your order #${createdOrder.id} has been placed and is being processed.`,
         duration: 5000,
       })
 
-      return orderId
+      return createdOrder.id
     } catch (error) {
       console.error('Failed to create order:', error)
       setError('Failed to create order. Please try again.')
       
-      toast({
-        title: 'Order failed',
-        description: 'There was an error placing your order. Please try again.',
-        variant: 'destructive',
-        duration: 5000,
-      })
-      
-      throw error
+      // Fallback to direct service
+      try {
+        const orderDataWithUser = {
+          ...orderData,
+          userId: user?.id || 'anonymous'
+        }
+        
+        const orderId = await saveOrder(orderDataWithUser)
+        
+        // Get the created order to add to state
+        const createdOrder = await getOrderById(orderId)
+        if (createdOrder) {
+          setOrders(prev => [createdOrder, ...prev])
+          setCurrentOrder(createdOrder)
+        }
+
+        toast({
+          title: 'Order placed successfully!',
+          description: `Your order #${orderId} has been placed and is being processed.`,
+          duration: 5000,
+        })
+
+        return orderId
+      } catch (fallbackError) {
+        toast({
+          title: 'Order failed',
+          description: 'There was an error placing your order. Please try again.',
+          variant: 'destructive',
+          duration: 5000,
+        })
+        
+        throw fallbackError
+      }
     } finally {
       setIsLoading(false)
     }
@@ -123,12 +160,36 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
   // Get user orders
   const getUserOrdersData = useCallback(async (userId?: string): Promise<Order[]> => {
     try {
-      const userOrders = await getUserOrders(userId || user?.id)
+      // Use API endpoint instead of direct Firebase service
+      const targetUserId = userId || user?.id
+      if (!targetUserId) return []
+      
+      const response = await fetch(`/api/orders?userId=${targetUserId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch orders: ${response.status}`)
+      }
+      
+      const data = await response.json()
+      const userOrders = data.orders || []
       setOrders(userOrders)
       return userOrders
     } catch (error) {
       console.error('Failed to get user orders:', error)
-      return []
+      // Fallback to service if API fails
+      try {
+        const userOrders = await getUserOrders(userId || user?.id)
+        setOrders(userOrders)
+        return userOrders
+      } catch (fallbackError) {
+        console.error('Fallback also failed:', fallbackError)
+        return []
+      }
     }
   }, [user?.id])
 
@@ -198,6 +259,7 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
       getUserOrdersData(user.id)
     }
   }, [user, getUserOrdersData])
+  
   const contextValue: OrderContextType = {
     currentOrder,
     orders,

@@ -15,7 +15,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
       {/* Left Side - Branding */}
       <div className="hidden md:flex md:w-1/2 bg-black relative">
         <div className="absolute inset-0 bg-gradient-to-r from-black to-transparent z-10"></div>
-        <Image src="/images/auth-background.jpg" alt="Broski's Kitchen" fill className="object-cover opacity-60" />
+        <Image src="/images/hero-bg.svg" alt="Broski's Kitchen" fill className="object-cover opacity-60" />
         <div className="relative z-20 flex flex-col justify-center items-center w-full p-12">
           <Link href="/" className="mb-8">
             <h1 className="text-4xl font-bold graffiti-text">Broski&apos;s Kitchen</h1>

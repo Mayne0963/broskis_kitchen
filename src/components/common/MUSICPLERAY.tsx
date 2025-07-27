@@ -87,7 +87,7 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
       id: 'upbeat',
       name: 'Upbeat Energy',
       description: 'Energetic and motivating tracks to boost your mood',
-      color: 'from-orange-500 to-red-600',
+      color: 'from-[var(--color-harvest-gold)] to-[var(--color-harvest-gold)]',
       tracks: [
         {
           id: 'upbeat-1',
@@ -179,6 +179,14 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
   useEffect(() => {
     if (audioRef.current && currentTrack) {
       audioRef.current.src = currentTrack.url
+      
+      // Add error handling for audio loading
+      audioRef.current.addEventListener('error', (e) => {
+        console.warn('Audio loading error for:', currentTrack.title, e);
+        // Skip to next track on error
+        handleNext();
+      });
+      
       audioRef.current.load()
       setCurrentTime(0)
       setError(null)
@@ -330,11 +338,11 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
   const getGenreColor = (genre?: string) => {
     const colors: { [key: string]: string } = {
       'Lofi': 'bg-purple-500',
-      'Jazz': 'bg-blue-500',
-      'Ambient': 'bg-green-500',
+      'Jazz': 'bg-gold-foil',
+    'Ambient': 'bg-harvest-gold',
       'Electronic': 'bg-pink-500',
       'Corporate': 'bg-orange-500',
-      'Acoustic': 'bg-yellow-500'
+      'Acoustic': 'bg-[var(--color-harvest-gold)]'
     }
     return colors[genre || ''] || 'bg-gray-500'
   }
@@ -489,8 +497,8 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
                   onClick={() => currentTrack && toggleFavorite(currentTrack.id)}
                   className={`transition-colors ${
                     currentTrack && favorites.includes(currentTrack.id)
-                      ? 'text-red-500 hover:text-red-400'
-                      : 'text-gray-400 hover:text-red-500'
+                      ? 'text-[var(--color-harvest-gold)] hover:text-[var(--color-harvest-gold)]'
+        : 'text-gray-400 hover:text-[var(--color-harvest-gold)]'
                   }`}
                 >
                   {currentTrack && favorites.includes(currentTrack.id) ? (
@@ -618,8 +626,8 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
 
         {/* Error Display */}
         {error && (
-          <div className="bg-red-900/50 border border-red-500 rounded-lg p-3">
-            <p className="text-red-300 text-sm">{error}</p>
+          <div className="bg-gold-foil/20 border border-gold-foil/30 rounded-lg p-3">
+            <p className="text-[var(--color-harvest-gold)] text-sm">{error}</p>
           </div>
         )}
 
@@ -677,8 +685,8 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
                     }}
                     className={`transition-colors ${
                       favorites.includes(track.id)
-                        ? 'text-red-500 hover:text-red-400'
-                        : 'text-gray-400 hover:text-red-500'
+                        ? 'text-[var(--color-harvest-gold)] hover:text-[var(--color-harvest-gold)]'
+          : 'text-gray-400 hover:text-[var(--color-harvest-gold)]'
                     }`}
                   >
                     {favorites.includes(track.id) ? (

@@ -45,8 +45,8 @@ export default function CountdownTimer({ endTime }: CountdownTimerProps) {
   
   if (isExpired) {
     return (
-      <div className="bg-red-600/20 border border-red-600/30 rounded-lg p-3 text-center">
-        <span className="text-red-400 font-medium">Drop Ended</span>
+      <div className="bg-gold-foil/20 border border-gold-foil/30 rounded-lg p-3 text-center">
+        <span className="text-[var(--color-harvest-gold)] font-medium">Drop Ended</span>
       </div>
     )
   }
@@ -56,15 +56,15 @@ export default function CountdownTimer({ endTime }: CountdownTimerProps) {
   return (
     <div className={`rounded-lg p-3 border ${
       isUrgent 
-        ? 'bg-red-600/20 border-red-600/30' 
+        ? 'bg-gold-foil/20 border-gold-foil/30' 
         : 'bg-[var(--color-harvest-gold)]/10 border-[var(--color-harvest-gold)]/30'
     }`}>
       <div className="flex items-center justify-center space-x-2 mb-2">
         <Clock className={`w-4 h-4 ${
-          isUrgent ? 'text-red-400' : 'text-[var(--color-harvest-gold)]'
+          isUrgent ? 'text-[var(--color-harvest-gold)]' : 'text-[var(--color-harvest-gold)]'
         }`} />
         <span className={`text-sm font-medium ${
-          isUrgent ? 'text-red-400' : 'text-[var(--color-harvest-gold)]'
+          isUrgent ? 'text-[var(--color-harvest-gold)]' : 'text-[var(--color-harvest-gold)]'
         }`}>
           {isUrgent ? 'Ending Soon!' : 'Time Remaining'}
         </span>
@@ -74,7 +74,7 @@ export default function CountdownTimer({ endTime }: CountdownTimerProps) {
         {timeLeft.hours > 0 && (
           <div className="text-center">
             <div className={`text-2xl font-bold ${
-              isUrgent ? 'text-red-400' : 'text-white'
+              isUrgent ? 'text-[var(--color-harvest-gold)]' : 'text-white'
             }`}>
               {timeLeft.hours.toString().padStart(2, '0')}
             </div>
@@ -84,7 +84,7 @@ export default function CountdownTimer({ endTime }: CountdownTimerProps) {
         
         <div className="text-center">
           <div className={`text-2xl font-bold ${
-            isUrgent ? 'text-red-400' : 'text-white'
+            isUrgent ? 'text-[var(--color-harvest-gold)]' : 'text-white'
           }`}>
             {timeLeft.minutes.toString().padStart(2, '0')}
           </div>
@@ -93,7 +93,7 @@ export default function CountdownTimer({ endTime }: CountdownTimerProps) {
         
         <div className="text-center">
           <div className={`text-2xl font-bold ${
-            isUrgent ? 'text-red-400' : 'text-white'
+            isUrgent ? 'text-[var(--color-harvest-gold)]' : 'text-white'
           } ${isUrgent ? 'animate-pulse' : ''}`}>
             {timeLeft.seconds.toString().padStart(2, '0')}
           </div>

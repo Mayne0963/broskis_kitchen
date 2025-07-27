@@ -9,9 +9,12 @@ import { OrderProvider } from "../lib/context/OrderContext"
 import MusicPlayer from "../components/layout/MusicPlayer"
 import ErrorBoundary from "../components/common/ErrorBoundary"
 import ChunkErrorHandler from "../components/common/ChunkErrorHandler"
+import ResourceErrorBoundary from "../components/common/ResourceErrorBoundary"
+import ProductionErrorBoundary from "../components/common/ProductionErrorBoundary"
+import ErrorMonitor from "../components/common/ErrorMonitor"
 import CookieConsent from "../components/gdpr/CookieConsent"
-import { Toaster } from "react-hot-toast"
-import { playfair, montserrat } from "./fonts"
+import { Toaster } from "sonner"
+import { playfair, montserrat } from "./fonts.ts"
 
 export const metadata: Metadata = {
   title: "Broski's Kitchen - Luxury Street Gourmet",
@@ -26,28 +29,33 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${playfair.variable} ${montserrat.variable} bg-black text-white min-h-screen flex flex-col`}>
-        <ErrorBoundary>
-          <ChunkErrorHandler />
-          <Providers>
-            <OrderProvider>
-              <ConditionalNavbar />
-              <main className="flex-grow">{children}</main>
-              <Footer />
-              <MusicPlayer />
-              <Toaster
-                position="top-right"
-                toastOptions={{
-                  duration: 4000,
-                  style: {
-                    background: '#1f2937',
-                    color: '#fff',
-                  },
-                }}
-              />
-              <CookieConsent />
-            </OrderProvider>
-          </Providers>
-        </ErrorBoundary>
+        <ProductionErrorBoundary>
+          <ErrorBoundary>
+            <ResourceErrorBoundary>
+              <ChunkErrorHandler />
+              <Providers>
+                <OrderProvider>
+                  <ConditionalNavbar />
+                  <main className="flex-grow">{children}</main>
+                  <Footer />
+                  <MusicPlayer />
+                  <Toaster
+                    position="top-right"
+                    toastOptions={{
+                      duration: 4000,
+                      style: {
+                        background: '#1f2937',
+                        color: '#fff',
+                      },
+                    }}
+                  />
+                  <CookieConsent />
+                   <ErrorMonitor />
+                 </OrderProvider>
+               </Providers>
+             </ResourceErrorBoundary>
+           </ErrorBoundary>
+         </ProductionErrorBoundary>
       </body>
     </html>
   )

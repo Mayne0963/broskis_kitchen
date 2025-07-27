@@ -108,12 +108,12 @@ export default function ProfilePage() {
           <div>
             <Label htmlFor="displayName">Name</Label>
             <Input id="displayName" {...register("displayName")} className="bg-[#2A2A2A] border-[var(--color-harvest-gold)]" />
-            {errors.displayName && <p className="text-red-500 text-sm">{errors.displayName.message}</p>}
+            {errors.displayName && <p className="text-[var(--color-harvest-gold)] text-sm">{errors.displayName.message}</p>}
           </div>
           <div>
             <Label htmlFor="email">Email</Label>
             <Input id="email" type="email" {...register("email")} className="bg-[#2A2A2A] border-[var(--color-harvest-gold)]" disabled />
-            {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
+            {errors.email && <p className="text-[var(--color-harvest-gold)] text-sm">{errors.email.message}</p>}
           </div>
           <Button type="submit" className="w-full bg-[var(--color-harvest-gold)] text-black">Update Profile</Button>
         </form>

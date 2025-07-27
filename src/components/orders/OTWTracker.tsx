@@ -77,17 +77,17 @@ export default function OTWTracker({ order }: OTWTrackerProps) {
     switch (status.toLowerCase()) {
       case 'confirmed':
       case 'accepted':
-        return 'bg-blue-100 text-blue-800'
+        return 'bg-gold-foil/20 text-gold-foil'
       case 'preparing':
       case 'driver_assigned':
-        return 'bg-yellow-100 text-yellow-800'
+        return 'bg-[var(--color-harvest-gold)]/20 text-[var(--color-harvest-gold)]'
       case 'out_for_delivery':
       case 'driver_pickup':
         return 'bg-orange-100 text-orange-800'
       case 'delivered':
-        return 'bg-green-100 text-green-800'
+        return 'bg-harvest-gold/20 text-harvest-gold'
       case 'cancelled':
-        return 'bg-red-100 text-red-800'
+        return 'bg-gold-foil/20 text-gold-foil'
       default:
         return 'bg-gray-100 text-gray-800'
     }
@@ -121,8 +121,8 @@ export default function OTWTracker({ order }: OTWTrackerProps) {
         )}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-            <p className="text-red-800 text-sm">{error}</p>
+          <div className="bg-gold-foil/10 border border-gold-foil/30 rounded-lg p-3">
+            <p className="text-[var(--color-harvest-gold)] text-sm">{error}</p>
             <Button 
               variant="outline" 
               size="sm" 

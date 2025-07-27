@@ -36,9 +36,9 @@ export default function OrderHistoryPage() {
       case 'ready':
         return 'bg-citrus-orange bg-opacity-20 text-citrus-orange'
       case 'out-for-delivery':
-        return 'bg-blue-500 bg-opacity-20 text-blue-400'
+        return 'bg-gold-foil bg-opacity-20 text-gold-foil'
       case 'cancelled':
-        return 'bg-red-500 bg-opacity-20 text-red-400'
+        return 'bg-[var(--color-harvest-gold)] bg-opacity-20 text-[var(--color-harvest-gold)]'
       default:
         return 'bg-[#333333] text-white'
     }

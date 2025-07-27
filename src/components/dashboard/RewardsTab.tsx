@@ -1,11 +1,14 @@
 "use client"
 
 import { useEffect, useState } from 'react'
-import { Star, Gift, Trophy, Clock, TrendingUp } from 'lucide-react'
+import { Star, Gift, Trophy, Clock, TrendingUp, Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import PointsDisplay from './PointsDisplay'
 import OffersGrid from './OffersGrid'
 import TierProgress from './TierProgress'
 import RedemptionHistory from './RedemptionHistory'
+import { toast } from 'sonner'
 
 interface RewardsTabProps {
   userId: string
@@ -41,116 +44,149 @@ interface Redemption {
   status: 'used' | 'expired' | 'active'
 }
 
-// Mock data - replace with actual API calls
-const mockRewardsData: RewardsData = {
-  points: 1250,
-  tier: 'Gold',
-  nextTier: 'Platinum',
-  pointsToNextTier: 750,
-  totalSpent: 485.50,
-  ordersCount: 23,
-  offers: [
-    {
-      id: '1',
-      title: 'Free Appetizer',
-      description: 'Get any appetizer free with your next order',
-      pointsCost: 500,
-      type: 'free_item',
-      value: 'Up to $12 value',
-      isAvailable: true
-    },
-    {
-      id: '2',
-      title: '20% Off Next Order',
-      description: 'Save 20% on your entire next order',
-      pointsCost: 800,
-      type: 'discount',
-      value: '20% off',
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      isAvailable: true
-    },
-    {
-      id: '3',
-      title: 'Premium Upgrade',
-      description: 'Upgrade any burger to wagyu beef',
-      pointsCost: 1200,
-      type: 'upgrade',
-      value: 'Premium upgrade',
-      isAvailable: true
-    },
-    {
-      id: '4',
-      title: 'Free Dessert',
-      description: 'Choose any dessert on the house',
-      pointsCost: 600,
-      type: 'free_item',
-      value: 'Up to $8 value',
-      isAvailable: false // Not enough points
-    }
-  ],
-  redemptions: [
-    {
-      id: '1',
-      offerTitle: 'Free Side Dish',
-      pointsUsed: 300,
-      redeemedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-      status: 'used'
-    },
-    {
-      id: '2',
-      offerTitle: '15% Off Order',
-      pointsUsed: 600,
-      redeemedAt: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000),
-      status: 'used'
-    }
-  ]
-}
-
 export default function RewardsTab({ userId }: RewardsTabProps) {
   const [rewardsData, setRewardsData] = useState<RewardsData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [redeeming, setRedeeming] = useState<string | null>(null)
+  
+  const fetchRewardsData = async () => {
+    try {
+      setLoading(true)
+      // Fetch user rewards data and offers in parallel
+      const [rewardsResponse, offersResponse] = await Promise.all([
+        fetch('/api/rewards/points', { 
+          cache: 'no-store',
+          credentials: 'include'
+        }),
+        fetch('/api/rewards/offers', { 
+          cache: 'no-store',
+          credentials: 'include'
+        })
+      ])
+      
+      if (!rewardsResponse.ok || !offersResponse.ok) {
+        throw new Error('Failed to fetch rewards data')
+      }
+      
+      const rewardsData = await rewardsResponse.json()
+      const offersData = await offersResponse.json()
+      
+      // Fetch redemption history
+      const redemptionsResponse = await fetch('/api/rewards/offers/redemptions', {
+        cache: 'no-store',
+        credentials: 'include'
+      })
+      
+      let redemptions = []
+      if (redemptionsResponse.ok) {
+        redemptions = await redemptionsResponse.json()
+      }
+      
+      // Combine the data into the expected format
+      const combinedData: RewardsData = {
+        points: rewardsData.points || 0,
+        tier: rewardsData.tier || 'Bronze',
+        nextTier: rewardsData.nextTier || 'Silver',
+        pointsToNextTier: rewardsData.pointsToNextTier || 0,
+        totalSpent: rewardsData.totalSpent || 0,
+        ordersCount: rewardsData.ordersCount || 0,
+        offers: offersData.map((offer: any) => ({
+          id: offer.id,
+          title: offer.title,
+          description: offer.description,
+          pointsCost: offer.pointsCost,
+          type: offer.type,
+          value: offer.value || `Up to $${Math.floor(offer.pointsCost / 50)} value`,
+          expiresAt: offer.validUntil ? new Date(offer.validUntil) : undefined,
+          isAvailable: rewardsData.points >= offer.pointsCost && offer.isActive
+        })) || [],
+        redemptions: redemptions.map((redemption: any) => ({
+          id: redemption.id,
+          offerTitle: redemption.offerTitle,
+          pointsUsed: redemption.pointsUsed,
+          redeemedAt: new Date(redemption.redeemedAt),
+          status: redemption.status
+        })) || []
+      }
+      
+      setRewardsData(combinedData)
+    } catch (error) {
+      console.error('Failed to fetch rewards data:', error)
+      toast.error('Failed to load rewards data')
+      // Set empty state on error
+      setRewardsData({
+        points: 0,
+        tier: 'Bronze',
+        nextTier: 'Silver',
+        pointsToNextTier: 500,
+        totalSpent: 0,
+        ordersCount: 0,
+        offers: [],
+        redemptions: []
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
   
   useEffect(() => {
-    const fetchRewardsData = async () => {
-      try {
-        // TODO: Replace with actual API call
-        // const response = await fetch(`/api/rewards/points?userId=${userId}`, { 
-        //   cache: 'no-store' 
-        // })
-        // const data = await response.json()
-        
-        // Mock delay to simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        setRewardsData(mockRewardsData)
-      } catch (error) {
-        console.error('Failed to fetch rewards data:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    
     fetchRewardsData()
   }, [userId])
   
+  const handleRedeemOffer = async (offerId: string) => {
+    if (!rewardsData) return
+    
+    setRedeeming(offerId)
+    try {
+      const response = await fetch('/api/rewards/redeem', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ offerId })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to redeem offer')
+      }
+
+      const result = await response.json()
+      toast.success('Offer redeemed successfully!')
+      
+      // Refresh rewards data after successful redemption
+      await fetchRewardsData()
+    } catch (error) {
+      console.error('Failed to redeem offer:', error)
+      toast.error('Failed to redeem offer. Please try again.')
+    } finally {
+      setRedeeming(null)
+    }
+  }
+  
   if (loading) {
     return (
-      <div className="space-y-6 animate-pulse">
-        <div className="h-8 bg-gray-700 rounded w-1/3"></div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="h-32 bg-gray-700 rounded"></div>
-          <div className="h-32 bg-gray-700 rounded"></div>
-          <div className="h-32 bg-gray-700 rounded"></div>
+      <div className="flex items-center justify-center h-64">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-[var(--color-harvest-gold)]" />
+          <p className="text-gray-400">Loading rewards data...</p>
         </div>
-        <div className="h-48 bg-gray-700 rounded"></div>
       </div>
     )
   }
   
   if (!rewardsData) {
     return (
-      <div className="text-center py-8 text-gray-400">
-        <Gift className="w-12 h-12 mx-auto mb-4 opacity-50" />
-        <p className="text-lg">Unable to load rewards data. Please try again.</p>
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-gray-400 mb-4">Failed to load rewards data</p>
+          <Button 
+             onClick={fetchRewardsData}
+             className="bg-[var(--color-harvest-gold)] text-black hover:bg-[var(--color-harvest-gold)]/90"
+           >
+             Try Again
+           </Button>
+        </div>
       </div>
     )
   }
@@ -226,10 +262,8 @@ export default function RewardsTab({ userId }: RewardsTabProps) {
         <OffersGrid 
           offers={rewardsData.offers}
           userPoints={rewardsData.points}
-          onRedeem={(offerId) => {
-            console.log('Redeeming offer:', offerId)
-            // TODO: Implement redemption logic
-          }}
+          onRedeem={handleRedeemOffer}
+          redeeming={redeeming}
         />
       </div>
       

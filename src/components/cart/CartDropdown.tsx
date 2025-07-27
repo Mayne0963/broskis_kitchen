@@ -101,7 +101,7 @@ const CartDropdown: React.FC = () => {
                           <span className="text-xs text-gold-foil font-bold">${item.price.toFixed(2)}</span>
                           <button
                             onClick={() => removeItem(item.id)}
-                            className="text-blood-red hover:text-red-400 transition-colors"
+                            className="text-[var(--color-harvest-gold)] hover:text-[var(--color-harvest-gold)] transition-colors"
                             aria-label="Remove item"
                           >
                             <FaTrash size={12} />

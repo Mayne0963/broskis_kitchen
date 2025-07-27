@@ -259,7 +259,7 @@ export default function DeliveryStep({ addresses, checkoutData, onUpdate }: Deli
               </div>
               
               {isNewAddressValid() && (
-                <div className="mt-4 p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                <div className="mt-4 p-3 bg-gold-foil/20 border border-gold-foil/30 rounded-lg">
                   <p className="text-green-300 text-sm font-medium">✓ Address looks good!</p>
                   <p className="text-green-200/80 text-sm mt-1">{formatAddress(newAddress)}</p>
                 </div>

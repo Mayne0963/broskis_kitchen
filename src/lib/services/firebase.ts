@@ -55,6 +55,14 @@ try {
     } catch (settingsError) {
       console.warn('Could not apply Firestore settings:', settingsError)
     }
+    
+    // Add global error handling for Firestore
+    window.addEventListener('unhandledrejection', (event) => {
+      if (event.reason?.message?.includes('firestore')) {
+        console.warn('Firestore connection error:', event.reason.message);
+        event.preventDefault(); // Prevent unhandled rejection
+      }
+    });
   }
   
   storage = getStorage(app)

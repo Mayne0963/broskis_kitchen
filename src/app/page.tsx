@@ -92,24 +92,24 @@ function Page() {
             transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
           >
             {/* HOME OF THE AWARD-WINNING - Gold, Serif, ALL CAPS */}
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-yellow-400 uppercase tracking-wide leading-tight" style={{ fontFamily: 'var(--font-playfair), serif', color: '#FFD700' }}>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-[var(--color-harvest-gold)] uppercase tracking-wide leading-tight" style={{ fontFamily: 'var(--font-playfair), serif', color: '#FFD700' }}>
               HOME OF THE AWARD-WINNING
             </h1>
              
             {/* BOOSIE WINGS - Larger, Gold, Bold Serif, ALL CAPS */}
-            <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-yellow-400 uppercase tracking-tight leading-none" style={{ fontFamily: 'var(--font-playfair), serif', color: '#FFD700' }}>
+            <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-[var(--color-harvest-gold)] uppercase tracking-tight leading-none" style={{ fontFamily: 'var(--font-playfair), serif', color: '#FFD700' }}>
               BOOSIE WINGS
             </h2>
              
             {/* CAUSE IT'S BADAZZ - Red, All Caps, smaller */}
             <motion.p 
-              className="text-xl md:text-2xl lg:text-3xl font-bold text-red-600 uppercase tracking-wide"
-              style={{ color: '#B22222' }}
+              className="text-xl md:text-2xl lg:text-3xl font-bold text-gold-foil uppercase tracking-wide"
+              style={{ color: '#FFD700' }}
               animate={{ 
                 textShadow: [
-                  "0 0 5px #B22222, 0 0 10px #B22222, 0 0 15px #B22222",
-                  "0 0 10px #B22222, 0 0 20px #B22222, 0 0 30px #B22222",
-                  "0 0 5px #B22222, 0 0 10px #B22222, 0 0 15px #B22222"
+                  "0 0 5px #FFD700, 0 0 10px #FFD700, 0 0 15px #FFD700",
+                  "0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFD700",
+                  "0 0 5px #FFD700, 0 0 10px #FFD700, 0 0 15px #FFD700"
                 ]
               }}
               transition={{ 
@@ -133,7 +133,7 @@ function Page() {
             <Link 
               href="/menu" 
               className="broski-otw-gold-button"
-              style={{ backgroundColor: '#B22222', borderColor: '#B22222' }}
+              style={{ backgroundColor: '#FFD700', borderColor: '#FFD700' }}
               aria-label="Order Now Button for Boosie Wings"
             >
               Order Now
@@ -231,7 +231,7 @@ function Page() {
             >
               <Link 
                 href="/menu" 
-                className="inline-block bg-[#B22222] hover:bg-[#8B1818] text-white font-bold py-4 px-12 text-xl rounded-lg shadow-2xl transform hover:scale-105 hover:shadow-[0_0_30px_rgba(178,34,34,0.6)] transition-all duration-300 border-2 border-[#B22222] hover:border-[#DC143C]"
+                className="inline-block bg-[#FFD700] hover:bg-[#E6C200] text-black font-bold py-4 px-12 text-xl rounded-lg shadow-2xl transform hover:scale-105 hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] transition-all duration-300 border-2 border-[#FFD700] hover:border-[#E6C200]"
                 aria-label="Explore Our Menu Button"
               >
                 Explore Our Menu
@@ -352,8 +352,8 @@ function Page() {
                 <h3 className="text-xl font-bold text-white mb-2">Boosie Sweet Heat Sauce</h3>
                 <p className="text-gray-300 mb-4">Smooth, saucy, and slightly savage. Our signature sweet heat sauce that brings the perfect balance of flavor and fire.</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-yellow-600 font-bold text-xl">$12</span>
-                  <Link href="/menu" className="bg-yellow-600 hover:bg-yellow-700 text-black font-bold py-2 px-4 rounded transition-colors duration-300">
+                  <span className="text-[var(--color-harvest-gold)] font-bold text-xl">$12</span>
+                  <Link href="/menu" className="bg-[var(--color-harvest-gold)] hover:bg-[var(--color-gold-rich)] text-black font-bold py-2 px-4 rounded transition-colors duration-300">
                     View Details
                   </Link>
                 </div>
@@ -365,8 +365,8 @@ function Page() {
                 <h3 className="text-xl font-bold text-white mb-2">Lotus Cheesecake</h3>
                 <p className="text-gray-300 mb-4">Decadent golden brown cheesecake infused with Lotus cookie crumbles, crafted with premium ingredients.</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-yellow-600 font-bold text-xl">$12</span>
-                  <Link href="/menu" className="bg-yellow-600 hover:bg-yellow-700 text-black font-bold py-2 px-4 rounded transition-colors duration-300">
+                  <span className="text-[var(--color-harvest-gold)] font-bold text-xl">$12</span>
+                  <Link href="/menu" className="bg-[var(--color-harvest-gold)] hover:bg-[var(--color-gold-rich)] text-black font-bold py-2 px-4 rounded transition-colors duration-300">
                     View Details
                   </Link>
                 </div>
@@ -378,8 +378,8 @@ function Page() {
                 <h3 className="text-xl font-bold text-white mb-2">Chocolate Cupcake</h3>
                 <p className="text-gray-300 mb-4">Rich chocolate cupcake with dark chocolate drizzle, made with premium cocoa and artisanal craftsmanship.</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-yellow-600 font-bold text-xl">$6</span>
-                  <Link href="/menu" className="bg-yellow-600 hover:bg-yellow-700 text-black font-bold py-2 px-4 rounded transition-colors duration-300">
+                  <span className="text-[var(--color-harvest-gold)] font-bold text-xl">$6</span>
+                  <Link href="/menu" className="bg-[var(--color-harvest-gold)] hover:bg-[var(--color-gold-rich)] text-black font-bold py-2 px-4 rounded transition-colors duration-300">
                     View Details
                   </Link>
                 </div>
@@ -391,8 +391,8 @@ function Page() {
                 <h3 className="text-xl font-bold text-white mb-2">Broski's Badazz Seasoning</h3>
                 <p className="text-gray-300 mb-4">Our signature blend of premium spices and herbs, the secret behind Broski's legendary flavor profile.</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-yellow-600 font-bold text-xl">$15</span>
-                  <Link href="/menu" className="bg-yellow-600 hover:bg-yellow-700 text-black font-bold py-2 px-4 rounded transition-colors duration-300">
+                  <span className="text-[var(--color-harvest-gold)] font-bold text-xl">$15</span>
+                  <Link href="/menu" className="bg-[var(--color-harvest-gold)] hover:bg-[var(--color-gold-rich)] text-black font-bold py-2 px-4 rounded transition-colors duration-300">
                     View Details
                   </Link>
                 </div>
@@ -404,20 +404,20 @@ function Page() {
 
       {/* CTA Section */}
       <section className="py-20 bg-[#0A0A0A] relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-yellow-600/10 via-transparent to-red-900/5 opacity-40"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-yellow-600/5 rounded-full blur-3xl"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-harvest-gold)]/10 via-transparent to-[var(--color-harvest-gold)]/5 opacity-40"></div>
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[var(--color-harvest-gold)]/5 rounded-full blur-3xl"></div>
         <div className="container mx-auto px-4 text-center relative z-10">
           <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white animate-fade-in">
-            Ready to Experience <span className="text-yellow-600">Broski&apos;s</span>?
+            Ready to Experience <span className="text-[var(--color-harvest-gold)]">Broski&apos;s</span>?
           </h2>
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto animate-fade-in animate-delay-200">
             Join thousands of satisfied customers who have discovered the perfect blend of luxury and street culture.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in animate-delay-400">
-            <Link href="/menu" className="bg-yellow-600 hover:bg-yellow-700 text-black font-bold py-4 px-10 rounded-lg transform hover:scale-105 transition-all duration-300">
+            <Link href="/menu" className="bg-[var(--color-harvest-gold)] hover:bg-[var(--color-gold-rich)] text-black font-bold py-4 px-10 rounded-lg transform hover:scale-105 transition-all duration-300">
               Order Now
             </Link>
-            <Link href="/rewards" className="border-2 border-yellow-600 text-yellow-600 hover:bg-yellow-600 hover:text-black font-bold py-4 px-10 rounded-lg transform hover:scale-105 transition-all duration-300">
+            <Link href="/rewards" className="border-2 border-[var(--color-harvest-gold)] text-[var(--color-harvest-gold)] hover:bg-[var(--color-harvest-gold)] hover:text-black font-bold py-4 px-10 rounded-lg transform hover:scale-105 transition-all duration-300">
               Join Rewards
             </Link>
           </div>

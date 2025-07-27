@@ -198,6 +198,15 @@ const MusicPlayer = () => {
   useEffect(() => {
     setCurrentPlaylist(chillLofi);
     setPlaylistTracks(chillLofi);
+    
+    // Add error handling for audio loading
+    if (audioRef.current) {
+      audioRef.current.addEventListener('error', (e) => {
+        console.warn('Audio loading error:', e);
+        // Skip to next track on error
+        nextTrack();
+      });
+    }
     // Auto-start background music with the first track from chill playlist
     if (chillLofi.length > 0 && !currentTrack) {
       // Small delay to ensure component is fully mounted
@@ -340,6 +349,10 @@ if (audioRef && audioRef.current) {
                     src={currentTrack.coverImage || "/placeholder.svg"}
                     alt={currentTrack.title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    onError={(e) => {
+                      console.warn('Image loading error:', currentTrack.coverImage);
+                      e.currentTarget.src = '/placeholder.svg';
+                    }}
                   />
                   {isPlaying && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">

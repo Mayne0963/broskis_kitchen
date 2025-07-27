@@ -119,7 +119,7 @@ export default function PaymentStep({
       </div>
       
       {/* Rewards Section */}
-      <div className="bg-gradient-to-r from-[var(--color-harvest-gold)]/10 to-yellow-600/10 border border-[var(--color-harvest-gold)]/30 rounded-lg p-6">
+      <div className="bg-gradient-to-r from-[var(--color-harvest-gold)]/10 to-[var(--color-gold-rich)]/10 border border-[var(--color-harvest-gold)]/30 rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
             <Star className="w-6 h-6 text-[var(--color-harvest-gold)] mr-3" />
@@ -322,7 +322,7 @@ export default function PaymentStep({
               </div>
               
               {isNewCardValid() && (
-                <div className="p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                <div className="p-3 bg-gold-foil/20 border border-gold-foil/30 rounded-lg">
                   <p className="text-green-300 text-sm font-medium">✓ Card information looks good!</p>
                 </div>
               )}

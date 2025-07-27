@@ -18,29 +18,12 @@ interface OffersGridProps {
   offers: Offer[]
   userPoints: number
   onRedeem: (offerId: string) => void
+  redeeming?: string | null
 }
 
-export default function OffersGrid({ offers, userPoints, onRedeem }: OffersGridProps) {
-  const [redeeming, setRedeeming] = useState<string | null>(null)
-  
-  const handleRedeem = async (offerId: string) => {
-    setRedeeming(offerId)
-    try {
-      // TODO: Replace with actual API call
-      // await fetch('/api/rewards/redeem', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ offerId })
-      // })
-      
-      // Mock delay
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      onRedeem(offerId)
-    } catch (error) {
-      console.error('Failed to redeem offer:', error)
-    } finally {
-      setRedeeming(null)
-    }
+export default function OffersGrid({ offers, userPoints, onRedeem, redeeming }: OffersGridProps) {
+  const handleRedeem = (offerId: string) => {
+    onRedeem(offerId)
   }
   
   const getTypeIcon = (type: string) => {
@@ -59,9 +42,9 @@ export default function OffersGrid({ offers, userPoints, onRedeem }: OffersGridP
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'discount':
-        return 'text-blue-400 bg-blue-400/20'
+        return 'text-gold-foil bg-gold-foil/20'
       case 'free_item':
-        return 'text-green-400 bg-green-400/20'
+        return 'text-harvest-gold bg-harvest-gold/20'
       case 'upgrade':
         return 'text-purple-400 bg-purple-400/20'
       default:
@@ -174,7 +157,7 @@ export default function OffersGrid({ offers, userPoints, onRedeem }: OffersGridP
             
             {/* Insufficient Points Warning */}
             {!affordable && (
-              <div className="mt-3 p-2 bg-red-900/20 border border-red-500/30 rounded text-xs text-red-300">
+              <div className="mt-3 p-2 bg-gold-foil/20 border border-gold-foil/30 rounded text-xs text-gold-foil">
                 You need {(offer.pointsCost - userPoints).toLocaleString()} more points to redeem this offer.
               </div>
             )}

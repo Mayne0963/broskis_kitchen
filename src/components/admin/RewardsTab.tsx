@@ -109,9 +109,9 @@ const getTypeColor = (type: string) => {
     case 'food':
       return 'bg-orange-100 text-orange-800'
     case 'discount':
-      return 'bg-green-100 text-green-800'
+      return 'bg-gold-foil/20 text-gold-foil'
     case 'service':
-      return 'bg-blue-100 text-blue-800'
+      return 'bg-harvest-gold/20 text-harvest-gold'
     case 'bonus':
       return 'bg-purple-100 text-purple-800'
     default:
@@ -319,7 +319,7 @@ export default function RewardsTab({ rewardsData }: RewardsTabProps) {
             {rewardsData.topRedemptions.map((redemption, index) => (
               <div key={index} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-gold-foil/20 flex items-center justify-center">
                     <span className="text-sm font-medium text-blue-600">{index + 1}</span>
                   </div>
                   <div>
@@ -400,7 +400,7 @@ export default function RewardsTab({ rewardsData }: RewardsTabProps) {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div 
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                      className="bg-gold-foil h-2 rounded-full transition-all duration-300" 
                       style={{ width: `${redemptionRate}%` }}
                     />
                   </div>
@@ -426,7 +426,7 @@ export default function RewardsTab({ rewardsData }: RewardsTabProps) {
                     variant="outline"
                     size="sm"
                     onClick={() => handleDeleteOffer(offer.id)}
-                    className="text-red-600 hover:text-red-700"
+                    className="text-[var(--color-harvest-gold)] hover:text-[var(--color-harvest-gold)]"
                   >
                     <Trash2 className="h-4 w-4 mr-1" />
                     Delete

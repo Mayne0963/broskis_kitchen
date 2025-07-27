@@ -81,7 +81,7 @@ export const ToastContainer = () => {
               ? "bg-blood-red"
               : toast.type === "warning"
               ? "bg-amber-500"
-              : "bg-blue-500"
+              : "bg-gold-foil"
           }`}
         >
           <span>{toast.message}</span>

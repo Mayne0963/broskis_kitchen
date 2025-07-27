@@ -189,7 +189,7 @@ export default function CartSummary({ cartData, checkoutData }: CartSummaryProps
         )}
         
         {/* Earning Points */}
-        <div className="mt-4 p-3 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+        <div className="mt-4 p-3 bg-gold-foil/20 border border-gold-foil/30 rounded-lg">
           <div className="flex items-center text-sm">
             <Star className="w-4 h-4 mr-2 text-blue-400" />
             <span className="text-blue-300 font-medium">

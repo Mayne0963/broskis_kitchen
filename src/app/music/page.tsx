@@ -56,9 +56,9 @@ const MusicPage = () => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-orange-500/20 to-red-600/20 rounded-xl p-6 border border-orange-500/30">
+          <div className="bg-gradient-to-br from-[var(--color-harvest-gold)]/20 to-[var(--color-harvest-gold)]/20 rounded-xl p-6 border border-[var(--color-harvest-gold)]/30">
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-[var(--color-harvest-gold)] to-[var(--color-harvest-gold)] rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">&#127928;</span>
               </div>
               <h3 className="text-xl font-bold text-white mb-3">Upbeat Energy</h3>

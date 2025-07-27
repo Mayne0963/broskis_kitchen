@@ -193,7 +193,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
                   className="w-full p-3 bg-[#111111] border border-[#333333] rounded-lg focus:border-gold-foil focus:outline-none"
                   placeholder="your@email.com"
                 />
-                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+                {errors.email && <p className="text-[var(--color-harvest-gold)] text-sm mt-1">{errors.email}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Phone *</label>
@@ -204,7 +204,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
                   className="w-full p-3 bg-[#111111] border border-[#333333] rounded-lg focus:border-gold-foil focus:outline-none"
                   placeholder="(555) 123-4567"
                 />
-                {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
+                {errors.phone && <p className="text-[var(--color-harvest-gold)] text-sm mt-1">{errors.phone}</p>}
               </div>
             </div>
           </div>
@@ -276,7 +276,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
                     className="w-full p-3 bg-[#111111] border border-[#333333] rounded-lg focus:border-gold-foil focus:outline-none"
                     placeholder="123 Main Street"
                   />
-                  {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
+                  {errors.address && <p className="text-[var(--color-harvest-gold)] text-sm mt-1">{errors.address}</p>}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
@@ -343,7 +343,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
                   </label>
                 ))}
               </div>
-              {errors.pickupLocation && <p className="text-red-500 text-sm mt-1">{errors.pickupLocation}</p>}
+              {errors.pickupLocation && <p className="text-[var(--color-harvest-gold)] text-sm mt-1">{errors.pickupLocation}</p>}
             </div>
           )}
 

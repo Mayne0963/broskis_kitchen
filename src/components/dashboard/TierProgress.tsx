@@ -107,7 +107,7 @@ export default function TierProgress({ currentTier, nextTier, pointsToNext }: Ti
         </div>
         
         {pointsToNext <= 100 && (
-          <div className="mt-4 p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+          <div className="mt-4 p-3 bg-gold-foil/20 border border-gold-foil/30 rounded-lg">
             <div className="text-sm">
               <p className="text-green-300 font-medium mb-1">Almost there!</p>
               <p className="text-green-200/80">

@@ -32,7 +32,7 @@ export default function PointsDisplay({ points, tier }: PointsDisplayProps) {
       <div className="text-center mb-6">
         <div className="flex items-center justify-center mb-4">
           <div className="relative">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[var(--color-harvest-gold)] to-yellow-600 flex items-center justify-center">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[var(--color-harvest-gold)] to-[var(--color-gold-rich)] flex items-center justify-center">
               <Star className="w-10 h-10 text-white fill-current" />
             </div>
             <div className="absolute -top-2 -right-2 bg-[var(--color-harvest-gold)] text-black text-xs font-bold px-2 py-1 rounded-full">
@@ -80,7 +80,7 @@ export default function PointsDisplay({ points, tier }: PointsDisplayProps) {
           </div>
         </div>
         
-        <div className="mt-4 p-3 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+        <div className="mt-4 p-3 bg-gold-foil/20 border border-gold-foil/30 rounded-lg">
           <div className="flex items-start">
             <Info className="w-4 h-4 text-blue-400 mt-0.5 mr-2 flex-shrink-0" />
             <div className="text-sm">

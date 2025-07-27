@@ -54,7 +54,7 @@ class ErrorBoundary extends Component<Props, State> {
           <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-6 text-center">
             <div className="mb-4">
               <svg
-                className="mx-auto h-12 w-12 text-red-500"
+                className="mx-auto h-12 w-12 text-[var(--color-harvest-gold)]"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -79,7 +79,7 @@ class ErrorBoundary extends Component<Props, State> {
             <div className="space-y-2">
               <button
                 onClick={this.handleRetry}
-                className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                className="w-full bg-gold-foil text-black px-4 py-2 rounded-md hover:bg-harvest-gold transition-colors"
               >
                 Try Again
               </button>

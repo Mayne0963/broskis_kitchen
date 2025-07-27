@@ -1,8 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Order, OrderStatus } from '@/types/order'
+import { db, isFirebaseConfigured } from '@/lib/services/firebase'
+import { 
+  collection, 
+  addDoc, 
+  doc, 
+  updateDoc, 
+  getDocs, 
+  query, 
+  where, 
+  orderBy, 
+  Timestamp,
+  deleteDoc
+} from 'firebase/firestore'
 
-// In a real application, this would connect to a database
-// For demo purposes, we'll use in-memory storage
+// Collection name for orders
+const ORDERS_COLLECTION = 'orders'
+
+// In-memory storage as fallback
 let orders: Order[] = []
 
 // Generate unique order ID
@@ -26,8 +41,74 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get('userId')
     const orderId = searchParams.get('orderId')
 
+    // Try Firebase first
+    if (isFirebaseConfigured && db) {
+      try {
+        if (orderId) {
+          // Get specific order from Firebase
+          const q = query(
+            collection(db, ORDERS_COLLECTION),
+            where('id', '==', orderId)
+          )
+          const querySnapshot = await getDocs(q)
+          
+          if (!querySnapshot.empty) {
+            const doc = querySnapshot.docs[0]
+            const data = doc.data()
+            const order = {
+              ...data,
+              createdAt: data.createdAt.toDate(),
+              updatedAt: data.updatedAt.toDate()
+            } as Order
+            return NextResponse.json({ order })
+          }
+        } else if (userId) {
+          // Get user orders from Firebase
+          const q = query(
+            collection(db, ORDERS_COLLECTION),
+            where('userId', '==', userId),
+            orderBy('createdAt', 'desc')
+          )
+          const querySnapshot = await getDocs(q)
+          const userOrders: Order[] = []
+          
+          querySnapshot.forEach((doc) => {
+            const data = doc.data()
+            userOrders.push({
+              ...data,
+              createdAt: data.createdAt.toDate(),
+              updatedAt: data.updatedAt.toDate()
+            } as Order)
+          })
+          
+          return NextResponse.json({ orders: userOrders })
+        } else {
+          // Get all orders from Firebase
+          const q = query(
+            collection(db, ORDERS_COLLECTION),
+            orderBy('createdAt', 'desc')
+          )
+          const querySnapshot = await getDocs(q)
+          const allOrders: Order[] = []
+          
+          querySnapshot.forEach((doc) => {
+            const data = doc.data()
+            allOrders.push({
+              ...data,
+              createdAt: data.createdAt.toDate(),
+              updatedAt: data.updatedAt.toDate()
+            } as Order)
+          })
+          
+          return NextResponse.json({ orders: allOrders })
+        }
+      } catch (firebaseError) {
+        console.warn('Firebase fetch failed, using fallback:', firebaseError)
+      }
+    }
+
+    // Fallback to in-memory storage
     if (orderId) {
-      // Get specific order
       const order = orders.find(o => o.id === orderId)
       if (!order) {
         return NextResponse.json(
@@ -39,12 +120,10 @@ export async function GET(request: NextRequest) {
     }
 
     if (userId) {
-      // Get user orders
       const userOrders = orders.filter(order => order.userId === userId)
       return NextResponse.json({ orders: userOrders })
     }
 
-    // Get all orders
     return NextResponse.json({ orders })
   } catch (error) {
     console.error('Error fetching orders:', error)
@@ -119,8 +198,26 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date()
     }
 
-    // Add to orders array
-    orders.unshift(newOrder)
+    // Try to save to Firebase first
+    if (isFirebaseConfigured && db) {
+      try {
+        const orderDoc = {
+          ...newOrder,
+          createdAt: Timestamp.fromDate(newOrder.createdAt),
+          updatedAt: Timestamp.fromDate(newOrder.updatedAt)
+        }
+        
+        await addDoc(collection(db, ORDERS_COLLECTION), orderDoc)
+        console.log('Order saved to Firebase with ID:', newOrder.id)
+      } catch (firebaseError) {
+        console.warn('Failed to save to Firebase, using fallback:', firebaseError)
+        // Add to in-memory storage as fallback
+        orders.unshift(newOrder)
+      }
+    } else {
+      // Add to in-memory storage
+      orders.unshift(newOrder)
+    }
 
     // Simulate processing time
     setTimeout(() => {
@@ -168,25 +265,65 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    const orderIndex = orders.findIndex(order => order.id === orderId)
-    if (orderIndex === -1) {
-      return NextResponse.json(
-        { error: 'Order not found' },
-        { status: 404 }
-      )
+    let updatedOrder: Order | null = null
+
+    // Try Firebase first
+    if (isFirebaseConfigured && db) {
+      try {
+        const q = query(
+          collection(db, ORDERS_COLLECTION),
+          where('id', '==', orderId)
+        )
+        const querySnapshot = await getDocs(q)
+        
+        if (!querySnapshot.empty) {
+          const orderDoc = querySnapshot.docs[0]
+          const updateData = {
+            status: status as OrderStatus,
+            estimatedTime,
+            updatedAt: Timestamp.now()
+          }
+          
+          await updateDoc(orderDoc.ref, updateData)
+          
+          // Get updated order
+          const updatedData = { ...orderDoc.data(), ...updateData }
+          updatedOrder = {
+            ...updatedData,
+            createdAt: updatedData.createdAt.toDate(),
+            updatedAt: updatedData.updatedAt.toDate()
+          } as Order
+          
+          console.log('Order updated in Firebase:', orderId)
+        }
+      } catch (firebaseError) {
+        console.warn('Failed to update in Firebase, using fallback:', firebaseError)
+      }
     }
 
-    // Update order
-    orders[orderIndex] = {
-      ...orders[orderIndex],
-      status: status as OrderStatus,
-      estimatedTime,
-      updatedAt: new Date()
+    // Fallback to in-memory storage if Firebase failed or not configured
+    if (!updatedOrder) {
+      const orderIndex = orders.findIndex(order => order.id === orderId)
+      if (orderIndex === -1) {
+        return NextResponse.json(
+          { error: 'Order not found' },
+          { status: 404 }
+        )
+      }
+
+      orders[orderIndex] = {
+        ...orders[orderIndex],
+        status: status as OrderStatus,
+        estimatedTime,
+        updatedAt: new Date()
+      }
+      
+      updatedOrder = orders[orderIndex]
     }
 
     return NextResponse.json({
       message: 'Order updated successfully',
-      order: orders[orderIndex]
+      order: updatedOrder
     })
   } catch (error) {
     console.error('Error updating order:', error)
@@ -210,33 +347,81 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    const orderIndex = orders.findIndex(order => order.id === orderId)
-    if (orderIndex === -1) {
-      return NextResponse.json(
-        { error: 'Order not found' },
-        { status: 404 }
-      )
+    let cancelledOrder: Order | null = null
+
+    // Try Firebase first
+    if (isFirebaseConfigured && db) {
+      try {
+        const q = query(
+          collection(db, ORDERS_COLLECTION),
+          where('id', '==', orderId)
+        )
+        const querySnapshot = await getDocs(q)
+        
+        if (!querySnapshot.empty) {
+          const orderDoc = querySnapshot.docs[0]
+          const orderData = orderDoc.data() as Order
+          
+          // Check if order can be cancelled
+          if (['delivered', 'completed', 'cancelled'].includes(orderData.status)) {
+            return NextResponse.json(
+              { error: 'Order cannot be cancelled' },
+              { status: 400 }
+            )
+          }
+          
+          const updateData = {
+            status: 'cancelled' as OrderStatus,
+            updatedAt: Timestamp.now()
+          }
+          
+          await updateDoc(orderDoc.ref, updateData)
+          
+          cancelledOrder = {
+            ...orderData,
+            status: 'cancelled' as OrderStatus,
+            updatedAt: new Date()
+          }
+          
+          console.log('Order cancelled in Firebase:', orderId)
+        }
+      } catch (firebaseError) {
+        console.warn('Failed to cancel in Firebase, using fallback:', firebaseError)
+      }
     }
 
-    // Check if order can be cancelled
-    const order = orders[orderIndex]
-    if (['delivered', 'completed', 'cancelled'].includes(order.status)) {
-      return NextResponse.json(
-        { error: 'Order cannot be cancelled' },
-        { status: 400 }
-      )
-    }
+    // Fallback to in-memory storage if Firebase failed or not configured
+    if (!cancelledOrder) {
+      const orderIndex = orders.findIndex(order => order.id === orderId)
+      if (orderIndex === -1) {
+        return NextResponse.json(
+          { error: 'Order not found' },
+          { status: 404 }
+        )
+      }
 
-    // Update order status to cancelled
-    orders[orderIndex] = {
-      ...order,
-      status: 'cancelled',
-      updatedAt: new Date()
+      // Check if order can be cancelled
+      const order = orders[orderIndex]
+      if (['delivered', 'completed', 'cancelled'].includes(order.status)) {
+        return NextResponse.json(
+          { error: 'Order cannot be cancelled' },
+          { status: 400 }
+        )
+      }
+
+      // Update order status to cancelled
+      orders[orderIndex] = {
+        ...order,
+        status: 'cancelled',
+        updatedAt: new Date()
+      }
+      
+      cancelledOrder = orders[orderIndex]
     }
 
     return NextResponse.json({
       message: 'Order cancelled successfully',
-      order: orders[orderIndex]
+      order: cancelledOrder
     })
   } catch (error) {
     console.error('Error cancelling order:', error)

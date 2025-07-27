@@ -113,7 +113,7 @@ export default function ResetPasswordPage() {
               disabled={isLoading}
             />
             {errors.email && (
-              <p className="text-sm text-red-500">{errors.email}</p>
+              <p className="text-sm text-[var(--color-harvest-gold)]">{errors.email}</p>
             )}
           </div>
 

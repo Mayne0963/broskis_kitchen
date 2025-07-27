@@ -20,7 +20,7 @@ export default function RedemptionHistory({ redemptions }: RedemptionHistoryProp
       case 'used':
         return <CheckCircle className="w-5 h-5 text-green-400" />
       case 'expired':
-        return <XCircle className="w-5 h-5 text-red-400" />
+        return <XCircle className="w-5 h-5 text-[var(--color-harvest-gold)]" />
       case 'active':
         return <Clock className="w-5 h-5 text-[var(--color-harvest-gold)]" />
       default:
@@ -44,9 +44,9 @@ export default function RedemptionHistory({ redemptions }: RedemptionHistoryProp
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'used':
-        return 'text-green-400 bg-green-400/20'
+        return 'text-gold-foil bg-gold-foil/20'
       case 'expired':
-        return 'text-red-400 bg-red-400/20'
+        return 'text-harvest-gold bg-harvest-gold/20'
       case 'active':
         return 'text-[var(--color-harvest-gold)] bg-[var(--color-harvest-gold)]/20'
       default:
@@ -137,7 +137,7 @@ export default function RedemptionHistory({ redemptions }: RedemptionHistoryProp
                 )}
                 
                 {redemption.status === 'expired' && (
-                  <div className="text-red-400 text-sm font-medium">
+                  <div className="text-[var(--color-harvest-gold)] text-sm font-medium">
                     ✗ Expired
                   </div>
                 )}

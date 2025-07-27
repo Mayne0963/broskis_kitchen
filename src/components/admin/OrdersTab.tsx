@@ -36,13 +36,13 @@ interface OrdersTabProps {
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'preparing':
-      return 'bg-yellow-100 text-yellow-800'
+      return 'bg-[var(--color-harvest-gold)]/20 text-[var(--color-harvest-gold)]'
     case 'ready':
-      return 'bg-green-100 text-green-800'
+      return 'bg-gold-foil/20 text-gold-foil'
     case 'delivered':
-      return 'bg-blue-100 text-blue-800'
+      return 'bg-harvest-gold/20 text-harvest-gold'
     case 'cancelled':
-      return 'bg-red-100 text-red-800'
+      return 'bg-gold-foil/20 text-gold-foil'
     default:
       return 'bg-gray-100 text-gray-800'
   }

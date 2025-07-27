@@ -74,7 +74,7 @@ export default function OrderConfirmation({
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Success Header */}
         <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-gold-foil rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-12 h-12 text-white" />
           </div>
           
@@ -231,7 +231,7 @@ export default function OrderConfirmation({
             Download Receipt
           </button>
           
-          <button className="flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+          <button className="flex items-center justify-center px-6 py-3 bg-gold-foil text-black font-semibold rounded-lg hover:bg-harvest-gold transition-colors">
             <MessageCircle className="w-5 h-5 mr-2" />
             Track Order
           </button>
@@ -246,7 +246,7 @@ export default function OrderConfirmation({
         
         {/* Additional Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-6">
+          <div className="bg-gold-foil/20 border border-gold-foil/30 rounded-lg p-6">
             <h4 className="text-lg font-semibold text-blue-300 mb-3">What's Next?</h4>
             <ul className="space-y-2 text-blue-200/80 text-sm">
               <li>• We'll send you updates via SMS and email</li>

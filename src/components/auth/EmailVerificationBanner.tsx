@@ -29,10 +29,10 @@ export function EmailVerificationBanner({ className }: EmailVerificationBannerPr
   }
 
   return (
-    <Alert className={`border-yellow-200 bg-yellow-50 ${className}`}>
-      <Mail className="h-4 w-4 text-yellow-600" />
+    <Alert className={`border-[var(--color-harvest-gold)]/30 bg-[var(--color-harvest-gold)]/10 ${className}`}>
+      <Mail className="h-4 w-4 text-[var(--color-harvest-gold)]" />
       <AlertDescription className="flex items-center justify-between w-full">
-        <div className="text-yellow-800">
+        <div className="text-[var(--color-harvest-gold)]">
           <strong>Email verification required.</strong> Please check your email and click the verification link to access all features.
         </div>
         <Button
@@ -40,7 +40,7 @@ export function EmailVerificationBanner({ className }: EmailVerificationBannerPr
           size="sm"
           onClick={handleResendVerification}
           disabled={isResending}
-          className="ml-4 border-yellow-300 text-yellow-700 hover:bg-yellow-100"
+          className="ml-4 border-[var(--color-harvest-gold)]/50 text-[var(--color-harvest-gold)] hover:bg-[var(--color-harvest-gold)]/20"
         >
           {isResending ? (
             <>

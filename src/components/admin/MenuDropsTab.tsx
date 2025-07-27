@@ -50,9 +50,9 @@ interface NewMenuDrop {
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'active':
-      return 'bg-green-100 text-green-800'
+      return 'bg-gold-foil/20 text-gold-foil'
     case 'scheduled':
-      return 'bg-blue-100 text-blue-800'
+      return 'bg-harvest-gold/20 text-harvest-gold'
     case 'ended':
       return 'bg-gray-100 text-gray-800'
     default:
@@ -265,7 +265,7 @@ export default function MenuDropsTab({ menuDrops }: MenuDropsTabProps) {
                       variant="outline"
                       size="sm"
                       onClick={() => handleDeleteDrop(drop.id)}
-                      className="text-red-600 hover:text-red-700"
+                      className="text-[var(--color-harvest-gold)] hover:text-[var(--color-harvest-gold)]"
                     >
                       <Trash2 className="h-4 w-4 mr-1" />
                       Delete
@@ -303,7 +303,7 @@ export default function MenuDropsTab({ menuDrops }: MenuDropsTabProps) {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div 
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                      className="bg-gold-foil h-2 rounded-full transition-all duration-300" 
                       style={{ width: `${progressPercentage}%` }}
                     />
                   </div>

@@ -63,7 +63,7 @@ export default async function MenuDropsPage() {
               Available Now
             </h2>
             <div className="flex items-center text-green-400">
-              <div className="w-3 h-3 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+              <div className="w-3 h-3 bg-gold-foil rounded-full mr-2 animate-pulse"></div>
               <span className="text-sm font-medium">Live</span>
             </div>
           </div>

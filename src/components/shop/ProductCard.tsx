@@ -18,7 +18,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, onQuick
 
   return (
     <div
-      className="bg-black rounded-lg overflow-hidden shadow-lg border border-[#FFD700] hover:border-[#B22222] transition-all duration-300"
+      className="bg-black rounded-lg overflow-hidden shadow-lg border border-[#FFD700] hover:border-[#E6C200] transition-all duration-300"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

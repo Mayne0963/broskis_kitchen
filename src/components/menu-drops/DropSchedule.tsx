@@ -59,7 +59,7 @@ export default function DropSchedule({ drops, userId }: DropScheduleProps) {
                 fill
                 className="object-cover"
               />
-              <div className="absolute top-4 left-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center">
+              <div className="absolute top-4 left-4 bg-gold-foil text-black px-3 py-1 rounded-full text-sm font-medium flex items-center">
                 <Clock className="w-3 h-3 mr-1" />
                 Scheduled
               </div>

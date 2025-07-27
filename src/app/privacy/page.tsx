@@ -1,3 +1,5 @@
+'use client'
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Shield, Eye, Lock, UserCheck, Database, Mail } from 'lucide-react'
