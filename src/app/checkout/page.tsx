@@ -84,7 +84,7 @@ async function getPaymentMethods(userId: string) {
 }
 
 export default async function CheckoutPage() {
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const sessionCookie = cookieStore.get('session')
   
   if (!sessionCookie) {

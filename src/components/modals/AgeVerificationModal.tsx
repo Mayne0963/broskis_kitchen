@@ -3,21 +3,22 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { FaTimes } from "react-icons/fa"
+import { FaTimes, FaExclamationTriangle } from "react-icons/fa"
 import { toast } from "@/hooks/use-toast"
+import { useAgeVerification } from "../../lib/context/AgeVerificationContext"
 
 interface AgeVerificationModalProps {
-  isOpen: boolean
   onClose: () => void
-  onVerify: (dob: Date) => void
+  onSuccess: () => void
 }
 
-const AgeVerificationModal: React.FC<AgeVerificationModalProps> = ({ isOpen, onClose, onVerify }) => {
+const AgeVerificationModal: React.FC<AgeVerificationModalProps> = ({ onClose, onSuccess }) => {
   const [month, setMonth] = useState("")
   const [day, setDay] = useState("")
   const [year, setYear] = useState("")
   const [currentYear, setCurrentYear] = useState(2024)
   const [years, setYears] = useState<number[]>([])
+  const { verifyAge, isVerifying, error } = useAgeVerification()
 
   useEffect(() => {
     const year = new Date().getFullYear()
@@ -46,9 +47,13 @@ const AgeVerificationModal: React.FC<AgeVerificationModalProps> = ({ isOpen, onC
       return
     }
 
-    const verified = await verifyAge(Number.parseInt(month), Number.parseInt(year))
+    const verified = await verifyAge(
+      Number.parseInt(month),
+      Number.parseInt(year)
+    )
 
     if (verified) {
+      onSuccess()
       onClose()
     }
   }

@@ -157,7 +157,7 @@ export async function GET(request: NextRequest) {
 // POST /api/rewards/offers - Redeem an offer
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const sessionCookie = cookieStore.get('session')
     
     if (!sessionCookie) {
@@ -245,7 +245,7 @@ export async function POST(request: NextRequest) {
 // GET /api/rewards/offers/redemptions - Get user's redemption history
 export async function PUT(request: NextRequest) {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const sessionCookie = cookieStore.get('session')
     
     if (!sessionCookie) {
