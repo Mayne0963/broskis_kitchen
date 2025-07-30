@@ -1,9 +1,0 @@
-<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="400" height="300" fill="#1A1A1A"/>
-  <rect x="1" y="1" width="398" height="298" fill="none" stroke="#B7985A" stroke-width="2" stroke-dasharray="8,4"/>
-  <circle cx="200" cy="120" r="30" fill="#B7985A" opacity="0.3"/>
-  <rect x="170" y="140" width="60" height="4" fill="#B7985A" opacity="0.5"/>
-  <rect x="180" y="150" width="40" height="3" fill="#B7985A" opacity="0.4"/>
-  <text x="200" y="200" text-anchor="middle" fill="#B7985A" font-family="Arial, sans-serif" font-size="16" font-weight="bold">Broski's Kitchen</text>
-  <text x="200" y="220" text-anchor="middle" fill="#888888" font-family="Arial, sans-serif" font-size="12">Image Placeholder</text>
-</svg>
