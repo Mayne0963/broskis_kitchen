@@ -63,7 +63,7 @@ const mockPointsHistory = {
 // GET /api/rewards/points - Get user's rewards data
 export async function GET(request: NextRequest) {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const sessionCookie = cookieStore.get('session')
     
     if (!sessionCookie) {
@@ -112,7 +112,7 @@ export async function GET(request: NextRequest) {
 // POST /api/rewards/points - Award points to user
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const sessionCookie = cookieStore.get('session')
     
     if (!sessionCookie) {
@@ -194,7 +194,7 @@ export async function POST(request: NextRequest) {
 // PUT /api/rewards/points - Deduct points (for redemptions)
 export async function PUT(request: NextRequest) {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const sessionCookie = cookieStore.get('session')
     
     if (!sessionCookie) {

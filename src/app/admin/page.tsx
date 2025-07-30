@@ -4,7 +4,7 @@ import AdminDashboard from '@/components/admin/AdminDashboard'
 
 // Mock function to check admin privileges
 async function checkAdminAccess() {
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const sessionCookie = cookieStore.get('session')
   
   if (!sessionCookie) {
