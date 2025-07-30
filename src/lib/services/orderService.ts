@@ -11,7 +11,11 @@ import {
   Timestamp
 } from 'firebase/firestore'
 import { Order, OrderStatus } from '@/types/order'
-import { submitOrderToOTW, getOTWOrderStatus } from './otw-integration'
+import {
+  submitOrderToOTW,
+  getOTWOrderStatus,
+  cancelOTWOrder,
+} from './otw-integration'
 
 // Collection name for orders
 const ORDERS_COLLECTION = 'orders'
@@ -347,6 +351,3 @@ export const getAllOrders = async (): Promise<Order[]> => {
   
   return []
 }
-
-// Import the cancelOTWOrder function
-import { cancelOTWOrder } from './otw-integration'
