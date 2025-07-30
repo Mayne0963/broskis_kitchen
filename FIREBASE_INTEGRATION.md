@@ -1,4 +1,4 @@
-# Firebase Integration for bosk's Kitchen Ordering System
+# Firebase Integration for Broski's Kitchen Ordering System
 
 This document outlines the Firebase integration implemented for the ordering system, including setup instructions and configuration details.
 
