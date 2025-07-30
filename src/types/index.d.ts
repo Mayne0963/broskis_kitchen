@@ -92,6 +92,7 @@ export interface RewardHistory {
 export interface RewardsContextType {
   points: number
   addPoints: (points: number) => void
+  redeemReward: (reward: Reward) => boolean
   redeemPoints: (points: number) => void
   history: RewardHistory[]
   loading: boolean
