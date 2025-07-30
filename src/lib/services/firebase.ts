@@ -204,7 +204,7 @@ export const storeVerificationStatus = async (userId: string, isVerified: boolea
         throw new Error('Firestore is not configured')
       }
       await setDoc(doc(db, "verifications", userId), {
-        verified: isVerified,
+        isVerified: isVerified,
         timestamp: Timestamp.now(),
         expiryDate: Timestamp.fromDate(expiryDate),
       })
