@@ -51,8 +51,12 @@ const RedeemModal: React.FC<RedeemModalProps> = ({ reward, userPoints, onClose }
 
       setCouponCode(newCoupon.code)
 
-      // Deduct points
-      redeemPoints(reward.pointsRequired)
+      // Deduct points if the context function is available
+      if (typeof redeemPoints === "function") {
+        redeemPoints(reward.pointsRequired)
+      } else {
+        console.warn("redeemPoints is not available")
+      }
 
       // Show success
       setSuccess(true)

@@ -92,12 +92,12 @@ function Page() {
             transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
           >
             {/* HOME OF THE AWARD-WINNING - Gold, Serif, ALL CAPS */}
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-[var(--color-harvest-gold)] uppercase tracking-wide leading-tight" style={{ fontFamily: 'var(--font-playfair), serif', color: '#FFD700' }}>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-[var(--color-harvest-gold)] uppercase tracking-wide leading-tight" style={{ color: '#FFD700' }}>
               HOME OF THE AWARD-WINNING
             </h1>
              
             {/* BOOSIE WINGS - Larger, Gold, Bold Serif, ALL CAPS */}
-            <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-[var(--color-harvest-gold)] uppercase tracking-tight leading-none" style={{ fontFamily: 'var(--font-playfair), serif', color: '#FFD700' }}>
+            <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-[var(--color-harvest-gold)] uppercase tracking-tight leading-none" style={{ color: '#FFD700' }}>
               BOOSIE WINGS
             </h2>
              
