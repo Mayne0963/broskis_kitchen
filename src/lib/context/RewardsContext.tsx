@@ -11,6 +11,7 @@ interface RewardsContextType {
   history: RewardHistory[]
   addPoints: (amount: number) => void
   redeemReward: (reward: Reward) => boolean
+  redeemPoints: (amount: number) => void
   spinWheel: () => number
 }
 
@@ -119,6 +120,21 @@ export const RewardsProvider: React.FC<RewardsProviderProps> = ({ children }) =>
     return false
   }
 
+  const redeemPoints = (amount: number) => {
+    if (points >= amount) {
+      setPoints((prevPoints) => prevPoints - amount)
+
+      const newHistoryItem: RewardHistory = {
+        id: `history-${Date.now()}`,
+        date: new Date().toISOString(),
+        action: "redeemed",
+        points: -amount,
+      }
+
+      setHistory((prevHistory) => [newHistoryItem, ...prevHistory])
+    }
+  }
+
   const spinWheel = (): number => {
     // Generate a random number of points between 10 and 100
     const randomPoints = Math.floor(Math.random() * 91) + 10
@@ -135,6 +151,7 @@ export const RewardsProvider: React.FC<RewardsProviderProps> = ({ children }) =>
         history,
         addPoints,
         redeemReward,
+        redeemPoints,
         spinWheel,
       }}
     >
