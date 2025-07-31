@@ -14,7 +14,6 @@ import ProductionErrorBoundary from "../components/common/ProductionErrorBoundar
 import ErrorMonitor from "../components/common/ErrorMonitor"
 import CookieConsent from "../components/gdpr/CookieConsent"
 import { Toaster } from "sonner"
-import { playfair, montserrat } from "./fonts.ts"
 
 export const metadata: Metadata = {
   title: "Broski's Kitchen - Luxury Street Gourmet",
@@ -28,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${playfair.variable} ${montserrat.variable} bg-black text-white min-h-screen flex flex-col`}>
+      <body className="bg-black text-white min-h-screen flex flex-col">
         <ProductionErrorBoundary>
           <ErrorBoundary>
             <ResourceErrorBoundary>

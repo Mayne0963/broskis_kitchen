@@ -3,6 +3,8 @@ import DropCard from '@/components/menu-drops/DropCard'
 import DropSchedule from '@/components/menu-drops/DropSchedule'
 import { getSessionCookie } from '@/lib/auth/session'
 
+export const dynamic = 'force-dynamic'
+
 // Mock data for now - will be replaced with actual API calls
 const mockActiveDrops = [
   {
