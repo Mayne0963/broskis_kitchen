@@ -7,6 +7,9 @@ import DeliveryStep from './DeliveryStep'
 import PaymentStep from './PaymentStep'
 import ReviewStep from './ReviewStep'
 import OrderConfirmation from './OrderConfirmation'
+import { useOrder } from '@/lib/context/OrderContext'
+import { useCoupon } from '@/lib/services/couponService'
+import type { Order } from '@/types/order'
 
 interface CartItem {
   id: string
@@ -67,6 +70,7 @@ interface CheckoutData {
   tip: number
   useRewards: boolean
   rewardsPoints: number
+  couponCode?: string
 }
 
 const steps = [
@@ -89,10 +93,13 @@ export default function CheckoutClient({
     specialInstructions: '',
     tip: 0,
     useRewards: false,
-    rewardsPoints: 0
+    rewardsPoints: 0,
+    couponCode: ''
   })
   const [isProcessing, setIsProcessing] = useState(false)
   const [orderId, setOrderId] = useState<string | null>(null)
+  const [order, setOrder] = useState<Order | null>(null)
+  const { createOrder, getOrder } = useOrder()
   
   const updateCheckoutData = (updates: Partial<CheckoutData>) => {
     setCheckoutData(prev => ({ ...prev, ...updates }))
@@ -135,22 +142,35 @@ export default function CheckoutClient({
   const handlePlaceOrder = async () => {
     setIsProcessing(true)
     try {
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/checkout/place-order', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     userId,
-      //     cartData,
-      //     checkoutData
-      //   })
-      // })
-      // const result = await response.json()
-      
-      // Mock delay and success
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      const mockOrderId = `BK-${Date.now()}`
-      setOrderId(mockOrderId)
+      const orderPayload = {
+        userId,
+        items: cartData.items,
+        subtotal: cartData.subtotal,
+        tax: cartData.tax,
+        deliveryFee: cartData.deliveryFee,
+        total: cartData.total,
+        status: 'pending' as const,
+        orderType: checkoutData.deliveryType,
+        deliveryAddress: checkoutData.selectedAddress || checkoutData.newAddress,
+        pickupLocation: checkoutData.deliveryType === 'pickup' ? 'Main' : undefined,
+        contactInfo: { email: 'test@example.com', phone: '0000000000' },
+        paymentInfo: {},
+        specialInstructions: checkoutData.specialInstructions,
+        estimatedTime: checkoutData.scheduledTime?.toISOString(),
+        scheduledTime: checkoutData.scheduledTime?.toISOString()
+      }
+
+      const newOrderId = await createOrder(orderPayload)
+      const created = await getOrder(newOrderId)
+      setOrderId(newOrderId)
+      if (created) setOrder(created)
+      if (checkoutData.couponCode) {
+        try {
+          await useCoupon(checkoutData.couponCode, newOrderId)
+        } catch (err) {
+          console.warn('Failed to apply coupon', err)
+        }
+      }
       setCurrentStep('confirmation')
     } catch (error) {
       console.error('Failed to place order:', error)
@@ -192,8 +212,7 @@ export default function CheckoutClient({
       case 'confirmation':
         return (
           <OrderConfirmation
-            orderId={orderId!}
-            cartData={cartData}
+            order={order!}
             checkoutData={checkoutData}
           />
         )

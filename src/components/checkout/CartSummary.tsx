@@ -27,6 +27,7 @@ interface CheckoutData {
   tip: number
   useRewards: boolean
   rewardsPoints: number
+  couponCode?: string
 }
 
 interface CartSummaryProps {
@@ -37,6 +38,7 @@ interface CartSummaryProps {
 export default function CartSummary({ cartData, checkoutData }: CartSummaryProps) {
   const rewardsDiscount = checkoutData.useRewards ? (checkoutData.rewardsPoints * 0.01) : 0
   const finalTotal = cartData.total + checkoutData.tip - rewardsDiscount
+  const couponApplied = Boolean(checkoutData.couponCode)
   
   const getEstimatedTime = () => {
     if (checkoutData.deliveryTime === 'scheduled' && checkoutData.scheduledTime) {
@@ -162,6 +164,13 @@ export default function CartSummary({ cartData, checkoutData }: CartSummaryProps
                 Rewards Discount
               </span>
               <span>-${rewardsDiscount.toFixed(2)}</span>
+            </div>
+          )}
+
+          {couponApplied && (
+            <div className="flex items-center justify-between text-[var(--color-harvest-gold)]">
+              <span>Coupon</span>
+              <span>{checkoutData.couponCode}</span>
             </div>
           )}
           

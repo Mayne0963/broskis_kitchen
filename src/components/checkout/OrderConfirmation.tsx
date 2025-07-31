@@ -2,24 +2,8 @@
 
 import { CheckCircle, Clock, MapPin, Truck, Star, Download, MessageCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import type { Order } from '@/types/order'
 
-interface CartItem {
-  id: string
-  name: string
-  description: string
-  price: number
-  quantity: number
-  image: string
-  customizations: string[]
-}
-
-interface CartData {
-  items: CartItem[]
-  subtotal: number
-  tax: number
-  deliveryFee: number
-  total: number
-}
 
 interface CheckoutData {
   deliveryType: 'delivery' | 'pickup'
@@ -33,19 +17,14 @@ interface CheckoutData {
 }
 
 interface OrderConfirmationProps {
-  orderId: string
-  cartData: CartData
+  order: Order
   checkoutData: CheckoutData
 }
 
-export default function OrderConfirmation({ 
-  orderId, 
-  cartData, 
-  checkoutData 
-}: OrderConfirmationProps) {
+export default function OrderConfirmation({ order, checkoutData }: OrderConfirmationProps) {
   const router = useRouter()
   const rewardsDiscount = checkoutData.useRewards ? (checkoutData.rewardsPoints * 0.01) : 0
-  const finalTotal = cartData.total + checkoutData.tip - rewardsDiscount
+  const finalTotal = order.total + checkoutData.tip - rewardsDiscount
   
   const getEstimatedDeliveryTime = () => {
     if (checkoutData.deliveryTime === 'scheduled' && checkoutData.scheduledTime) {
@@ -85,7 +64,7 @@ export default function OrderConfirmation({
           
           <div className="mt-6 p-4 bg-[var(--color-dark-charcoal)] rounded-lg border border-[var(--color-harvest-gold)]/20 inline-block">
             <div className="text-sm text-gray-400 mb-1">Order Number</div>
-            <div className="text-2xl font-bold text-[var(--color-harvest-gold)]">{orderId}</div>
+            <div className="text-2xl font-bold text-[var(--color-harvest-gold)]">{order.id}</div>
           </div>
         </div>
         
@@ -135,7 +114,7 @@ export default function OrderConfirmation({
             <h3 className="text-xl font-bold text-white mb-4">Items Ordered</h3>
             
             <div className="space-y-4">
-              {cartData.items.map((item) => (
+              {order.items.map((item) => (
                 <div key={item.id} className="flex items-start space-x-4 pb-4 border-b border-gray-700 last:border-b-0 last:pb-0">
                   <img
                     src={item.image}
@@ -182,19 +161,19 @@ export default function OrderConfirmation({
             <div className="space-y-3">
               <div className="flex items-center justify-between text-gray-300">
                 <span>Subtotal</span>
-                <span>${cartData.subtotal.toFixed(2)}</span>
+                <span>${order.subtotal.toFixed(2)}</span>
               </div>
               
               {checkoutData.deliveryType === 'delivery' && (
                 <div className="flex items-center justify-between text-gray-300">
                   <span>Delivery Fee</span>
-                  <span>${cartData.deliveryFee.toFixed(2)}</span>
+                  <span>${order.deliveryFee.toFixed(2)}</span>
                 </div>
               )}
               
               <div className="flex items-center justify-between text-gray-300">
                 <span>Tax</span>
-                <span>${cartData.tax.toFixed(2)}</span>
+                <span>${order.tax.toFixed(2)}</span>
               </div>
               
               {checkoutData.tip > 0 && (
@@ -262,7 +241,7 @@ export default function OrderConfirmation({
               <p>• Call us: <a href="tel:+1234567890" className="underline">(123) 456-7890</a></p>
               <p>• Email: <a href="mailto:support@broskiskitchen.com" className="underline">support@broskiskitchen.com</a></p>
               <p>• Live chat available 24/7</p>
-              <p>• Order ID: <span className="font-mono">{orderId}</span></p>
+              <p>• Order ID: <span className="font-mono">{order.id}</span></p>
             </div>
           </div>
         </div>
