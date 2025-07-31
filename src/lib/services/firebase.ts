@@ -4,6 +4,12 @@ import { getFirestore, doc, setDoc, getDoc, Timestamp, Firestore, connectFiresto
 import { getStorage, FirebaseStorage } from "firebase/storage"
 import { toast } from "sonner"
 
+const showErrorToast = (message: string) => {
+  if (typeof window !== "undefined") {
+    toast.error(message)
+  }
+}
+
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -27,8 +33,7 @@ const requiredConfigKeys = [
 for (const key of requiredConfigKeys) {
   if (!firebaseConfig[key as keyof typeof firebaseConfig]) {
     const errorMessage = `Missing Firebase environment variable: NEXT_PUBLIC_FIREBASE_${key.toUpperCase()}`
-    toast.error(errorMessage)
-    throw new Error(errorMessage)
+    console.warn(errorMessage)
   }
 }
 
@@ -38,8 +43,15 @@ let db: Firestore
 let storage: FirebaseStorage
 let isFirebaseConfigured = false
 
-try {
-  app = !getApps().length ? initializeApp(firebaseConfig as Record<string, string>) : getApp()
+const hasRequiredConfig = requiredConfigKeys.every(
+  (key) => !!firebaseConfig[key as keyof typeof firebaseConfig]
+)
+
+if (hasRequiredConfig) {
+  try {
+    app = !getApps().length
+      ? initializeApp(firebaseConfig as Record<string, string>)
+      : getApp()
   auth = getAuth(app)
   
   // Initialize Firestore with settings to prevent WebChannel errors
@@ -65,12 +77,14 @@ try {
     });
   }
   
-  storage = getStorage(app)
-  isFirebaseConfigured = true
-} catch (error: any) {
-  console.error("Firebase initialization failed:", error)
-  toast.error(`Failed to initialize Firebase: ${error.message || "Unknown error"}`)
-  throw new Error("Failed to initialize Firebase. Check your environment variables and network connection.")
+    storage = getStorage(app)
+    isFirebaseConfigured = true
+  } catch (error: any) {
+    console.error("Firebase initialization failed:", error)
+    showErrorToast(`Failed to initialize Firebase: ${error.message || "Unknown error"}`)
+  }
+} else {
+  console.warn("Firebase environment variables are missing. Skipping initialization.")
 }
 
 // Generate a local user ID instead of using anonymous authentication
@@ -124,7 +138,7 @@ export const onAuthStateChange = (callback: (user: User | null) => void) => {
       }
     } catch (error: any) {
       console.error('Error in onAuthStateChanged callback:', error)
-      toast.error(`Authentication state error: ${error.message || "Unknown error"}`)
+      showErrorToast(`Authentication state error: ${error.message || "Unknown error"}`)
       callback(null) // Ensure callback is called even on error
     }
   })
@@ -143,7 +157,7 @@ export const onAuthStateChangedWrapper = (callback: (user: User | null) => void)
 
 export const createUserDocument = async (user: { uid: string; email?: string; displayName?: string; }) => {
   if (!db) {
-    toast.error("Firestore is not initialized.")
+    showErrorToast("Firestore is not initialized.")
     return null
   }
   
@@ -159,20 +173,22 @@ export const createUserDocument = async (user: { uid: string; email?: string; di
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
       })
-      toast.success("User profile created successfully!")
+      if (typeof window !== "undefined") {
+        toast.success("User profile created successfully!")
+      }
     }
     
     return userRef
   } catch (error: any) {
     console.error('Error creating user document:', error)
-    toast.error(`Failed to create user profile: ${error.message || "Unknown error"}`)
+    showErrorToast(`Failed to create user profile: ${error.message || "Unknown error"}`)
     return null
   }
 }
 
 export const getUserDocument = async (uid: string) => {
   if (!db) {
-    toast.error("Firestore is not initialized.")
+    showErrorToast("Firestore is not initialized.")
     return null
   }
   
@@ -187,7 +203,7 @@ export const getUserDocument = async (uid: string) => {
     return null
   } catch (error: any) {
     console.error('Error getting user document:', error)
-    toast.error(`Failed to get user document: ${error.message || "Unknown error"}`)
+    showErrorToast(`Failed to get user document: ${error.message || "Unknown error"}`)
     return false
   }
 }
@@ -222,7 +238,7 @@ export const storeVerificationStatus = async (userId: string, isVerified: boolea
     return true
   } catch (error: any) {
     console.error("Error storing verification status:", error)
-    toast.error(`Failed to store verification status: ${error.message || "Unknown error"}`)
+    showErrorToast(`Failed to store verification status: ${error.message || "Unknown error"}`)
 
     // Fallback to localStorage
     if (typeof window !== "undefined") {
@@ -244,7 +260,7 @@ export const getVerificationStatus = async (userId: string): Promise<boolean> =>
   }
 
   if (!db || !auth) {
-    toast.error("Firestore is not initialized.");
+    showErrorToast("Firestore is not initialized.");
     return false;
   }
 
@@ -285,7 +301,7 @@ export const getVerificationStatus = async (userId: string): Promise<boolean> =>
       }
     }
     
-    toast.error(`Failed to get verification status: ${error.message || "Unknown error"}`);
+    showErrorToast(`Failed to get verification status: ${error.message || "Unknown error"}`);
     return false;
   }
 }
