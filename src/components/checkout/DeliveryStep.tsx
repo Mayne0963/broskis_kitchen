@@ -342,4 +342,5 @@ export default function DeliveryStep({ addresses, checkoutData, onUpdate }: Deli
       </div>
     </div>
   )
+
 }

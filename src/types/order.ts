@@ -68,6 +68,8 @@ export interface Order {
   // Add payment status
   paymentStatus?: 'pending' | 'processing' | 'succeeded' | 'failed' | 'canceled'
   stripePaymentIntentId?: string
+  couponCode?: string
+  couponDiscount?: number
 }
 
 export type OrderStatus = 
@@ -118,4 +120,7 @@ export interface OrderFormData {
 
   // Additional
   specialInstructions?: string
+  couponCode?: string
+  couponDiscount?: number
+
 }

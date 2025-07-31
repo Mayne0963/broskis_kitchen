@@ -174,7 +174,7 @@ export async function POST(request: NextRequest) {
     )
     const tax = subtotal * 0.0825 // 8.25% tax rate
     const deliveryFee = calculateDeliveryFee(subtotal, orderData.orderType)
-    const total = subtotal + tax + deliveryFee
+    const total = subtotal + tax + deliveryFee - (orderData.couponDiscount || 0)
 
     // Create new order
     const newOrder: Order = {
@@ -185,6 +185,8 @@ export async function POST(request: NextRequest) {
       tax,
       deliveryFee,
       total,
+      couponCode: orderData.couponCode,
+      couponDiscount: orderData.couponDiscount,
       status: 'pending',
       orderType: orderData.orderType,
       deliveryAddress: orderData.deliveryAddress,

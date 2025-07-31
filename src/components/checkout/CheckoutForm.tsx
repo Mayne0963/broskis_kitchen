@@ -31,10 +31,13 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
     phone: '',
     orderType: 'delivery',
     deliveryTime: 'asap',
-    paymentMethod: 'card'
+    paymentMethod: 'card',
+    couponCode: '',
+    couponDiscount: 0
   })
   
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [couponInput, setCouponInput] = useState('')
 
   // Reset payment method to card if non-premium user has cash selected
   useEffect(() => {
@@ -110,6 +113,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
           stripePaymentIntentId: paymentIntentId
         },
         specialInstructions: formData.specialInstructions,
+        couponCode: formData.couponCode,
+        couponDiscount: formData.couponDiscount,
         estimatedTime: formData.deliveryTime === 'scheduled' ? formData.scheduledTime : undefined
       }
 
@@ -428,6 +433,27 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
             }}
           />
           )}
+
+          {/* Coupon Code */}
+          <div className="bg-[#1A1A1A] p-6 rounded-lg border border-[#333333]">
+            <h3 className="text-lg font-semibold mb-4">Coupon Code</h3>
+            <div className="flex">
+              <input
+                type="text"
+                value={couponInput}
+                onChange={(e) => setCouponInput(e.target.value)}
+                className="flex-1 p-3 bg-[#111111] border border-[#333333] rounded-l-lg focus:border-gold-foil focus:outline-none"
+                placeholder="Enter coupon"
+              />
+              <button
+                type="button"
+                onClick={() => updateFormData('couponCode', couponInput.trim())}
+                className="px-4 bg-gold-foil text-black rounded-r-lg"
+              >
+                Apply
+              </button>
+            </div>
+          </div>
 
           {/* Special Instructions */}
           <div className="bg-[#1A1A1A] p-6 rounded-lg border border-[#333333]">
