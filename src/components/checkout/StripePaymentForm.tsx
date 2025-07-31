@@ -7,13 +7,10 @@ import {
   PaymentElement,
   Elements,
 } from '@stripe/react-stripe-js'
-import { loadStripe } from '@stripe/stripe-js'
+import stripePromise from '@/lib/stripe'
 import { FaLock, FaSpinner } from 'react-icons/fa'
 import { toast } from '@/hooks/use-toast'
 
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-)
 
 interface StripePaymentFormProps {
   amount: number
