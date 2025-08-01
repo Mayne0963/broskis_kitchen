@@ -11,6 +11,59 @@ export const categories = [
   { id: "infused", name: "Infused" },
 ]
 
+// Infused menu offerings currently feature a few specialty items
+export const infusedMenuItems = [
+  {
+    id: 'infused-wings',
+    name: 'Infused Wings',
+    description:
+      'Crispy chicken wings tossed in our signature sauce with a special infusion.',
+    price: 16.99,
+    image:
+      'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=infused%20wings%20crispy%20chicken%20wings%20special%20infusion&image_size=square_hd',
+    category: 'wings',
+    infused: true,
+    dietary: { dairyFree: true, glutenFree: true, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'infused-brownie',
+    name: 'Infused Chocolate Brownie',
+    description:
+      'Rich chocolate brownie with a special infusion, topped with gold flakes.',
+    price: 12.99,
+    image:
+      'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Infused%20chocolate%20brownie%20rich%20chocolate%20special%20infusion%20gold%20flakes&image_size=square_hd',
+    category: 'desserts',
+    infused: true,
+    new: true,
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: true, vegan: false },
+  },
+  {
+    id: 'infused-margarita',
+    name: 'Infused Luxury Margarita',
+    description:
+      'Premium tequila, fresh lime juice, agave nectar, and a special infusion with gold rim.',
+    price: 15.99,
+    image:
+      'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Infused%20luxury%20margarita%20premium%20tequila%20fresh%20lime%20juice%20agave%20nectar%20special%20infusion%20gold%20rim&image_size=square_hd',
+    category: 'drinks',
+    infused: true,
+    dietary: { dairyFree: true, glutenFree: true, vegetarian: true, vegan: true },
+  },
+  {
+    id: 'infused-chocolate',
+    name: 'Infused Luxury Chocolate Bar',
+    description:
+      'Premium dark chocolate with a special infusion, sea salt, and gold flakes.',
+    price: 18.99,
+    image:
+      'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Infused%20luxury%20chocolate%20bar%20premium%20dark%20chocolate%20special%20infusion%20sea%20salt%20gold%20flakes&image_size=square_hd',
+    category: 'desserts',
+    infused: true,
+    dietary: { dairyFree: false, glutenFree: true, vegetarian: true, vegan: false },
+  },
+]
+
 export const menuItems = [
   {
     id: 'belgiumwaffles',

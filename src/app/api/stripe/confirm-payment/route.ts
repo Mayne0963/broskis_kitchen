@@ -5,7 +5,12 @@ import Stripe from 'stripe'
 
 export async function POST(request: NextRequest) {
   try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error('Stripe secret key is missing')
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+    }
+
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
       apiVersion: '2025-02-24.acacia',
     })
     const { paymentIntentId } = await request.json()

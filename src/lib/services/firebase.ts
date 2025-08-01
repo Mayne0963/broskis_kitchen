@@ -2,6 +2,7 @@ import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app"
 import { getAuth, onAuthStateChanged, Auth, User, GoogleAuthProvider, getIdToken } from "firebase/auth"
 import { getFirestore, doc, setDoc, getDoc, Timestamp, Firestore, connectFirestoreEmulator } from "firebase/firestore"
 import { getStorage, FirebaseStorage } from "firebase/storage"
+// Avoid importing client-side toast library on the server
 import { toast } from "sonner"
 
 const firebaseConfig = {
@@ -27,8 +28,7 @@ const requiredConfigKeys = [
 for (const key of requiredConfigKeys) {
   if (!firebaseConfig[key as keyof typeof firebaseConfig]) {
     const errorMessage = `Missing Firebase environment variable: NEXT_PUBLIC_FIREBASE_${key.toUpperCase()}`
-    toast.error(errorMessage)
-    throw new Error(errorMessage)
+    console.warn(errorMessage)
   }
 }
 
@@ -69,8 +69,9 @@ try {
   isFirebaseConfigured = true
 } catch (error: any) {
   console.error("Firebase initialization failed:", error)
-  toast.error(`Failed to initialize Firebase: ${error.message || "Unknown error"}`)
-  throw new Error("Failed to initialize Firebase. Check your environment variables and network connection.")
+  console.error(`Failed to initialize Firebase: ${error.message || "Unknown error"}`)
+  // In non-configured environments we simply disable Firebase features
+  isFirebaseConfigured = false
 }
 
 // Generate a local user ID instead of using anonymous authentication
@@ -124,7 +125,7 @@ export const onAuthStateChange = (callback: (user: User | null) => void) => {
       }
     } catch (error: any) {
       console.error('Error in onAuthStateChanged callback:', error)
-      toast.error(`Authentication state error: ${error.message || "Unknown error"}`)
+      console.error(`Authentication state error: ${error.message || "Unknown error"}`)
       callback(null) // Ensure callback is called even on error
     }
   })
@@ -143,7 +144,7 @@ export const onAuthStateChangedWrapper = (callback: (user: User | null) => void)
 
 export const createUserDocument = async (user: { uid: string; email?: string; displayName?: string; }) => {
   if (!db) {
-    toast.error("Firestore is not initialized.")
+    console.error("Firestore is not initialized.")
     return null
   }
   
@@ -165,14 +166,14 @@ export const createUserDocument = async (user: { uid: string; email?: string; di
     return userRef
   } catch (error: any) {
     console.error('Error creating user document:', error)
-    toast.error(`Failed to create user profile: ${error.message || "Unknown error"}`)
+    console.error(`Failed to create user profile: ${error.message || "Unknown error"}`)
     return null
   }
 }
 
 export const getUserDocument = async (uid: string) => {
   if (!db) {
-    toast.error("Firestore is not initialized.")
+    console.error("Firestore is not initialized.")
     return null
   }
   
@@ -187,7 +188,7 @@ export const getUserDocument = async (uid: string) => {
     return null
   } catch (error: any) {
     console.error('Error getting user document:', error)
-    toast.error(`Failed to get user document: ${error.message || "Unknown error"}`)
+    console.error(`Failed to get user document: ${error.message || "Unknown error"}`)
     return false
   }
 }
@@ -222,7 +223,7 @@ export const storeVerificationStatus = async (userId: string, isVerified: boolea
     return true
   } catch (error: any) {
     console.error("Error storing verification status:", error)
-    toast.error(`Failed to store verification status: ${error.message || "Unknown error"}`)
+    console.error(`Failed to store verification status: ${error.message || "Unknown error"}`)
 
     // Fallback to localStorage
     if (typeof window !== "undefined") {
@@ -244,7 +245,7 @@ export const getVerificationStatus = async (userId: string): Promise<boolean> =>
   }
 
   if (!db || !auth) {
-    toast.error("Firestore is not initialized.");
+    console.error("Firestore is not initialized.");
     return false;
   }
 
@@ -285,7 +286,7 @@ export const getVerificationStatus = async (userId: string): Promise<boolean> =>
       }
     }
     
-    toast.error(`Failed to get verification status: ${error.message || "Unknown error"}`);
+    console.error(`Failed to get verification status: ${error.message || "Unknown error"}`);
     return false;
   }
 }
