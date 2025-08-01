@@ -307,6 +307,32 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
+                  <Image src="/images/menu-itens/BoosieGoldWings.png" alt="Boosie Gold Wings" fill className="object-cover rounded-lg" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Boosie Gold Wings</h3>
+                <p className="text-[#FFD700] mb-4">Crispy fried wings coated in our signature honey-gold sauce with a sprinkle of sesame seeds.</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-[#FFD700] font-bold text-xl">$12</span>
+                  <Link href="/menu" className="bg-[#FFD700] hover:bg-[#E6C200] text-black font-bold py-2 px-4 rounded transition-colors duration-300">
+                    View Details
+                  </Link>
+                </div>
+              </div>
+              <div className="specialty-card scroll-item">
+                <div className="relative h-48 mb-4">
+                  <Image src="/images/menu-itens/BoosieRedWings.png" alt="Boosie Red Wings" fill className="object-cover rounded-lg" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Boosie Red Wings</h3>
+                <p className="text-[#FFD700] mb-4">Crispy wings drenched in our fiery house-made red hot sauce.</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-[#FFD700] font-bold text-xl">$12</span>
+                  <Link href="/menu" className="bg-[#FFD700] hover:bg-[#E6C200] text-black font-bold py-2 px-4 rounded transition-colors duration-300">
+                    View Details
+                  </Link>
+                </div>
+              </div>
+              <div className="specialty-card scroll-item">
+                <div className="relative h-48 mb-4">
                   <Image src="/images/1000009265.png" alt="Lotus Cheesecake" fill className="object-cover rounded-lg" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Lotus Cheesecake</h3>
@@ -351,6 +377,32 @@ function Page() {
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Boosie Sweet Heat Sauce</h3>
                 <p className="text-gray-300 mb-4">Smooth, saucy, and slightly savage. Our signature sweet heat sauce that brings the perfect balance of flavor and fire.</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-[var(--color-harvest-gold)] font-bold text-xl">$12</span>
+                  <Link href="/menu" className="bg-[var(--color-harvest-gold)] hover:bg-[var(--color-gold-rich)] text-black font-bold py-2 px-4 rounded transition-colors duration-300">
+                    View Details
+                  </Link>
+                </div>
+              </div>
+              <div className="specialty-card scroll-item">
+                <div className="relative h-48 mb-4">
+                  <Image src="/images/menu-itens/BoosieGoldWings.png" alt="Boosie Gold Wings" fill className="object-cover rounded-lg" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Boosie Gold Wings</h3>
+                <p className="text-gray-300 mb-4">Crispy fried wings coated in our signature honey-gold sauce with a sprinkle of sesame seeds.</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-[var(--color-harvest-gold)] font-bold text-xl">$12</span>
+                  <Link href="/menu" className="bg-[var(--color-harvest-gold)] hover:bg-[var(--color-gold-rich)] text-black font-bold py-2 px-4 rounded transition-colors duration-300">
+                    View Details
+                  </Link>
+                </div>
+              </div>
+              <div className="specialty-card scroll-item">
+                <div className="relative h-48 mb-4">
+                  <Image src="/images/menu-itens/BoosieRedWings.png" alt="Boosie Red Wings" fill className="object-cover rounded-lg" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Boosie Red Wings</h3>
+                <p className="text-gray-300 mb-4">Crispy wings drenched in our fiery house-made red hot sauce.</p>
                 <div className="flex justify-between items-center">
                   <span className="text-[var(--color-harvest-gold)] font-bold text-xl">$12</span>
                   <Link href="/menu" className="bg-[var(--color-harvest-gold)] hover:bg-[var(--color-gold-rich)] text-black font-bold py-2 px-4 rounded transition-colors duration-300">
