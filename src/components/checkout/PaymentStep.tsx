@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { CreditCard, Star, Plus, DollarSign, Gift } from 'lucide-react'
+import { validateCoupon } from '@/lib/services/couponService'
 
 interface PaymentMethod {
   id: string
@@ -26,6 +27,7 @@ interface CheckoutData {
   tip: number
   useRewards: boolean
   rewardsPoints: number
+  couponCode?: string
 }
 
 interface PaymentStepProps {
@@ -53,6 +55,9 @@ export default function PaymentStep({
     name: '',
     zipCode: ''
   })
+  const [couponInput, setCouponInput] = useState('')
+  const [couponMessage, setCouponMessage] = useState<string | null>(null)
+  const [validatingCoupon, setValidatingCoupon] = useState(false)
   
   // Mock user rewards data - replace with actual API call
   const userRewards = {
@@ -91,6 +96,19 @@ export default function PaymentStep({
   const handleRewardsPointsChange = (points: number) => {
     const validPoints = Math.min(points, userRewards.maxRedeemable, userRewards.availablePoints)
     onUpdate({ rewardsPoints: validPoints })
+  }
+
+  const applyCoupon = async () => {
+    if (!couponInput.trim()) return
+    setValidatingCoupon(true)
+    const result = await validateCoupon(couponInput.trim())
+    if (result.valid) {
+      onUpdate({ couponCode: couponInput.trim() })
+      setCouponMessage('Coupon applied!')
+    } else {
+      setCouponMessage(result.error || 'Invalid coupon')
+    }
+    setValidatingCoupon(false)
   }
   
   const getCardIcon = (brand: string) => {
@@ -379,6 +397,31 @@ export default function PaymentStep({
             />
           </div>
         </div>
+      </div>
+
+      {/* Coupon Code */}
+      <div>
+        <h3 className="text-lg font-semibold text-white mb-4">Coupon Code</h3>
+        <div className="flex items-center space-x-2">
+          <input
+            type="text"
+            value={couponInput}
+            onChange={(e) => setCouponInput(e.target.value)}
+            placeholder="Enter code"
+            className="flex-1 px-3 py-2 bg-[var(--color-dark-charcoal)] border border-[#FFD700] rounded-lg text-white placeholder-[#FFD700] focus:border-[var(--color-harvest-gold)] focus:outline-none"
+          />
+          <button
+            type="button"
+            onClick={applyCoupon}
+            disabled={validatingCoupon}
+            className="btn-primary"
+          >
+            {validatingCoupon ? 'Applying...' : 'Apply'}
+          </button>
+        </div>
+        {couponMessage && (
+          <p className="text-sm mt-2 text-[var(--color-harvest-gold)]">{couponMessage}</p>
+        )}
       </div>
     </div>
   )

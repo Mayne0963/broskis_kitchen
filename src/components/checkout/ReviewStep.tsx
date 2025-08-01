@@ -32,6 +32,7 @@ interface CheckoutData {
   tip: number
   useRewards: boolean
   rewardsPoints: number
+  couponCode?: string
 }
 
 interface ReviewStepProps {
@@ -51,6 +52,7 @@ export default function ReviewStep({
 }: ReviewStepProps) {
   const rewardsDiscount = checkoutData.useRewards ? (checkoutData.rewardsPoints * 0.01) : 0
   const finalTotal = cartData.total + checkoutData.tip - rewardsDiscount
+  const couponApplied = Boolean(checkoutData.couponCode)
   
   const getDeliveryAddress = () => {
     if (checkoutData.selectedAddress) {
@@ -272,6 +274,13 @@ export default function ReviewStep({
                 Rewards Discount
               </span>
               <span>-${rewardsDiscount.toFixed(2)}</span>
+            </div>
+          )}
+
+          {couponApplied && (
+            <div className="flex items-center justify-between text-[var(--color-harvest-gold)]">
+              <span>Coupon</span>
+              <span>{checkoutData.couponCode}</span>
             </div>
           )}
           

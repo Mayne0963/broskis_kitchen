@@ -84,11 +84,11 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
     ctx.lineWidth = 2
     ctx.stroke()
 
-    // Draw pointer
+    // Draw pointer on the right side of the wheel
     ctx.beginPath()
-    ctx.moveTo(centerX, centerY - radius - 10)
-    ctx.lineTo(centerX - 10, centerY - radius + 10)
-    ctx.lineTo(centerX + 10, centerY - radius + 10)
+    ctx.moveTo(centerX + radius + 10, centerY)
+    ctx.lineTo(centerX + radius - 10, centerY - 10)
+    ctx.lineTo(centerX + radius - 10, centerY + 10)
     ctx.closePath()
     ctx.fillStyle = "#D4AF37"
     ctx.fill()
@@ -99,9 +99,9 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
     const segmentAngle = 360 / segments.length
     // Normalize the angle to 0-360 range
     const normalizedAngle = ((finalAngle % 360) + 360) % 360
-    // The pointer is at the top (0 degrees), so we need to account for that
-    // Since the wheel rotates clockwise, we calculate from the top
-    const pointerAngle = (360 - normalizedAngle) % 360
+    // Pointer is drawn on the right side (0 degrees from the x-axis)
+    const pointerOrientation = 0
+    const pointerAngle = (pointerOrientation - normalizedAngle + 360) % 360
     const segmentIndex = Math.floor(pointerAngle / segmentAngle) % segments.length
     return segmentIndex
   }
