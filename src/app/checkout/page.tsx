@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import CheckoutClient from '@/components/checkout/CheckoutClient'
+import CheckoutForm from '@/components/checkout/CheckoutForm'
 
 // Mock function to get cart data - replace with actual implementation
 async function getCartData(userId: string) {
@@ -104,12 +104,7 @@ export default async function CheckoutPage() {
     return (
       <div className="min-h-screen bg-[var(--color-rich-black)] py-8">
         <div className="container mx-auto px-4">
-          <CheckoutClient 
-            cartData={cartData}
-            addresses={addresses}
-            paymentMethods={paymentMethods}
-            userId={userId}
-          />
+          <CheckoutForm onOrderComplete={(id) => console.log('Order', id)} />
         </div>
       </div>
     )
@@ -130,4 +125,5 @@ export default async function CheckoutPage() {
       </div>
     )
   }
+
 }

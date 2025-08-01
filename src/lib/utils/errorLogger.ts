@@ -46,11 +46,12 @@ export function logError(error: Error, additionalInfo?: Record<string, any>) {
   if (process.env.NODE_ENV === 'production') {
     // Example: Send to Sentry, LogRocket, or custom endpoint
     // sendToErrorService(errorDetails);
-    console.error('Production Error:', {
-      message: errorDetails.message,
-      digest: errorDetails.digest,
-      timestamp: errorDetails.timestamp
-    });
+
+    // Log a concise production error to avoid generic [object Object] output
+    const { message, digest, timestamp } = errorDetails
+    console.error(
+      `Production Error: ${message} (digest: ${digest}, timestamp: ${timestamp})`
+    )
   }
 
   return errorDetails;

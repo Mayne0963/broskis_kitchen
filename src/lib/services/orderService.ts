@@ -48,7 +48,7 @@ export const saveOrder = async (orderData: Omit<Order, 'id' | 'createdAt' | 'upd
     ...orderData,
     id: orderId,
     deliveryFee,
-    total: orderData.subtotal + orderData.tax + deliveryFee,
+    total: orderData.subtotal + orderData.tax + deliveryFee - (orderData.couponDiscount || 0),
     status: 'pending',
     createdAt: new Date(),
     updatedAt: new Date()
@@ -349,4 +349,4 @@ export const getAllOrders = async (): Promise<Order[]> => {
 }
 
 // Import the cancelOTWOrder function
-import { cancelOTWOrder } from './otw-integration'
+
