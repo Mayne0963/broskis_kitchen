@@ -17,7 +17,7 @@ interface RedeemModalProps {
 
 const RedeemModal: React.FC<RedeemModalProps> = ({ reward, userPoints, onClose }) => {
   const { user } = useAuth()
-  const { redeemPoints } = useRewards()
+  const { redeemReward } = useRewards()
   const [isRedeeming, setIsRedeeming] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
@@ -52,7 +52,7 @@ const RedeemModal: React.FC<RedeemModalProps> = ({ reward, userPoints, onClose }
       setCouponCode(newCoupon.code)
 
       // Deduct points
-      redeemPoints(reward.pointsRequired)
+      redeemReward(reward)
 
       // Show success
       setSuccess(true)

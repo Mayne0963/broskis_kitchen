@@ -112,11 +112,12 @@ export interface RewardHistory {
 
 export interface RewardsContextType {
   points: number
-  addPoints: (points: number) => void
-  redeemPoints: (points: number) => void
+  tier: string
+  rewards: Reward[]
   history: RewardHistory[]
-  loading: boolean
-  error: string | null
+  addPoints: (amount: number) => void
+  redeemReward: (reward: Reward) => boolean
+  spinWheel: () => number
 }
 
 // Chat types
