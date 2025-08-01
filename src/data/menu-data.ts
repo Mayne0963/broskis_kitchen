@@ -15,7 +15,7 @@ export const menuItems = [
   {
     id: 'belgiumwaffles',
     name: 'Belgium Waffles',
-    description: "Belgium Waffles from Broski's Kitchen.",
+    description: 'Crispy golden waffles topped with powdered sugar and maple syrup.',
     price: 12.99,
     image: '/images/menu-itens/BelgiumWaffles.png',
     category: 'desserts',
@@ -24,7 +24,7 @@ export const menuItems = [
   {
     id: 'birriatacos',
     name: 'Birria Tacos',
-    description: "Birria Tacos from Broski's Kitchen.",
+    description: 'Slow-braised beef tacos served with rich consommé for dipping.',
     price: 12.99,
     image: '/images/menu-itens/BirriaTacos.png',
     category: 'tacos',
@@ -33,7 +33,7 @@ export const menuItems = [
   {
     id: 'boosiegoldwings',
     name: 'Boosie Gold Wings',
-    description: "Boosie Gold Wings from Broski's Kitchen.",
+    description: 'Crispy wings tossed in our sweet honey-gold sauce.',
     price: 12.99,
     image: '/images/menu-itens/BoosieGoldWings.png',
     category: 'wings',
@@ -42,7 +42,7 @@ export const menuItems = [
   {
     id: 'boosiepunch',
     name: 'Boosie Punch',
-    description: "Boosie Punch from Broski's Kitchen.",
+    description: 'Tropical fruit punch with a hint of citrus and a signature kick.',
     price: 12.99,
     image: '/images/menu-itens/BoosiePunch.png',
     category: 'drinks',
@@ -51,7 +51,7 @@ export const menuItems = [
   {
     id: 'boosieredwings',
     name: 'Boosie Red Wings',
-    description: "Boosie Red Wings from Broski's Kitchen.",
+    description: 'Fiery wings glazed in our spicy house hot sauce.',
     price: 12.99,
     image: '/images/menu-itens/BoosieRedWings.png',
     category: 'wings',
@@ -60,7 +60,7 @@ export const menuItems = [
   {
     id: 'broskisdog',
     name: 'Broskis Dog',
-    description: "Broskis Dog from Broski's Kitchen.",
+    description: 'Grilled beef hot dog topped with onions, relish and mustard.',
     price: 12.99,
     image: '/images/menu-itens/BroskisDog.png',
     category: 'sandwiches',
@@ -69,7 +69,7 @@ export const menuItems = [
   {
     id: 'broskissliders',
     name: 'Broskis Sliders',
-    description: "Broskis Sliders from Broski's Kitchen.",
+    description: 'Mini beef sliders stacked with melted cheese on toasted buns.',
     price: 12.99,
     image: '/images/menu-itens/BroskisSliders.png',
     category: 'burgers',
@@ -78,7 +78,7 @@ export const menuItems = [
   {
     id: 'broskistea',
     name: 'Broskis Tea',
-    description: "Broskis Tea from Broski's Kitchen.",
+    description: 'Sweet southern-style tea brewed fresh every day.',
     price: 12.99,
     image: '/images/menu-itens/BroskisTea.png',
     category: 'drinks',
@@ -87,7 +87,7 @@ export const menuItems = [
   {
     id: 'broskistoasterstrudel',
     name: 'Broskis Toaster Strudel',
-    description: "Broskis Toaster Strudel from Broski's Kitchen.",
+    description: 'Flaky pastry filled with sweet berry jam and drizzled with icing.',
     price: 12.99,
     image: '/images/menu-itens/BroskisToasterStrudel.png',
     category: 'desserts',
@@ -96,7 +96,7 @@ export const menuItems = [
   {
     id: 'cabbage',
     name: 'Cabbage',
-    description: "Cabbage from Broski's Kitchen.",
+    description: 'Seasoned cabbage sautéed until tender and flavorful.',
     price: 12.99,
     image: '/images/menu-itens/Cabbage.png',
     category: 'sides',
@@ -105,7 +105,7 @@ export const menuItems = [
   {
     id: 'cheeseburger',
     name: 'Cheese Burger',
-    description: "Cheese Burger from Broski's Kitchen.",
+    description: 'Juicy beef patty topped with melted American cheese on a brioche bun.',
     price: 12.99,
     image: '/images/menu-itens/CheeseBurger.png',
     category: 'burgers',
@@ -114,7 +114,7 @@ export const menuItems = [
   {
     id: 'cheesecakebites',
     name: 'Cheesecake Bites',
-    description: "Cheesecake Bites from Broski's Kitchen.",
+    description: 'Creamy cheesecake squares coated in graham cracker crumbs.',
     price: 12.99,
     image: '/images/menu-itens/CheesecakeBites.png',
     category: 'desserts',
@@ -123,7 +123,7 @@ export const menuItems = [
   {
     id: 'cheesecakecones',
     name: 'Cheesecake Cones',
-    description: "Cheesecake Cones from Broski's Kitchen.",
+    description: 'Crisp waffle cones filled with creamy cheesecake and fruit.',
     price: 12.99,
     image: '/images/menu-itens/CheesecakeCones.png',
     category: 'desserts',
@@ -132,7 +132,7 @@ export const menuItems = [
   {
     id: 'chickensandwich',
     name: 'Chicken Sandwich',
-    description: "Chicken Sandwich from Broski's Kitchen.",
+    description: 'Crispy chicken breast with pickles and our signature sauce.',
     price: 12.99,
     image: '/images/menu-itens/ChickenSandwich.png',
     category: 'sandwiches',
@@ -141,7 +141,7 @@ export const menuItems = [
   {
     id: 'chickentenders',
     name: 'Chicken Tenders',
-    description: "Chicken Tenders from Broski's Kitchen.",
+    description: 'Breaded chicken strips served with your choice of dip.',
     price: 12.99,
     image: '/images/menu-itens/ChickenTenders.png',
     category: 'sides',
@@ -150,7 +150,7 @@ export const menuItems = [
   {
     id: 'chocolatecookies',
     name: 'Chocolate Cookies',
-    description: "Chocolate Cookies from Broski's Kitchen.",
+    description: 'Rich chocolate cookies baked with dark chocolate chips.',
     price: 12.99,
     image: '/images/menu-itens/ChocolateCookies.png',
     category: 'desserts',
@@ -159,7 +159,7 @@ export const menuItems = [
   {
     id: 'chocolatelavacake',
     name: 'Chocolate Lava Cake',
-    description: "Chocolate Lava Cake from Broski's Kitchen.",
+    description: 'Warm chocolate cake with a gooey molten center.',
     price: 12.99,
     image: '/images/menu-itens/ChocolateLavaCake.png',
     category: 'desserts',
@@ -168,7 +168,7 @@ export const menuItems = [
   {
     id: 'cornonthecob',
     name: 'Corn On The Cob',
-    description: "Corn On The Cob from Broski's Kitchen.",
+    description: 'Sweet corn brushed with garlic butter and grilled to perfection.',
     price: 12.99,
     image: '/images/menu-itens/CornOnTheCob.png',
     category: 'sides',
@@ -177,7 +177,7 @@ export const menuItems = [
   {
     id: 'doublestackcheeseburger',
     name: 'Double Stack Cheese Burger',
-    description: "Double Stack Cheese Burger from Broski's Kitchen.",
+    description: 'Two juicy patties layered with cheese and special sauce.',
     price: 12.99,
     image: '/images/menu-itens/DoubleStackCheeseBurger.png',
     category: 'burgers',
@@ -186,7 +186,7 @@ export const menuItems = [
   {
     id: 'lemonpeppertenders',
     name: 'Lemon Pepper Tenders',
-    description: "Lemon Pepper Tenders from Broski's Kitchen.",
+    description: 'Fried chicken tenders tossed in zesty lemon pepper seasoning.',
     price: 12.99,
     image: '/images/menu-itens/LemonPepperTenders.png',
     category: 'sides',
@@ -195,7 +195,7 @@ export const menuItems = [
   {
     id: 'macncheese',
     name: 'Mac N Cheese',
-    description: "Mac N Cheese from Broski's Kitchen.",
+    description: 'Classic macaroni baked in a creamy cheese sauce.',
     price: 12.99,
     image: '/images/menu-itens/MacNCheese.png',
     category: 'sides',
@@ -204,7 +204,7 @@ export const menuItems = [
   {
     id: 'nachos',
     name: 'Nachos',
-    description: "Nachos from Broski's Kitchen.",
+    description: 'Tortilla chips smothered in queso, jalapeños and pico de gallo.',
     price: 12.99,
     image: '/images/menu-itens/Nachos.png',
     category: 'sides',
@@ -213,7 +213,7 @@ export const menuItems = [
   {
     id: 'ribs',
     name: 'Ribs',
-    description: "Ribs from Broski's Kitchen.",
+    description: 'Slow-cooked pork ribs glazed with smoky barbecue sauce.',
     price: 12.99,
     image: '/images/menu-itens/Ribs.png',
     category: 'sandwiches',
@@ -222,7 +222,7 @@ export const menuItems = [
   {
     id: 'salmon',
     name: 'Salmon',
-    description: "Salmon from Broski's Kitchen.",
+    description: 'Grilled salmon fillet with a light lemon herb marinade.',
     price: 12.99,
     image: '/images/menu-itens/Salmon.png',
     category: 'sandwiches',
@@ -231,7 +231,7 @@ export const menuItems = [
   {
     id: 'salmonbites',
     name: 'Salmon Bites',
-    description: "Salmon Bites from Broski's Kitchen.",
+    description: 'Bite-size pieces of fried salmon served with dipping sauce.',
     price: 12.99,
     image: '/images/menu-itens/SalmonBites.png',
     category: 'sides',
@@ -240,7 +240,7 @@ export const menuItems = [
   {
     id: 'sexyyredwings',
     name: 'Sexyy Red Wings',
-    description: "Sexyy Red Wings from Broski's Kitchen.",
+    description: 'Spicy wings coated in our signature red hot sauce.',
     price: 12.99,
     image: '/images/menu-itens/SexyyRedWings.png',
     category: 'wings',
@@ -249,7 +249,7 @@ export const menuItems = [
   {
     id: 'shrimpngrits',
     name: 'Shrimp N Grits',
-    description: "Shrimp N Grits from Broski's Kitchen.",
+    description: 'Creamy cheddar grits topped with seasoned shrimp.',
     price: 12.99,
     image: '/images/menu-itens/ShrimpNGrits.png',
     category: 'sides',
@@ -258,7 +258,7 @@ export const menuItems = [
   {
     id: 'sweetpotatoepancakes',
     name: 'Sweet Potatoe Pancakes',
-    description: "Sweet Potatoe Pancakes from Broski's Kitchen.",
+    description: 'Fluffy pancakes made with sweet potato and warm spices.',
     price: 12.99,
     image: '/images/menu-itens/SweetPotatoePancakes.png',
     category: 'desserts',
@@ -267,7 +267,7 @@ export const menuItems = [
   {
     id: 'sweetpotatoes',
     name: 'Sweet Potatoes',
-    description: "Sweet Potatoes from Broski's Kitchen.",
+    description: 'Roasted sweet potato wedges tossed in brown sugar.',
     price: 12.99,
     image: '/images/menu-itens/SweetPotatoes.png',
     category: 'sides',
@@ -287,18 +287,6 @@ export const customizationOptions: { [key: string]: CustomizationCategory[] } = 
         { id: "beef", name: "Premium Beef", price: 0 },
         { id: "wagyu", name: "Wagyu Beef", price: 5.99 },
         { id: "beyond", name: "Beyond Meat", price: 2.99 },
-      ],
-    },
-    {
-      id: "patty-cook",
-      name: "Cooking Preference",
-      required: true,
-      multiple: false,
-      options: [
-        { id: "medium-rare", name: "Medium Rare", price: 0 },
-        { id: "medium", name: "Medium", price: 0 },
-        { id: "medium-well", name: "Medium Well", price: 0 },
-        { id: "well-done", name: "Well Done", price: 0 },
       ],
     },
     {
