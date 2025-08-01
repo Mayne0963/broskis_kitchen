@@ -13,21 +13,6 @@ export const categories = [
 
 export const menuItems = [
   {
-    id: "belgium-waffles",
-    name: "Belgium Waffles",
-    description: "Sweet and savory belgium waffles topped with powdered sugar, butter, and rich maple syrup.",
-    price: 18.99,
-    image: "/images/belgium-waffles.jpg",
-    category: "Breakfast",
-    popular: true,
-    dietary: {
-      dairyFree: false,
-      glutenFree: false,
-      vegetarian: false,
-      vegan: false,
-    },
-  },
-  {
     id: "luxury-burger",
     name: "Luxury Burger",
     description: "Premium beef patty with truffle aioli, aged cheddar, and caramelized onions on a brioche bun.",
