@@ -61,10 +61,15 @@ const MenuItemCard: React.FC<MenuItemProps> = ({ item, onAddToCart }) => {
   return (
     <>
       <div className="menu-card overflow-hidden">
-        <div className="relative h-48 w-full">
+        <div className="relative w-full aspect-square">
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent z-10"></div>
           {item.image ? (
-            <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover" />
+            <Image
+              src={item.image || "/placeholder.svg"}
+              alt={item.name}
+              fill
+              className="object-contain"
+            />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-800 text-gray-500">No Image</div>
           )}
