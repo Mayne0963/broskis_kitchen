@@ -4,10 +4,20 @@ import Stripe from 'stripe';
 import { db } from '@/lib/services/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-02-24.acacia' });
+let stripe: Stripe | null = null;
+if (process.env.STRIPE_SECRET_KEY) {
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2025-02-24.acacia',
+  });
+} else {
+  console.error('Stripe secret key is missing');
+}
 
 // Helper to get or create Stripe customer ID
 async function getStripeCustomerId(userId: string) {
+  if (!stripe) {
+    throw new Error('Stripe not configured');
+  }
   const userRef = doc(db, 'users', userId);
   const userSnap = await getDoc(userRef);
   let customerId = userSnap.data()?.stripeCustomerId;
@@ -23,6 +33,7 @@ async function getStripeCustomerId(userId: string) {
 // GET: List payment methods
 export async function GET() {
   try {
+    if (!stripe) return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     const session = await getSessionCookie();
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const customerId = await getStripeCustomerId(session.uid);
@@ -36,6 +47,7 @@ export async function GET() {
 // POST: Attach new payment method
 export async function POST(request: NextRequest) {
   try {
+    if (!stripe) return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     const session = await getSessionCookie();
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const { paymentMethodId } = await request.json();
@@ -50,6 +62,7 @@ export async function POST(request: NextRequest) {
 // DELETE: Detach payment method
 export async function DELETE(request: NextRequest) {
   try {
+    if (!stripe) return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     const session = await getSessionCookie();
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const { paymentMethodId } = await request.json();

@@ -1,13 +1,5 @@
-import { Playfair_Display, Montserrat } from 'next/font/google';
-
-export const playfair = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800', '900'],
-  variable: '--font-playfair',
-});
-
-export const montserrat = Montserrat({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-montserrat',
-});
+// Local build environments may not have internet access, so avoid downloading
+// Google Fonts at build time. Instead, export empty variables that keep the
+// existing CSS structure without triggering font downloads.
+export const playfair = { variable: '' };
+export const montserrat = { variable: '' };

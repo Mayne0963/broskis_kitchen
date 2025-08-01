@@ -11,251 +11,352 @@ export const categories = [
   { id: "infused", name: "Infused" },
 ]
 
-export const menuItems = [
+// Infused menu offerings currently feature a few specialty items
+export const infusedMenuItems = [
   {
-    id: "luxury-burger",
-    name: "Luxury Burger",
-    description: "Premium beef patty with truffle aioli, aged cheddar, and caramelized onions on a brioche bun.",
-    price: 18.99,
-    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=luxury%20gourmet%20burger%20with%20truffle%20aioli%20aged%20cheddar%20caramelized%20onions%20brioche%20bun%20premium%20beef%20patty&image_size=square_hd",
-    category: "burgers",
-    popular: true,
-    dietary: {
-      dairyFree: false,
-      glutenFree: false,
-      vegetarian: false,
-      vegan: false,
-    },
-  },
-  {
-    id: "gourmet-tacos",
-    name: "Gourmet Street Tacos",
-    description: "Three street-style tacos with premium fillings and house-made salsas.",
-    price: 14.99,
-    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=gourmet%20street%20tacos%20premium%20fillings%20house%20made%20salsas%20luxury%20presentation&image_size=square_hd",
-    category: "tacos",
-    popular: true,
-    dietary: {
-      dairyFree: false,
-      glutenFree: false,
-      vegetarian: false,
-      vegan: false,
-    },
-  },
-  {
-    id: "truffle-fries",
-    name: "Truffle Parmesan Fries",
-    description: "Hand-cut fries tossed with truffle oil, parmesan cheese, and fresh herbs.",
-    price: 9.99,
-    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=truffle%20parmesan%20fries%20hand%20cut%20golden%20crispy%20fresh%20herbs%20gourmet%20side%20dish&image_size=square_hd",
-    category: "sides",
-    dietary: {
-      dairyFree: false,
-      glutenFree: true,
-      vegetarian: true,
-      vegan: false,
-    },
-  },
-  {
-    id: "wagyu-sandwich",
-    name: "Wagyu Beef Sandwich",
-    description: "Thinly sliced wagyu beef with horseradish cream, arugula, and caramelized onions on artisan bread.",
-    price: 22.99,
-    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=wagyu%20beef%20sandwich%20thinly%20sliced%20horseradish%20cream%20arugula%20artisan%20bread%20luxury%20sandwich&image_size=square_hd",
-    category: "sandwiches",
-    popular: true,
-    dietary: {
-      dairyFree: false,
-      glutenFree: false,
-      vegetarian: false,
-      vegan: false,
-    },
-  },
-  {
-    id: "vegan-burger",
-    name: "Luxury Vegan Burger",
+    id: 'infused-wings',
+    name: 'Infused Wings',
     description:
-      "Plant-based patty with vegan truffle aioli, dairy-free cheese, and caramelized onions on a vegan brioche bun.",
-    price: 17.99,
-    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=luxury%20vegan%20burger%20plant%20based%20patty%20vegan%20truffle%20aioli%20dairy%20free%20cheese%20vegan%20brioche&image_size=square_hd",
-    category: "burgers",
+      'Crispy chicken wings tossed in our signature sauce and infused with a touch of premium cannabis.',
+    price: 16.99,
+    image:
+      'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=infused%20wings%20crispy%20chicken%20wings%20special%20infusion&image_size=square_hd',
+    category: 'wings',
+    infused: true,
+    dietary: { dairyFree: true, glutenFree: true, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'infused-brownie',
+    name: 'Infused Chocolate Brownie',
+    description:
+      'Decadent chocolate brownie infused with THC and finished with edible gold flakes.',
+    price: 12.99,
+    image:
+      'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Infused%20chocolate%20brownie%20rich%20chocolate%20special%20infusion%20gold%20flakes&image_size=square_hd',
+    category: 'desserts',
+    infused: true,
     new: true,
-    dietary: {
-      dairyFree: true,
-      glutenFree: false,
-      vegetarian: true,
-      vegan: true,
-    },
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: true, vegan: false },
   },
   {
-    id: "buffalo-cauliflower",
-    name: "Buffalo Cauliflower",
-    description: "Crispy cauliflower florets tossed in buffalo sauce, served with vegan ranch dressing.",
-    price: 13.99,
-    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=buffalo%20cauliflower%20crispy%20florets%20buffalo%20sauce%20vegan%20ranch%20dressing%20appetizer&image_size=square_hd",
-    category: "sides",
-    dietary: {
-      dairyFree: true,
-      glutenFree: true,
-      vegetarian: true,
-      vegan: true,
-    },
-  },
-  {
-    id: "lobster-tacos",
-    name: "Lobster Tacos",
-    description: "Butter-poached lobster, avocado crema, mango salsa, and micro greens on corn tortillas.",
-    price: 24.99,
-    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=lobster%20tacos%20butter%20poached%20lobster%20avocado%20crema%20mango%20salsa%20corn%20tortillas%20luxury%20seafood&image_size=square_hd",
-    category: "tacos",
-    new: true,
-    dietary: {
-      dairyFree: false,
-      glutenFree: true,
-      vegetarian: false,
-      vegan: false,
-    },
-  },
-  {
-    id: "gold-cheesecake",
-    name: "24K Gold Cheesecake",
-    description: "New York style cheesecake topped with edible 24K gold leaf and berry compote.",
-    price: 14.99,
-    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=24k%20gold%20cheesecake%20new%20york%20style%20edible%20gold%20leaf%20berry%20compote%20luxury%20dessert&image_size=square_hd",
-    category: "desserts",
-    popular: true,
-    dietary: {
-      dairyFree: false,
-      glutenFree: false,
-      vegetarian: true,
-      vegan: false,
-    },
-  },
-  {
-    id: "korean-wings",
-    name: "Korean Gochujang Wings",
-    description: "Crispy wings glazed with sweet and spicy gochujang sauce, topped with sesame seeds and green onions.",
+    id: 'infused-margarita',
+    name: 'Infused Luxury Margarita',
+    description:
+      'Premium tequila shaken with fresh lime and agave then kissed with an infused kick and a gold rim.',
     price: 15.99,
-    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=korean%20gochujang%20wings%20crispy%20sweet%20spicy%20glaze%20sesame%20seeds%20green%20onions&image_size=square_hd",
-    category: "wings",
-    dietary: {
-      dairyFree: true,
-      glutenFree: true,
-      vegetarian: false,
-      vegan: false,
-    },
+    image:
+      'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Infused%20luxury%20margarita%20premium%20tequila%20fresh%20lime%20juice%20agave%20nectar%20special%20infusion%20gold%20rim&image_size=square_hd',
+    category: 'drinks',
+    infused: true,
+    dietary: { dairyFree: true, glutenFree: true, vegetarian: true, vegan: true },
   },
   {
-    id: "loaded-nachos",
-    name: "Luxury Loaded Nachos",
+    id: 'infused-chocolate',
+    name: 'Infused Luxury Chocolate Bar',
     description:
-      "House-made tortilla chips topped with premium beef, queso, guacamole, pico de gallo, jalapeños, and sour cream.",
-    price: 16.99,
-    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=luxury%20loaded%20nachos%20house%20made%20tortilla%20chips%20premium%20beef%20queso%20guacamole%20pico%20de%20gallo&image_size=square_hd",
-    category: "sides",
-    popular: true,
-    dietary: {
-      dairyFree: false,
-      glutenFree: false,
-      vegetarian: false,
-      vegan: false,
-    },
-  },
-  {
-    id: "mushroom-burger",
-    name: "Truffle Mushroom Burger",
-    description:
-      "Premium beef patty topped with sautéed wild mushrooms, truffle butter, and Swiss cheese on a brioche bun.",
-    price: 19.99,
-    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=truffle%20mushroom%20burger%20premium%20beef%20patty%20sauteed%20wild%20mushrooms%20truffle%20butter%20swiss%20cheese%20brioche&image_size=square_hd",
-    category: "burgers",
-    dietary: {
-      dairyFree: false,
-      glutenFree: false,
-      vegetarian: false,
-      vegan: false,
-    },
-  },
-  {
-    id: "fish-tacos",
-    name: "Blackened Fish Tacos",
-    description: "Blackened mahi-mahi with cabbage slaw, chipotle crema, and pickled red onions on corn tortillas.",
-    price: 16.99,
-    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=blackened%20fish%20tacos%20mahi%20mahi%20cabbage%20slaw%20chipotle%20crema%20pickled%20red%20onions%20corn%20tortillas&image_size=square_hd",
-    category: "tacos",
-    dietary: {
-      dairyFree: false,
-      glutenFree: true,
-      vegetarian: false,
-      vegan: false,
-    },
+      'Silky dark chocolate bar infused with cannabis, sprinkled with sea salt and shimmering gold dust.',
+    price: 18.99,
+    image:
+      'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Infused%20luxury%20chocolate%20bar%20premium%20dark%20chocolate%20special%20infusion%20sea%20salt%20gold%20flakes&image_size=square_hd',
+    category: 'desserts',
+    infused: true,
+    dietary: { dairyFree: false, glutenFree: true, vegetarian: true, vegan: false },
   },
 ]
 
-// Create a new array for infused menu items
-export const infusedMenuItems = [
+export const menuItems = [
   {
-    id: "infused-wings",
-    name: "Infused Wings",
-    description: "Crispy chicken wings tossed in our signature sauce with a special infusion.",
-    price: 16.99,
-    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=infused%20wings%20crispy%20chicken%20wings%20special%20infusion&image_size=square_hd",
-    category: "wings",
-    infused: true,
-    dietary: {
-      dairyFree: true,
-      glutenFree: true,
-      vegetarian: false,
-      vegan: false,
-    },
-  },
-  {
-    id: "infused-brownie",
-    name: "Infused Chocolate Brownie",
-    description: "Rich chocolate brownie with a special infusion, topped with gold flakes.",
+    id: 'belgiumwaffles',
+    name: 'Belgium Waffles',
+    description:
+      'Crisp golden waffles served with powdered sugar, warm maple syrup and whipped butter on the side.',
     price: 12.99,
-    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Infused%20chocolate%20brownie%20rich%20chocolate%20special%20infusion%20gold%20flakes&image_size=square_hd",
-    category: "desserts",
-    infused: true,
-    new: true,
-    dietary: {
-      dairyFree: false,
-      glutenFree: false,
-      vegetarian: true,
-      vegan: false,
-    },
+    image: '/images/menu-itens/BelgiumWaffles.png',
+    category: 'desserts',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
   {
-    id: "infused-margarita",
-    name: "Infused Luxury Margarita",
-    description: "Premium tequila, fresh lime juice, agave nectar, and a special infusion with gold rim.",
-    price: 15.99,
-    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Infused%20luxury%20margarita%20premium%20tequila%20fresh%20lime%20juice%20agave%20nectar%20special%20infusion%20gold%20rim&image_size=square_hd",
-    category: "drinks",
-    infused: true,
-    dietary: {
-      dairyFree: true,
-      glutenFree: true,
-      vegetarian: true,
-      vegan: true,
-    },
+    id: 'birriatacos',
+    name: 'Birria Tacos',
+    description:
+      'Slow-braised beef tucked in soft tortillas with melted cheese and a side of savory consommé.',
+    price: 12.99,
+    image: '/images/menu-itens/BirriaTacos.png',
+    category: 'tacos',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
   {
-    id: "infused-chocolate",
-    name: "Infused Luxury Chocolate Bar",
-    description: "Premium dark chocolate with a special infusion, sea salt, and gold flakes.",
-    price: 18.99,
-    image: "https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Infused%20luxury%20chocolate%20bar%20premium%20dark%20chocolate%20special%20infusion%20sea%20salt%20gold%20flakes&image_size=square_hd",
-    category: "desserts",
-    infused: true,
-    dietary: {
-      dairyFree: false,
-      glutenFree: true,
-      vegetarian: true,
-      vegan: false,
-    },
+    id: 'boosiegoldwings',
+    name: 'Boosie Gold Wings',
+    description:
+      'Crispy fried wings coated in our signature honey-gold sauce with a sprinkle of sesame seeds.',
+    price: 12.99,
+    image: '/images/menu-itens/BoosieGoldWings.png',
+    category: 'wings',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'boosiepunch',
+    name: 'Boosie Punch',
+    description:
+      'Refreshing tropical fruit punch with bright citrus flavors and a signature kick.',
+    price: 12.99,
+    image: '/images/menu-itens/BoosiePunch.png',
+    category: 'drinks',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'boosieredwings',
+    name: 'Boosie Red Wings',
+    description:
+      'Crispy wings drenched in our fiery house-made red hot sauce.',
+    price: 12.99,
+    image: '/images/menu-itens/BoosieRedWings.png',
+    category: 'wings',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'broskisdog',
+    name: 'Broskis Dog',
+    description:
+      'Grilled all-beef hot dog piled high with onions, relish and classic yellow mustard.',
+    price: 12.99,
+    image: '/images/menu-itens/BroskisDog.png',
+    category: 'sandwiches',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'broskissliders',
+    name: 'Broskis Sliders',
+    description:
+      'Three mini beef sliders stacked with melted cheese on toasted brioche buns.',
+    price: 12.99,
+    image: '/images/menu-itens/BroskisSliders.png',
+    category: 'burgers',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'broskistea',
+    name: 'Broskis Tea',
+    description:
+      'Classic Southern sweet tea brewed fresh each day and served over ice.',
+    price: 12.99,
+    image: '/images/menu-itens/BroskisTea.png',
+    category: 'drinks',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'broskistoasterstrudel',
+    name: 'Broskis Toaster Strudel',
+    description:
+      'Flaky pastry pockets filled with berry jam and drizzled with vanilla icing.',
+    price: 12.99,
+    image: '/images/menu-itens/BroskisToasterStrudel.png',
+    category: 'desserts',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'cabbage',
+    name: 'Cabbage',
+    description:
+      'Seasoned cabbage sautéed with onions until tender and packed with flavor.',
+    price: 12.99,
+    image: '/images/menu-itens/Cabbage.png',
+    category: 'sides',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'cheeseburger',
+    name: 'Cheese Burger',
+    description:
+      'Juicy beef patty topped with melted American cheese and pickles on a soft brioche bun.',
+    price: 12.99,
+    image: '/images/menu-itens/CheeseBurger.png',
+    category: 'burgers',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'cheesecakebites',
+    name: 'Cheesecake Bites',
+    description:
+      'Bite-size pieces of creamy cheesecake rolled in sweet graham cracker crumbs.',
+    price: 12.99,
+    image: '/images/menu-itens/CheesecakeBites.png',
+    category: 'desserts',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'cheesecakecones',
+    name: 'Cheesecake Cones',
+    description:
+      'Crispy waffle cones overflowing with smooth cheesecake filling and fresh fruit.',
+    price: 12.99,
+    image: '/images/menu-itens/CheesecakeCones.png',
+    category: 'desserts',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'chickensandwich',
+    name: 'Chicken Sandwich',
+    description:
+      'Crispy fried chicken breast with tangy pickles and our signature sauce on a toasted bun.',
+    price: 12.99,
+    image: '/images/menu-itens/ChickenSandwich.png',
+    category: 'sandwiches',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'chickentenders',
+    name: 'Chicken Tenders',
+    description:
+      'Breaded chicken strips fried until golden brown and served with your choice of dipping sauce.',
+    price: 12.99,
+    image: '/images/menu-itens/ChickenTenders.png',
+    category: 'sides',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'chocolatecookies',
+    name: 'Chocolate Cookies',
+    description:
+      'Chewy double-chocolate cookies loaded with dark chocolate chunks.',
+    price: 12.99,
+    image: '/images/menu-itens/ChocolateCookies.png',
+    category: 'desserts',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'chocolatelavacake',
+    name: 'Chocolate Lava Cake',
+    description:
+      'Warm chocolate cake with a gooey molten center dusted with powdered sugar.',
+    price: 12.99,
+    image: '/images/menu-itens/ChocolateLavaCake.png',
+    category: 'desserts',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'cornonthecob',
+    name: 'Corn On The Cob',
+    description:
+      'Sweet corn brushed with garlic butter then grilled to smoky perfection.',
+    price: 12.99,
+    image: '/images/menu-itens/CornOnTheCob.png',
+    category: 'sides',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'doublestackcheeseburger',
+    name: 'Double Stack Cheese Burger',
+    description:
+      'Two seared beef patties layered with melted cheese and our special sauce.',
+    price: 12.99,
+    image: '/images/menu-itens/DoubleStackCheeseBurger.png',
+    category: 'burgers',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'lemonpeppertenders',
+    name: 'Lemon Pepper Tenders',
+    description:
+      'Crispy chicken tenders tossed in a zesty lemon pepper seasoning.',
+    price: 12.99,
+    image: '/images/menu-itens/LemonPepperTenders.png',
+    category: 'sides',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'macncheese',
+    name: 'Mac N Cheese',
+    description:
+      'Classic elbow macaroni baked in a creamy cheddar cheese sauce.',
+    price: 12.99,
+    image: '/images/menu-itens/MacNCheese.png',
+    category: 'sides',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'nachos',
+    name: 'Nachos',
+    description:
+      'House tortilla chips smothered in queso, jalapeños and fresh pico de gallo.',
+    price: 12.99,
+    image: '/images/menu-itens/Nachos.png',
+    category: 'sides',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'ribs',
+    name: 'Ribs',
+    description:
+      'Slow-cooked pork ribs glazed in smoky barbecue sauce.',
+    price: 12.99,
+    image: '/images/menu-itens/Ribs.png',
+    category: 'sandwiches',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'salmon',
+    name: 'Salmon',
+    description:
+      'Grilled salmon fillet finished with a bright lemon-herb marinade.',
+    price: 12.99,
+    image: '/images/menu-itens/Salmon.png',
+    category: 'sandwiches',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'salmonbites',
+    name: 'Salmon Bites',
+    description:
+      'Bite-size salmon pieces fried crisp and served with tangy dipping sauce.',
+    price: 12.99,
+    image: '/images/menu-itens/SalmonBites.png',
+    category: 'sides',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'sexyyredwings',
+    name: 'Sexyy Red Wings',
+    description:
+      'Spicy wings coated in our signature bright red hot sauce.',
+    price: 12.99,
+    image: '/images/menu-itens/SexyyRedWings.png',
+    category: 'wings',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'shrimpngrits',
+    name: 'Shrimp N Grits',
+    description:
+      'Creamy cheddar grits topped with seasoned shrimp and scallions.',
+    price: 12.99,
+    image: '/images/menu-itens/ShrimpNGrits.png',
+    category: 'sides',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'sweetpotatoepancakes',
+    name: 'Sweet Potatoe Pancakes',
+    description:
+      'Fluffy pancakes made with mashed sweet potatoes and warm spices.',
+    price: 12.99,
+    image: '/images/menu-itens/SweetPotatoePancakes.png',
+    category: 'desserts',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'sweetpotatoes',
+    name: 'Sweet Potatoes',
+    description:
+      'Roasted sweet potato wedges tossed with brown sugar and butter.',
+    price: 12.99,
+    image: '/images/menu-itens/SweetPotatoes.png',
+    category: 'sides',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
 ]
+
 
 export const customizationOptions: { [key: string]: CustomizationCategory[] } = {
   burgers: [
@@ -268,18 +369,6 @@ export const customizationOptions: { [key: string]: CustomizationCategory[] } = 
         { id: "beef", name: "Premium Beef", price: 0 },
         { id: "wagyu", name: "Wagyu Beef", price: 5.99 },
         { id: "beyond", name: "Beyond Meat", price: 2.99 },
-      ],
-    },
-    {
-      id: "patty-cook",
-      name: "Cooking Preference",
-      required: true,
-      multiple: false,
-      options: [
-        { id: "medium-rare", name: "Medium Rare", price: 0 },
-        { id: "medium", name: "Medium", price: 0 },
-        { id: "medium-well", name: "Medium Well", price: 0 },
-        { id: "well-done", name: "Well Done", price: 0 },
       ],
     },
     {
@@ -518,17 +607,18 @@ export const customizationOptions: { [key: string]: CustomizationCategory[] } = 
         { id: "strong", name: "Strong (15mg)", price: 4.99 },
       ],
     },
-    {
-      id: "type",
-      name: "Type",
-      required: false,
-      multiple: false,
-      options: [
-        { id: "sativa", name: "Sativa Dominant", price: 0 },
-        { id: "indica", name: "Indica Dominant", price: 0 },
-        { id: "hybrid", name: "Hybrid", price: 0 },
-      ],
-    },
+    // Temporarily disable cook type selection
+    // {
+    //   id: "type",
+    //   name: "Type",
+    //   required: false,
+    //   multiple: false,
+    //   options: [
+    //     { id: "sativa", name: "Sativa Dominant", price: 0 },
+    //     { id: "indica", name: "Indica Dominant", price: 0 },
+    //     { id: "hybrid", name: "Hybrid", price: 0 },
+    //   ],
+    // },
   ],
 }
 

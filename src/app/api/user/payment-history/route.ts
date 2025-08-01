@@ -4,7 +4,12 @@ import Stripe from 'stripe';
 import { db } from '@/lib/services/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-02-24.acacia' });
+let stripe: Stripe | null = null;
+if (process.env.STRIPE_SECRET_KEY) {
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2025-02-24.acacia' });
+} else {
+  console.error('Stripe secret key is missing');
+}
 
 // Helper to get Stripe customer ID
 async function getStripeCustomerId(userId: string) {
@@ -16,6 +21,7 @@ async function getStripeCustomerId(userId: string) {
 // GET: Fetch payment history
 export async function GET(request: NextRequest) {
   try {
+    if (!stripe) return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     const session = await getSessionCookie();
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const customerId = await getStripeCustomerId(session.uid);
