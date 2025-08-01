@@ -17,7 +17,7 @@ export const infusedMenuItems = [
     id: 'infused-wings',
     name: 'Infused Wings',
     description:
-      'Crispy chicken wings tossed in our signature sauce with a special infusion.',
+      'Crispy chicken wings tossed in our signature sauce and infused with a touch of premium cannabis.',
     price: 16.99,
     image:
       'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=infused%20wings%20crispy%20chicken%20wings%20special%20infusion&image_size=square_hd',
@@ -29,7 +29,7 @@ export const infusedMenuItems = [
     id: 'infused-brownie',
     name: 'Infused Chocolate Brownie',
     description:
-      'Rich chocolate brownie with a special infusion, topped with gold flakes.',
+      'Decadent chocolate brownie infused with THC and finished with edible gold flakes.',
     price: 12.99,
     image:
       'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Infused%20chocolate%20brownie%20rich%20chocolate%20special%20infusion%20gold%20flakes&image_size=square_hd',
@@ -42,7 +42,7 @@ export const infusedMenuItems = [
     id: 'infused-margarita',
     name: 'Infused Luxury Margarita',
     description:
-      'Premium tequila, fresh lime juice, agave nectar, and a special infusion with gold rim.',
+      'Premium tequila shaken with fresh lime and agave then kissed with an infused kick and a gold rim.',
     price: 15.99,
     image:
       'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Infused%20luxury%20margarita%20premium%20tequila%20fresh%20lime%20juice%20agave%20nectar%20special%20infusion%20gold%20rim&image_size=square_hd',
@@ -54,7 +54,7 @@ export const infusedMenuItems = [
     id: 'infused-chocolate',
     name: 'Infused Luxury Chocolate Bar',
     description:
-      'Premium dark chocolate with a special infusion, sea salt, and gold flakes.',
+      'Silky dark chocolate bar infused with cannabis, sprinkled with sea salt and shimmering gold dust.',
     price: 18.99,
     image:
       'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=Infused%20luxury%20chocolate%20bar%20premium%20dark%20chocolate%20special%20infusion%20sea%20salt%20gold%20flakes&image_size=square_hd',
@@ -68,7 +68,8 @@ export const menuItems = [
   {
     id: 'belgiumwaffles',
     name: 'Belgium Waffles',
-    description: 'Crispy golden waffles topped with powdered sugar and maple syrup.',
+    description:
+      'Crisp golden waffles served with powdered sugar, warm maple syrup and whipped butter on the side.',
     price: 12.99,
     image: '/images/menu-itens/BelgiumWaffles.png',
     category: 'desserts',
@@ -77,7 +78,8 @@ export const menuItems = [
   {
     id: 'birriatacos',
     name: 'Birria Tacos',
-    description: 'Slow-braised beef tacos served with rich consommé for dipping.',
+    description:
+      'Slow-braised beef tucked in soft tortillas with melted cheese and a side of savory consommé.',
     price: 12.99,
     image: '/images/menu-itens/BirriaTacos.png',
     category: 'tacos',
@@ -86,7 +88,8 @@ export const menuItems = [
   {
     id: 'boosiegoldwings',
     name: 'Boosie Gold Wings',
-    description: 'Crispy wings tossed in our sweet honey-gold sauce.',
+    description:
+      'Crispy fried wings coated in our signature honey-gold sauce with a sprinkle of sesame seeds.',
     price: 12.99,
     image: '/images/menu-itens/BoosieGoldWings.png',
     category: 'wings',
@@ -95,7 +98,8 @@ export const menuItems = [
   {
     id: 'boosiepunch',
     name: 'Boosie Punch',
-    description: 'Tropical fruit punch with a hint of citrus and a signature kick.',
+    description:
+      'Refreshing tropical fruit punch with bright citrus flavors and a signature kick.',
     price: 12.99,
     image: '/images/menu-itens/BoosiePunch.png',
     category: 'drinks',
@@ -104,7 +108,8 @@ export const menuItems = [
   {
     id: 'boosieredwings',
     name: 'Boosie Red Wings',
-    description: 'Fiery wings glazed in our spicy house hot sauce.',
+    description:
+      'Crispy wings drenched in our fiery house-made red hot sauce.',
     price: 12.99,
     image: '/images/menu-itens/BoosieRedWings.png',
     category: 'wings',
@@ -113,7 +118,8 @@ export const menuItems = [
   {
     id: 'broskisdog',
     name: 'Broskis Dog',
-    description: 'Grilled beef hot dog topped with onions, relish and mustard.',
+    description:
+      'Grilled all-beef hot dog piled high with onions, relish and classic yellow mustard.',
     price: 12.99,
     image: '/images/menu-itens/BroskisDog.png',
     category: 'sandwiches',
@@ -122,7 +128,8 @@ export const menuItems = [
   {
     id: 'broskissliders',
     name: 'Broskis Sliders',
-    description: 'Mini beef sliders stacked with melted cheese on toasted buns.',
+    description:
+      'Three mini beef sliders stacked with melted cheese on toasted brioche buns.',
     price: 12.99,
     image: '/images/menu-itens/BroskisSliders.png',
     category: 'burgers',
@@ -131,7 +138,8 @@ export const menuItems = [
   {
     id: 'broskistea',
     name: 'Broskis Tea',
-    description: 'Sweet southern-style tea brewed fresh every day.',
+    description:
+      'Classic Southern sweet tea brewed fresh each day and served over ice.',
     price: 12.99,
     image: '/images/menu-itens/BroskisTea.png',
     category: 'drinks',
@@ -140,7 +148,8 @@ export const menuItems = [
   {
     id: 'broskistoasterstrudel',
     name: 'Broskis Toaster Strudel',
-    description: 'Flaky pastry filled with sweet berry jam and drizzled with icing.',
+    description:
+      'Flaky pastry pockets filled with berry jam and drizzled with vanilla icing.',
     price: 12.99,
     image: '/images/menu-itens/BroskisToasterStrudel.png',
     category: 'desserts',
@@ -149,7 +158,8 @@ export const menuItems = [
   {
     id: 'cabbage',
     name: 'Cabbage',
-    description: 'Seasoned cabbage sautéed until tender and flavorful.',
+    description:
+      'Seasoned cabbage sautéed with onions until tender and packed with flavor.',
     price: 12.99,
     image: '/images/menu-itens/Cabbage.png',
     category: 'sides',
@@ -158,7 +168,8 @@ export const menuItems = [
   {
     id: 'cheeseburger',
     name: 'Cheese Burger',
-    description: 'Juicy beef patty topped with melted American cheese on a brioche bun.',
+    description:
+      'Juicy beef patty topped with melted American cheese and pickles on a soft brioche bun.',
     price: 12.99,
     image: '/images/menu-itens/CheeseBurger.png',
     category: 'burgers',
@@ -167,7 +178,8 @@ export const menuItems = [
   {
     id: 'cheesecakebites',
     name: 'Cheesecake Bites',
-    description: 'Creamy cheesecake squares coated in graham cracker crumbs.',
+    description:
+      'Bite-size pieces of creamy cheesecake rolled in sweet graham cracker crumbs.',
     price: 12.99,
     image: '/images/menu-itens/CheesecakeBites.png',
     category: 'desserts',
@@ -176,7 +188,8 @@ export const menuItems = [
   {
     id: 'cheesecakecones',
     name: 'Cheesecake Cones',
-    description: 'Crisp waffle cones filled with creamy cheesecake and fruit.',
+    description:
+      'Crispy waffle cones overflowing with smooth cheesecake filling and fresh fruit.',
     price: 12.99,
     image: '/images/menu-itens/CheesecakeCones.png',
     category: 'desserts',
@@ -185,7 +198,8 @@ export const menuItems = [
   {
     id: 'chickensandwich',
     name: 'Chicken Sandwich',
-    description: 'Crispy chicken breast with pickles and our signature sauce.',
+    description:
+      'Crispy fried chicken breast with tangy pickles and our signature sauce on a toasted bun.',
     price: 12.99,
     image: '/images/menu-itens/ChickenSandwich.png',
     category: 'sandwiches',
@@ -194,7 +208,8 @@ export const menuItems = [
   {
     id: 'chickentenders',
     name: 'Chicken Tenders',
-    description: 'Breaded chicken strips served with your choice of dip.',
+    description:
+      'Breaded chicken strips fried until golden brown and served with your choice of dipping sauce.',
     price: 12.99,
     image: '/images/menu-itens/ChickenTenders.png',
     category: 'sides',
@@ -203,7 +218,8 @@ export const menuItems = [
   {
     id: 'chocolatecookies',
     name: 'Chocolate Cookies',
-    description: 'Rich chocolate cookies baked with dark chocolate chips.',
+    description:
+      'Chewy double-chocolate cookies loaded with dark chocolate chunks.',
     price: 12.99,
     image: '/images/menu-itens/ChocolateCookies.png',
     category: 'desserts',
@@ -212,7 +228,8 @@ export const menuItems = [
   {
     id: 'chocolatelavacake',
     name: 'Chocolate Lava Cake',
-    description: 'Warm chocolate cake with a gooey molten center.',
+    description:
+      'Warm chocolate cake with a gooey molten center dusted with powdered sugar.',
     price: 12.99,
     image: '/images/menu-itens/ChocolateLavaCake.png',
     category: 'desserts',
@@ -221,7 +238,8 @@ export const menuItems = [
   {
     id: 'cornonthecob',
     name: 'Corn On The Cob',
-    description: 'Sweet corn brushed with garlic butter and grilled to perfection.',
+    description:
+      'Sweet corn brushed with garlic butter then grilled to smoky perfection.',
     price: 12.99,
     image: '/images/menu-itens/CornOnTheCob.png',
     category: 'sides',
@@ -230,7 +248,8 @@ export const menuItems = [
   {
     id: 'doublestackcheeseburger',
     name: 'Double Stack Cheese Burger',
-    description: 'Two juicy patties layered with cheese and special sauce.',
+    description:
+      'Two seared beef patties layered with melted cheese and our special sauce.',
     price: 12.99,
     image: '/images/menu-itens/DoubleStackCheeseBurger.png',
     category: 'burgers',
@@ -239,7 +258,8 @@ export const menuItems = [
   {
     id: 'lemonpeppertenders',
     name: 'Lemon Pepper Tenders',
-    description: 'Fried chicken tenders tossed in zesty lemon pepper seasoning.',
+    description:
+      'Crispy chicken tenders tossed in a zesty lemon pepper seasoning.',
     price: 12.99,
     image: '/images/menu-itens/LemonPepperTenders.png',
     category: 'sides',
@@ -248,7 +268,8 @@ export const menuItems = [
   {
     id: 'macncheese',
     name: 'Mac N Cheese',
-    description: 'Classic macaroni baked in a creamy cheese sauce.',
+    description:
+      'Classic elbow macaroni baked in a creamy cheddar cheese sauce.',
     price: 12.99,
     image: '/images/menu-itens/MacNCheese.png',
     category: 'sides',
@@ -257,7 +278,8 @@ export const menuItems = [
   {
     id: 'nachos',
     name: 'Nachos',
-    description: 'Tortilla chips smothered in queso, jalapeños and pico de gallo.',
+    description:
+      'House tortilla chips smothered in queso, jalapeños and fresh pico de gallo.',
     price: 12.99,
     image: '/images/menu-itens/Nachos.png',
     category: 'sides',
@@ -266,7 +288,8 @@ export const menuItems = [
   {
     id: 'ribs',
     name: 'Ribs',
-    description: 'Slow-cooked pork ribs glazed with smoky barbecue sauce.',
+    description:
+      'Slow-cooked pork ribs glazed in smoky barbecue sauce.',
     price: 12.99,
     image: '/images/menu-itens/Ribs.png',
     category: 'sandwiches',
@@ -275,7 +298,8 @@ export const menuItems = [
   {
     id: 'salmon',
     name: 'Salmon',
-    description: 'Grilled salmon fillet with a light lemon herb marinade.',
+    description:
+      'Grilled salmon fillet finished with a bright lemon-herb marinade.',
     price: 12.99,
     image: '/images/menu-itens/Salmon.png',
     category: 'sandwiches',
@@ -284,7 +308,8 @@ export const menuItems = [
   {
     id: 'salmonbites',
     name: 'Salmon Bites',
-    description: 'Bite-size pieces of fried salmon served with dipping sauce.',
+    description:
+      'Bite-size salmon pieces fried crisp and served with tangy dipping sauce.',
     price: 12.99,
     image: '/images/menu-itens/SalmonBites.png',
     category: 'sides',
@@ -293,7 +318,8 @@ export const menuItems = [
   {
     id: 'sexyyredwings',
     name: 'Sexyy Red Wings',
-    description: 'Spicy wings coated in our signature red hot sauce.',
+    description:
+      'Spicy wings coated in our signature bright red hot sauce.',
     price: 12.99,
     image: '/images/menu-itens/SexyyRedWings.png',
     category: 'wings',
@@ -302,7 +328,8 @@ export const menuItems = [
   {
     id: 'shrimpngrits',
     name: 'Shrimp N Grits',
-    description: 'Creamy cheddar grits topped with seasoned shrimp.',
+    description:
+      'Creamy cheddar grits topped with seasoned shrimp and scallions.',
     price: 12.99,
     image: '/images/menu-itens/ShrimpNGrits.png',
     category: 'sides',
@@ -311,7 +338,8 @@ export const menuItems = [
   {
     id: 'sweetpotatoepancakes',
     name: 'Sweet Potatoe Pancakes',
-    description: 'Fluffy pancakes made with sweet potato and warm spices.',
+    description:
+      'Fluffy pancakes made with mashed sweet potatoes and warm spices.',
     price: 12.99,
     image: '/images/menu-itens/SweetPotatoePancakes.png',
     category: 'desserts',
@@ -320,7 +348,8 @@ export const menuItems = [
   {
     id: 'sweetpotatoes',
     name: 'Sweet Potatoes',
-    description: 'Roasted sweet potato wedges tossed in brown sugar.',
+    description:
+      'Roasted sweet potato wedges tossed with brown sugar and butter.',
     price: 12.99,
     image: '/images/menu-itens/SweetPotatoes.png',
     category: 'sides',
@@ -578,17 +607,18 @@ export const customizationOptions: { [key: string]: CustomizationCategory[] } = 
         { id: "strong", name: "Strong (15mg)", price: 4.99 },
       ],
     },
-    {
-      id: "type",
-      name: "Type",
-      required: false,
-      multiple: false,
-      options: [
-        { id: "sativa", name: "Sativa Dominant", price: 0 },
-        { id: "indica", name: "Indica Dominant", price: 0 },
-        { id: "hybrid", name: "Hybrid", price: 0 },
-      ],
-    },
+    // Temporarily disable cook type selection
+    // {
+    //   id: "type",
+    //   name: "Type",
+    //   required: false,
+    //   multiple: false,
+    //   options: [
+    //     { id: "sativa", name: "Sativa Dominant", price: 0 },
+    //     { id: "indica", name: "Indica Dominant", price: 0 },
+    //     { id: "hybrid", name: "Hybrid", price: 0 },
+    //   ],
+    // },
   ],
 }
 
