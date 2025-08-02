@@ -18,6 +18,24 @@ export default function RewardsPage() {
   const { points, tier, history } = useRewards()
   const [activeTab, setActiveTab] = useState("rewards")
   const [selectedReward, setSelectedReward] = useState(null)
+
+  // Hero Section
+  const heroSection = (
+    <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden">
+      <Image
+        src="/images/RewardsHero.png"
+        alt="Broski's Kitchen Rewards"
+        fill
+        style={{ objectFit: "cover" }}
+        priority
+        className="brightness-75"
+      />
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-white z-10">
+        <h1 className="text-4xl md:text-6xl font-bold mb-4">Rewards Program</h1>
+        <p className="text-xl md:text-2xl">Earn Points, Get Rewarded</p>
+      </div>
+    </div>
+  )
   const [showRedeemModal, setShowRedeemModal] = useState(false)
   const [showSpinGame, setShowSpinGame] = useState(false)
 
@@ -60,25 +78,7 @@ export default function RewardsPage() {
 
   return (
     <div className="min-h-screen pb-20">
-      {/* Hero Section */}
-      <section className="relative h-[40vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0 bg-black">
-          <div className="absolute inset-0 bg-gradient-to-r from-black to-transparent opacity-70 z-10"></div>
-          <Image 
-            src="/images/rewards-hero.svg" 
-            alt="Rewards Program" 
-            fill 
-            className="object-cover" 
-            priority
-          />
-        </div>
-        <div className="container mx-auto px-4 z-10 text-center">
-          <h1 className="heading-xl mb-4 text-white gritty-shadow">Rewards Program</h1>
-          <p className="text-xl text-gray-200 max-w-2xl mx-auto">
-            Earn points with every purchase and redeem them for exclusive rewards.
-          </p>
-        </div>
-      </section>
+      {heroSection}
 
       {/* Points Status */}
       <section className="bg-[#111111] py-8 border-b border-[#333333]">

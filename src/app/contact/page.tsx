@@ -16,10 +16,28 @@ import {
 } from "react-icons/fa"
 import ContactForm from "../../components/contact/ContactForm"
 import ContactMap from "../../components/contact/ContactMap"
+import Image from "next/image"
 import { locationData } from "../../data/location-data"
 
 export default function ContactPage() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null)
+
+  const heroSection = (
+    <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden">
+      <Image
+        src="/images/contact-hero.svg"
+        alt="Contact Broski's Kitchen"
+        fill
+        style={{ objectFit: "cover" }}
+        priority
+        className="brightness-75"
+      />
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-white z-10">
+        <h1 className="text-4xl md:text-6xl font-bold mb-4">Contact Us</h1>
+        <p className="text-xl md:text-2xl">We'd Love to Hear from You</p>
+      </div>
+    </div>
+  )
 
   const toggleFaq = (index: number) => {
     setExpandedFaq(expandedFaq === index ? null : index)
@@ -65,23 +83,7 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen pb-20">
-      {/* Hero Section */}
-      <section className="relative h-[40vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0 bg-black">
-          <div className="absolute inset-0 bg-gradient-to-r from-black to-transparent opacity-70 z-10"></div>
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: "url('/images/contact-hero.svg')" }}
-          ></div>
-        </div>
-        <div className="container mx-auto px-4 z-10 text-center">
-          <h1 className="heading-xl mb-4 text-white gritty-shadow">Contact Us</h1>
-          <p className="text-xl text-[#FFD700] max-w-2xl mx-auto">
-            We'd love to hear from you. Reach out with questions, feedback, or to book your next event.
-          </p>
-        </div>
-      </section>
-
+      {heroSection}
       {/* Contact Information & Form Section */}
       <section className="py-16">
         <div className="container mx-auto px-4">

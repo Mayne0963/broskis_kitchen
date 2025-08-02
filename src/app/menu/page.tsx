@@ -18,6 +18,24 @@ export default function MenuPage() {
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [filteredItems, setFilteredItems] = useState(menuItems)
+  
+  // Hero Image Section
+  const heroSection = (
+    <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden">
+      <Image
+        src="/images/menu-hero.svg"
+        alt="Broski's Kitchen Menu Hero"
+        fill
+        style={{ objectFit: "cover" }}
+        priority
+        className="brightness-75"
+      />
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-white z-10">
+        <h1 className="text-4xl md:text-6xl font-bold mb-4">Our Menu</h1>
+        <p className="text-xl md:text-2xl">Discover Our Delicious Offerings</p>
+      </div>
+    </div>
+  )
   const [showFilters, setShowFilters] = useState(false)
   const [priceRange, setPriceRange] = useState([0, 50])
   const [dietaryFilters, setDietaryFilters] = useState({

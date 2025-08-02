@@ -4,7 +4,7 @@ export const categories = [
   { id: "burgers", name: "Burgers" },
   { id: "wings", name: "Wings" },
   { id: "tacos", name: "Tacos" },
-  { id: "sandwiches", name: "Sandwiches"}
+  { id: "sandwiches", name: "Sandwiches"},
   { id: "sides", name: "Sides" },
   { id: "desserts", name: "Desserts" },
   { id: "drinks", name: "Drinks" },

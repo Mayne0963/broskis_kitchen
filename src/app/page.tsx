@@ -18,6 +18,24 @@ function Page() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const { itemCount } = useCart();
+
+  // Hero Section
+  const heroSection = (
+    <div className="relative w-full h-[400px] md:h-[600px] overflow-hidden">
+      <Image
+        src="/images/Broskis-New-Hero.png"
+        alt="Welcome to Broski's Kitchen"
+        fill
+        style={{ objectFit: "cover" }}
+        priority
+        className="brightness-75"
+      />
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-white z-10">
+        <h1 className="text-5xl md:text-7xl font-bold mb-4">Broski's Kitchen</h1>
+        <p className="text-2xl md:text-3xl">Where Every Meal Tells a Story</p>
+      </div>
+    </div>
+  );
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const { heroContent, loading } = useHeroContent();
@@ -62,9 +80,9 @@ function Page() {
           </a>
         </div>
         
-        {/* Hero Content - Central Vertical Layout */}
-        <div className="relative z-10 text-center px-4 sm:px-6 lg:px-6 max-w-6xl mx-auto flex flex-col items-center justify-start pt-8 min-h-screen w-full">
-          {/* Centered Broski's Gold Logo at Top */}
+        {heroSection}
+        <div className="relative z-10 text-center px-4 sm:px-6 lg:px-6 max-w-6xl mx-auto flex flex-col items-center justify-start pt-8 w-full">
+          {/* Content after hero */}
           <motion.div 
             className="mb-8 flex justify-center"
             initial={{ opacity: 0, y: -50 }}
