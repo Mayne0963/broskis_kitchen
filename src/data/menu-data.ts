@@ -357,7 +357,7 @@ export const menuItems = [
     image: '/images/menu-itens/BroskisTea.png',
     category: 'drinks',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
-  }
+  },
   {
     name: 'Birria Tacos',
     description:
