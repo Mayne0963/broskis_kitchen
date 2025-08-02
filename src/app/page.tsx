@@ -19,43 +19,6 @@ function Page() {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const { itemCount } = useCart();
 
-  // Hero Section
-  const heroSection = (
-    <div className="relative w-full h-[400px] md:h-[600px] overflow-hidden">
-      <Image
-        src="/images/Broskis-New-Hero.png"
-        alt="Welcome to Broski's Kitchen"
-        fill
-        style={{ objectFit: "cover" }}
-        priority
-        className="brightness-75"
-      />
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-white z-10">
-        <h1 className="text-5xl md:text-7xl font-bold mb-4">Broski's Kitchen</h1>
-        <p className="text-2xl md:text-3xl">Where Every Meal Tells a Story</p>
-      </div>
-    </div>
-  );
-  const pathname = usePathname();
-  const { user, logout } = useAuth();
-  const { heroContent, loading } = useHeroContent();
-
-  useEffect(() => {
-    // Show popup after 3 seconds
-    const showTimer = setTimeout(() => {
-      setShowSaucePopup(true);
-    }, 3000);
-
-    // Hide popup after 8 seconds (3s delay + 5s visible)
-    const hideTimer = setTimeout(() => {
-      setShowSaucePopup(false);
-    }, 11000);
-
-    return () => {
-      clearTimeout(showTimer);
-      clearTimeout(hideTimer);
-    };
-  }, []);
 
   return (
     <div className="min-h-screen bg-black text-white">
