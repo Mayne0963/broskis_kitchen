@@ -4,7 +4,7 @@ export const categories = [
   { id: "burgers", name: "Burgers" },
   { id: "wings", name: "Wings" },
   { id: "tacos", name: "Tacos" },
-  { id: "sandwiches", name: "Sandwiches" },
+  { id: "sandwiches", name: "Sandwiches"}
   { id: "sides", name: "Sides" },
   { id: "desserts", name: "Desserts" },
   { id: "drinks", name: "Drinks" },
@@ -62,21 +62,302 @@ export const infusedMenuItems = [
     infused: true,
     dietary: { dairyFree: false, glutenFree: true, vegetarian: true, vegan: false },
   },
+  {
+    id: 'infusedtoasterstrudel',
+    name: 'Infused Toaster Strudel',
+    description:
+      'Flaky pastry pockets filled with berry jam and drizzled with vanilla icing.',
+    price: 12.99,
+    image: '/images/menu-itens/InfusedToasterStrudel.png',
+    category: 'desserts',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
 ]
 
 export const menuItems = [
+  // Burgers
   {
-    id: 'belgiumwaffles',
-    name: 'Belgium Waffles',
+    id: 'veggieburgerdeluxe',
+    name: 'Veggie Burger Deluxe',
+    description:
+      'Juicy beef patty topped with melted American cheese and pickles on a soft brioche bun.',
+    price: 12.99,
+    image: '/images/menu-itens/VeggieBurgerDeluxe.png',
+    category: 'burgers',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'broskissliders',
+    name: 'Broskis Sliders',
+    description:
+      'Three mini beef sliders stacked with melted cheese on toasted brioche buns.',
+    price: 12.99,
+    image: '/images/menu-itens/BroskisSliders.png',
+    category: 'burgers',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'doublestackveggieburger',
+    name: 'Double Stack Veggie Burger',
+    description:
+      'Two seared beef patties layered with melted cheese and our special sauce.',
+    price: 12.99,
+    image: '/images/menu-itens/DoubleStackVeggieBurger.png',
+    category: 'burgers',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+
+  // Wings
+  {
+    id: 'boosiegoldwings',
+    name: 'Boosie Gold Wings',
+    description:
+      'Crispy fried wings coated in our signature honey-gold sauce with a sprinkle of sesame seeds.',
+    price: 12.99,
+    image: '/images/menu-itens/BoosieGoldWings.png',
+    category: 'wings',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'smokedfriedwings',
+    name: 'Smoked Fried Wings',
+    description:
+      'Crispy wings drenched in our fiery house-made red hot sauce.',
+    price: 12.99,
+    image: '/images/menu-itens/SmokedFriedWings.png',
+    category: 'wings',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'sexyyredwings',
+    name: 'Sexyy Red Wings',
+    description:
+      'Spicy wings coated in our signature bright red hot sauce.',
+    price: 12.99,
+    image: '/images/menu-itens/SexyyRedWings.png',
+    category: 'wings',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+
+  // Tacos
+  {
+    id: 'birriatacos',
+    name: 'Birria Tacos',
+    description:
+      'Slow-braised beef tucked in soft tortillas with melted cheese and a side of savory consommé.',
+    price: 12.99,
+    image: '/images/menu-itens/BirriaTacos.png',
+    category: 'tacos',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+
+  // Sandwiches
+  {
+    id: 'broskisdog',
+    name: 'Broskis Dog',
+    description:
+      'Grilled all-beef hot dog piled high with onions, relish and classic yellow mustard.',
+    price: 12.99,
+    image: '/images/menu-itens/BroskisDog.png',
+    category: 'sandwiches',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'wildcaughtcodsandwich',
+    name: 'Wild Caught Cod Sandwich',
+    description:
+      'Crispy fried chicken breast with tangy pickles and our signature sauce on a toasted bun.',
+    price: 12.99,
+    image: '/images/menu-itens/WildCaughtCodSandwich.png',
+    category: 'sandwiches',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'ribs',
+    name: 'Rib Plate',
+    description:
+      'Slow-cooked pork ribs glazed in smoky barbecue sauce.',
+    price: 12.99,
+    image: '/images/menu-itens/RibsPlate.png',
+    category: 'sandwiches',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'salmon',
+    name: 'Salmon Plate',
+    description:
+      'Grilled salmon fillet finished with a bright lemon-herb marinade.',
+    price: 12.99,
+    image: '/images/menu-itens/SalmonPlate.png',
+    category: 'sandwiches',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+
+  // Sides
+  {
+    id: 'steamfriedcabbage',
+    name: 'Steam Fried Cabbage',
+    description:
+      'Seasoned cabbage sautéed with onions until tender and packed with flavor.',
+    price: 12.99,
+    image: '/images/menu-itens/SteamFriedCabbage.png',
+    category: 'sides',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'cornonthecob',
+    name: 'Smoked Corn On The Cob',
+    description:
+      'Sweet corn brushed with garlic butter then grilled to smoky perfection.',
+    price: 12.99,
+    image: '/images/menu-itens/SmokedCornOnTheCob.png',
+    category: 'sides',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'boostenders',
+    name: 'Boosie Powder Tenders',
+    description:
+      'Crispy chicken tenders tossed in a zesty lemon pepper seasoning.',
+    price: 12.99,
+    image: '/images/menu-itens/BoosiePowderChickenTenders.png',
+    category: 'sides',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'macncheese',
+    name: 'Mac N Cheese',
+    description:
+      'Classic elbow macaroni baked in a creamy cheddar cheese sauce.',
+    price: 12.99,
+    image: '/images/menu-itens/MacNCheese.png',
+    category: 'sides',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'nachos',
+    name: 'Nachos',
+    description:
+      'House tortilla chips smothered in queso, jalapeños and fresh pico de gallo.',
+    price: 12.99,
+    image: '/images/menu-itens/Nachos.png',
+    category: 'sides',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'salmonbites',
+    name: 'Salmon Bites',
+    description:
+      'Bite-size salmon pieces fried crisp and served with tangy dipping sauce.',
+    price: 12.99,
+    image: '/images/menu-itens/SalmonBites.png',
+    category: 'sides',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'shrimpngrits',
+    name: 'Shrimp N Grits',
+    description:
+      'Creamy cheddar grits topped with seasoned shrimp and scallions.',
+    price: 12.99,
+    image: '/images/menu-itens/ShrimpNGrits.png',
+    category: 'sides',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'sweetpotatoes',
+    name: 'Sweet Potatoes',
+    description:
+      'Roasted sweet potato wedges tossed with brown sugar and butter.',
+    price: 12.99,
+    image: '/images/menu-itens/SweetPotatoes.png',
+    category: 'sides',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+
+  // Desserts
+  {
+    id: 'broskispearlsugarwaffles',
+    name: 'Broskis Pearl Sugar Waffles',
     description:
       'Crisp golden waffles served with powdered sugar, warm maple syrup and whipped butter on the side.',
     price: 12.99,
-    image: '/images/menu-itens/BelgiumWaffles.png',
+    image: '/images/menu-itens/BroskisPearlSugarWaffles.png',
     category: 'desserts',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
   {
-    id: 'birriatacos',
+    id: 'broskiscake',
+    name: 'Broskis Cake',
+    description:
+      "A sinfully delicious warm chocolate cake with an irresistibly gooey molten center, drizzled with luxurious dark chocolate ganache and dusted with gold-flecked powdered sugar. So good it will make your knees weak.",
+    price: 12.99,
+    image: '/images/menu-itens/BroskisCake.png',
+    category: 'desserts',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'cheesecakebites',
+    name: 'Cheesecake Bites',
+    description:
+      'Bite-size pieces of creamy cheesecake rolled in sweet graham cracker crumbs.',
+    price: 12.99,
+    image: '/images/menu-itens/CheesecakeBites.png',
+    category: 'desserts',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'cheesecakecones',
+    name: 'Cheesecake Cones',
+    description:
+      'Crispy waffle cones overflowing with smooth cheesecake filling and fresh fruit.',
+    price: 12.99,
+    image: '/images/menu-itens/CheesecakeCones.png',
+    category: 'desserts',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'chocolatecchipcookies',
+    name: 'Broskis Chocolate Chip Cookies',
+    description:
+      'Chewy double-chocolate cookies loaded with dark chocolate chunks.',
+    price: 12.99,
+    image: '/images/menu-itens/BroskisChocolateCookies.png',
+    category: 'desserts',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'sweetpotatoepancakes',
+    name: 'Sweet Potatoe Pancakes',
+    description:
+      'Fluffy pancakes made with mashed sweet potatoes and warm spices.',
+    price: 12.99,
+    image: '/images/menu-itens/SweetPotatoePancakes.png',
+    category: 'desserts',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+
+  // Drinks
+  {
+    id: 'boosiepunch',
+    name: 'Boosie Punch',
+    description:
+      'Refreshing tropical fruit punch with bright citrus flavors and a signature kick.',
+    price: 12.99,
+    image: '/images/menu-itens/BoosiePunch.png',
+    category: 'drinks',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  {
+    id: 'broskissweettea',
+    name: 'Broskis Sweet Tea',
+    description:
+      'Classic Southern sweet tea brewed fresh each day and served over ice.',
+    price: 12.99,
+    image: '/images/menu-itens/BroskisTea.png',
+    category: 'drinks',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  }
     name: 'Birria Tacos',
     description:
       'Slow-braised beef tucked in soft tortillas with melted cheese and a side of savory consommé.',
@@ -106,12 +387,12 @@ export const menuItems = [
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
   {
-    id: 'boosieredwings',
-    name: 'Boosie Red Wings',
+    id: 'smokedfriedwings',
+    name: 'Smoked Fried Wings',
     description:
       'Crispy wings drenched in our fiery house-made red hot sauce.',
     price: 12.99,
-    image: '/images/menu-itens/BoosieRedWings.png',
+    image: '/images/menu-itens/SmokedFriedWings.png',
     category: 'wings',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
@@ -136,8 +417,8 @@ export const menuItems = [
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
   {
-    id: 'broskistea',
-    name: 'Broskis Tea',
+    id: 'broskissweettea',
+    name: 'Broskis Sweet Tea',
     description:
       'Classic Southern sweet tea brewed fresh each day and served over ice.',
     price: 12.99,
@@ -146,32 +427,22 @@ export const menuItems = [
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
   {
-    id: 'broskistoasterstrudel',
-    name: 'Broskis Toaster Strudel',
-    description:
-      'Flaky pastry pockets filled with berry jam and drizzled with vanilla icing.',
-    price: 12.99,
-    image: '/images/menu-itens/BroskisToasterStrudel.png',
-    category: 'desserts',
-    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
-  },
-  {
-    id: 'cabbage',
-    name: 'Cabbage',
+    id: 'steamfriedcabbage',
+    name: 'Steam Fried Cabbage',
     description:
       'Seasoned cabbage sautéed with onions until tender and packed with flavor.',
     price: 12.99,
-    image: '/images/menu-itens/Cabbage.png',
+    image: '/images/menu-itens/SteamFriedCabbage.png',
     category: 'sides',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
   {
-    id: 'cheeseburger',
-    name: 'Cheese Burger',
+    id: 'veggieburgerdeluxe',
+    name: 'Veggie Burger Deluxe',
     description:
       'Juicy beef patty topped with melted American cheese and pickles on a soft brioche bun.',
     price: 12.99,
-    image: '/images/menu-itens/CheeseBurger.png',
+    image: '/images/menu-itens/VeggieBurgerDeluxe.png',
     category: 'burgers',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
@@ -196,72 +467,62 @@ export const menuItems = [
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
   {
-    id: 'chickensandwich',
-    name: 'Chicken Sandwich',
+    id: 'wildcaughtcodsandwich',
+    name: 'Wild Caught Cod Sandwich',
     description:
       'Crispy fried chicken breast with tangy pickles and our signature sauce on a toasted bun.',
     price: 12.99,
-    image: '/images/menu-itens/ChickenSandwich.png',
+    image: '/images/menu-itens/WildCaughtCodSandwich.png',
     category: 'sandwiches',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
   {
-    id: 'chickentenders',
-    name: 'Chicken Tenders',
-    description:
-      'Breaded chicken strips fried until golden brown and served with your choice of dipping sauce.',
-    price: 12.99,
-    image: '/images/menu-itens/ChickenTenders.png',
-    category: 'sides',
-    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
-  },
-  {
-    id: 'chocolatecookies',
-    name: 'Chocolate Cookies',
+    id: 'chocolatecchipcookies',
+    name: 'Broskis Chocolate Chip Cookies',
     description:
       'Chewy double-chocolate cookies loaded with dark chocolate chunks.',
     price: 12.99,
-    image: '/images/menu-itens/ChocolateCookies.png',
+    image: '/images/menu-itens/BroskisChocolateCookies.png',
     category: 'desserts',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
   {
-    id: 'chocolatelavacake',
-    name: 'Chocolate Lava Cake',
+    id: 'broskiscake',
+    name: 'Broskis Cake',
     description:
-      'Warm chocolate cake with a gooey molten center dusted with powdered sugar.',
+      "A sinfully delicious warm chocolate cake with an irresistibly gooey molten center, drizzled with luxurious dark chocolate ganache and dusted with gold-flecked powdered sugar. So good it will make your knees weak.",
     price: 12.99,
-    image: '/images/menu-itens/ChocolateLavaCake.png',
+    image: '/images/menu-itens/BroskisCake.png',
     category: 'desserts',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
   {
     id: 'cornonthecob',
-    name: 'Corn On The Cob',
+    name: 'Smoked Corn On The Cob',
     description:
       'Sweet corn brushed with garlic butter then grilled to smoky perfection.',
     price: 12.99,
-    image: '/images/menu-itens/CornOnTheCob.png',
+    image: '/images/menu-itens/SmokedCornOnTheCob.png',
     category: 'sides',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
   {
-    id: 'doublestackcheeseburger',
-    name: 'Double Stack Cheese Burger',
+    id: 'doublestackveggieburger',
+    name: 'Double Stack Veggie Burger',
     description:
       'Two seared beef patties layered with melted cheese and our special sauce.',
     price: 12.99,
-    image: '/images/menu-itens/DoubleStackCheeseBurger.png',
+    image: '/images/menu-itens/DoubleStackVeggieBurger.png',
     category: 'burgers',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
   {
-    id: 'lemonpeppertenders',
-    name: 'Lemon Pepper Tenders',
+    id: 'boostenders',
+    name: 'Boosie Powder Tenders',
     description:
       'Crispy chicken tenders tossed in a zesty lemon pepper seasoning.',
     price: 12.99,
-    image: '/images/menu-itens/LemonPepperTenders.png',
+    image: '/images/menu-itens/BoosiePowderChickenTenders.png',
     category: 'sides',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
@@ -287,21 +548,21 @@ export const menuItems = [
   },
   {
     id: 'ribs',
-    name: 'Ribs',
+    name: 'Rib Plate',
     description:
       'Slow-cooked pork ribs glazed in smoky barbecue sauce.',
     price: 12.99,
-    image: '/images/menu-itens/Ribs.png',
+    image: '/images/menu-itens/RibsPlate.png',
     category: 'sandwiches',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
   {
     id: 'salmon',
-    name: 'Salmon',
+    name: 'Salmon Plate',
     description:
       'Grilled salmon fillet finished with a bright lemon-herb marinade.',
     price: 12.99,
-    image: '/images/menu-itens/Salmon.png',
+    image: '/images/menu-itens/SalmonPlate.png',
     category: 'sandwiches',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
