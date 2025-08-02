@@ -358,6 +358,7 @@ export const menuItems = [
     category: 'drinks',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   }
+  {
     name: 'Birria Tacos',
     description:
       'Slow-braised beef tucked in soft tortillas with melted cheese and a side of savory consommé.',
