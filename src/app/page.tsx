@@ -42,8 +42,6 @@ function Page() {
             <span className="text-base font-extrabold tracking-wide">OTW DELIVERY</span>
           </a>
         </div>
-        
-        {heroSection}
         <div className="relative z-10 text-center px-4 sm:px-6 lg:px-6 max-w-6xl mx-auto flex flex-col items-center justify-start pt-8 w-full">
           {/* Content after hero */}
           <motion.div 
