@@ -69,7 +69,7 @@ export const infusedMenuItems = [
     description:
       'Flaky pastry pockets filled with berry jam and drizzled with vanilla icing.',
     price: 12.99,
-    image: '/images/menu-items/infused-toaster-strudel.png',
+    image: '/images/menu-items/InfusedToasterStrudel.png',
     category: 'desserts',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
@@ -83,7 +83,7 @@ export const menuItems = [
     description:
       'Crisp golden waffles served with powdered sugar, warm maple syrup and whipped butter on the side.',
     price: 12.99,
-    image: '/images/menu-items/broskis-pearl-sugar-waffles.png',
+    image: '/images/menu-items/BroskisPearlSugarWaffles.png',
     category: 'breakfast',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: true, vegan: false },
   },
@@ -93,7 +93,7 @@ export const menuItems = [
     description:
       'Fluffy pancakes made with mashed sweet potatoes and warm spices.',
     price: 12.99,
-    image: '/images/menu-items/sweet-potato-pancakes.png',
+    image: '/images/menu-items/SweetPotatoePancakes.png',
     category: 'breakfast',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: true, vegan: false },
   },
@@ -105,7 +105,7 @@ export const menuItems = [
     description:
       'Plant-based patty topped with vegan cheese and crisp pickles on a soft brioche bun.',
     price: 12.99,
-    image: '/images/menu-items/veggie-burger-deluxe.png',
+    image: '/images/menu-items/VeggieBurgerDeluxe.png',
     category: 'burgers',
     dietary: { dairyFree: true, glutenFree: false, vegetarian: true, vegan: true },
   },
@@ -115,7 +115,7 @@ export const menuItems = [
     description:
       'Three mini plant-based sliders stacked with melted American cheese on toasted brioche buns.',
     price: 13.99,
-    image: '/images/menu-items/broskis-sliders.png',
+    image: '/images/menu-items/BroskisVeggieSliders.png',
     category: 'burgers',
     dietary: { dairyFree: true, glutenFree: false, vegetarian: true, vegan: true },
   },
@@ -125,7 +125,7 @@ export const menuItems = [
     description:
       'Two plant-based patties layered with melted American cheese and our signature special sauce.',
     price: 12.99,
-    image: '/images/menu-items/double-stack-veggie-burger.png',
+    image: '/images/menu-items/DoubleStackVeggieBurger.png',
     category: 'burgers',
     dietary: { dairyFree: true, glutenFree: false, vegetarian: true, vegan: true },
   },
@@ -137,7 +137,7 @@ export const menuItems = [
     description:
       'Crispy fried wings coated in our signature honey-gold sauce with a sprinkle of sesame seeds.',
     price: 12.99,
-    image: '/images/menu-items/boosie-gold-wings.png',
+    image: '/images/menu-items/BoosieGoldWings.png',
     category: 'wings',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
@@ -147,7 +147,7 @@ export const menuItems = [
     description:
       'Crispy wings drenched in our fiery house-made red hot sauce.',
     price: 12.99,
-    image: '/images/menu-items/smoked-fried-wings.png',
+    image: '/images/menu-items/SmokedFriedWings.png',
     category: 'wings',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
@@ -157,7 +157,7 @@ export const menuItems = [
     description:
       'Spicy wings coated in our signature bright red hot sauce.',
     price: 12.99,
-    image: '/images/menu-items/sexyy-red-wings.png',
+    image: '/images/menu-items/SexyyRedWings.png',
     category: 'wings',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
@@ -169,7 +169,7 @@ export const menuItems = [
     description:
       'Slow-braised beef tucked in soft tortillas with melted cheese and a side of savory consommé.',
     price: 12.99,
-    image: '/images/menu-items/birria-tacos.png',
+    image: '/images/menu-items/BirriaTacos.png',
     category: 'tacos',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
@@ -181,7 +181,7 @@ export const menuItems = [
     description:
       'Grilled all-beef hot dog piled high with onions, relish and classic yellow mustard.',
     price: 12.99,
-    image: '/images/menu-items/broskis-dog.png',
+    image: '/images/menu-items/BroskisDog.png',
     category: 'sandwiches',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
@@ -191,7 +191,7 @@ export const menuItems = [
     description:
       'Crispy fried chicken breast with tangy pickles and our signature sauce on a toasted bun.',
     price: 12.99,
-    image: '/images/menu-items/wild-caught-cod-sandwich.png',
+    image: '/images/menu-items/WildCaughtCodSandwich.png',
     category: 'sandwiches',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
@@ -201,7 +201,7 @@ export const menuItems = [
     description:
       'Slow-cooked pork ribs glazed in smoky barbecue sauce.',
     price: 12.99,
-    image: '/images/menu-items/ribs-plate.png',
+    image: '/images/menu-items/RibsPlate.png',
     category: 'sandwiches',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
@@ -211,7 +211,7 @@ export const menuItems = [
     description:
       'Grilled salmon fillet finished with a bright lemon-herb marinade.',
     price: 12.99,
-    image: '/images/menu-items/salmon-plate.png',
+    image: '/images/menu-items/SalmonPlate.png',
     category: 'sandwiches',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
@@ -221,7 +221,7 @@ export const menuItems = [
     description:
       'Home-style meatloaf topped with rich brown gravy and served with mashed potatoes.',
     price: 14.99,
-    image: '/images/menu-items/meatloaf-plate.png',
+    image: '/images/menu-items/MeatloafPlate.png',
     category: 'sandwiches',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
@@ -233,7 +233,7 @@ export const menuItems = [
     description:
       'Seasoned cabbage sautéed with onions until tender and packed with flavor.',
     price: 12.99,
-    image: '/images/menu-items/steam-fried-cabbage.png',
+    image: '/images/menu-items/SteamFriedCabbage.png',
     category: 'sides',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
@@ -243,7 +243,7 @@ export const menuItems = [
     description:
       'Sweet corn brushed with garlic butter then grilled to smoky perfection.',
     price: 12.99,
-    image: '/images/menu-items/smoked-corn-on-the-cob.png',
+    image: '/images/menu-items/SmokedCornOnTheCob.png',
     category: 'sides',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
@@ -253,7 +253,7 @@ export const menuItems = [
     description:
       'Crispy chicken tenders tossed in a zesty lemon pepper seasoning.',
     price: 12.99,
-    image: '/images/menu-items/boosie-powder-chicken-tenders.png',
+    image: '/images/menu-items/BoosiePowderChickenTenders.png',
     category: 'sides',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
@@ -263,7 +263,7 @@ export const menuItems = [
     description:
       'Classic elbow macaroni baked in a creamy cheddar cheese sauce.',
     price: 12.99,
-    image: '/images/menu-items/mac-n-cheese.png',
+    image: '/images/menu-items/MacNCheese.png',
     category: 'sides',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
@@ -273,7 +273,7 @@ export const menuItems = [
     description:
       'House tortilla chips smothered in queso, jalapeños and fresh pico de gallo.',
     price: 12.99,
-    image: '/images/menu-items/nachos.png',
+    image: '/images/menu-items/Nachos.png',
     category: 'sides',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
@@ -283,7 +283,7 @@ export const menuItems = [
     description:
       'Bite-size salmon pieces fried crisp and served with tangy dipping sauce.',
     price: 12.99,
-    image: '/images/menu-items/salmon-bites.png',
+    image: '/images/menu-items/SalmonBites.png',
     category: 'sides',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
@@ -355,7 +355,7 @@ export const menuItems = [
     description:
       'Crispy waffle cones overflowing with smooth cheesecake filling and fresh fruit.',
     price: 12.99,
-    image: '/images/menu-items/CheesecakeCones.png',
+    image: '/images/menu-items/StuffedCheesecakeCones.png',
     category: 'desserts',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
