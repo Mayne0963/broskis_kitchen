@@ -11,12 +11,12 @@ export const metadata: Metadata = {
 export default function LocationsPage() {
   return (
     <div>
-      <div className="relative w-full h-[400px] md:h-[400px] overflow-hidden">
+      <div className="relative w-full h-[500px] md:h-[600px] overflow-hidden">
         <Image
           src="/images/LocationsHero.png"
           alt="Broski's Kitchen Locations"
           fill
-          style={{ objectFit: "contain" }}
+          style={{ objectFit: "fill" }}
           priority
           className="brightness-75"
         />
