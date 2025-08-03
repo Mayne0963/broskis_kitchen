@@ -16,7 +16,7 @@ export default function LocationsPage() {
           src="/images/LocationsHero.png"
           alt="Broski's Kitchen Locations"
           fill
-          style={{ objectFit: "cover" }}
+          style={{ objectFit: "contain" }}
           priority
           className="brightness-75"
         />
