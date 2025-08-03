@@ -23,7 +23,7 @@ export default function MenuPage() {
   const heroSection = (
     <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden">
       <Image
-        src="/images/menu-hero.svg"
+        src="/images/HomePageHeroImage.png"
         alt="Broski's Kitchen Menu Hero"
         fill
         style={{ objectFit: "cover" }}
