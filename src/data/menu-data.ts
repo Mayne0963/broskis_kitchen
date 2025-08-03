@@ -1,6 +1,7 @@
 import type { CustomizationCategory } from "@/types"
 
 export const categories = [
+  { id: "breakfast", name: "Breakfast" },
   { id: "burgers", name: "Burgers" },
   { id: "wings", name: "Wings" },
   { id: "tacos", name: "Tacos" },
@@ -75,36 +76,58 @@ export const infusedMenuItems = [
 ]
 
 export const menuItems = [
+  // Breakfast
+  {
+    id: 'broskispearlsugarwaffles',
+    name: 'Broskis Pearl Sugar Waffles',
+    description:
+      'Crisp golden waffles served with powdered sugar, warm maple syrup and whipped butter on the side.',
+    price: 12.99,
+    image: '/images/menu-itens/BroskisPearlSugarWaffles.png',
+    category: 'breakfast',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: true, vegan: false },
+  },
+  {
+    id: 'sweetpotatoepancakes',
+    name: 'Sweet Potato Pancakes',
+    description:
+      'Fluffy pancakes made with mashed sweet potatoes and warm spices.',
+    price: 12.99,
+    image: '/images/menu-itens/SweetPotatoePancakes.png',
+    category: 'breakfast',
+    dietary: { dairyFree: false, glutenFree: false, vegetarian: true, vegan: false },
+  },
+
   // Burgers
   {
     id: 'veggieburgerdeluxe',
     name: 'Veggie Burger Deluxe',
     description:
-      'Juicy beef patty topped with melted American cheese and pickles on a soft brioche bun.',
+      'Plant-based patty topped with vegan cheese and crisp pickles on a soft brioche bun.',
     price: 12.99,
     image: '/images/menu-itens/VeggieBurgerDeluxe.png',
     category: 'burgers',
-    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+    dietary: { dairyFree: true, glutenFree: false, vegetarian: true, vegan: true },
   },
   {
     id: 'broskissliders',
-    name: 'Broskis Sliders',
+    name: 'Broskis Veggie Sliders',
     description:
-      'Three mini beef sliders stacked with melted cheese on toasted brioche buns.',
-    price: 12.99,
+      'Three mini plant-based sliders stacked with melted American cheese on toasted brioche buns.',
+    price: 13.99,
     image: '/images/menu-itens/BroskisSliders.png',
     category: 'burgers',
-    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+    dietary: { dairyFree: true, glutenFree: false, vegetarian: true, vegan: true },
   },
   {
     id: 'doublestackveggieburger',
     name: 'Double Stack Veggie Burger',
     description:
-      'Two seared beef patties layered with melted cheese and our special sauce.',
+      'Two plant-based patties layered with melted American cheese and our signature special sauce.',
     price: 12.99,
     image: '/images/menu-itens/DoubleStackVeggieBurger.png',
     category: 'burgers',
-    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+    dietary: { dairyFree: true, glutenFree: false, vegetarian: true, vegan: true },
   },
 
   // Wings
@@ -215,7 +238,7 @@ export const menuItems = [
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
   {
-    id: 'boostenders',
+    id: 'boosietenders',
     name: 'Boosie Powder Tenders',
     description:
       'Crispy chicken tenders tossed in a zesty lemon pepper seasoning.',
@@ -277,16 +300,6 @@ export const menuItems = [
 
   // Desserts
   {
-    id: 'broskispearlsugarwaffles',
-    name: 'Broskis Pearl Sugar Waffles',
-    description:
-      'Crisp golden waffles served with powdered sugar, warm maple syrup and whipped butter on the side.',
-    price: 12.99,
-    image: '/images/menu-itens/BroskisPearlSugarWaffles.png',
-    category: 'desserts',
-    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
-  },
-  {
     id: 'broskiscake',
     name: 'Broskis Cake',
     description:
@@ -326,16 +339,7 @@ export const menuItems = [
     category: 'desserts',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
   },
-  {
-    id: 'sweetpotatoepancakes',
-    name: 'Sweet Potatoe Pancakes',
-    description:
-      'Fluffy pancakes made with mashed sweet potatoes and warm spices.',
-    price: 12.99,
-    image: '/images/menu-itens/SweetPotatoePancakes.png',
-    category: 'desserts',
-    dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
-  },
+
 
   // Drinks
   {
@@ -361,6 +365,44 @@ export const menuItems = [
 ] 
 
 export const customizationOptions: { [key: string]: CustomizationCategory[] } = {
+  breakfast: [
+    {
+      id: "eggs",
+      name: "Egg Style",
+      required: false,
+      multiple: false,
+      options: [
+        { id: "scrambled", name: "Scrambled", price: 0 },
+        { id: "over-easy", name: "Over Easy", price: 0 },
+        { id: "over-medium", name: "Over Medium", price: 0 },
+        { id: "over-hard", name: "Over Hard", price: 0 },
+        { id: "poached", name: "Poached", price: 0 },
+      ],
+    },
+    {
+      id: "protein",
+      name: "Protein Choice",
+      required: false,
+      multiple: false,
+      options: [
+        { id: "beyond-sausage", name: "Beyond Sausage", price: 2.99 },
+        { id: "tempeh-bacon", name: "Tempeh Bacon", price: 2.99 },
+        { id: "tofu-scramble", name: "Tofu Scramble", price: 2.99 },
+      ],
+    },
+    {
+      id: "extras",
+      name: "Extras",
+      required: false,
+      multiple: true,
+      options: [
+        { id: "avocado", name: "Avocado", price: 1.99 },
+        { id: "vegan-cheese", name: "Vegan Cheese", price: 1.49 },
+        { id: "extra-toast", name: "Extra Toast", price: 0.99 },
+        { id: "fruit", name: "Fresh Fruit", price: 2.99 },
+      ],
+    },
+  ],
   burgers: [
     {
       id: "patty-type",
