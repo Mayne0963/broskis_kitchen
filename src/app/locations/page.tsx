@@ -20,10 +20,6 @@ export default function LocationsPage() {
           priority
           className="brightness-75"
         />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-white z-10">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">Our Locations</h1>
-          <p className="text-xl md:text-2xl">Find a Broski's Kitchen Near You</p>
-        </div>
       </div>
       <LocationsClientPage locations={locationData} />
     </div>
