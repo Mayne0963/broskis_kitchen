@@ -50,25 +50,6 @@ export default function LocationsClientPage({ locations }: LocationsClientPagePr
 
   return (
     <div className="min-h-screen pb-20">
-      {/* Hero Section */}
-      <section className="relative h-[40vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <Image 
-            src="https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=modern%20restaurant%20locations%20urban%20street%20food%20kitchen%20multiple%20locations%20cityscape&image_size=landscape_16_9" 
-            alt="Broski's Kitchen Locations" 
-            fill 
-            className="object-cover" 
-            priority 
-          />
-          <div className="absolute inset-0 bg-black bg-opacity-60"></div>
-        </div>
-        <div className="container mx-auto px-4 z-10 text-center">
-          <h1 className="heading-xl mb-4 text-white gritty-shadow">Our Locations</h1>
-          <p className="text-xl text-gray-200 max-w-2xl mx-auto">
-            Find a Broski's Kitchen near you and experience luxury street food.
-          </p>
-        </div>
-      </section>
 
       {/* Search and Filter Section */}
       <section className="bg-[#111111] py-8 sticky top-20 z-30 border-b border-[#333333]">
