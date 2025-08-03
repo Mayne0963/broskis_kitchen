@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function LocationsPage() {
   return (
     <div>
-      <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden">
+      <div className="relative w-full h-[400px] md:h-[400px] overflow-hidden">
         <Image
           src="/images/LocationsHero.png"
           alt="Broski's Kitchen Locations"
