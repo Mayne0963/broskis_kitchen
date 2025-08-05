@@ -164,7 +164,7 @@ export async function verifyCustomerAccess(): Promise<{ success: boolean; user?:
  * Create a role-based middleware wrapper
  */
 export function withRoleAuth(requiredRole: UserRole | UserRole[]) {
-  return async (handler: Function) => {
+  return async (handler: (user: any) => Promise<Response> | Response) => {
     const verification = await verifyRole(requiredRole)
     
     if (!verification.success) {

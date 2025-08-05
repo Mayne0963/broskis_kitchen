@@ -321,45 +321,7 @@ class OrderFlowTestSuite {
     const tests: TestResult[] = [];
     const startTime = Date.now();
 
-    // Test 1: Send email notification
-    tests.push(await this.runTest('Send Email Notification', async () => {
-      const notificationService = new NotificationService();
-      
-      const result = await notificationService.sendEmail({
-        to: this.testUsers[0].email,
-        template: 'order_confirmation',
-        data: {
-          orderId: this.testOrders[0].id || 'test_order',
-          customerName: this.testUsers[0].name,
-          items: this.testOrders[0].items,
-          total: this.testOrders[0].total
-        }
-      });
-
-      if (!result.success) {
-        throw new Error(`Email sending failed: ${result.error}`);
-      }
-
-      return { messageId: result.messageId };
-    }));
-
-    // Test 2: Send SMS notification
-    tests.push(await this.runTest('Send SMS Notification', async () => {
-      const notificationService = new NotificationService();
-      
-      const result = await notificationService.sendSMS({
-        to: this.testUsers[0].phone,
-        message: `Your order ${this.testOrders[0].id} has been confirmed and is being prepared.`
-      });
-
-      if (!result.success) {
-        throw new Error(`SMS sending failed: ${result.error}`);
-      }
-
-      return { messageId: result.messageId };
-    }));
-
-    // Test 3: Send push notification
+    // Test 1: Send push notification
     tests.push(await this.runTest('Send Push Notification', async () => {
       const notificationService = new NotificationService();
       

@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { otwService } from '@/lib/services/otw-service';
-import { smsService } from '@/lib/services/sms-service';
-import { emailService } from '@/lib/services/email-service';
 import { db } from '@/lib/firebase';
 import { doc, updateDoc, getDoc, query, collection, where, getDocs } from 'firebase/firestore';
 
@@ -106,48 +104,11 @@ export async function POST(request: NextRequest) {
 
     await updateDoc(doc(db, 'orders', orderId), updateData);
 
-    // Send notifications to customer
-    const customerPhone = orderData.customerInfo?.phone;
-    const customerEmail = orderData.customerInfo?.email;
-    const orderNumber = orderData.orderNumber || orderId;
-
-    // Send SMS notification
-    if (customerPhone && smsService.validatePhoneNumber(customerPhone)) {
-      const formattedPhone = smsService.formatPhoneNumber(customerPhone);
-      
-      if (deliveryUpdate.status === 'assigned' && deliveryUpdate.driverInfo) {
-        await smsService.sendDeliveryUpdate(
-          formattedPhone,
-          orderNumber,
-          deliveryUpdate.driverInfo.name,
-          deliveryUpdate.estimatedArrival || 'Soon'
-        );
-      } else {
-        await smsService.sendOrderUpdate(
-          formattedPhone,
-          orderNumber,
-          orderStatus,
-          updateData.estimatedTime
-        );
-      }
-    }
-
-    // Send email notification for important status changes
-    if (customerEmail && ['out_for_delivery', 'delivered'].includes(orderStatus)) {
-      await emailService.sendOrderUpdate(
-        customerEmail,
-        orderData.customerInfo?.name || 'Customer',
-        {
-          orderNumber,
-          status: orderStatus,
-          items: orderData.items || [],
-          total: orderData.pricing?.total || 0,
-          estimatedTime: updateData.estimatedTime,
-          trackingUrl: orderData.deliveryInfo?.trackingUrl,
-          driverInfo: deliveryUpdate.driverInfo
-        }
-      );
-    }
+    // Note: Email and SMS notifications have been disabled
+    // Push notifications can be implemented via Firebase Cloud Messaging
+    console.log(`Delivery status updated for order ${orderData.orderNumber || orderId}: ${deliveryUpdate.status}`);
+    
+    // TODO: Implement push notifications for delivery updates if needed
 
     console.log(`Order ${orderId} updated with delivery status: ${deliveryUpdate.status}`);
 

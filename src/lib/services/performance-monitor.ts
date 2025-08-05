@@ -169,7 +169,7 @@ class PerformanceMonitor {
       // Add load average on Unix systems
       if (process.platform !== 'win32') {
         try {
-          const os = require('os');
+          const os = await import('os');
           healthMetric.loadAverage = os.loadavg();
         } catch (error) {
           // Ignore if os module is not available

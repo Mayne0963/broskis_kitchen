@@ -1,8 +1,6 @@
 import Stripe from 'stripe';
 import { db } from '@/lib/firebase';
 import { doc, updateDoc, getDoc, addDoc, collection } from 'firebase/firestore';
-import { emailService } from './email-service';
-import { smsService } from './sms-service';
 import { otwService } from './otw-service';
 
 interface RefundRequest {
@@ -119,8 +117,8 @@ class RefundService {
         status: refund.status
       });
 
-      // Send notifications
-      await this.sendRefundNotifications(orderData, refundAmount, refundRequest.reason);
+      // TODO: Send push notifications for refund confirmation
+      console.log(`Refund processed for order ${refundRequest.orderId}: $${refundAmount.toFixed(2)}`);
 
       return {
         refundId: refund.id,
@@ -205,8 +203,8 @@ class RefundService {
         ]
       });
 
-      // Send cancellation notifications
-      await this.sendCancellationNotifications(orderData, cancellationRequest.reason, refundInfo);
+      // TODO: Send push notifications for order cancellation
+      console.log(`Order cancelled: ${cancellationRequest.orderId}. Reason: ${cancellationRequest.reason}`);
 
       return true;
 
@@ -260,74 +258,7 @@ class RefundService {
     return now.toISOString();
   }
 
-  private async sendRefundNotifications(orderData: any, refundAmount: number, reason: string): Promise<void> {
-    const customerEmail = orderData.customerInfo?.email;
-    const customerPhone = orderData.customerInfo?.phone;
-    const orderNumber = orderData.orderNumber || orderData.id;
 
-    // Send email notification
-    if (customerEmail) {
-      await emailService.sendRefundConfirmation(
-        customerEmail,
-        orderData.customerInfo?.name || 'Customer',
-        {
-          orderNumber,
-          refundAmount,
-          reason,
-          estimatedArrival: '5-10 business days',
-          originalTotal: orderData.pricing?.total || 0
-        }
-      );
-    }
-
-    // Send SMS notification
-    if (customerPhone && smsService.validatePhoneNumber(customerPhone)) {
-      const formattedPhone = smsService.formatPhoneNumber(customerPhone);
-      const message = `💰 Refund processed for order ${orderNumber}. Amount: $${refundAmount.toFixed(2)}. You'll receive it in 5-10 business days. Questions? Contact Broski's Kitchen.`;
-      
-      await smsService.sendSMS({
-        to: formattedPhone,
-        message,
-        orderId: orderNumber
-      });
-    }
-  }
-
-  private async sendCancellationNotifications(orderData: any, reason: string, refundInfo: any): Promise<void> {
-    const customerEmail = orderData.customerInfo?.email;
-    const customerPhone = orderData.customerInfo?.phone;
-    const orderNumber = orderData.orderNumber || orderData.id;
-
-    // Send email notification
-    if (customerEmail) {
-      await emailService.sendOrderCancellation(
-        customerEmail,
-        orderData.customerInfo?.name || 'Customer',
-        {
-          orderNumber,
-          reason,
-          refundInfo,
-          items: orderData.items || []
-        }
-      );
-    }
-
-    // Send SMS notification
-    if (customerPhone && smsService.validatePhoneNumber(customerPhone)) {
-      const formattedPhone = smsService.formatPhoneNumber(customerPhone);
-      let message = `❌ Order ${orderNumber} has been cancelled. Reason: ${reason}.`;
-      
-      if (refundInfo) {
-        message += ` Refund of $${refundInfo.amount.toFixed(2)} is being processed.`;
-      }
-      
-      await smsService.sendSMS({
-        to: formattedPhone,
-        message,
-        orderId: orderNumber
-      });
-    }
-  }
 }
 
 export const refundService = new RefundService();

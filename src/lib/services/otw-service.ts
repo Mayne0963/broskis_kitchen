@@ -247,8 +247,8 @@ class OTWService {
   }
 
   // Webhook signature verification
-  verifyWebhookSignature(payload: string, signature: string): boolean {
-    const crypto = require('crypto');
+  async verifyWebhookSignature(payload: string, signature: string): Promise<boolean> {
+    const crypto = await import('crypto');
     const expectedSignature = crypto
       .createHmac('sha256', this.config.webhookSecret)
       .update(payload)

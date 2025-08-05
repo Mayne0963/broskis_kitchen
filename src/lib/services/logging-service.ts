@@ -187,8 +187,8 @@ class Logger {
   private async writeToFile(logs: LogEntry[]) {
     // File logging implementation would go here
     // This is a placeholder for file system logging
-    const fs = require('fs').promises;
-    const path = require('path');
+    const { promises: fs } = await import('fs');
+    const path = await import('path');
     
     try {
       const logDir = path.join(process.cwd(), 'logs');
