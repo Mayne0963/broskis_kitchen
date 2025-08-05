@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { CreditCard, Star, Plus, DollarSign, Gift } from 'lucide-react'
+import StripePaymentForm from './StripePaymentForm'
 
 interface PaymentMethod {
   id: string
@@ -235,98 +236,43 @@ export default function PaymentStep({
           <span className="text-[#FFD700]">Add New Payment Method</span>
         </button>
         
-        {/* New Card Form */}
+        {/* Stripe Payment Form */}
         {showNewCardForm && (
-          <div className="mt-4 p-6 bg-black/30 rounded-lg border border-[#FFD700]">
-            <h4 className="text-white font-semibold mb-4">Add New Card</h4>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-[#FFD700] mb-2">Card Number</label>
-                <input
-                  type="text"
-                  value={formatCardNumber(newCard.number)}
-                  onChange={(e) => setNewCard({ ...newCard, number: e.target.value.replace(/\s/g, '') })}
-                  placeholder="1234 5678 9012 3456"
-                  maxLength={19}
-                  className="w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border border-[#FFD700] rounded-lg text-white placeholder-[#FFD700] focus:border-[var(--color-harvest-gold)] focus:outline-none"
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-[#FFD700] mb-2">Expiry Month</label>
-                  <select
-                    value={newCard.expiryMonth}
-                    onChange={(e) => setNewCard({ ...newCard, expiryMonth: e.target.value })}
-                    className="w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border border-[#FFD700] rounded-lg text-white focus:border-[var(--color-harvest-gold)] focus:outline-none"
-                  >
-                    <option value="">Month</option>
-                    {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
-                      <option key={month} value={month.toString().padStart(2, '0')}>
-                        {month.toString().padStart(2, '0')}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-[#FFD700] mb-2">Expiry Year</label>
-                  <select
-                    value={newCard.expiryYear}
-                    onChange={(e) => setNewCard({ ...newCard, expiryYear: e.target.value })}
-                    className="w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border border-gray-600 rounded-lg text-white focus:border-[var(--color-harvest-gold)] focus:outline-none"
-                  >
-                    <option value="">Year</option>
-                    {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i).map(year => (
-                      <option key={year} value={year}>{year}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-[#FFD700] mb-2">CVC</label>
-                  <input
-                    type="text"
-                    value={newCard.cvc}
-                    onChange={(e) => setNewCard({ ...newCard, cvc: e.target.value })}
-                    placeholder="123"
-                    maxLength={4}
-                    className="w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-[var(--color-harvest-gold)] focus:outline-none"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-[#FFD700] mb-2">ZIP Code</label>
-                  <input
-                    type="text"
-                    value={newCard.zipCode}
-                    onChange={(e) => setNewCard({ ...newCard, zipCode: e.target.value })}
-                    placeholder="94102"
-                    className="w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-[var(--color-harvest-gold)] focus:outline-none"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-[#FFD700] mb-2">Cardholder Name</label>
-                <input
-                  type="text"
-                  value={newCard.name}
-                  onChange={(e) => setNewCard({ ...newCard, name: e.target.value })}
-                  placeholder="John Doe"
-                  className="w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-[var(--color-harvest-gold)] focus:outline-none"
-                />
-              </div>
-              
-              {isNewCardValid() && (
-                <div className="p-3 bg-gold-foil/20 border border-gold-foil/30 rounded-lg">
-                  <p className="text-green-300 text-sm font-medium">✓ Card information looks good!</p>
-                </div>
-              )}
-            </div>
+          <div className="mt-4">
+            <StripePaymentForm
+              amount={cartData.total + checkoutData.tip - (checkoutData.useRewards ? checkoutData.rewardsPoints * 0.01 : 0)}
+              onPaymentSuccess={(paymentIntentId) => {
+                onUpdate({ 
+                  newPayment: { 
+                    type: 'stripe',
+                    paymentIntentId,
+                    amount: cartData.total + checkoutData.tip - (checkoutData.useRewards ? checkoutData.rewardsPoints * 0.01 : 0),
+                    status: 'succeeded',
+                    last4: '****' // Will be updated after payment
+                  },
+                  selectedPayment: undefined
+                })
+                setShowNewCardForm(false)
+              }}
+              onPaymentError={(error) => {
+                console.error('Payment error:', error)
+                // Clear the new payment form on error
+                setShowNewCardForm(false)
+                onUpdate({
+                  selectedPayment: undefined,
+                  newPayment: undefined
+                })
+                // TODO: Show error toast to user
+              }}
+              orderMetadata={{
+                tip: checkoutData.tip.toString(),
+                rewardsUsed: checkoutData.useRewards.toString(),
+                rewardsPoints: checkoutData.rewardsPoints.toString(),
+                subtotal: cartData.subtotal.toString(),
+                tax: cartData.tax.toString(),
+                deliveryFee: cartData.deliveryFee.toString()
+              }}
+            />
           </div>
         )}
       </div>

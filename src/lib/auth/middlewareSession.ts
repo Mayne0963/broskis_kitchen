@@ -9,7 +9,7 @@ export interface SessionUser {
 }
 
 // Lightweight session check for middleware (Edge Runtime)
-// Since Firebase Admin SDK doesn't work in Edge Runtime, we'll use a simpler approach
+// Since Firebase Admin SDK doesn't work in Edge Runtime, we'll decode the JWT manually
 export async function getSessionCookieForMiddleware(): Promise<SessionUser | null> {
   try {
     const cookieStore = await cookies()
@@ -20,18 +20,31 @@ export async function getSessionCookieForMiddleware(): Promise<SessionUser | nul
       return null
     }
 
-    // For middleware in Edge Runtime, we'll just check if session cookie exists
-    // The actual verification happens in the dashboard page server component
+    // For middleware in Edge Runtime, we'll decode the JWT payload without verification
+    // The actual verification happens in the page server components
     // This is a security trade-off for Edge Runtime compatibility
     
-    // Return a basic user object to allow middleware to pass
-    // Real verification happens server-side in the dashboard
-    return {
-      uid: 'middleware-check',
-      email: 'user@example.com',
-      emailVerified: true,
-      name: 'User',
-      role: 'customer'
+    try {
+      // Decode JWT payload (without verification for middleware)
+      const payload = JSON.parse(atob(sessionCookie.split('.')[1]))
+      
+      return {
+        uid: payload.uid || 'middleware-check',
+        email: payload.email || 'user@example.com',
+        emailVerified: payload.email_verified || true,
+        name: payload.name || payload.email?.split('@')[0] || 'User',
+        role: payload.role || payload.custom_claims?.role || 'customer'
+      }
+    } catch (decodeError) {
+      console.log('Could not decode session cookie, using fallback')
+      // Fallback for basic session check
+      return {
+        uid: 'middleware-check',
+        email: 'user@example.com',
+        emailVerified: true,
+        name: 'User',
+        role: 'customer'
+      }
     }
   } catch (error) {
     console.error('Error checking session cookie in middleware:', error)

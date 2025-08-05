@@ -20,6 +20,7 @@ import {
 import OrdersTab from './OrdersTab'
 import MenuDropsTab from './MenuDropsTab'
 import RewardsTab from './RewardsTab'
+import UserManagement from './UserManagement'
 
 interface AdminDashboardProps {
   data: {
@@ -193,11 +194,12 @@ export default function AdminDashboard({ data }: AdminDashboardProps) {
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="orders">Orders</TabsTrigger>
           <TabsTrigger value="menu-drops">Menu Drops</TabsTrigger>
           <TabsTrigger value="rewards">Rewards</TabsTrigger>
+          <TabsTrigger value="users">Users</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -331,7 +333,7 @@ export default function AdminDashboard({ data }: AdminDashboardProps) {
         </TabsContent>
 
         <TabsContent value="orders">
-          <OrdersTab orders={data.recentOrders} />
+          <OrdersTab initialOrders={data.recentOrders} />
         </TabsContent>
 
         <TabsContent value="menu-drops">
@@ -340,6 +342,10 @@ export default function AdminDashboard({ data }: AdminDashboardProps) {
 
         <TabsContent value="rewards">
           <RewardsTab rewardsData={data.rewardsData} />
+        </TabsContent>
+
+        <TabsContent value="users">
+          <UserManagement />
         </TabsContent>
       </Tabs>
     </div>

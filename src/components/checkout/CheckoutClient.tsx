@@ -93,6 +93,7 @@ export default function CheckoutClient({
   })
   const [isProcessing, setIsProcessing] = useState(false)
   const [orderId, setOrderId] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
   
   const updateCheckoutData = (updates: Partial<CheckoutData>) => {
     setCheckoutData(prev => ({ ...prev, ...updates }))
@@ -121,6 +122,7 @@ export default function CheckoutClient({
   const handleNext = () => {
     const stepIndex = getCurrentStepIndex()
     if (stepIndex < steps.length - 1 && canProceedToNext()) {
+      setError(null) // Clear any previous errors
       setCurrentStep(steps[stepIndex + 1].id as CheckoutStep)
     }
   }
@@ -128,33 +130,105 @@ export default function CheckoutClient({
   const handlePrevious = () => {
     const stepIndex = getCurrentStepIndex()
     if (stepIndex > 0) {
+      setError(null) // Clear any previous errors
       setCurrentStep(steps[stepIndex - 1].id as CheckoutStep)
     }
   }
   
   const handlePlaceOrder = async () => {
     setIsProcessing(true)
+    
     try {
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/checkout/place-order', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     userId,
-      //     cartData,
-      //     checkoutData
-      //   })
-      // })
-      // const result = await response.json()
+      // Create order data
+      const orderData = {
+        items: cartData.items,
+        subtotal: cartData.subtotal,
+        tax: cartData.tax,
+        orderType: checkoutData.deliveryType,
+        deliveryAddress: checkoutData.deliveryType === 'delivery' ? checkoutData.selectedAddress : undefined,
+        pickupLocation: checkoutData.deliveryType === 'pickup' ? 'Main Location' : undefined,
+        contactInfo: {
+          email: checkoutData.selectedAddress?.email || 'customer@example.com',
+          phone: checkoutData.selectedAddress?.phone || '555-0123'
+        },
+        paymentInfo: {
+          method: checkoutData.selectedPayment?.type || 'card',
+          last4: checkoutData.selectedPayment?.last4 || '****'
+        },
+        specialInstructions: checkoutData.specialInstructions,
+        userId: userId
+      }
+
+      // Create order
+      const orderResponse = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+      })
+
+      if (!orderResponse.ok) {
+        throw new Error('Failed to create order')
+      }
+
+      const { order } = await orderResponse.json()
       
-      // Mock delay and success
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      const mockOrderId = `BK-${Date.now()}`
-      setOrderId(mockOrderId)
-      setCurrentStep('confirmation')
+      // Create payment intent
+      const paymentResponse = await fetch('/api/stripe/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: order.total,
+          metadata: {
+            orderId: order.id,
+            orderType: order.orderType
+          }
+        })
+      })
+
+      if (!paymentResponse.ok) {
+        throw new Error('Failed to create payment intent')
+      }
+
+      const { paymentIntentId } = await paymentResponse.json()
+      
+      // Check if payment was already processed via Stripe Elements
+       if (checkoutData.newPayment?.paymentIntentId) {
+         // Payment already processed, just confirm the order
+         const confirmResponse = await fetch('/api/stripe/confirm-payment', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({
+             paymentIntentId: checkoutData.newPayment.paymentIntentId
+           })
+         })
+
+         if (!confirmResponse.ok) {
+           throw new Error('Failed to confirm payment')
+         }
+
+         // Update order status to confirmed
+         await fetch('/api/orders', {
+           method: 'PUT',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({
+             orderId: order.id,
+             status: 'confirmed'
+           })
+         })
+       } else if (checkoutData.selectedPayment) {
+         // Using existing payment method - would need additional processing
+         console.log('Using existing payment method:', checkoutData.selectedPayment)
+         // For now, simulate successful payment with existing method
+         await new Promise(resolve => setTimeout(resolve, 1000))
+       }
+       
+       setOrderId(order.id)
+       setCurrentStep('confirmation')
     } catch (error) {
-      console.error('Failed to place order:', error)
-      // Handle error - show toast or error message
+      console.error('Error placing order:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Failed to place order'
+      setError(errorMessage)
+      // TODO: Show error toast to user
     } finally {
       setIsProcessing(false)
     }
@@ -208,6 +282,22 @@ export default function CheckoutClient({
   
   return (
     <div className="max-w-7xl mx-auto">
+      {/* Error Display */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-900/20 border border-red-500/30 rounded-lg">
+          <div className="flex items-center">
+            <div className="text-red-400 font-medium">Error</div>
+            <button 
+              onClick={() => setError(null)}
+              className="ml-auto text-red-400 hover:text-red-300"
+            >
+              ×
+            </button>
+          </div>
+          <p className="text-red-300 text-sm mt-1">{error}</p>
+        </div>
+      )}
+
       {/* Progress Steps */}
       <div className="mb-8">
         <div className="flex items-center justify-between">

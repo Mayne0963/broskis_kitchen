@@ -14,10 +14,20 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase - prevent duplicate app error
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+let app;
+let isFirebaseConfigured = false;
+
+try {
+  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+  isFirebaseConfigured = true;
+} catch (error) {
+  console.error('Firebase initialization failed:', error);
+  isFirebaseConfigured = false;
+}
 
 // Initialize Firebase services
-export const db = getFirestore(app);
-export const auth = getAuth(app);
+export const db = isFirebaseConfigured ? getFirestore(app) : null;
+export const auth = isFirebaseConfigured ? getAuth(app) : null;
+export { isFirebaseConfigured };
 
 export default app;

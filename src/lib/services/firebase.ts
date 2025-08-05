@@ -301,4 +301,4 @@ if (isFirebaseConfigured && auth) {
   })
 }
 
-export { app, auth, db, storage, isFirebaseConfigured, googleProvider }
+export { app, auth, db, storage, isFirebaseConfigured, googleProvider, GoogleAuthProvider, getIdToken }

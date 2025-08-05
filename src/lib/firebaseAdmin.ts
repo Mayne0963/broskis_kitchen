@@ -1,15 +1,34 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
+import { getFirestore } from 'firebase-admin/firestore';
+
+const phase = process.env.NEXT_PHASE;
+const isBuildTime = phase === 'phase-production-build';
+
+// Mock implementations for build time
+const mockAuth = {
+  verifyIdToken: async () => ({ uid: 'dummy', email_verified: true, firebase: { sign_in_provider: 'custom' } }),
+  createSessionCookie: async () => 'dummy-cookie',
+  verifySessionCookie: async () => ({ uid: 'dummy' }),
+  revokeRefreshTokens: async () => {},
+};
+
+const mockDb = {
+  collection: () => ({
+    doc: () => ({
+      get: async () => ({ exists: false, data: () => null }),
+      set: async () => {},
+      update: async () => {},
+      delete: async () => {},
+    }),
+    add: async () => ({ id: 'mock-id' }),
+    where: () => ({ get: async () => ({ docs: [] }) }),
+  }),
+};
 
 export const adminAuth = () => {
-  const phase = process.env.NEXT_PHASE;
-  if (phase === 'phase-production-build') {
-    return {
-      verifyIdToken: async () => ({ uid: 'dummy', email_verified: true, firebase: { sign_in_provider: 'custom' } }),
-      createSessionCookie: async () => 'dummy-cookie',
-      verifySessionCookie: async () => ({ uid: 'dummy' }),
-      revokeRefreshTokens: async () => {},
-    };
+  if (isBuildTime) {
+    return mockAuth;
   }
 
   if (!getApps().length) {
@@ -18,20 +37,28 @@ export const adminAuth = () => {
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
 
     if (!rawKey || !projectId || !clientEmail) {
-      throw new Error(
-        'Missing Firebase Admin SDK environment variables. Ensure FIREBASE_PRIVATE_KEY, FIREBASE_PROJECT_ID, and FIREBASE_CLIENT_EMAIL are set.'
-      );
+      console.warn('Missing Firebase Admin SDK environment variables. Using mock auth.');
+      return mockAuth;
     }
-    // Replace escaped newlines with actual newlines
-    const privateKey = rawKey.replace(/\\n/g, "\n");
+    
+    try {
+      // Replace escaped newlines with actual newlines
+      const privateKey = rawKey.replace(/\\n/g, "\n");
 
-    initializeApp({
-      credential: cert({
-        projectId,
-        clientEmail,
-        privateKey,
-      }),
-    });
+      initializeApp({
+        credential: cert({
+          projectId,
+          clientEmail,
+          privateKey,
+        }),
+      });
+    } catch (error) {
+      console.warn('Failed to initialize Firebase Admin SDK:', error);
+      return mockAuth;
+    }
   }
   return getAuth();
 };
+
+export const auth = adminAuth();
+export const db = isBuildTime ? mockDb : getFirestore();

@@ -2,6 +2,8 @@
 
 import { CheckCircle, Clock, MapPin, Truck, Star, Download, MessageCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import RealTimeOrderStatus from '@/components/orders/RealTimeOrderStatus'
+import { useState } from 'react'
 
 interface CartItem {
   id: string
@@ -44,6 +46,7 @@ export default function OrderConfirmation({
   checkoutData 
 }: OrderConfirmationProps) {
   const router = useRouter()
+  const [currentOrder, setCurrentOrder] = useState<any>(null)
   const rewardsDiscount = checkoutData.useRewards ? (checkoutData.rewardsPoints * 0.01) : 0
   const finalTotal = cartData.total + checkoutData.tip - rewardsDiscount
   
@@ -128,6 +131,14 @@ export default function OrderConfirmation({
           </div>
         </div>
         
+        {/* Real-time Order Status */}
+        <div className="mb-8">
+          <RealTimeOrderStatus 
+            orderId={orderId} 
+            onOrderUpdate={(order) => setCurrentOrder(order)}
+          />
+        </div>
+
         {/* Order Details */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Items Ordered */}

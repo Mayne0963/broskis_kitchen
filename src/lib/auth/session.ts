@@ -37,7 +37,7 @@ export async function getSessionCookie(): Promise<DecodedIdToken | null> {
       email: decodedClaims.email || '',
       emailVerified: decodedClaims.email_verified || false,
       name: decodedClaims.name || decodedClaims.email?.split('@')[0],
-      role: decodedClaims.role || 'customer'
+      role: decodedClaims.role || decodedClaims.custom_claims?.role || 'customer'
     }
   } catch (error) {
     console.error('Error verifying session cookie:', error)

@@ -176,6 +176,11 @@ export default function StripePaymentForm(props: StripePaymentFormProps) {
           body: JSON.stringify({
             amount: props.amount,
             currency: 'usd',
+            metadata: {
+              source: 'broskis-kitchen-checkout',
+              orderId: props.orderId || '',
+              ...props.orderMetadata,
+            },
           }),
         })
 
@@ -187,16 +192,19 @@ export default function StripePaymentForm(props: StripePaymentFormProps) {
         const data = await response.json()
         if (data.clientSecret) {
           setClientSecret(data.clientSecret)
+        } else if (data.error) {
+          throw new Error(data.error)
         }
       } catch (error) {
         console.error('Error creating payment intent:', error)
+        props.onPaymentError('Failed to initialize payment')
       }
     }
 
     if (props.amount > 0) {
       createPaymentIntent()
     }
-  }, [props.amount])
+  }, [props.amount, props.orderId, props.orderMetadata, props.onPaymentError])
 
   const options = {
     clientSecret,

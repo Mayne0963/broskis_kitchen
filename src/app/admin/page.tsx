@@ -1,20 +1,6 @@
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import AdminDashboard from '@/components/admin/AdminDashboard'
-
-// Mock function to check admin privileges
-async function checkAdminAccess() {
-  const cookieStore = cookies()
-  const sessionCookie = cookieStore.get('session')
-  
-  if (!sessionCookie) {
-    return false
-  }
-  
-  // TODO: Replace with actual admin verification
-  // For now, assume user is admin if they have a session
-  return true
-}
+import { verifyAdminAccess } from '@/lib/auth/rbac'
 
 // Mock function to fetch admin data
 async function getAdminData() {
@@ -104,10 +90,10 @@ async function getAdminData() {
 }
 
 export default async function AdminPage() {
-  const isAdmin = await checkAdminAccess()
+  const verification = await verifyAdminAccess()
   
-  if (!isAdmin) {
-    redirect('/login?redirect=/admin')
+  if (!verification.success) {
+    redirect('/auth/login?redirect=/admin')
   }
   
   const adminData = await getAdminData()
