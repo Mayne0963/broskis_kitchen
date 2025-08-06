@@ -84,19 +84,38 @@ export default function ErrorMonitor() {
     return () => clearTimeout(timeoutId)
   }, [])
 
-  // Monitor for 404 image errors specifically
+  // Monitor for image errors with graceful fallback handling
   useEffect(() => {
+    const failedImages = new Set<string>()
     const images = document.querySelectorAll('img')
     
     const handleImageError = (event: Event) => {
       const img = event.target as HTMLImageElement
-      logError(new Error(`Image failed to load: ${img.src}`), {
-        type: 'imageError',
-        src: img.src,
-        alt: img.alt,
-        naturalWidth: img.naturalWidth,
-        naturalHeight: img.naturalHeight
-      })
+      const src = img.src
+      
+      // Avoid logging the same image error multiple times
+      if (failedImages.has(src)) {
+        return
+      }
+      failedImages.add(src)
+      
+      // Only log errors for images that should exist (not placeholder or fallback images)
+      if (!src.includes('placeholder') && !src.includes('fallback') && !src.includes('data:image')) {
+        logError(new Error(`Image failed to load: ${src}`), {
+          type: 'imageError',
+          src: src,
+          alt: img.alt,
+          naturalWidth: img.naturalWidth,
+          naturalHeight: img.naturalHeight,
+          timestamp: new Date().toISOString()
+        })
+      }
+      
+      // Attempt to set a fallback image if one isn't already set
+      if (!src.includes('placeholder.svg') && !src.includes('fallback')) {
+        img.src = '/placeholder.svg'
+        img.alt = img.alt || 'Image not available'
+      }
     }
 
     images.forEach(img => {

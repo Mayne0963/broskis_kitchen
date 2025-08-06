@@ -50,7 +50,7 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
           title: 'Chill Lofi Beat',
           artist: 'Royalty Free Music',
           url: '/music/chill-lofi-beat.mp3',
-          coverImage: '/images/lofi_study_beats.jpg',
+          coverImage: '/images/lofi_study_beats.svg',
           genre: 'Lofi',
           duration: 180
         },
@@ -94,7 +94,7 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
           title: 'Uplifting Corporate',
           artist: 'Royalty Free Music',
           url: '/music/uplifting-corporate.mp3',
-          coverImage: '/images/lofi_study_beats.jpg',
+          coverImage: '/images/lofi_study_beats.svg',
           genre: 'Corporate',
           duration: 220
         },
@@ -103,7 +103,7 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
           title: 'Electronic Future',
           artist: 'Digital Beats',
           url: '/music/electronic-future.mp3',
-          coverImage: '/images/lofi_study_beats.jpg',
+          coverImage: '/images/lofi_study_beats.svg',
           genre: 'Electronic',
           duration: 190
         },

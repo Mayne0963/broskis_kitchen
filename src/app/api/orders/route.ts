@@ -147,6 +147,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Validate contact information (required for all orders)
     if (!orderData.contactInfo?.email || !orderData.contactInfo?.phone) {
       return NextResponse.json(
         { error: 'Contact information is required' },
@@ -179,7 +180,7 @@ export async function POST(request: NextRequest) {
     // Create new order
     const newOrder: Order = {
       id: generateOrderId(),
-      userId: orderData.userId,
+      userId: orderData.userId || null, // Allow null for guest orders
       items: orderData.items,
       subtotal,
       tax,

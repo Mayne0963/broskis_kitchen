@@ -20,15 +20,18 @@ interface CheckoutData {
   deliveryTime: 'asap' | 'scheduled'
   scheduledTime?: Date
   specialInstructions: string
+  guestEmail?: string
+  guestPhone?: string
 }
 
 interface DeliveryStepProps {
   addresses: Address[]
   checkoutData: CheckoutData
   onUpdate: (updates: Partial<CheckoutData>) => void
+  isAuthenticated?: boolean
 }
 
-export default function DeliveryStep({ addresses, checkoutData, onUpdate }: DeliveryStepProps) {
+export default function DeliveryStep({ addresses, checkoutData, onUpdate, isAuthenticated = true }: DeliveryStepProps) {
   const [showNewAddressForm, setShowNewAddressForm] = useState(false)
   const [newAddress, setNewAddress] = useState<Partial<Address>>({
     type: 'home',
@@ -409,6 +412,46 @@ export default function DeliveryStep({ addresses, checkoutData, onUpdate }: Deli
           className="w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-[var(--color-harvest-gold)] focus:outline-none resize-none"
         />
       </div>
+      
+      {/* Guest Contact Information */}
+      {!isAuthenticated && (
+        <div>
+          <h3 className="text-lg font-semibold text-white mb-4">Contact Information</h3>
+          <p className="text-gray-400 mb-4">We'll use this information to send you order updates</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Email Address *</label>
+              <input
+                type="email"
+                value={checkoutData.guestEmail || ''}
+                onChange={(e) => onUpdate({ guestEmail: e.target.value })}
+                placeholder="your@email.com"
+                required
+                className="w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-[var(--color-harvest-gold)] focus:outline-none"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Phone Number *</label>
+              <input
+                type="tel"
+                value={checkoutData.guestPhone || ''}
+                onChange={(e) => onUpdate({ guestPhone: e.target.value })}
+                placeholder="(555) 123-4567"
+                required
+                className="w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-[var(--color-harvest-gold)] focus:outline-none"
+              />
+            </div>
+          </div>
+          
+          <div className="mt-4 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+            <p className="text-blue-300 text-sm">
+              💡 <strong>Tip:</strong> Create an account after checkout to track your orders and save your preferences for faster ordering next time!
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -18,7 +18,7 @@ const MusicPlayer = () => {
       title: "Chill Lofi Beat",
       artist: "Royalty Free Music",
       url: "/music/chill-lofi-beat.mp3",
-      coverImage: "/images/lofi_study_beats.jpg",
+      coverImage: "/images/lofi_study_beats.svg",
     },
     {
       id: "2",
@@ -53,7 +53,7 @@ const MusicPlayer = () => {
       title: "Midnight Study Session",
       artist: "Lo-Fi Collective",
       url: "/music/midnight-study.mp3",
-      coverImage: "/images/lofi_study_beats.jpg",
+      coverImage: "/images/lofi_study_beats.svg",
     },
     {
       id: "10",
@@ -84,7 +84,7 @@ const MusicPlayer = () => {
       title: "Uplifting Corporate",
       artist: "Royalty Free Music",
       url: "/music/uplifting-corporate.mp3",
-      coverImage: "/images/lofi_study_beats.jpg",
+      coverImage: "/images/lofi_study_beats.svg",
     },
     {
       id: "6",
@@ -98,7 +98,7 @@ const MusicPlayer = () => {
       title: "Electronic Future",
       artist: "Digital Beats",
       url: "/music/electronic-future.mp3",
-      coverImage: "/images/lofi_study_beats.jpg",
+      coverImage: "/images/lofi_study_beats.svg",
     },
     {
       id: "13",
@@ -112,7 +112,7 @@ const MusicPlayer = () => {
       title: "Energetic Pop",
       artist: "Pop Collective",
       url: "/music/energetic-pop.mp3",
-      coverImage: "/images/lofi_study_beats.jpg",
+      coverImage: "/images/lofi_study_beats.svg",
     },
     {
       id: "15",
@@ -126,7 +126,7 @@ const MusicPlayer = () => {
       title: "Dance Floor Anthem",
       artist: "Electronic Vibes",
       url: "/music/dance-floor-anthem.mp3",
-      coverImage: "/images/lofi_study_beats.jpg",
+      coverImage: "/images/lofi_study_beats.svg",
     },
     {
       id: "17",
@@ -140,7 +140,7 @@ const MusicPlayer = () => {
       title: "Latin Fiesta",
       artist: "Tropical Sounds",
       url: "/music/latin-fiesta.mp3",
-      coverImage: "/images/lofi_study_beats.jpg",
+      coverImage: "/images/lofi_study_beats.svg",
     },
   ]
 
@@ -171,7 +171,7 @@ const MusicPlayer = () => {
       title: "Vintage Swing",
       artist: "Swing Orchestra",
       url: "/music/vintage-swing.mp3",
-      coverImage: "/images/lofi_study_beats.jpg",
+      coverImage: "/images/lofi_study_beats.svg",
     },
     {
       id: "23",

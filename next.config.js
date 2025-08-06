@@ -12,7 +12,7 @@ const nextConfig = {
   // Use standalone output for better API route support (production only)
   trailingSlash: false,
   ...(process.env.NODE_ENV === 'production' && { output: 'standalone' }),
-  // Webpack configuration to help prevent chunk loading errors
+  // Enhanced webpack configuration to prevent chunk loading errors
   webpack: (config, { dev, isServer }) => {
     // Optimize chunk splitting for better loading reliability
     if (!dev && !isServer) {
@@ -20,6 +20,9 @@ const nextConfig = {
         ...config.optimization,
         splitChunks: {
           ...config.optimization.splitChunks,
+          chunks: 'all',
+          minSize: 20000,
+          maxSize: 244000,
           cacheGroups: {
             ...config.optimization.splitChunks.cacheGroups,
             // Create a separate chunk for vendor libraries
@@ -28,6 +31,7 @@ const nextConfig = {
               name: 'vendors',
               chunks: 'all',
               priority: 10,
+              enforce: true,
             },
             // Create a separate chunk for common components
             common: {
@@ -36,18 +40,45 @@ const nextConfig = {
               chunks: 'all',
               priority: 5,
               reuseExistingChunk: true,
+              enforce: true,
+            },
+            // Separate chunk for layout components
+            layout: {
+              test: /[\\/]src[\\/](components[\\/]layout|app[\\/]layout)/,
+              name: 'layout',
+              chunks: 'all',
+              priority: 8,
+              enforce: true,
             },
           },
         },
+        // Add module concatenation for better performance
+        concatenateModules: true,
       };
     }
     
+    // Add resolve fallbacks for better compatibility
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      net: false,
+      tls: false,
+    };
+    
     return config;
   },
-  // Optional: Disable granular chunks if needed (uncomment if issues persist)
-  // experimental: {
-  //   granularChunks: false,
-  // },
+  // Experimental settings to improve build stability
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'sonner'],
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
+  },
   
   // Skip static generation for auth pages
   async generateBuildId() {

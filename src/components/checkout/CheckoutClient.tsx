@@ -2,11 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, ShoppingCart, MapPin, CreditCard, Clock, Check } from 'lucide-react'
+import { Elements } from '@stripe/react-stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
 import CartSummary from './CartSummary'
 import DeliveryStep from './DeliveryStep'
 import PaymentStep from './PaymentStep'
 import ReviewStep from './ReviewStep'
 import OrderConfirmation from './OrderConfirmation'
+import { guestOrderUtils } from '@/utils/guestOrderTracking'
+
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+)
 
 interface CartItem {
   id: string
@@ -58,6 +65,8 @@ interface CheckoutClientProps {
   addresses: Address[]
   paymentMethods: PaymentMethod[]
   userId: string
+  isAuthenticated: boolean
+  userEmail: string
 }
 
 type CheckoutStep = 'delivery' | 'payment' | 'review' | 'confirmation'
@@ -75,6 +84,8 @@ interface CheckoutData {
   useRewards: boolean
   rewardsPoints: number
   paymentType?: 'card' | 'digital_wallet' | 'cashapp'
+  guestEmail?: string
+  guestPhone?: string
 }
 
 const steps = [
@@ -88,7 +99,9 @@ export default function CheckoutClient({
   cartData, 
   addresses, 
   paymentMethods, 
-  userId 
+  userId,
+  isAuthenticated,
+  userEmail
 }: CheckoutClientProps) {
   const [currentStep, setCurrentStep] = useState<CheckoutStep>('delivery')
   const [checkoutData, setCheckoutData] = useState<CheckoutData>({
@@ -246,8 +259,12 @@ export default function CheckoutClient({
         deliveryAddress: checkoutData.deliveryType === 'delivery' ? checkoutData.selectedAddress : undefined,
         pickupLocation: checkoutData.deliveryType === 'pickup' ? 'Main Location' : undefined,
         contactInfo: {
-          email: checkoutData.selectedAddress?.email || 'customer@example.com',
-          phone: checkoutData.selectedAddress?.phone || '555-0123'
+          email: isAuthenticated 
+            ? (checkoutData.selectedAddress?.email || userEmail || 'customer@example.com')
+            : (checkoutData.guestEmail || 'guest@example.com'),
+          phone: isAuthenticated 
+            ? (checkoutData.selectedAddress?.phone || '555-0123')
+            : (checkoutData.guestPhone || '555-0123')
         },
         paymentInfo: {
           method: checkoutData.paymentType || checkoutData.selectedPayment?.type || 'card',
@@ -259,7 +276,7 @@ export default function CheckoutClient({
         tip: checkoutData.tip,
         rewardsUsed: checkoutData.useRewards,
         rewardsPoints: checkoutData.rewardsPoints,
-        userId: userId
+        userId: isAuthenticated ? userId : null
       }
 
       // Create order
@@ -274,6 +291,17 @@ export default function CheckoutClient({
       }
 
       const { order } = await orderResponse.json()
+      
+      // Store order for guest users
+       if (!isAuthenticated && guestOrderUtils.isClient()) {
+         guestOrderUtils.saveGuestOrder({
+           orderId: order.id,
+           email: checkoutData.guestEmail || 'guest@example.com',
+           phone: checkoutData.guestPhone || '555-0123',
+           total: order.total,
+           status: order.status
+         })
+       }
       
       // Create payment intent
       const paymentResponse = await fetch('/api/stripe/create-payment-intent', {
@@ -386,16 +414,19 @@ export default function CheckoutClient({
             addresses={addresses}
             checkoutData={checkoutData}
             onUpdate={updateCheckoutData}
+            isAuthenticated={isAuthenticated}
           />
         )
       case 'payment':
         return (
-          <PaymentStep
-            paymentMethods={paymentMethods}
-            checkoutData={checkoutData}
-            cartData={cartData}
-            onUpdate={updateCheckoutData}
-          />
+          <Elements stripe={stripePromise}>
+            <PaymentStep
+              paymentMethods={paymentMethods}
+              checkoutData={checkoutData}
+              cartData={cartData}
+              onUpdate={updateCheckoutData}
+            />
+          </Elements>
         )
       case 'review':
         return (

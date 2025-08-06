@@ -58,35 +58,36 @@ async function getPaymentMethods(userId: string) {
 
 export default function CheckoutPage() {
   const { items, subtotal, tax, total, itemCount } = useCart()
-  const { user, isAuthenticated } = useAuth()
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth()
   const router = useRouter()
   const [addresses, setAddresses] = useState([])
   const [paymentMethods, setPaymentMethods] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login?redirect=/checkout')
-      return
-    }
-  }, [isAuthenticated, router])
+  // No authentication redirect - allow guest checkout
+  // Users can proceed without being logged in
   
-  // Load user data
+  // Load user data (only for authenticated users)
   useEffect(() => {
     const loadUserData = async () => {
-      if (!user?.id) return
-      
       try {
         setLoading(true)
-        const [addressesData, paymentMethodsData] = await Promise.all([
-          getUserAddresses(user.id),
-          getPaymentMethods(user.id)
-        ])
         
-        setAddresses(addressesData)
-        setPaymentMethods(paymentMethodsData)
+        if (user?.id && isAuthenticated) {
+          // Load saved addresses and payment methods for authenticated users
+          const [addressesData, paymentMethodsData] = await Promise.all([
+            getUserAddresses(user.id),
+            getPaymentMethods(user.id)
+          ])
+          
+          setAddresses(addressesData)
+          setPaymentMethods(paymentMethodsData)
+        } else {
+          // For guest users, start with empty arrays
+          setAddresses([])
+          setPaymentMethods([])
+        }
       } catch (err) {
         console.error('Failed to load user data:', err)
         setError('Failed to load checkout data. Please try again.')
@@ -95,8 +96,11 @@ export default function CheckoutPage() {
       }
     }
     
-    loadUserData()
-  }, [user?.id])
+    // Only load data after auth loading is complete
+    if (!authLoading) {
+      loadUserData()
+    }
+  }, [user?.id, isAuthenticated, authLoading])
   
   // Check if cart is empty
   if (itemCount === 0) {
@@ -170,6 +174,8 @@ export default function CheckoutPage() {
           addresses={addresses}
           paymentMethods={paymentMethods}
           userId={user?.id || ''}
+          isAuthenticated={isAuthenticated}
+          userEmail={user?.email || ''}
         />
       </div>
     </div>
