@@ -33,16 +33,31 @@ export default function CashAppPayment({
     setIsProcessing(true)
 
     try {
-      // Create payment intent with CashApp payment method
+      // First create a payment method for CashApp
+      const { error: pmError, paymentMethod } = await stripe.createPaymentMethod({
+        type: 'cashapp',
+      })
+
+      if (pmError) {
+        throw new Error(pmError.message || 'Failed to create CashApp payment method')
+      }
+
+      if (!paymentMethod) {
+        throw new Error('No payment method created')
+      }
+
+      // Create payment intent with the payment method
       const response = await fetch('/api/stripe/create-payment-intent', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          amount: Math.round(amount * 100), // Convert to cents
+          amount: amount, // Amount in dollars
           currency,
           payment_method_types: ['cashapp'],
+          payment_method: paymentMethod.id,
+          confirm: true,
           metadata: {
             source: 'broskis-kitchen-cashapp',
             paymentType: 'cashapp',
@@ -52,34 +67,23 @@ export default function CashAppPayment({
       })
 
       if (!response.ok) {
-        throw new Error('Failed to create payment intent')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to create payment intent')
       }
 
-      const { clientSecret } = await response.json()
-
-      // Confirm payment with CashApp
-      const { error, paymentIntent } = await stripe.confirmCashappPayment(
-        clientSecret,
-        {
-          return_url: `${window.location.origin}/checkout?success=true`,
-        }
-      )
-
-      if (error) {
-        throw new Error(error.message || 'CashApp payment failed')
-      }
+      const { paymentIntent } = await response.json()
 
       if (paymentIntent) {
         if (paymentIntent.status === 'succeeded') {
-          onPaymentSuccess(paymentIntent.payment_method?.id || '', {
+          onPaymentSuccess(paymentMethod.id, {
             paymentIntentId: paymentIntent.id,
-            paymentMethod: paymentIntent.payment_method,
+            paymentMethod: paymentMethod,
             type: 'cashapp',
             status: 'succeeded'
           })
-        } else if (paymentIntent.status === 'requires_action') {
-          // Handle redirect case - CashApp will redirect back
-          console.log('CashApp payment requires action, redirecting...')
+        } else if (paymentIntent.status === 'requires_action' && paymentIntent.next_action?.redirect_to_url) {
+          // Handle redirect case - CashApp will redirect to complete payment
+          window.location.href = paymentIntent.next_action.redirect_to_url.url
         } else {
           throw new Error(`Payment failed with status: ${paymentIntent.status}`)
         }

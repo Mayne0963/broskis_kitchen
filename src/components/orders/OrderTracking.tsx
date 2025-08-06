@@ -140,6 +140,8 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
     
     if (!isFirebaseConfigured()) {
       console.log('Firebase not configured, using initial orders')
+      setOrders(initialOrders)
+      setIsLoading(false)
       return
     }
 
@@ -172,6 +174,12 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
           setError('Failed to load orders. Please try again.')
           setIsLoading(false)
           setOrders(initialOrders)
+          
+          // If it's a permission error, try using API fallback
+          if (error.code === 'permission-denied') {
+            console.log('Permission denied, falling back to API')
+            fetchOrdersFromAPI()
+          }
         }
       )
 
@@ -263,11 +271,37 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
     return () => clearInterval(interval)
   }, [orders])
 
+  // Fetch orders from API as fallback
+  const fetchOrdersFromAPI = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch(`/api/orders?userId=${userId}`)
+      if (response.ok) {
+        const data = await response.json()
+        if (data.orders) {
+          setOrders(data.orders)
+          setError(null)
+        }
+      } else {
+        throw new Error('Failed to fetch orders')
+      }
+    } catch (error) {
+      console.error('Error fetching orders from API:', error)
+      setError('Failed to load orders')
+      setOrders(initialOrders)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [userId, initialOrders])
+
   // Manual refresh function
   const handleManualRefresh = useCallback(async () => {
     setIsRefreshing(true)
     setConnectionStatus('connecting')
     setLastRefresh(new Date())
+    
+    // Try to refresh via API
+    await fetchOrdersFromAPI()
     
     // Add a small delay to show the refresh animation
     setTimeout(() => {
@@ -275,7 +309,7 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
       setConnectionStatus('connected')
       toast.success('Orders refreshed')
     }, 1000)
-  }, [])
+  }, [fetchOrdersFromAPI])
 
   // Toggle push notifications
   const toggleNotifications = useCallback(async () => {

@@ -124,8 +124,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return false
       }
       
+      // Force ID token refresh to get latest custom claims
+      const idToken = await getIdToken(userCredential.user, true)
+      
       // Create session cookie
-      const idToken = await getIdToken(userCredential.user)
       const response = await fetch('/api/auth/session-login', {
         method: 'POST',
         headers: {

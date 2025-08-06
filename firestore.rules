@@ -1,6 +1,21 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Admin access - full control for admin role
+    match /admin/{document=**} {
+      allow read, write: if request.auth.token.role == 'admin';
+    }
+    
+    // Orders - admin can access all orders
+    match /orders/{document=**} {
+      allow read, write: if request.auth.token.role == 'admin';
+    }
+    
+    // Public data - readable by everyone
+    match /public/{document=**} {
+      allow read: if true;
+    }
+    
     // Helper functions
     function isAuthenticated() {
       return request.auth != null;

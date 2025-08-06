@@ -5,6 +5,7 @@ import { Clock, CheckCircle, Truck, ChefHat, Package, AlertCircle } from 'lucide
 import { Order, OrderStatus } from '@/types/order'
 import { db, isFirebaseConfigured } from '@/lib/services/firebase'
 import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore'
+import { useAuth } from '@/lib/context/AuthContext'
 
 interface RealTimeOrderStatusProps {
   orderId: string
@@ -21,6 +22,7 @@ interface StatusStep {
 }
 
 export default function RealTimeOrderStatus({ orderId, onOrderUpdate }: RealTimeOrderStatusProps) {
+  const { user, isAuthenticated } = useAuth()
   const [order, setOrder] = useState<Order | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -33,8 +35,8 @@ export default function RealTimeOrderStatus({ orderId, onOrderUpdate }: RealTime
 
     const setupRealtimeListener = async () => {
       try {
-        if (isFirebaseConfigured && db) {
-          // Set up Firebase real-time listener
+        if (isFirebaseConfigured && db && isAuthenticated && user) {
+          // Set up Firebase real-time listener with authentication
           const q = query(
             collection(db, 'orders'),
             where('id', '==', orderId)
@@ -51,10 +53,15 @@ export default function RealTimeOrderStatus({ orderId, onOrderUpdate }: RealTime
                   updatedAt: orderDoc.data().updatedAt?.toDate?.() || new Date(),
                 } as Order
                 
-                setOrder(orderData)
-                setLastUpdate(new Date())
-                onOrderUpdate?.(orderData)
-                setError(null)
+                // Verify user has permission to view this order
+                if (orderData.userId === user.id || user.role === 'admin') {
+                  setOrder(orderData)
+                  setLastUpdate(new Date())
+                  onOrderUpdate?.(orderData)
+                  setError(null)
+                } else {
+                  setError('Access denied to this order')
+                }
               } else {
                 setError('Order not found')
               }
@@ -69,7 +76,7 @@ export default function RealTimeOrderStatus({ orderId, onOrderUpdate }: RealTime
             }
           )
         } else {
-          // Fallback to polling if Firebase is not configured
+          // Fallback to polling if Firebase is not configured or user not authenticated
           pollOrderStatus()
         }
       } catch (err) {
