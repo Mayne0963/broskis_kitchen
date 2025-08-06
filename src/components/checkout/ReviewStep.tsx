@@ -5,15 +5,18 @@ import { MapPin, CreditCard, Clock, Star, Edit, Truck, Home } from 'lucide-react
 interface CartItem {
   id: string
   name: string
-  description: string
   price: number
   quantity: number
-  image: string
-  customizations: {
-    category: string
-    name: string
-    price: number
-  }[]
+  image?: string
+  customizations?: {
+    [categoryId: string]: CustomizationOption[]
+  }
+}
+
+interface CustomizationOption {
+  id: string
+  name: string
+  price: number
 }
 
 interface CartData {
@@ -59,12 +62,16 @@ export default function ReviewStep({
   const finalTotal = Math.max(0, cartData.total + checkoutData.tip - rewardsDiscount)
   
   const getItemTotal = (item: CartItem) => {
-    const customizationsTotal = item.customizations.reduce((sum, custom) => sum + custom.price, 0)
+    const customizationsTotal = item.customizations 
+      ? Object.values(item.customizations).flat().reduce((sum, custom) => sum + custom.price, 0)
+      : 0
     return (item.price + customizationsTotal) * item.quantity
   }
   
   const getItemPrice = (item: CartItem) => {
-    const customizationsTotal = item.customizations.reduce((sum, custom) => sum + custom.price, 0)
+    const customizationsTotal = item.customizations 
+      ? Object.values(item.customizations).flat().reduce((sum, custom) => sum + custom.price, 0)
+      : 0
     return item.price + customizationsTotal
   }
   
@@ -124,7 +131,7 @@ export default function ReviewStep({
           {cartData.items.map((item) => (
             <div key={item.id} className="flex items-start space-x-3 sm:space-x-4 pb-4 border-b border-gray-700 last:border-b-0 last:pb-0">
               <img
-                src={item.image}
+                src={item.image || 'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=delicious_food_item_restaurant_photography&image_size=square'}
                 alt={item.name}
                 className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover flex-shrink-0"
               />
@@ -133,11 +140,10 @@ export default function ReviewStep({
                 <div className="flex items-start justify-between">
                   <div>
                     <h4 className="text-sm sm:text-base text-white font-medium">{item.name}</h4>
-                    <p className="text-gray-400 text-xs sm:text-sm mt-1">{item.description}</p>
                     
-                    {item.customizations.length > 0 && (
+                    {item.customizations && Object.keys(item.customizations).length > 0 && (
                       <div className="mt-2">
-                        {item.customizations.map((customization, index) => (
+                        {Object.values(item.customizations).flat().map((customization, index) => (
                           <span key={index} className="inline-block text-xs text-[var(--color-harvest-gold)] bg-[var(--color-harvest-gold)]/10 px-2 py-1 rounded mr-2 mb-1">
                             + {customization.name} {customization.price > 0 && `(+$${customization.price.toFixed(2)})`}
                           </span>

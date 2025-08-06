@@ -5,11 +5,18 @@ import { Star, Clock, Truck, MapPin } from 'lucide-react'
 interface CartItem {
   id: string
   name: string
-  description: string
   price: number
   quantity: number
-  image: string
-  customizations: string[]
+  image?: string
+  customizations?: {
+    [categoryId: string]: CustomizationOption[]
+  }
+}
+
+interface CustomizationOption {
+  id: string
+  name: string
+  price: number
 }
 
 interface CartData {
@@ -35,6 +42,18 @@ interface CartSummaryProps {
 }
 
 export default function CartSummary({ cartData, checkoutData }: CartSummaryProps) {
+  const getItemTotalPrice = (item: CartItem) => {
+    let totalPrice = item.price
+    
+    if (item.customizations) {
+      Object.values(item.customizations).flat().forEach(customization => {
+        totalPrice += customization.price
+      })
+    }
+    
+    return totalPrice
+  }
+  
   const rewardsDiscount = checkoutData.useRewards ? (checkoutData.rewardsPoints * 0.01) : 0
   const finalTotal = cartData.total + checkoutData.tip - rewardsDiscount
   
@@ -93,7 +112,7 @@ export default function CartSummary({ cartData, checkoutData }: CartSummaryProps
           {cartData.items.map((item) => (
             <div key={item.id} className="flex items-start space-x-3">
               <img
-                src={item.image}
+                src={item.image || 'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=delicious_food_item_restaurant_photography&image_size=square'}
                 alt={item.name}
                 className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
               />
@@ -102,11 +121,11 @@ export default function CartSummary({ cartData, checkoutData }: CartSummaryProps
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <h4 className="text-white font-medium text-sm truncate">{item.name}</h4>
-                    {item.customizations.length > 0 && (
+                    {item.customizations && Object.keys(item.customizations).length > 0 && (
                       <div className="mt-1">
-                        {item.customizations.map((customization, index) => (
+                        {Object.values(item.customizations).flat().map((customization, index) => (
                           <span key={index} className="text-xs text-gray-400 block">
-                            + {customization}
+                            + {customization.name} {customization.price > 0 && `(+$${customization.price.toFixed(2)})`}
                           </span>
                         ))}
                       </div>
@@ -115,10 +134,10 @@ export default function CartSummary({ cartData, checkoutData }: CartSummaryProps
                   
                   <div className="text-right ml-2">
                     <div className="text-white font-semibold text-sm">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      ${(getItemTotalPrice(item) * item.quantity).toFixed(2)}
                     </div>
                     <div className="text-gray-400 text-xs">
-                      ${item.price.toFixed(2)} × {item.quantity}
+                      ${getItemTotalPrice(item).toFixed(2)} × {item.quantity}
                     </div>
                   </div>
                 </div>

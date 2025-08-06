@@ -11,11 +11,18 @@ import OrderConfirmation from './OrderConfirmation'
 interface CartItem {
   id: string
   name: string
-  description: string
   price: number
   quantity: number
-  image: string
-  customizations: string[]
+  image?: string
+  customizations?: {
+    [categoryId: string]: CustomizationOption[]
+  }
+}
+
+interface CustomizationOption {
+  id: string
+  name: string
+  price: number
 }
 
 interface CartData {
@@ -208,11 +215,32 @@ export default function CheckoutClient({
     setIsProcessing(true)
     
     try {
-      // Create order data
+      // Calculate item prices including customizations
+      const calculateItemPrice = (item: CartItem) => {
+        let price = item.price
+        if (item.customizations) {
+          Object.values(item.customizations).flat().forEach(option => {
+            price += option.price || 0
+          })
+        }
+        return price
+      }
+      
+      // Create order data with proper item pricing
+      const orderItems = cartData.items.map(item => ({
+        ...item,
+        totalPrice: calculateItemPrice(item) * item.quantity,
+        customizationText: item.customizations 
+          ? Object.values(item.customizations).flat().map(opt => opt.name).join(', ')
+          : ''
+      }))
+      
       const orderData = {
-        items: cartData.items,
+        items: orderItems,
         subtotal: cartData.subtotal,
         tax: cartData.tax,
+        deliveryFee: cartData.deliveryFee,
+        total: cartData.total,
         orderType: checkoutData.deliveryType,
         deliveryAddress: checkoutData.deliveryType === 'delivery' ? checkoutData.selectedAddress : undefined,
         pickupLocation: checkoutData.deliveryType === 'pickup' ? 'Main Location' : undefined,
@@ -225,6 +253,9 @@ export default function CheckoutClient({
           last4: checkoutData.selectedPayment?.last4 || '****'
         },
         specialInstructions: checkoutData.specialInstructions,
+        tip: checkoutData.tip,
+        rewardsUsed: checkoutData.useRewards,
+        rewardsPoints: checkoutData.rewardsPoints,
         userId: userId
       }
 

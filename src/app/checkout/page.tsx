@@ -1,37 +1,10 @@
-import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
-import CheckoutClient from '@/components/checkout/CheckoutClient'
+'use client'
 
-// Mock function to get cart data - replace with actual implementation
-async function getCartData(userId: string) {
-  // TODO: Replace with actual API call to get cart data
-  return {
-    items: [
-      {
-        id: '1',
-        name: 'Broski Burger Deluxe',
-        description: 'Wagyu beef, truffle aioli, aged cheddar',
-        price: 24.99,
-        quantity: 2,
-        image: 'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=gourmet_burger_with_wagyu_beef_truffle_aioli_aged_cheddar_restaurant_photography&image_size=square',
-        customizations: ['Extra cheese', 'No pickles']
-      },
-      {
-        id: '2',
-        name: 'Truffle Fries',
-        description: 'Hand-cut fries with truffle oil and parmesan',
-        price: 12.99,
-        quantity: 1,
-        image: 'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=truffle_fries_hand_cut_parmesan_gourmet_food_photography&image_size=square',
-        customizations: []
-      }
-    ],
-    subtotal: 62.97,
-    tax: 5.67,
-    deliveryFee: 3.99,
-    total: 72.63
-  }
-}
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useCart } from '@/lib/context/CartContext'
+import { useAuth } from '@/lib/context/AuthContext'
+import CheckoutClient from '@/components/checkout/CheckoutClient'
 
 // Mock function to get user addresses - replace with actual implementation
 async function getUserAddresses(userId: string) {
@@ -83,46 +56,92 @@ async function getPaymentMethods(userId: string) {
   ]
 }
 
-export default async function CheckoutPage() {
-  const cookieStore = cookies()
-  const sessionCookie = cookieStore.get('session')
+export default function CheckoutPage() {
+  const { items, subtotal, tax, total, itemCount } = useCart()
+  const { user, isAuthenticated } = useAuth()
+  const router = useRouter()
+  const [addresses, setAddresses] = useState([])
+  const [paymentMethods, setPaymentMethods] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   
-  if (!sessionCookie) {
-    redirect('/login?redirect=/checkout')
-  }
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login?redirect=/checkout')
+      return
+    }
+  }, [isAuthenticated, router])
   
-  // TODO: Verify session and get user ID
-  const userId = 'mock-user-id' // Replace with actual user ID from session
-  
-  try {
-    const [cartData, addresses, paymentMethods] = await Promise.all([
-      getCartData(userId),
-      getUserAddresses(userId),
-      getPaymentMethods(userId)
-    ])
+  // Load user data
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (!user?.id) return
+      
+      try {
+        setLoading(true)
+        const [addressesData, paymentMethodsData] = await Promise.all([
+          getUserAddresses(user.id),
+          getPaymentMethods(user.id)
+        ])
+        
+        setAddresses(addressesData)
+        setPaymentMethods(paymentMethodsData)
+      } catch (err) {
+        console.error('Failed to load user data:', err)
+        setError('Failed to load checkout data. Please try again.')
+      } finally {
+        setLoading(false)
+      }
+    }
     
+    loadUserData()
+  }, [user?.id])
+  
+  // Check if cart is empty
+  if (itemCount === 0) {
     return (
-      <div className="min-h-screen bg-[var(--color-rich-black)] py-8">
-        <div className="container mx-auto px-4">
-          <CheckoutClient 
-            cartData={cartData}
-            addresses={addresses}
-            paymentMethods={paymentMethods}
-            userId={userId}
-          />
+      <div className="min-h-screen bg-[var(--color-rich-black)] flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-white mb-4">Your Cart is Empty</h1>
+          <p className="text-gray-400 mb-6">Add some delicious items to your cart before checking out.</p>
+          <a 
+            href="/menu" 
+            className="bg-[var(--color-harvest-gold)] text-black px-6 py-3 rounded-lg font-semibold hover:bg-[var(--color-harvest-gold)]/90 transition-colors"
+          >
+            Browse Menu
+          </a>
         </div>
       </div>
     )
-  } catch (error) {
-    console.error('Failed to load checkout data:', error)
+  }
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[var(--color-rich-black)] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-harvest-gold)] mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading checkout...</p>
+        </div>
+      </div>
+    )
+  }
+  
+  if (error) {
     return (
       <div className="min-h-screen bg-[var(--color-rich-black)] flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">Unable to Load Checkout</h1>
-          <p className="text-gray-400 mb-6">Please try again or contact support if the problem persists.</p>
+          <p className="text-gray-400 mb-6">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="bg-[var(--color-harvest-gold)] text-black px-6 py-3 rounded-lg font-semibold hover:bg-[var(--color-harvest-gold)]/90 transition-colors mr-4"
+          >
+            Try Again
+          </button>
           <a 
             href="/cart" 
-            className="bg-[var(--color-harvest-gold)] text-black px-6 py-3 rounded-lg font-semibold hover:bg-[var(--color-harvest-gold)]/90 transition-colors"
+            className="bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition-colors"
           >
             Return to Cart
           </a>
@@ -130,4 +149,29 @@ export default async function CheckoutPage() {
       </div>
     )
   }
+  
+  // Calculate delivery fee based on subtotal
+  const deliveryFee = subtotal > 50 ? 0 : 3.99
+  const finalTotal = total + deliveryFee
+  
+  const cartData = {
+    items,
+    subtotal,
+    tax,
+    deliveryFee,
+    total: finalTotal
+  }
+  
+  return (
+    <div className="min-h-screen bg-[var(--color-rich-black)] py-8">
+      <div className="container mx-auto px-4">
+        <CheckoutClient 
+          cartData={cartData}
+          addresses={addresses}
+          paymentMethods={paymentMethods}
+          userId={user?.id || ''}
+        />
+      </div>
+    </div>
+  )
 }
