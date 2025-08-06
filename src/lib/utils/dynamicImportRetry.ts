@@ -108,37 +108,59 @@ export function setupChunkErrorHandler(): void {
     // Store a flag to prevent multiple reloads in quick succession
     let reloadPending = false;
     let reloadTimeout: NodeJS.Timeout | null = null;
+    let errorCount = 0;
+    const MAX_ERRORS = 3; // Only reload after multiple chunk errors
     
     const handleChunkError = (error: Error) => {
       if (isChunkLoadError(error) && !reloadPending) {
-        console.error('Chunk loading error detected:', error);
-        reloadPending = true;
+        errorCount++;
+        console.warn(`Chunk loading error detected (${errorCount}/${MAX_ERRORS}):`, error);
         
-        // Clear any existing timeout to debounce multiple errors
-        if (reloadTimeout) {
-          clearTimeout(reloadTimeout);
+        // Only reload after multiple chunk errors to prevent excessive reloads
+        if (errorCount >= MAX_ERRORS) {
+          reloadPending = true;
+          
+          // Clear any existing timeout to debounce multiple errors
+          if (reloadTimeout) {
+            clearTimeout(reloadTimeout);
+          }
+          
+          // Debounced auto-reload only after multiple chunk errors
+          console.log('Multiple chunk errors detected - auto-reloading in 3 seconds...');
+          reloadTimeout = setTimeout(() => {
+            console.log('Auto-reloading page to recover from chunk errors');
+            window.location.reload();
+          }, 3000);
         }
-        
-        // Debounced auto-reload for all chunk errors to ensure seamless recovery
-        console.log('Chunk error handler initialized - auto-reloading in 2 seconds...');
-        reloadTimeout = setTimeout(() => {
-          console.log('Auto-reloading page to recover from chunk error');
-          window.location.reload();
-        }, 2000);
+      }
+    };
+    
+    // Reset error count after successful operations
+    const resetErrorCount = () => {
+      if (errorCount > 0) {
+        console.log('Resetting chunk error count after successful operation');
+        errorCount = 0;
       }
     };
     
     window.addEventListener('error', (event) => {
-      if (event.error) handleChunkError(event.error);
+      if (event.error) {
+        handleChunkError(event.error);
+      } else {
+        resetErrorCount();
+      }
     });
     
     window.addEventListener('unhandledrejection', (event) => {
-      if (event.reason) {
+      if (event.reason && isChunkLoadError(event.reason)) {
         handleChunkError(event.reason);
         event.preventDefault();
       }
     });
     
-    console.log('Chunk error handler initialized');
+    // Reset error count on successful navigation
+    window.addEventListener('beforeunload', resetErrorCount);
+    
+    console.log('Optimized chunk error handler initialized');
   }
 }

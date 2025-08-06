@@ -13,7 +13,14 @@ export async function POST(request: NextRequest) {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
       apiVersion: '2025-02-24.acacia',
     })
-    const { amount, currency = 'usd', metadata = {} } = await request.json()
+    const { 
+      amount, 
+      currency = 'usd', 
+      metadata = {}, 
+      payment_method_types,
+      payment_method,
+      confirm = false 
+    } = await request.json()
 
     if (!amount || amount <= 0) {
       return NextResponse.json(
@@ -22,21 +29,44 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const paymentIntent = await stripe.paymentIntents.create({
+    // Prepare payment intent options
+    const paymentIntentOptions: Stripe.PaymentIntentCreateParams = {
       amount: Math.round(amount * 100), // Convert to cents
       currency,
       metadata: {
         ...metadata,
         source: 'broskis-kitchen',
       },
-      automatic_payment_methods: {
+    }
+
+    // Handle specific payment method types
+    if (payment_method_types && Array.isArray(payment_method_types)) {
+      paymentIntentOptions.payment_method_types = payment_method_types
+    } else {
+      // Enable automatic payment methods for cards, digital wallets, etc.
+      paymentIntentOptions.automatic_payment_methods = {
         enabled: true,
-      },
-    })
+        allow_redirects: 'always', // Allow redirects for methods like CashApp
+      }
+    }
+
+    // If payment method is provided, attach it
+    if (payment_method) {
+      paymentIntentOptions.payment_method = payment_method
+    }
+
+    // If confirm is true, confirm the payment immediately
+    if (confirm) {
+      paymentIntentOptions.confirm = true
+      paymentIntentOptions.return_url = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/checkout/success`
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create(paymentIntentOptions)
 
     return NextResponse.json({
       clientSecret: paymentIntent.client_secret,
       paymentIntentId: paymentIntent.id,
+      paymentIntent: paymentIntent,
     })
   } catch (error) {
     console.error('Error creating payment intent:', error)

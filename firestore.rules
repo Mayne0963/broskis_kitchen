@@ -59,7 +59,8 @@ service cloud.firestore {
                        isOwner(resource.data.userId) && 
                        validateOrderData(resource.data) &&
                        notTooFrequent();
-      allow update: if hasAdminRole() && validateOrderData(resource.data);
+      allow update: if (isOwner(resource.data.userId) || hasAdminRole()) && 
+                       validateOrderUpdateData(resource.data);
       allow delete: if hasAdminRole();
     }
     
@@ -133,8 +134,14 @@ service cloud.firestore {
              data.total is number &&
              data.total > 0 &&
              data.total <= 10000 &&
-             data.status in ['pending', 'confirmed', 'preparing', 'ready', 'delivered', 'cancelled'] &&
+             data.status in ['pending', 'confirmed', 'preparing', 'ready', 'delivered', 'cancelled', 'out_for_delivery', 'ready_for_pickup', 'completed'] &&
              data.createdAt is timestamp;
+    }
+    
+    function validateOrderUpdateData(data) {
+      return data.keys().hasAny(['status', 'updatedAt']) &&
+             (!data.keys().hasAny(['status']) || data.status in ['pending', 'confirmed', 'preparing', 'ready', 'delivered', 'cancelled', 'out_for_delivery', 'ready_for_pickup', 'completed']) &&
+             (!data.keys().hasAny(['updatedAt']) || data.updatedAt is timestamp);
     }
     
     function validateAddressData(data) {

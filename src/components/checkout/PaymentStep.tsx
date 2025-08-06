@@ -1,8 +1,10 @@
 "use client"
 
 import { useState } from 'react'
-import { CreditCard, Star, Plus, DollarSign, Gift, Loader2 } from 'lucide-react'
+import { CreditCard, Star, Plus, DollarSign, Gift, Loader2, Smartphone } from 'lucide-react'
 import StripePaymentForm from './StripePaymentForm'
+import PaymentRequestButton from './PaymentRequestButton'
+import CashAppPayment from './CashAppPayment'
 
 interface PaymentMethod {
   id: string
@@ -27,6 +29,7 @@ interface CheckoutData {
   tip: number
   useRewards: boolean
   rewardsPoints: number
+  paymentType?: 'card' | 'digital_wallet' | 'cashapp'
 }
 
 interface PaymentStepProps {
@@ -45,6 +48,8 @@ export default function PaymentStep({
   onUpdate 
 }: PaymentStepProps) {
   const [showNewCardForm, setShowNewCardForm] = useState(false)
+  const [showDigitalWallets, setShowDigitalWallets] = useState(false)
+  const [showCashApp, setShowCashApp] = useState(false)
   const [customTip, setCustomTip] = useState('')
   const [isLoadingRewards, setIsLoadingRewards] = useState(false)
   const [rewardsError, setRewardsError] = useState<string | null>(null)
@@ -64,8 +69,52 @@ export default function PaymentStep({
   }
   
   const handlePaymentSelect = (payment: PaymentMethod) => {
-    onUpdate({ selectedPayment: payment, newPayment: undefined })
+    onUpdate({ selectedPayment: payment, newPayment: undefined, paymentType: 'card' })
     setShowNewCardForm(false)
+    setShowDigitalWallets(false)
+    setShowCashApp(false)
+  }
+  
+  const handleDigitalWalletPayment = (paymentMethodId: string, paymentDetails: any) => {
+    const finalAmount = calculateFinalAmount()
+    onUpdate({ 
+      newPayment: { 
+        type: 'digital_wallet',
+        paymentMethodId,
+        paymentDetails,
+        amount: finalAmount,
+        status: 'succeeded'
+      },
+      selectedPayment: undefined,
+      paymentType: 'digital_wallet'
+    })
+    setShowDigitalWallets(false)
+  }
+  
+  const handleCashAppPayment = (paymentMethodId: string, paymentDetails: any) => {
+    const finalAmount = calculateFinalAmount()
+    onUpdate({ 
+      newPayment: { 
+        type: 'cashapp',
+        paymentMethodId,
+        paymentDetails,
+        amount: finalAmount,
+        status: 'succeeded'
+      },
+      selectedPayment: undefined,
+      paymentType: 'cashapp'
+    })
+    setShowCashApp(false)
+  }
+  
+  const handlePaymentError = (error: string) => {
+    console.error('Payment error:', error)
+    // Reset payment state on error
+    onUpdate({
+      selectedPayment: undefined,
+      newPayment: undefined,
+      paymentType: undefined
+    })
   }
   
   const handleTipSelect = (tipPercentage: number) => {
@@ -220,11 +269,53 @@ export default function PaymentStep({
       
       {/* Payment Methods */}
       <div>
-        <h3 className="text-lg font-semibold text-white mb-4">Payment Method</h3>
+        <h3 className="text-lg font-semibold text-white mb-6">Payment Method</h3>
+        
+        {/* Digital Wallets (Apple Pay, Google Pay) */}
+        <div className="mb-6">
+          <PaymentRequestButton
+            amount={calculateFinalAmount()}
+            onPaymentSuccess={handleDigitalWalletPayment}
+            onPaymentError={handlePaymentError}
+            orderMetadata={{
+              tip: checkoutData.tip.toFixed(2),
+              rewardsUsed: checkoutData.useRewards.toString(),
+              rewardsPoints: checkoutData.rewardsPoints.toString(),
+              rewardsDiscount: (checkoutData.useRewards ? checkoutData.rewardsPoints * 0.01 : 0).toFixed(2),
+              subtotal: cartData.subtotal.toFixed(2),
+              tax: cartData.tax.toFixed(2),
+              deliveryFee: cartData.deliveryFee.toFixed(2),
+              originalTotal: cartData.total.toFixed(2)
+            }}
+          />
+        </div>
+        
+        {/* CashApp Payment */}
+        <div className="mb-6">
+          <CashAppPayment
+            amount={calculateFinalAmount()}
+            onPaymentSuccess={handleCashAppPayment}
+            onPaymentError={handlePaymentError}
+            orderMetadata={{
+              tip: checkoutData.tip.toFixed(2),
+              rewardsUsed: checkoutData.useRewards.toString(),
+              rewardsPoints: checkoutData.rewardsPoints.toString(),
+              rewardsDiscount: (checkoutData.useRewards ? checkoutData.rewardsPoints * 0.01 : 0).toFixed(2),
+              subtotal: cartData.subtotal.toFixed(2),
+              tax: cartData.tax.toFixed(2),
+              deliveryFee: cartData.deliveryFee.toFixed(2),
+              originalTotal: cartData.total.toFixed(2)
+            }}
+          />
+        </div>
         
         {/* Existing Payment Methods */}
         {paymentMethods.length > 0 && (
-          <div className="space-y-3 mb-4">
+          <div className="space-y-3 mb-6">
+            <div className="flex items-center space-x-2 mb-3">
+              <CreditCard className="w-5 h-5 text-[var(--color-harvest-gold)]" />
+              <span className="text-white font-medium">Saved Cards</span>
+            </div>
             {paymentMethods.map((payment) => (
               <button
                 key={payment.id}
@@ -234,7 +325,7 @@ export default function PaymentStep({
                   ${
                     checkoutData.selectedPayment?.id === payment.id
                       ? 'border-[var(--color-harvest-gold)] bg-[var(--color-harvest-gold)]/10'
-                      : 'border-[#FFD700] hover:border-[#E6C200]'
+                      : 'border-gray-600 hover:border-[var(--color-harvest-gold)]'
                   }
                 `}
               >
@@ -242,7 +333,7 @@ export default function PaymentStep({
                   <div className={`p-2 rounded-lg mr-2 sm:mr-3 ${
                     checkoutData.selectedPayment?.id === payment.id
                       ? 'bg-[var(--color-harvest-gold)] text-black'
-                      : 'bg-[#FFD700] text-black'
+                      : 'bg-gray-700 text-white'
                   }`}>
                     {getCardIcon(payment.brand)}
                   </div>
@@ -258,7 +349,7 @@ export default function PaymentStep({
                         </span>
                       )}
                     </div>
-                    <p className="text-[#FFD700] text-xs sm:text-sm">
+                    <p className="text-gray-400 text-xs sm:text-sm">
                       Expires {payment.expiryMonth.toString().padStart(2, '0')}/{payment.expiryYear}
                     </p>
                   </div>
@@ -268,55 +359,62 @@ export default function PaymentStep({
           </div>
         )}
         
-        {/* Add New Payment Method */}
-        <button
-          onClick={() => setShowNewCardForm(!showNewCardForm)}
-          className="w-full p-4 border-2 border-dashed border-[#FFD700] rounded-lg hover:border-[var(--color-harvest-gold)] transition-colors text-center"
-        >
-          <Plus className="w-6 h-6 mx-auto mb-2 text-[#FFD700]" />
-          <span className="text-[#FFD700]">Add New Payment Method</span>
-        </button>
-        
-        {/* Stripe Payment Form */}
-        {showNewCardForm && (
-          <div className="mt-4">
-            <StripePaymentForm
-              amount={calculateFinalAmount()}
-              onPaymentSuccess={(paymentIntentId) => {
-                const finalAmount = calculateFinalAmount()
-                onUpdate({ 
-                  newPayment: { 
-                    type: 'stripe',
-                    paymentIntentId,
-                    amount: finalAmount,
-                    status: 'succeeded',
-                    last4: '****' // Will be updated after payment
-                  },
-                  selectedPayment: undefined
-                })
-                setShowNewCardForm(false)
-              }}
-              onPaymentError={(error) => {
-                console.error('Payment error:', error)
-                setShowNewCardForm(false)
-                onUpdate({
-                  selectedPayment: undefined,
-                  newPayment: undefined
-                })
-              }}
-              orderMetadata={{
-                tip: checkoutData.tip.toFixed(2),
-                rewardsUsed: checkoutData.useRewards.toString(),
-                rewardsPoints: checkoutData.rewardsPoints.toString(),
-                rewardsDiscount: (checkoutData.useRewards ? checkoutData.rewardsPoints * 0.01 : 0).toFixed(2),
-                subtotal: cartData.subtotal.toFixed(2),
-                tax: cartData.tax.toFixed(2),
-                deliveryFee: cartData.deliveryFee.toFixed(2),
-                originalTotal: cartData.total.toFixed(2)
-              }}
-            />
+        {/* Add New Card */}
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2 mb-3">
+            <Plus className="w-5 h-5 text-[var(--color-harvest-gold)]" />
+            <span className="text-white font-medium">Add New Card</span>
           </div>
-        )}
+          
+          <button
+            onClick={() => {
+              setShowNewCardForm(!showNewCardForm)
+              if (!showNewCardForm) {
+                setShowDigitalWallets(false)
+                setShowCashApp(false)
+              }
+            }}
+            className="w-full p-4 border-2 border-dashed border-gray-600 rounded-lg hover:border-[var(--color-harvest-gold)] transition-colors text-center bg-[var(--color-dark-charcoal)]"
+          >
+            <CreditCard className="w-6 h-6 mx-auto mb-2 text-gray-400" />
+            <span className="text-gray-300">Add Debit/Credit Card</span>
+          </button>
+          
+          {/* Stripe Payment Form */}
+          {showNewCardForm && (
+            <div className="mt-4">
+              <StripePaymentForm
+                amount={calculateFinalAmount()}
+                onPaymentSuccess={(paymentIntentId) => {
+                  const finalAmount = calculateFinalAmount()
+                  onUpdate({ 
+                    newPayment: { 
+                      type: 'stripe',
+                      paymentIntentId,
+                      amount: finalAmount,
+                      status: 'succeeded',
+                      last4: '****' // Will be updated after payment
+                    },
+                    selectedPayment: undefined,
+                    paymentType: 'card'
+                  })
+                  setShowNewCardForm(false)
+                }}
+                onPaymentError={handlePaymentError}
+                orderMetadata={{
+                  tip: checkoutData.tip.toFixed(2),
+                  rewardsUsed: checkoutData.useRewards.toString(),
+                  rewardsPoints: checkoutData.rewardsPoints.toString(),
+                  rewardsDiscount: (checkoutData.useRewards ? checkoutData.rewardsPoints * 0.01 : 0).toFixed(2),
+                  subtotal: cartData.subtotal.toFixed(2),
+                  tax: cartData.tax.toFixed(2),
+                  deliveryFee: cartData.deliveryFee.toFixed(2),
+                  originalTotal: cartData.total.toFixed(2)
+                }}
+              />
+            </div>
+          )}
+        </div>
       </div>
       
       {/* Tip Section */}

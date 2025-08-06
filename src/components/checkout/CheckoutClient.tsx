@@ -74,6 +74,7 @@ interface CheckoutData {
   tip: number
   useRewards: boolean
   rewardsPoints: number
+  paymentType?: 'card' | 'digital_wallet' | 'cashapp'
 }
 
 const steps = [
@@ -249,8 +250,10 @@ export default function CheckoutClient({
           phone: checkoutData.selectedAddress?.phone || '555-0123'
         },
         paymentInfo: {
-          method: checkoutData.selectedPayment?.type || 'card',
-          last4: checkoutData.selectedPayment?.last4 || '****'
+          method: checkoutData.paymentType || checkoutData.selectedPayment?.type || 'card',
+          last4: checkoutData.selectedPayment?.last4 || checkoutData.newPayment?.paymentDetails?.last4 || '****',
+          paymentType: checkoutData.paymentType,
+          paymentMethodId: checkoutData.newPayment?.paymentMethodId || checkoutData.selectedPayment?.id
         },
         specialInstructions: checkoutData.specialInstructions,
         tip: checkoutData.tip,
@@ -291,36 +294,67 @@ export default function CheckoutClient({
 
       const { paymentIntentId } = await paymentResponse.json()
       
-      // Check if payment was already processed via Stripe Elements
-       if (checkoutData.newPayment?.paymentIntentId) {
-         // Payment already processed, just confirm the order
-         const confirmResponse = await fetch('/api/stripe/confirm-payment', {
-           method: 'POST',
-           headers: { 'Content-Type': 'application/json' },
-           body: JSON.stringify({
-             paymentIntentId: checkoutData.newPayment.paymentIntentId
-           })
-         })
+      // Handle different payment types
+      if (checkoutData.newPayment) {
+        // Payment already processed via new payment methods
+        if (checkoutData.newPayment.type === 'digital_wallet') {
+          console.log('Digital wallet payment completed:', checkoutData.newPayment.paymentDetails)
+        } else if (checkoutData.newPayment.type === 'cashapp') {
+          console.log('CashApp payment completed:', checkoutData.newPayment.paymentDetails)
+        } else if (checkoutData.newPayment.type === 'stripe') {
+          // Traditional Stripe payment - confirm if needed
+          if (checkoutData.newPayment.paymentIntentId) {
+            const confirmResponse = await fetch('/api/stripe/confirm-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                paymentIntentId: checkoutData.newPayment.paymentIntentId
+              })
+            })
 
-         if (!confirmResponse.ok) {
-           throw new Error('Failed to confirm payment')
-         }
-
-         // Update order status to confirmed
-         await fetch('/api/orders', {
-           method: 'PUT',
-           headers: { 'Content-Type': 'application/json' },
-           body: JSON.stringify({
-             orderId: order.id,
-             status: 'confirmed'
-           })
-         })
-       } else if (checkoutData.selectedPayment) {
-         // Using existing payment method - would need additional processing
-         console.log('Using existing payment method:', checkoutData.selectedPayment)
-         // For now, simulate successful payment with existing method
-         await new Promise(resolve => setTimeout(resolve, 1000))
-       }
+            if (!confirmResponse.ok) {
+              throw new Error('Failed to confirm payment')
+            }
+          }
+        }
+        
+        // Update order status to confirmed
+        await fetch('/api/orders', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderId: order.id,
+            status: 'confirmed',
+            paymentMethod: checkoutData.newPayment.type,
+            paymentDetails: {
+              type: checkoutData.newPayment.type,
+              amount: checkoutData.newPayment.amount,
+              status: checkoutData.newPayment.status
+            }
+          })
+        })
+      } else if (checkoutData.selectedPayment) {
+        // Using existing payment method - would need additional processing
+        console.log('Using existing payment method:', checkoutData.selectedPayment)
+        // For now, simulate successful payment with existing method
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+        // Update order status to confirmed
+        await fetch('/api/orders', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderId: order.id,
+            status: 'confirmed',
+            paymentMethod: 'existing_card',
+            paymentDetails: {
+              type: 'card',
+              last4: checkoutData.selectedPayment.last4,
+              brand: checkoutData.selectedPayment.brand
+            }
+          })
+        })
+      }
        
        setOrderId(order.id)
        setCurrentStep('confirmation')

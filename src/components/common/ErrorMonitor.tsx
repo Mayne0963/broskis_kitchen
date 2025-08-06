@@ -8,32 +8,44 @@ export default function ErrorMonitor() {
   useEffect(() => {
     // Handle unhandled promise rejections
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      logError(new Error(event.reason), {
-        type: 'unhandledRejection',
-        reason: event.reason
-      })
+      try {
+        logError(new Error(event.reason), {
+          type: 'unhandledRejection',
+          reason: event.reason
+        })
+      } catch (error) {
+        console.error('Error in handleUnhandledRejection:', error)
+      }
     }
 
     // Handle global JavaScript errors
     const handleError = (event: ErrorEvent) => {
-      logError(new Error(event.message), {
-        type: 'globalError',
-        filename: event.filename,
-        lineno: event.lineno,
-        colno: event.colno
-      })
+      try {
+        logError(new Error(event.message), {
+          type: 'globalError',
+          filename: event.filename,
+          lineno: event.lineno,
+          colno: event.colno
+        })
+      } catch (error) {
+        console.error('Error in handleError:', error)
+      }
     }
 
     // Handle resource loading errors
     const handleResourceError = (event: Event) => {
-      const target = event.target as HTMLElement
-      if (target) {
-        logError(new Error(`Resource failed to load: ${target.tagName}`), {
-          type: 'resourceError',
-          tagName: target.tagName,
-          src: (target as any).src || (target as any).href,
-          outerHTML: target.outerHTML
-        })
+      try {
+        const target = event.target as HTMLElement
+        if (target) {
+          logError(new Error(`Resource failed to load: ${target.tagName}`), {
+            type: 'resourceError',
+            tagName: target.tagName,
+            src: (target as any).src || (target as any).href,
+            outerHTML: target.outerHTML
+          })
+        }
+      } catch (error) {
+        console.error('Error in handleResourceError:', error)
       }
     }
 
