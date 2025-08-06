@@ -41,7 +41,13 @@ export async function POST(request: NextRequest) {
 
     // Handle specific payment method types
     if (payment_method_types && Array.isArray(payment_method_types)) {
-      paymentIntentOptions.payment_method_types = payment_method_types
+      // Ensure CashApp is properly configured
+      if (payment_method_types.includes('cashapp')) {
+        paymentIntentOptions.payment_method_types = ['cashapp']
+        paymentIntentOptions.automatic_payment_methods = undefined
+      } else {
+        paymentIntentOptions.payment_method_types = payment_method_types
+      }
     } else {
       // Enable automatic payment methods for cards, digital wallets, etc.
       paymentIntentOptions.automatic_payment_methods = {

@@ -55,13 +55,13 @@ export default function CashAppPayment({
         throw new Error('Failed to create payment intent')
       }
 
-      const { client_secret } = await response.json()
+      const { clientSecret } = await response.json()
 
       // Confirm payment with CashApp
       const { error, paymentIntent } = await stripe.confirmCashappPayment(
-        client_secret,
+        clientSecret,
         {
-          return_url: `${window.location.origin}/checkout/success`,
+          return_url: `${window.location.origin}/checkout?success=true`,
         }
       )
 
@@ -69,12 +69,20 @@ export default function CashAppPayment({
         throw new Error(error.message || 'CashApp payment failed')
       }
 
-      if (paymentIntent && paymentIntent.status === 'succeeded') {
-        onPaymentSuccess(paymentIntent.payment_method?.id || '', {
-          paymentIntentId: paymentIntent.id,
-          paymentMethod: paymentIntent.payment_method,
-          type: 'cashapp',
-        })
+      if (paymentIntent) {
+        if (paymentIntent.status === 'succeeded') {
+          onPaymentSuccess(paymentIntent.payment_method?.id || '', {
+            paymentIntentId: paymentIntent.id,
+            paymentMethod: paymentIntent.payment_method,
+            type: 'cashapp',
+            status: 'succeeded'
+          })
+        } else if (paymentIntent.status === 'requires_action') {
+          // Handle redirect case - CashApp will redirect back
+          console.log('CashApp payment requires action, redirecting...')
+        } else {
+          throw new Error(`Payment failed with status: ${paymentIntent.status}`)
+        }
       }
     } catch (error) {
       console.error('CashApp payment error:', error)
