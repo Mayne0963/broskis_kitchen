@@ -1078,19 +1078,7 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
     }
   }
 
-  const getStatusDisplayName = (status: OrderStatus): string => {
-    switch (status) {
-      case 'pending': return 'Pending'
-      case 'confirmed': return 'Confirmed'
-      case 'preparing': return 'Preparing'
-      case 'ready': return 'Ready'
-      case 'out-for-delivery': return 'Out for Delivery'
-      case 'delivered': return 'Delivered'
-      case 'completed': return 'Completed'
-      case 'cancelled': return 'Cancelled'
-      default: return status
-    }
-  }
+
 
   const getOrderTypeIcon = (orderType: string) => {
     return orderType === 'delivery' ? <Truck className="w-4 h-4" /> : <Package className="w-4 h-4" />
@@ -1106,12 +1094,7 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
     }).format(date)
   }
 
-  const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount)
-  }
+
 
   const isActiveOrder = (status: OrderStatus): boolean => {
     return !['delivered', 'completed', 'cancelled'].includes(status)
