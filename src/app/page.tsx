@@ -286,7 +286,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/images/menu-itens/BoosieGoldWings.png" alt="Boosie Gold Wings" fill className="object-cover rounded-lg" />
+                  <Image src="/images/menu-items/BoosieGoldWings.png" alt="Boosie Gold Wings" fill className="object-cover rounded-lg" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Boosie Gold Wings</h3>
                 <p className="text-[#FFD700] mb-4">Crispy fried wings coated in our signature honey-gold sauce with a sprinkle of sesame seeds.</p>
@@ -299,7 +299,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/images/menu-itens/BoosieRedWings.png" alt="Boosie Red Wings" fill className="object-cover rounded-lg" />
+                  <Image src="/images/menu-items/SexyyRedWings.png" alt="Sexyy Red Wings" fill className="object-cover rounded-lg" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Boosie Red Wings</h3>
                 <p className="text-[#FFD700] mb-4">Crispy wings drenched in our fiery house-made red hot sauce.</p>
@@ -365,7 +365,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/images/menu-itens/BoosieGoldWings.png" alt="Boosie Gold Wings" fill className="object-cover rounded-lg" />
+                  <Image src="/images/menu-items/BoosieGoldWings.png" alt="Boosie Gold Wings" fill className="object-cover rounded-lg" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Boosie Gold Wings</h3>
                 <p className="text-gray-300 mb-4">Crispy fried wings coated in our signature honey-gold sauce with a sprinkle of sesame seeds.</p>
@@ -378,7 +378,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/images/menu-itens/BoosieRedWings.png" alt="Boosie Red Wings" fill className="object-cover rounded-lg" />
+                  <Image src="/images/menu-items/SexyyRedWings.png" alt="Sexyy Red Wings" fill className="object-cover rounded-lg" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Boosie Red Wings</h3>
                 <p className="text-gray-300 mb-4">Crispy wings drenched in our fiery house-made red hot sauce.</p>

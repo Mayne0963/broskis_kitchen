@@ -13,6 +13,8 @@ import {
   Timestamp,
   deleteDoc
 } from 'firebase/firestore'
+import { withErrorHandler } from '@/lib/middleware/error-handler'
+import { logger } from '@/lib/services/logging-service'
 
 // Collection name for orders
 const ORDERS_COLLECTION = 'orders'
@@ -35,11 +37,16 @@ function calculateDeliveryFee(subtotal: number, orderType: 'delivery' | 'pickup'
 }
 
 // GET /api/orders - Get all orders or user orders
-export async function GET(request: NextRequest) {
-  try {
+export const GET = withErrorHandler(async (request: NextRequest) => {
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('userId')
     const orderId = searchParams.get('orderId')
+
+    logger.logBusinessEvent('order_fetch_attempt', {
+      userId,
+      orderId,
+      fetchType: orderId ? 'single' : userId ? 'user_orders' : 'all_orders'
+    })
 
     // Try Firebase first
     if (isFirebaseConfigured && db) {
@@ -60,6 +67,13 @@ export async function GET(request: NextRequest) {
               createdAt: data.createdAt.toDate(),
               updatedAt: data.updatedAt.toDate()
             } as Order
+            
+            logger.logBusinessEvent('order_fetch_success', {
+              orderId,
+              orderStatus: order.status,
+              orderType: order.orderType
+            })
+            
             return NextResponse.json({ order })
           }
         } else if (userId) {
@@ -103,7 +117,11 @@ export async function GET(request: NextRequest) {
           return NextResponse.json({ orders: allOrders })
         }
       } catch (firebaseError) {
-        console.warn('Firebase fetch failed, using fallback:', firebaseError)
+        logger.error('Firebase fetch failed, using fallback', {
+          error: firebaseError,
+          userId,
+          orderId
+        })
       }
     }
 
@@ -111,36 +129,53 @@ export async function GET(request: NextRequest) {
     if (orderId) {
       const order = orders.find(o => o.id === orderId)
       if (!order) {
+        logger.logBusinessEvent('order_not_found', { orderId })
         return NextResponse.json(
           { error: 'Order not found' },
           { status: 404 }
         )
       }
+      logger.logBusinessEvent('order_fetch_success', {
+        orderId,
+        source: 'memory',
+        orderStatus: order.status
+      })
       return NextResponse.json({ order })
     }
 
     if (userId) {
       const userOrders = orders.filter(order => order.userId === userId)
+      logger.logBusinessEvent('user_orders_fetch_success', {
+        userId,
+        orderCount: userOrders.length,
+        source: 'memory'
+      })
       return NextResponse.json({ orders: userOrders })
     }
 
+    logger.logBusinessEvent('all_orders_fetch_success', {
+      orderCount: orders.length,
+      source: 'memory'
+    })
     return NextResponse.json({ orders })
-  } catch (error) {
-    console.error('Error fetching orders:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch orders' },
-      { status: 500 }
-    )
-  }
-}
+})
 
 // POST /api/orders - Create new order
-export async function POST(request: NextRequest) {
-  try {
+export const POST = withErrorHandler(async (request: NextRequest) => {
     const orderData = await request.json()
+
+    logger.logBusinessEvent('order_creation_attempt', {
+      orderType: orderData.orderType,
+      itemCount: orderData.items?.length || 0,
+      userId: orderData.userId
+    })
 
     // Validate required fields
     if (!orderData.items || orderData.items.length === 0) {
+      logger.logBusinessEvent('order_validation_failed', {
+        reason: 'no_items',
+        userId: orderData.userId
+      })
       return NextResponse.json(
         { error: 'Order must contain at least one item' },
         { status: 400 }
@@ -149,6 +184,10 @@ export async function POST(request: NextRequest) {
 
     // Validate contact information (required for all orders)
     if (!orderData.contactInfo?.email || !orderData.contactInfo?.phone) {
+      logger.logBusinessEvent('order_validation_failed', {
+        reason: 'missing_contact_info',
+        userId: orderData.userId
+      })
       return NextResponse.json(
         { error: 'Contact information is required' },
         { status: 400 }
@@ -156,6 +195,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (orderData.orderType === 'delivery' && !orderData.deliveryAddress) {
+      logger.logBusinessEvent('order_validation_failed', {
+        reason: 'missing_delivery_address',
+        userId: orderData.userId
+      })
       return NextResponse.json(
         { error: 'Delivery address is required for delivery orders' },
         { status: 400 }
@@ -163,6 +206,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (orderData.orderType === 'pickup' && !orderData.pickupLocation) {
+      logger.logBusinessEvent('order_validation_failed', {
+        reason: 'missing_pickup_location',
+        userId: orderData.userId
+      })
       return NextResponse.json(
         { error: 'Pickup location is required for pickup orders' },
         { status: 400 }
@@ -209,15 +256,36 @@ export async function POST(request: NextRequest) {
         }
         
         await addDoc(collection(db, ORDERS_COLLECTION), orderDoc)
-        console.log('Order saved to Firebase with ID:', newOrder.id)
+        logger.logBusinessEvent('order_created_firebase', {
+          orderId: newOrder.id,
+          orderType: newOrder.orderType,
+          total: newOrder.total,
+          userId: newOrder.userId
+        })
       } catch (firebaseError) {
-        console.warn('Failed to save to Firebase, using fallback:', firebaseError)
+        logger.error('Failed to save order to Firebase, using fallback', {
+          error: firebaseError,
+          orderId: newOrder.id,
+          userId: newOrder.userId
+        })
         // Add to in-memory storage as fallback
         orders.unshift(newOrder)
+        logger.logBusinessEvent('order_created_memory', {
+          orderId: newOrder.id,
+          orderType: newOrder.orderType,
+          total: newOrder.total,
+          userId: newOrder.userId
+        })
       }
     } else {
       // Add to in-memory storage
       orders.unshift(newOrder)
+      logger.logBusinessEvent('order_created_memory', {
+        orderId: newOrder.id,
+        orderType: newOrder.orderType,
+        total: newOrder.total,
+        userId: newOrder.userId
+      })
     }
 
     // Simulate processing time
@@ -238,6 +306,14 @@ export async function POST(request: NextRequest) {
       }
     }, 2000)
 
+    logger.logBusinessEvent('order_creation_success', {
+      orderId: newOrder.id,
+      orderType: newOrder.orderType,
+      total: newOrder.total,
+      userId: newOrder.userId,
+      itemCount: newOrder.items.length
+    })
+
     return NextResponse.json(
       { 
         message: 'Order created successfully',
@@ -245,21 +321,24 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     )
-  } catch (error) {
-    console.error('Error creating order:', error)
-    return NextResponse.json(
-      { error: 'Failed to create order' },
-      { status: 500 }
-    )
-  }
-}
+})
 
 // PUT /api/orders - Update order status
-export async function PUT(request: NextRequest) {
-  try {
+export const PUT = withErrorHandler(async (request: NextRequest) => {
     const { orderId, status, estimatedTime } = await request.json()
 
+    logger.logBusinessEvent('order_update_attempt', {
+      orderId,
+      newStatus: status,
+      estimatedTime
+    })
+
     if (!orderId || !status) {
+      logger.logBusinessEvent('order_update_validation_failed', {
+        reason: 'missing_required_fields',
+        orderId,
+        status
+      })
       return NextResponse.json(
         { error: 'Order ID and status are required' },
         { status: 400 }
@@ -295,10 +374,18 @@ export async function PUT(request: NextRequest) {
             updatedAt: updatedData.updatedAt.toDate()
           } as Order
           
-          console.log('Order updated in Firebase:', orderId)
+          logger.logBusinessEvent('order_updated_firebase', {
+            orderId,
+            newStatus: status,
+            estimatedTime
+          })
         }
       } catch (firebaseError) {
-        console.warn('Failed to update in Firebase, using fallback:', firebaseError)
+        logger.error('Failed to update order in Firebase, using fallback', {
+          error: firebaseError,
+          orderId,
+          status
+        })
       }
     }
 
@@ -306,6 +393,10 @@ export async function PUT(request: NextRequest) {
     if (!updatedOrder) {
       const orderIndex = orders.findIndex(order => order.id === orderId)
       if (orderIndex === -1) {
+        logger.logBusinessEvent('order_update_failed', {
+          reason: 'order_not_found',
+          orderId
+        })
         return NextResponse.json(
           { error: 'Order not found' },
           { status: 404 }
@@ -320,28 +411,36 @@ export async function PUT(request: NextRequest) {
       }
       
       updatedOrder = orders[orderIndex]
+      logger.logBusinessEvent('order_updated_memory', {
+        orderId,
+        newStatus: status,
+        estimatedTime
+      })
     }
+
+    logger.logBusinessEvent('order_update_success', {
+      orderId,
+      newStatus: status,
+      previousStatus: updatedOrder?.status
+    })
 
     return NextResponse.json({
       message: 'Order updated successfully',
       order: updatedOrder
     })
-  } catch (error) {
-    console.error('Error updating order:', error)
-    return NextResponse.json(
-      { error: 'Failed to update order' },
-      { status: 500 }
-    )
-  }
-}
+})
 
 // DELETE /api/orders - Cancel order
-export async function DELETE(request: NextRequest) {
-  try {
+export const DELETE = withErrorHandler(async (request: NextRequest) => {
     const { searchParams } = new URL(request.url)
     const orderId = searchParams.get('orderId')
 
+    logger.logBusinessEvent('order_cancellation_attempt', { orderId })
+
     if (!orderId) {
+      logger.logBusinessEvent('order_cancellation_validation_failed', {
+        reason: 'missing_order_id'
+      })
       return NextResponse.json(
         { error: 'Order ID is required' },
         { status: 400 }
@@ -365,6 +464,11 @@ export async function DELETE(request: NextRequest) {
           
           // Check if order can be cancelled
           if (['delivered', 'completed', 'cancelled'].includes(orderData.status)) {
+            logger.logBusinessEvent('order_cancellation_failed', {
+              reason: 'invalid_status',
+              orderId,
+              currentStatus: orderData.status
+            })
             return NextResponse.json(
               { error: 'Order cannot be cancelled' },
               { status: 400 }
@@ -384,10 +488,16 @@ export async function DELETE(request: NextRequest) {
             updatedAt: new Date()
           }
           
-          console.log('Order cancelled in Firebase:', orderId)
+          logger.logBusinessEvent('order_cancelled_firebase', {
+            orderId,
+            previousStatus: orderData.status
+          })
         }
       } catch (firebaseError) {
-        console.warn('Failed to cancel in Firebase, using fallback:', firebaseError)
+        logger.error('Failed to cancel order in Firebase, using fallback', {
+          error: firebaseError,
+          orderId
+        })
       }
     }
 
@@ -395,6 +505,10 @@ export async function DELETE(request: NextRequest) {
     if (!cancelledOrder) {
       const orderIndex = orders.findIndex(order => order.id === orderId)
       if (orderIndex === -1) {
+        logger.logBusinessEvent('order_cancellation_failed', {
+          reason: 'order_not_found',
+          orderId
+        })
         return NextResponse.json(
           { error: 'Order not found' },
           { status: 404 }
@@ -404,6 +518,11 @@ export async function DELETE(request: NextRequest) {
       // Check if order can be cancelled
       const order = orders[orderIndex]
       if (['delivered', 'completed', 'cancelled'].includes(order.status)) {
+        logger.logBusinessEvent('order_cancellation_failed', {
+          reason: 'invalid_status',
+          orderId,
+          currentStatus: order.status
+        })
         return NextResponse.json(
           { error: 'Order cannot be cancelled' },
           { status: 400 }
@@ -418,17 +537,19 @@ export async function DELETE(request: NextRequest) {
       }
       
       cancelledOrder = orders[orderIndex]
+      logger.logBusinessEvent('order_cancelled_memory', {
+        orderId,
+        previousStatus: order.status
+      })
     }
+
+    logger.logBusinessEvent('order_cancellation_success', {
+      orderId,
+      previousStatus: cancelledOrder?.status
+    })
 
     return NextResponse.json({
       message: 'Order cancelled successfully',
       order: cancelledOrder
     })
-  } catch (error) {
-    console.error('Error cancelling order:', error)
-    return NextResponse.json(
-      { error: 'Failed to cancel order' },
-      { status: 500 }
-    )
-  }
-}
+})

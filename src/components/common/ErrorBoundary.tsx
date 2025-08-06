@@ -1,102 +1,240 @@
-'use client';
+"use client"
 
-import React, { Component, ReactNode } from 'react';
+import React, { Component, ErrorInfo, ReactNode } from 'react'
+import ErrorFallback, { NetworkErrorFallback, PaymentErrorFallback, LoadingErrorFallback } from './ErrorFallback'
 
 interface Props {
-  children: ReactNode;
-  fallback?: ReactNode;
+  children: ReactNode
+  fallback?: React.ComponentType<{ error: Error; resetError: () => void }>
+  onError?: (error: Error, errorInfo: ErrorInfo) => void
+  isolate?: boolean
+  errorType?: 'general' | 'network' | 'payment' | 'loading'
 }
 
 interface State {
-  hasError: boolean;
-  error?: Error;
+  hasError: boolean
+  error: Error | null
+  errorInfo: ErrorInfo | null
+  errorId: string
 }
 
 class ErrorBoundary extends Component<Props, State> {
+  private retryTimeoutId: number | null = null
+
   constructor(props: Props) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error: Error): State {
-    // Update state so the next render will show the fallback UI
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Log the error to console or error reporting service
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
-    
-    // Check if it's a chunk loading error
-    if (error.name === 'ChunkLoadError' || error.message.includes('Loading chunk')) {
-      console.log('Chunk loading error detected, attempting to reload...');
-      // Optionally reload the page after a short delay
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+    super(props)
+    this.state = {
+      hasError: false,
+      error: null,
+      errorInfo: null,
+      errorId: ''
     }
   }
 
-  handleRetry = () => {
-    this.setState({ hasError: false, error: undefined });
-  };
+  static getDerivedStateFromError(error: Error): Partial<State> {
+    return {
+      hasError: true,
+      error,
+      errorId: `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    }
+  }
 
-  render() {
-    if (this.state.hasError) {
-      // Custom fallback UI
-      if (this.props.fallback) {
-        return this.props.fallback;
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    this.setState({ errorInfo })
+    
+    // Log error to console in development
+    if (process.env.NODE_ENV === 'development') {
+      console.group('🚨 Error Boundary Caught Error')
+      console.error('Error:', error)
+      console.error('Error Info:', errorInfo)
+      console.error('Component Stack:', errorInfo.componentStack)
+      console.groupEnd()
+    }
+
+    // Call custom error handler if provided
+    if (this.props.onError) {
+      this.props.onError(error, errorInfo)
+    }
+
+    // Log to external service in production
+    if (process.env.NODE_ENV === 'production') {
+      this.logErrorToService(error, errorInfo)
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.retryTimeoutId) {
+      window.clearTimeout(this.retryTimeoutId)
+    }
+  }
+
+  private logErrorToService = async (error: Error, errorInfo: ErrorInfo) => {
+    try {
+      // In a real app, you'd send this to your logging service
+      const errorData = {
+        message: error.message,
+        stack: error.stack,
+        componentStack: errorInfo.componentStack,
+        errorId: this.state.errorId,
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+        url: window.location.href,
+        userId: this.getUserId(), // Implement this based on your auth system
       }
 
-      // Default fallback UI
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-6 text-center">
-            <div className="mb-4">
-              <svg
-                className="mx-auto h-12 w-12 text-[var(--color-harvest-gold)]"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-                />
-              </svg>
-            </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              Something went wrong
-            </h2>
-            <p className="text-gray-600 mb-4">
-              {this.state.error?.name === 'ChunkLoadError' || 
-               this.state.error?.message.includes('Loading chunk')
-                ? 'Failed to load application resources. This usually happens due to a network issue or when the app has been updated.'
-                : 'An unexpected error occurred. Please try again.'}
-            </p>
-            <div className="space-y-2">
-              <button
-                onClick={this.handleRetry}
-                className="w-full bg-gold-foil text-black px-4 py-2 rounded-md hover:bg-harvest-gold transition-colors"
-              >
-                Try Again
-              </button>
-              <button
-                onClick={() => window.location.reload()}
-                className="w-full bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors"
-              >
-                Reload Page
-              </button>
-            </div>
-          </div>
-        </div>
-      );
+      // Example: Send to your logging endpoint
+      // await fetch('/api/log-error', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(errorData)
+      // })
+
+      console.log('Error logged:', errorData)
+    } catch (loggingError) {
+      console.error('Failed to log error:', loggingError)
+    }
+  }
+
+  private getUserId = (): string | null => {
+    // Implement based on your authentication system
+    // For example, get from localStorage, context, or cookies
+    try {
+      return localStorage.getItem('userId') || null
+    } catch {
+      return null
+    }
+  }
+
+  private resetError = () => {
+    this.setState({
+      hasError: false,
+      error: null,
+      errorInfo: null,
+      errorId: ''
+    })
+  }
+
+  private resetErrorWithDelay = (delay: number = 100) => {
+    this.retryTimeoutId = window.setTimeout(() => {
+      this.resetError()
+    }, delay)
+  }
+
+  render() {
+    if (this.state.hasError && this.state.error) {
+      // Use custom fallback if provided
+      if (this.props.fallback) {
+        const FallbackComponent = this.props.fallback
+        return <FallbackComponent error={this.state.error} resetError={this.resetError} />
+      }
+
+      // Use specific error fallbacks based on error type
+      switch (this.props.errorType) {
+        case 'network':
+          return <NetworkErrorFallback resetError={this.resetError} />
+        case 'payment':
+          return <PaymentErrorFallback resetError={this.resetError} />
+        case 'loading':
+          return <LoadingErrorFallback resetError={this.resetError} />
+        default:
+          return (
+            <ErrorFallback
+              error={this.state.error}
+              resetError={this.resetError}
+            />
+          )
+      }
     }
 
-    return this.props.children;
+    return this.props.children
   }
 }
 
-export default ErrorBoundary;
+export default ErrorBoundary
+
+// Higher-order component for easy wrapping
+export function withErrorBoundary<P extends object>(
+  Component: React.ComponentType<P>,
+  errorBoundaryProps?: Omit<Props, 'children'>
+) {
+  const WrappedComponent = (props: P) => (
+    <ErrorBoundary {...errorBoundaryProps}>
+      <Component {...props} />
+    </ErrorBoundary>
+  )
+
+  WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name})`
+  return WrappedComponent
+}
+
+// Hook for manual error reporting
+export function useErrorHandler() {
+  return (error: Error, errorInfo?: { componentStack?: string }) => {
+    // In a real app, you'd send this to your error reporting service
+    console.error('Manual error report:', { error, errorInfo })
+    
+    if (process.env.NODE_ENV === 'production') {
+      // Send to logging service
+      // logErrorToService(error, errorInfo)
+    }
+  }
+}
+
+// Async error boundary for handling promise rejections
+export class AsyncErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props)
+    this.state = {
+      hasError: false,
+      error: null,
+      errorInfo: null,
+      errorId: ''
+    }
+  }
+
+  componentDidMount() {
+    window.addEventListener('unhandledrejection', this.handleUnhandledRejection)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('unhandledrejection', this.handleUnhandledRejection)
+  }
+
+  handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+    const error = new Error(event.reason?.message || 'Unhandled promise rejection')
+    error.stack = event.reason?.stack
+    
+    this.setState({
+      hasError: true,
+      error,
+      errorId: `async_error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    })
+
+    // Prevent the default browser behavior
+    event.preventDefault()
+  }
+
+  resetError = () => {
+    this.setState({
+      hasError: false,
+      error: null,
+      errorInfo: null,
+      errorId: ''
+    })
+  }
+
+  render() {
+    if (this.state.hasError && this.state.error) {
+      return (
+        <ErrorFallback
+          error={this.state.error}
+          resetError={this.resetError}
+          title="Async Operation Failed"
+          description="An asynchronous operation failed. This might be due to a network issue or server problem."
+        />
+      )
+    }
+
+    return this.props.children
+  }
+}
