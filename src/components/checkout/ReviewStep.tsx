@@ -9,7 +9,11 @@ interface CartItem {
   price: number
   quantity: number
   image: string
-  customizations: string[]
+  customizations: {
+    category: string
+    name: string
+    price: number
+  }[]
 }
 
 interface CartData {
@@ -39,6 +43,7 @@ interface ReviewStepProps {
   checkoutData: CheckoutData
   onUpdate: (updates: Partial<CheckoutData>) => void
   onPlaceOrder: () => void
+  onEditStep: (step: 'delivery' | 'payment') => void
   isProcessing: boolean
 }
 
@@ -47,10 +52,21 @@ export default function ReviewStep({
   checkoutData, 
   onUpdate, 
   onPlaceOrder, 
+  onEditStep,
   isProcessing 
 }: ReviewStepProps) {
   const rewardsDiscount = checkoutData.useRewards ? (checkoutData.rewardsPoints * 0.01) : 0
-  const finalTotal = cartData.total + checkoutData.tip - rewardsDiscount
+  const finalTotal = Math.max(0, cartData.total + checkoutData.tip - rewardsDiscount)
+  
+  const getItemTotal = (item: CartItem) => {
+    const customizationsTotal = item.customizations.reduce((sum, custom) => sum + custom.price, 0)
+    return (item.price + customizationsTotal) * item.quantity
+  }
+  
+  const getItemPrice = (item: CartItem) => {
+    const customizationsTotal = item.customizations.reduce((sum, custom) => sum + custom.price, 0)
+    return item.price + customizationsTotal
+  }
   
   const getDeliveryAddress = () => {
     if (checkoutData.selectedAddress) {
@@ -97,33 +113,33 @@ export default function ReviewStep({
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold text-white mb-2">Review Your Order</h2>
-        <p className="text-gray-400">Please review all details before placing your order</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Review Your Order</h2>
+        <p className="text-sm sm:text-base text-gray-400">Please review all details before placing your order</p>
       </div>
       
       {/* Order Items */}
-      <div className="bg-black/30 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Order Items</h3>
+      <div className="bg-black/30 rounded-lg p-4 sm:p-6">
+        <h3 className="text-base sm:text-lg font-semibold text-white mb-4">Order Items</h3>
         <div className="space-y-4">
           {cartData.items.map((item) => (
-            <div key={item.id} className="flex items-start space-x-4 pb-4 border-b border-gray-700 last:border-b-0 last:pb-0">
+            <div key={item.id} className="flex items-start space-x-3 sm:space-x-4 pb-4 border-b border-gray-700 last:border-b-0 last:pb-0">
               <img
                 src={item.image}
                 alt={item.name}
-                className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
+                className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover flex-shrink-0"
               />
               
               <div className="flex-1">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h4 className="text-white font-medium">{item.name}</h4>
-                    <p className="text-gray-400 text-sm mt-1">{item.description}</p>
+                    <h4 className="text-sm sm:text-base text-white font-medium">{item.name}</h4>
+                    <p className="text-gray-400 text-xs sm:text-sm mt-1">{item.description}</p>
                     
                     {item.customizations.length > 0 && (
                       <div className="mt-2">
                         {item.customizations.map((customization, index) => (
                           <span key={index} className="inline-block text-xs text-[var(--color-harvest-gold)] bg-[var(--color-harvest-gold)]/10 px-2 py-1 rounded mr-2 mb-1">
-                            + {customization}
+                            + {customization.name} {customization.price > 0 && `(+$${customization.price.toFixed(2)})`}
                           </span>
                         ))}
                       </div>
@@ -131,11 +147,11 @@ export default function ReviewStep({
                   </div>
                   
                   <div className="text-right">
-                    <div className="text-white font-semibold">
-                      ${(item.price * item.quantity).toFixed(2)}
+                    <div className="text-sm sm:text-base text-white font-semibold">
+                      ${getItemTotal(item).toFixed(2)}
                     </div>
-                    <div className="text-gray-400 text-sm">
-                      ${item.price.toFixed(2)} × {item.quantity}
+                    <div className="text-gray-400 text-xs sm:text-sm">
+                      ${getItemPrice(item).toFixed(2)} × {item.quantity}
                     </div>
                   </div>
                 </div>
@@ -146,10 +162,10 @@ export default function ReviewStep({
       </div>
       
       {/* Delivery Information */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-black/30 rounded-lg p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <div className="bg-black/30 rounded-lg p-4 sm:p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white flex items-center">
+            <h3 className="text-base sm:text-lg font-semibold text-white flex items-center">
               {checkoutData.deliveryType === 'delivery' ? (
                 <Truck className="w-5 h-5 mr-2 text-[var(--color-harvest-gold)]" />
               ) : (
@@ -157,8 +173,12 @@ export default function ReviewStep({
               )}
               {checkoutData.deliveryType === 'delivery' ? 'Delivery' : 'Pickup'}
             </h3>
-            <button className="text-[var(--color-harvest-gold)] hover:text-[var(--color-harvest-gold)]/80 text-sm font-medium">
-              <Edit className="w-4 h-4" />
+            <button 
+              onClick={() => onEditStep('delivery')}
+              className="text-[var(--color-harvest-gold)] hover:text-[var(--color-harvest-gold)]/80 text-xs sm:text-sm font-medium flex items-center"
+            >
+              <Edit className="w-4 h-4 mr-1" />
+              Edit
             </button>
           </div>
           
@@ -168,8 +188,8 @@ export default function ReviewStep({
                 <div className="flex items-start">
                   <MapPin className="w-4 h-4 text-gray-400 mt-1 mr-2 flex-shrink-0" />
                   <div>
-                    <div className="text-white font-medium">Delivery Address</div>
-                    <div className="text-gray-400 text-sm">{getDeliveryAddress()}</div>
+                    <div className="text-sm sm:text-base text-white font-medium">Delivery Address</div>
+                    <div className="text-gray-400 text-xs sm:text-sm">{getDeliveryAddress()}</div>
                   </div>
                 </div>
               </div>
@@ -179,8 +199,8 @@ export default function ReviewStep({
               <div className="flex items-start">
                 <Clock className="w-4 h-4 text-gray-400 mt-1 mr-2 flex-shrink-0" />
                 <div>
-                  <div className="text-white font-medium">Estimated Time</div>
-                  <div className="text-gray-400 text-sm">{getEstimatedTime()}</div>
+                  <div className="text-sm sm:text-base text-white font-medium">Estimated Time</div>
+                  <div className="text-gray-400 text-xs sm:text-sm">{getEstimatedTime()}</div>
                 </div>
               </div>
             </div>
@@ -197,27 +217,31 @@ export default function ReviewStep({
         </div>
         
         {/* Payment Information */}
-        <div className="bg-black/30 rounded-lg p-6">
+        <div className="bg-black/30 rounded-lg p-4 sm:p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white flex items-center">
+            <h3 className="text-base sm:text-lg font-semibold text-white flex items-center">
               <CreditCard className="w-5 h-5 mr-2 text-[var(--color-harvest-gold)]" />
               Payment
             </h3>
-            <button className="text-[var(--color-harvest-gold)] hover:text-[var(--color-harvest-gold)]/80 text-sm font-medium">
-              <Edit className="w-4 h-4" />
+            <button 
+              onClick={() => onEditStep('payment')}
+              className="text-[var(--color-harvest-gold)] hover:text-[var(--color-harvest-gold)]/80 text-sm font-medium flex items-center"
+            >
+              <Edit className="w-4 h-4 mr-1" />
+              Edit
             </button>
           </div>
           
           <div className="space-y-3">
             <div>
-              <div className="text-white font-medium mb-1">Payment Method</div>
-              <div className="text-gray-400 text-sm">{getPaymentMethod()}</div>
+              <div className="text-sm sm:text-base text-white font-medium mb-1">Payment Method</div>
+              <div className="text-gray-400 text-xs sm:text-sm">{getPaymentMethod()}</div>
             </div>
             
             {checkoutData.tip > 0 && (
               <div>
-                <div className="text-white font-medium mb-1">Tip</div>
-                <div className="text-gray-400 text-sm">${checkoutData.tip.toFixed(2)}</div>
+                <div className="text-sm sm:text-base text-white font-medium mb-1">Tip</div>
+                <div className="text-gray-400 text-xs sm:text-sm">${checkoutData.tip.toFixed(2)}</div>
               </div>
             )}
             
@@ -237,29 +261,27 @@ export default function ReviewStep({
       </div>
       
       {/* Order Summary */}
-      <div className="bg-black/30 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Order Summary</h3>
+      <div className="bg-black/30 rounded-lg p-4 sm:p-6">
+        <h3 className="text-base sm:text-lg font-semibold text-white mb-4">Order Summary</h3>
         
         <div className="space-y-3">
-          <div className="flex items-center justify-between text-gray-300">
+          <div className="flex items-center justify-between text-gray-300 text-sm sm:text-base">
             <span>Subtotal ({cartData.items.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
             <span>${cartData.subtotal.toFixed(2)}</span>
           </div>
           
-          {checkoutData.deliveryType === 'delivery' && (
-            <div className="flex items-center justify-between text-gray-300">
-              <span>Delivery Fee</span>
-              <span>${cartData.deliveryFee.toFixed(2)}</span>
-            </div>
-          )}
+          <div className="flex items-center justify-between text-gray-300 text-sm sm:text-base">
+            <span>{checkoutData.deliveryType === 'delivery' ? 'Delivery Fee' : 'Pickup Fee'}</span>
+            <span>${checkoutData.deliveryType === 'delivery' ? cartData.deliveryFee.toFixed(2) : '0.00'}</span>
+          </div>
           
-          <div className="flex items-center justify-between text-gray-300">
+          <div className="flex items-center justify-between text-gray-300 text-sm sm:text-base">
             <span>Tax</span>
             <span>${cartData.tax.toFixed(2)}</span>
           </div>
           
           {checkoutData.tip > 0 && (
-            <div className="flex items-center justify-between text-gray-300">
+            <div className="flex items-center justify-between text-gray-300 text-sm sm:text-base">
               <span>Tip</span>
               <span>${checkoutData.tip.toFixed(2)}</span>
             </div>
@@ -276,7 +298,7 @@ export default function ReviewStep({
           )}
           
           <div className="border-t border-gray-600 pt-3">
-            <div className="flex items-center justify-between text-white text-xl font-bold">
+            <div className="flex items-center justify-between text-white text-lg sm:text-xl font-bold">
               <span>Total</span>
               <span>${finalTotal.toFixed(2)}</span>
             </div>
@@ -304,7 +326,7 @@ export default function ReviewStep({
           onClick={onPlaceOrder}
           disabled={isProcessing}
           className="
-            w-full py-4 px-6 bg-[var(--color-harvest-gold)] text-black text-lg font-bold rounded-lg
+            w-full py-3 sm:py-4 px-4 sm:px-6 bg-[var(--color-harvest-gold)] text-black text-base sm:text-lg font-bold rounded-lg
             hover:bg-[var(--color-harvest-gold)]/90 transition-all
             disabled:opacity-50 disabled:cursor-not-allowed
             flex items-center justify-center

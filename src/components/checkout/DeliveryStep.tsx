@@ -37,6 +37,8 @@ export default function DeliveryStep({ addresses, checkoutData, onUpdate }: Deli
     state: '',
     zipCode: ''
   })
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
+  const [isValidatingAddress, setIsValidatingAddress] = useState(false)
   
   const handleDeliveryTypeChange = (type: 'delivery' | 'pickup') => {
     onUpdate({ deliveryType: type })
@@ -50,6 +52,16 @@ export default function DeliveryStep({ addresses, checkoutData, onUpdate }: Deli
   const handleNewAddressChange = (field: string, value: string) => {
     const updated = { ...newAddress, [field]: value }
     setNewAddress(updated)
+    
+    // Clear validation error for this field
+    if (validationErrors[field]) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[field]
+        return newErrors
+      })
+    }
+    
     onUpdate({ newAddress: updated, selectedAddress: undefined })
   }
   
@@ -72,8 +84,40 @@ export default function DeliveryStep({ addresses, checkoutData, onUpdate }: Deli
     return `${address.street}, ${address.city}, ${address.state} ${address.zipCode}`
   }
   
+  const validateNewAddress = async () => {
+    setIsValidatingAddress(true)
+    const errors: Record<string, string> = {}
+    
+    if (!newAddress.street?.trim()) {
+      errors.street = 'Street address is required'
+    }
+    
+    if (!newAddress.city?.trim()) {
+      errors.city = 'City is required'
+    }
+    
+    if (!newAddress.state?.trim()) {
+      errors.state = 'State is required'
+    } else if (newAddress.state.length !== 2) {
+      errors.state = 'Please use 2-letter state code (e.g., CA)'
+    }
+    
+    if (!newAddress.zipCode?.trim()) {
+      errors.zipCode = 'ZIP code is required'
+    } else if (!/^\d{5}(-\d{4})?$/.test(newAddress.zipCode)) {
+      errors.zipCode = 'Please enter a valid ZIP code'
+    }
+    
+    // Simulate address validation delay
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
+    setValidationErrors(errors)
+    setIsValidatingAddress(false)
+    return Object.keys(errors).length === 0
+  }
+  
   const isNewAddressValid = () => {
-    return newAddress.street && newAddress.city && newAddress.state && newAddress.zipCode
+    return newAddress.street && newAddress.city && newAddress.state && newAddress.zipCode && Object.keys(validationErrors).length === 0
   }
   
   return (
@@ -87,7 +131,7 @@ export default function DeliveryStep({ addresses, checkoutData, onUpdate }: Deli
       {/* Delivery Type Selection */}
       <div>
         <h3 className="text-lg font-semibold text-white mb-4">Delivery Method</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <button
             onClick={() => handleDeliveryTypeChange('delivery')}
             className={`
@@ -100,15 +144,15 @@ export default function DeliveryStep({ addresses, checkoutData, onUpdate }: Deli
             `}
           >
             <div className="flex items-center mb-3">
-              <Truck className={`w-6 h-6 mr-3 ${
+              <Truck className={`w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3 ${
                 checkoutData.deliveryType === 'delivery' ? 'text-[var(--color-harvest-gold)]' : 'text-gray-400'
               }`} />
-              <span className="text-lg font-semibold text-white">Delivery</span>
+              <span className="text-base sm:text-lg font-semibold text-white">Delivery</span>
             </div>
-            <p className="text-gray-400 text-sm mb-2">Get it delivered to your door</p>
-            <div className="text-sm">
+            <p className="text-gray-400 text-xs sm:text-sm mb-2">Get it delivered to your door</p>
+            <div className="text-xs sm:text-sm">
               <span className="text-[var(--color-harvest-gold)] font-medium">30-40 min</span>
-              <span className="text-gray-400 ml-2">• $3.99 fee</span>
+              <span className="text-gray-400 ml-1 sm:ml-2">• $3.99 fee</span>
             </div>
           </button>
           
@@ -124,15 +168,15 @@ export default function DeliveryStep({ addresses, checkoutData, onUpdate }: Deli
             `}
           >
             <div className="flex items-center mb-3">
-              <MapPin className={`w-6 h-6 mr-3 ${
+              <MapPin className={`w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3 ${
                 checkoutData.deliveryType === 'pickup' ? 'text-[var(--color-harvest-gold)]' : 'text-gray-400'
               }`} />
-              <span className="text-lg font-semibold text-white">Pickup</span>
+              <span className="text-base sm:text-lg font-semibold text-white">Pickup</span>
             </div>
-            <p className="text-gray-400 text-sm mb-2">Pick up from our location</p>
-            <div className="text-sm">
+            <p className="text-gray-400 text-xs sm:text-sm mb-2">Pick up from our location</p>
+            <div className="text-xs sm:text-sm">
               <span className="text-[var(--color-harvest-gold)] font-medium">15-25 min</span>
-              <span className="text-gray-400 ml-2">• No delivery fee</span>
+              <span className="text-gray-400 ml-1 sm:ml-2">• No delivery fee</span>
             </div>
           </button>
         </div>
@@ -213,48 +257,73 @@ export default function DeliveryStep({ addresses, checkoutData, onUpdate }: Deli
                   </select>
                 </div>
                 
-                <div className="md:col-span-1">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Street Address</label>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Street Address *</label>
                   <input
                     type="text"
                     value={newAddress.street || ''}
                     onChange={(e) => handleNewAddressChange('street', e.target.value)}
+                    onBlur={validateNewAddress}
                     placeholder="123 Main Street"
-                    className="w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-[var(--color-harvest-gold)] focus:outline-none"
+                    className={`w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border rounded-lg text-white placeholder-gray-500 focus:outline-none ${
+                      validationErrors.street ? 'border-red-500 focus:border-red-500' : 'border-gray-600 focus:border-[var(--color-harvest-gold)]'
+                    }`}
                   />
+                  {validationErrors.street && (
+                    <p className="text-red-400 text-sm mt-1">{validationErrors.street}</p>
+                  )}
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">City</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">City *</label>
                   <input
                     type="text"
                     value={newAddress.city || ''}
                     onChange={(e) => handleNewAddressChange('city', e.target.value)}
+                    onBlur={validateNewAddress}
                     placeholder="San Francisco"
-                    className="w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-[var(--color-harvest-gold)] focus:outline-none"
+                    className={`w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border rounded-lg text-white placeholder-gray-500 focus:outline-none ${
+                      validationErrors.city ? 'border-red-500 focus:border-red-500' : 'border-gray-600 focus:border-[var(--color-harvest-gold)]'
+                    }`}
                   />
+                  {validationErrors.city && (
+                    <p className="text-red-400 text-sm mt-1">{validationErrors.city}</p>
+                  )}
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">State</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">State *</label>
                   <input
                     type="text"
                     value={newAddress.state || ''}
-                    onChange={(e) => handleNewAddressChange('state', e.target.value)}
+                    onChange={(e) => handleNewAddressChange('state', e.target.value.toUpperCase())}
+                    onBlur={validateNewAddress}
                     placeholder="CA"
-                    className="w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-[var(--color-harvest-gold)] focus:outline-none"
+                    maxLength={2}
+                    className={`w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border rounded-lg text-white placeholder-gray-500 focus:outline-none ${
+                      validationErrors.state ? 'border-red-500 focus:border-red-500' : 'border-gray-600 focus:border-[var(--color-harvest-gold)]'
+                    }`}
                   />
+                  {validationErrors.state && (
+                    <p className="text-red-400 text-sm mt-1">{validationErrors.state}</p>
+                  )}
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">ZIP Code</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">ZIP Code *</label>
                   <input
                     type="text"
                     value={newAddress.zipCode || ''}
                     onChange={(e) => handleNewAddressChange('zipCode', e.target.value)}
+                    onBlur={validateNewAddress}
                     placeholder="94102"
-                    className="w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-[var(--color-harvest-gold)] focus:outline-none"
+                    className={`w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border rounded-lg text-white placeholder-gray-500 focus:outline-none ${
+                      validationErrors.zipCode ? 'border-red-500 focus:border-red-500' : 'border-gray-600 focus:border-[var(--color-harvest-gold)]'
+                    }`}
                   />
+                  {validationErrors.zipCode && (
+                    <p className="text-red-400 text-sm mt-1">{validationErrors.zipCode}</p>
+                  )}
                 </div>
               </div>
               

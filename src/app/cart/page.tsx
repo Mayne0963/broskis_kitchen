@@ -41,6 +41,28 @@ export default function CartPage() {
     return item.customizations && Object.keys(item.customizations).length > 0
   }
 
+  // Calculate item total including customizations
+  const getItemTotal = (item: OrderItem) => {
+    let total = item.price
+    if (item.customizations) {
+      Object.values(item.customizations).flat().forEach(option => {
+        total += option.price || 0
+      })
+    }
+    return total * item.quantity
+  }
+
+  // Calculate item base price including customizations
+  const getItemPrice = (item: OrderItem) => {
+    let price = item.price
+    if (item.customizations) {
+      Object.values(item.customizations).flat().forEach(option => {
+        price += option.price || 0
+      })
+    }
+    return price
+  }
+
   if (items.length === 0) {
     return (
       <div className="min-h-screen py-20">
@@ -101,17 +123,21 @@ export default function CartPage() {
                             </span>
                           )}
                         </div>
-                        <div className="text-gold-foil font-bold mt-1">${item.price.toFixed(2)}</div>
+                        <div className="text-gold-foil font-bold mt-1">${getItemPrice(item).toFixed(2)}</div>
 
                         {/* Display customizations if any */}
                         {hasCustomizations(item) && (
                           <div className="mt-2 text-sm text-gray-400">
-                            {Object.values(item.customizations ?? {})
-                              .flat()
-                              .map((option, index) => (
-                                <div key={index} className="flex justify-between">
-                                  <span>{option.name}</span>
-                                  {option.price > 0 && <span>+${option.price.toFixed(2)}</span>}
+                            {Object.entries(item.customizations ?? {})
+                              .map(([category, options]) => (
+                                <div key={category} className="mb-1">
+                                  <span className="text-xs text-gray-500 uppercase">{category}:</span>
+                                  {options.map((option, index) => (
+                                    <div key={index} className="flex justify-between ml-2">
+                                      <span>{option.name}</span>
+                                      {option.price > 0 && <span className="text-gold-foil">+${option.price.toFixed(2)}</span>}
+                                    </div>
+                                  ))}
                                 </div>
                               ))}
                           </div>

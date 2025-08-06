@@ -9,9 +9,9 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Use standalone output for better API route support
+  // Use standalone output for better API route support (production only)
   trailingSlash: false,
-  output: 'standalone',
+  ...(process.env.NODE_ENV === 'production' && { output: 'standalone' }),
   // Webpack configuration to help prevent chunk loading errors
   webpack: (config, { dev, isServer }) => {
     // Optimize chunk splitting for better loading reliability

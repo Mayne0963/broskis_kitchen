@@ -8,8 +8,8 @@ import {
   Elements,
 } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
-import { FaLock, FaSpinner } from 'react-icons/fa'
-import { toast } from '@/hooks/use-toast'
+import { Lock, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -35,52 +35,11 @@ function PaymentForm({
   const stripe = useStripe()
   const elements = useElements()
   const [isLoading, setIsLoading] = useState(false)
-  const [clientSecret, setClientSecret] = useState('')
-
-  useEffect(() => {
-    const createPaymentIntent = async () => {
-      try {
-        const response = await fetch('/api/stripe/create-payment-intent', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            amount,
-            currency: 'usd',
-            metadata: {
-              source: 'broskis-kitchen-checkout',
-              orderId: orderId || '',
-              ...orderMetadata,
-            },
-          }),
-        })
-
-        if (!response.ok) {
-          const errorText = await response.text()
-          throw new Error(`HTTP ${response.status}: ${errorText || 'Payment intent creation failed'}`)
-        }
-
-        const data = await response.json()
-
-        if (data.error) {
-          throw new Error(data.error)
-        }
-
-        setClientSecret(data.clientSecret)
-      } catch (error) {
-        console.error('Error creating payment intent:', error)
-        onPaymentError('Failed to initialize payment')
-      }
-    }
-
-    if (amount > 0) {
-      createPaymentIntent()
-    }
-  }, [amount, onPaymentError])
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
+    setError(null)
 
     if (!stripe || !elements || disabled) {
       return
@@ -100,41 +59,26 @@ function PaymentForm({
 
       if (paymentIntent && paymentIntent.status === 'succeeded') {
         onPaymentSuccess(paymentIntent.id)
-        toast({
-          title: 'Payment Successful',
-          description: 'Your payment has been processed successfully.',
-        })
+        toast.success('Payment processed successfully!')
       } else {
         throw new Error('Payment was not completed')
       }
     } catch (error) {
       console.error('Payment error:', error)
       const errorMessage = error instanceof Error ? error.message : 'Payment failed'
+      setError(errorMessage)
       onPaymentError(errorMessage)
-      toast({
-        title: 'Payment Failed',
-        description: errorMessage,
-        variant: 'destructive',
-      })
+      toast.error(errorMessage)
     } finally {
       setIsLoading(false)
     }
   }
 
-  if (!clientSecret) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <FaSpinner className="animate-spin text-gold-foil text-xl" />
-        <span className="ml-2">Initializing payment...</span>
-      </div>
-    )
-  }
-
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="bg-[#1A1A1A] p-6 rounded-lg border border-[#333333]">
-        <h3 className="text-lg font-semibold mb-4 flex items-center">
-          <FaLock className="mr-2 text-gold-foil" />
+      <div className="bg-[var(--color-dark-charcoal)] p-6 rounded-lg border border-gray-600">
+        <h3 className="text-lg font-semibold mb-4 flex items-center text-white">
+          <Lock className="mr-2 text-[var(--color-harvest-gold)] w-5 h-5" />
           Secure Payment
         </h3>
         <PaymentElement
@@ -144,14 +88,20 @@ function PaymentForm({
         />
       </div>
 
+      {error && (
+        <div className="p-4 bg-red-500/10 border border-red-500 rounded-lg">
+          <p className="text-red-400 text-sm">{error}</p>
+        </div>
+      )}
+
       <button
         type="submit"
         disabled={!stripe || !elements || isLoading || disabled}
-        className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+        className="w-full bg-[var(--color-harvest-gold)] hover:bg-[var(--color-gold-rich)] text-black font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
       >
         {isLoading ? (
           <>
-            <FaSpinner className="animate-spin mr-2" />
+            <Loader2 className="animate-spin mr-2 w-4 h-4" />
             Processing Payment...
           </>
         ) : (
@@ -164,9 +114,16 @@ function PaymentForm({
 
 export default function StripePaymentForm(props: StripePaymentFormProps) {
   const [clientSecret, setClientSecret] = useState('')
+  const [isInitializing, setIsInitializing] = useState(true)
 
   useEffect(() => {
     const createPaymentIntent = async () => {
+      if (props.amount <= 0) {
+        props.onPaymentError('Invalid payment amount')
+        return
+      }
+
+      setIsInitializing(true)
       try {
         const response = await fetch('/api/stripe/create-payment-intent', {
           method: 'POST',
@@ -174,7 +131,7 @@ export default function StripePaymentForm(props: StripePaymentFormProps) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            amount: props.amount,
+            amount: Math.round(props.amount * 100), // Convert to cents
             currency: 'usd',
             metadata: {
               source: 'broskis-kitchen-checkout',
@@ -185,25 +142,26 @@ export default function StripePaymentForm(props: StripePaymentFormProps) {
         })
 
         if (!response.ok) {
-          const errorText = await response.text()
-          throw new Error(`HTTP ${response.status}: ${errorText || 'Payment intent creation failed'}`)
+          const errorData = await response.json().catch(() => ({ error: 'Network error' }))
+          throw new Error(errorData.error || `HTTP ${response.status}: Payment setup failed`)
         }
 
         const data = await response.json()
         if (data.clientSecret) {
           setClientSecret(data.clientSecret)
-        } else if (data.error) {
-          throw new Error(data.error)
+        } else {
+          throw new Error(data.error || 'No client secret received')
         }
       } catch (error) {
         console.error('Error creating payment intent:', error)
-        props.onPaymentError('Failed to initialize payment')
+        const errorMessage = error instanceof Error ? error.message : 'Failed to initialize payment'
+        props.onPaymentError(errorMessage)
+      } finally {
+        setIsInitializing(false)
       }
     }
 
-    if (props.amount > 0) {
-      createPaymentIntent()
-    }
+    createPaymentIntent()
   }, [props.amount, props.orderId, props.orderMetadata, props.onPaymentError])
 
   const options = {
@@ -212,9 +170,9 @@ export default function StripePaymentForm(props: StripePaymentFormProps) {
       theme: 'night' as const,
       variables: {
         colorPrimary: '#D4AF37',
-        colorBackground: '#1A1A1A',
+        colorBackground: '#2A2A2A',
         colorText: '#FFFFFF',
-        colorDanger: '#df1b41',
+        colorDanger: '#ef4444',
         fontFamily: 'Inter, system-ui, sans-serif',
         spacingUnit: '4px',
         borderRadius: '8px',
@@ -222,11 +180,11 @@ export default function StripePaymentForm(props: StripePaymentFormProps) {
     },
   }
 
-  if (!clientSecret) {
+  if (isInitializing || !clientSecret) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <FaSpinner className="animate-spin text-gold-foil text-xl" />
-        <span className="ml-2">Loading payment form...</span>
+      <div className="flex items-center justify-center p-8 bg-[var(--color-dark-charcoal)] rounded-lg border border-gray-600">
+        <Loader2 className="animate-spin text-[var(--color-harvest-gold)] w-6 h-6" />
+        <span className="ml-2 text-gray-300">Initializing secure payment...</span>
       </div>
     )
   }

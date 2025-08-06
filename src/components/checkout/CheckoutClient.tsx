@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, ShoppingCart, MapPin, CreditCard, Clock, Check } from 'lucide-react'
 import CartSummary from './CartSummary'
 import DeliveryStep from './DeliveryStep'
@@ -95,6 +95,41 @@ export default function CheckoutClient({
   const [orderId, setOrderId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   
+  // Load saved checkout data on component mount
+  useEffect(() => {
+    const savedData = localStorage.getItem('checkoutData')
+    const savedStep = localStorage.getItem('checkoutStep')
+    
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData)
+        setCheckoutData(parsedData)
+      } catch (error) {
+        console.error('Error parsing saved checkout data:', error)
+      }
+    }
+    
+    if (savedStep && ['delivery', 'payment', 'review'].includes(savedStep)) {
+      setCurrentStep(savedStep as CheckoutStep)
+    }
+  }, [])
+  
+  // Save checkout data to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('checkoutData', JSON.stringify(checkoutData))
+  }, [checkoutData])
+  
+  // Save current step to localStorage whenever it changes
+  useEffect(() => {
+    if (currentStep !== 'confirmation') {
+      localStorage.setItem('checkoutStep', currentStep)
+    } else {
+      // Clear saved data when order is completed
+      localStorage.removeItem('checkoutData')
+      localStorage.removeItem('checkoutStep')
+    }
+  }, [currentStep])
+  
   const updateCheckoutData = (updates: Partial<CheckoutData>) => {
     setCheckoutData(prev => ({ ...prev, ...updates }))
   }
@@ -107,13 +142,24 @@ export default function CheckoutClient({
     switch (currentStep) {
       case 'delivery':
         if (checkoutData.deliveryType === 'delivery') {
-          return checkoutData.selectedAddress || checkoutData.newAddress
+          // For delivery, need either selected address or valid new address
+          if (checkoutData.selectedAddress) return true
+          if (checkoutData.newAddress) {
+            const { street, city, state, zipCode } = checkoutData.newAddress
+            return !!(street && city && state && zipCode)
+          }
+          return false
         }
-        return true
+        return true // Pickup doesn't require address
       case 'payment':
-        return checkoutData.selectedPayment || checkoutData.newPayment
+        return !!(checkoutData.selectedPayment || checkoutData.newPayment)
       case 'review':
-        return true
+        // Ensure all required data is present for final review
+        const hasAddress = checkoutData.deliveryType === 'pickup' || 
+                          checkoutData.selectedAddress || 
+                          (checkoutData.newAddress?.street && checkoutData.newAddress?.city)
+        const hasPayment = !!(checkoutData.selectedPayment || checkoutData.newPayment)
+        return hasAddress && hasPayment
       default:
         return false
     }
@@ -121,9 +167,28 @@ export default function CheckoutClient({
   
   const handleNext = () => {
     const stepIndex = getCurrentStepIndex()
-    if (stepIndex < steps.length - 1 && canProceedToNext()) {
-      setError(null) // Clear any previous errors
-      setCurrentStep(steps[stepIndex + 1].id as CheckoutStep)
+    if (stepIndex < steps.length - 1) {
+      if (canProceedToNext()) {
+        setError(null) // Clear any previous errors
+        setCurrentStep(steps[stepIndex + 1].id as CheckoutStep)
+      } else {
+        // Show specific error message based on current step
+        let errorMessage = ''
+        switch (currentStep) {
+          case 'delivery':
+            if (checkoutData.deliveryType === 'delivery') {
+              errorMessage = 'Please select or add a delivery address to continue.'
+            }
+            break
+          case 'payment':
+            errorMessage = 'Please select or add a payment method to continue.'
+            break
+          case 'review':
+            errorMessage = 'Please complete all required information before placing your order.'
+            break
+        }
+        setError(errorMessage)
+      }
     }
   }
   
@@ -133,6 +198,10 @@ export default function CheckoutClient({
       setError(null) // Clear any previous errors
       setCurrentStep(steps[stepIndex - 1].id as CheckoutStep)
     }
+  }
+  
+  const handleEditStep = (step: CheckoutStep) => {
+    setCurrentStep(step)
   }
   
   const handlePlaceOrder = async () => {
@@ -226,9 +295,19 @@ export default function CheckoutClient({
        setCurrentStep('confirmation')
     } catch (error) {
       console.error('Error placing order:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Failed to place order'
+      let errorMessage = 'Failed to place order. Please try again.'
+      
+      if (error instanceof Error) {
+        if (error.message.includes('payment')) {
+          errorMessage = 'Payment processing failed. Please check your payment method and try again.'
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorMessage = 'Network error. Please check your connection and try again.'
+        } else {
+          errorMessage = error.message
+        }
+      }
+      
       setError(errorMessage)
-      // TODO: Show error toast to user
     } finally {
       setIsProcessing(false)
     }
@@ -260,6 +339,7 @@ export default function CheckoutClient({
             checkoutData={checkoutData}
             onUpdate={updateCheckoutData}
             onPlaceOrder={handlePlaceOrder}
+            onEditStep={handleEditStep}
             isProcessing={isProcessing}
           />
         )
@@ -300,7 +380,8 @@ export default function CheckoutClient({
 
       {/* Progress Steps */}
       <div className="mb-8">
-        <div className="flex items-center justify-between">
+        {/* Desktop Progress Steps */}
+        <div className="hidden md:flex items-center justify-between">
           {steps.slice(0, -1).map((step, index) => {
             const isActive = step.id === currentStep
             const isCompleted = getCurrentStepIndex() > index
@@ -352,23 +433,65 @@ export default function CheckoutClient({
             )
           })}
         </div>
+        
+        {/* Mobile Progress Steps */}
+        <div className="md:hidden">
+          <div className="flex items-center justify-center space-x-2 mb-4">
+            {steps.slice(0, -1).map((step, index) => {
+              const isActive = step.id === currentStep
+              const isCompleted = getCurrentStepIndex() > index
+              
+              return (
+                <div key={step.id} className="flex items-center">
+                  <div className={`
+                    w-3 h-3 rounded-full transition-all
+                    ${
+                      isCompleted
+                        ? 'bg-[var(--color-harvest-gold)]'
+                        : isActive
+                        ? 'bg-[var(--color-harvest-gold)]'
+                        : 'bg-[#FFD700]/30'
+                    }
+                  `} />
+                  {index < steps.length - 2 && (
+                    <div className={`
+                      w-8 h-0.5 mx-2
+                      ${
+                        isCompleted
+                          ? 'bg-[var(--color-harvest-gold)]'
+                          : 'bg-[#FFD700]/30'
+                      }
+                    `} />
+                  )}
+                </div>
+              )
+            })}
+          </div>
+          
+          {/* Current Step Title */}
+          <div className="text-center">
+            <h3 className="text-lg font-semibold text-white">
+              Step {getCurrentStepIndex() + 1} of {steps.length - 1}: {steps.find(s => s.id === currentStep)?.title}
+            </h3>
+          </div>
+        </div>
       </div>
       
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
         {/* Step Content */}
-        <div className="lg:col-span-2">
-          <div className="bg-[var(--color-dark-charcoal)] rounded-lg p-6 border border-[var(--color-harvest-gold)]/20">
+        <div className="lg:col-span-2 order-2 lg:order-1">
+          <div className="bg-[var(--color-dark-charcoal)] rounded-lg p-4 sm:p-6 border border-[var(--color-harvest-gold)]/20">
             {renderStepContent()}
           </div>
           
           {/* Navigation Buttons */}
           {currentStep !== 'confirmation' && (
-            <div className="flex items-center justify-between mt-6">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between mt-6 gap-4 sm:gap-0">
               <button
                 onClick={handlePrevious}
                 disabled={getCurrentStepIndex() === 0}
-                className="btn-outline"
+                className="btn-outline order-2 sm:order-1"
               >
                 <ChevronLeft className="w-5 h-5 mr-2" />
                 Previous
@@ -378,7 +501,7 @@ export default function CheckoutClient({
                 <button
                   onClick={handleNext}
                   disabled={!canProceedToNext()}
-                  className="btn-primary"
+                  className="btn-primary order-1 sm:order-2"
                 >
                   Continue
                   <ChevronRight className="w-5 h-5 ml-2" />
@@ -387,7 +510,7 @@ export default function CheckoutClient({
                 <button
                   onClick={handlePlaceOrder}
                   disabled={isProcessing || !canProceedToNext()}
-                  className="btn-primary"
+                  className="btn-primary order-1 sm:order-2"
                 >
                   {isProcessing ? (
                     <>
@@ -407,11 +530,13 @@ export default function CheckoutClient({
         </div>
         
         {/* Cart Summary */}
-        <div className="lg:col-span-1">
-          <CartSummary 
-            cartData={cartData}
-            checkoutData={checkoutData}
-          />
+        <div className="lg:col-span-1 order-1 lg:order-2">
+          <div className="sticky top-4">
+            <CartSummary 
+              cartData={cartData}
+              checkoutData={checkoutData}
+            />
+          </div>
         </div>
       </div>
     </div>

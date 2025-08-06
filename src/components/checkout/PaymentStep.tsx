@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from 'react'
-import { CreditCard, Star, Plus, DollarSign, Gift } from 'lucide-react'
+import { CreditCard, Star, Plus, DollarSign, Gift, Loader2 } from 'lucide-react'
 import StripePaymentForm from './StripePaymentForm'
 
 interface PaymentMethod {
@@ -46,6 +46,8 @@ export default function PaymentStep({
 }: PaymentStepProps) {
   const [showNewCardForm, setShowNewCardForm] = useState(false)
   const [customTip, setCustomTip] = useState('')
+  const [isLoadingRewards, setIsLoadingRewards] = useState(false)
+  const [rewardsError, setRewardsError] = useState<string | null>(null)
   const [newCard, setNewCard] = useState({
     number: '',
     expiryMonth: '',
@@ -58,7 +60,7 @@ export default function PaymentStep({
   // Mock user rewards data - replace with actual API call
   const userRewards = {
     availablePoints: 1250,
-    maxRedeemable: Math.min(1250, Math.floor(cartData.total * 100)) // Max 100% of order value
+    maxRedeemable: Math.min(1250, Math.floor((cartData.total + checkoutData.tip) * 100)) // Max 100% of order value including tip
   }
   
   const handlePaymentSelect = (payment: PaymentMethod) => {
@@ -78,20 +80,40 @@ export default function PaymentStep({
     onUpdate({ tip: tipAmount })
   }
   
-  const handleRewardsToggle = (useRewards: boolean) => {
+  const handleRewardsToggle = async (useRewards: boolean) => {
     if (useRewards) {
-      onUpdate({ 
-        useRewards: true, 
-        rewardsPoints: Math.min(userRewards.maxRedeemable, userRewards.availablePoints)
-      })
+      setIsLoadingRewards(true)
+      setRewardsError(null)
+      
+      try {
+        // Simulate API call to validate rewards
+        await new Promise(resolve => setTimeout(resolve, 800))
+        
+        onUpdate({ 
+          useRewards: true, 
+          rewardsPoints: Math.min(userRewards.maxRedeemable, userRewards.availablePoints)
+        })
+      } catch (error) {
+        setRewardsError('Failed to apply rewards. Please try again.')
+        onUpdate({ useRewards: false, rewardsPoints: 0 })
+      } finally {
+        setIsLoadingRewards(false)
+      }
     } else {
       onUpdate({ useRewards: false, rewardsPoints: 0 })
+      setRewardsError(null)
     }
   }
   
   const handleRewardsPointsChange = (points: number) => {
     const validPoints = Math.min(points, userRewards.maxRedeemable, userRewards.availablePoints)
     onUpdate({ rewardsPoints: validPoints })
+  }
+  
+  const calculateFinalAmount = () => {
+    const baseAmount = cartData.total + checkoutData.tip
+    const rewardsDiscount = checkoutData.useRewards ? checkoutData.rewardsPoints * 0.01 : 0
+    return Math.max(0, baseAmount - rewardsDiscount)
   }
   
   const getCardIcon = (brand: string) => {
@@ -132,18 +154,30 @@ export default function PaymentStep({
             </div>
           </div>
           
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={checkoutData.useRewards}
-              onChange={(e) => handleRewardsToggle(e.target.checked)}
-              className="sr-only peer"
-            />
-            <div className="w-11 h-6 bg-[#FFD700] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--color-harvest-gold)]"></div>
-          </label>
+          <div className="flex items-center space-x-2">
+            {isLoadingRewards && (
+              <Loader2 className="w-4 h-4 text-[var(--color-harvest-gold)] animate-spin" />
+            )}
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={checkoutData.useRewards}
+                onChange={(e) => handleRewardsToggle(e.target.checked)}
+                disabled={isLoadingRewards}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-[#FFD700] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--color-harvest-gold)] peer-disabled:opacity-50"></div>
+            </label>
+          </div>
         </div>
         
-        {checkoutData.useRewards && (
+        {rewardsError && (
+          <div className="mt-4 p-3 bg-red-900/20 border border-red-500/30 rounded-lg">
+            <p className="text-red-400 text-sm">{rewardsError}</p>
+          </div>
+        )}
+        
+        {checkoutData.useRewards && !isLoadingRewards && (
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-[#FFD700] mb-2">
@@ -173,6 +207,13 @@ export default function PaymentStep({
                 -${(checkoutData.rewardsPoints * 0.01).toFixed(2)}
               </span>
             </div>
+            
+            <div className="flex items-center justify-between p-3 bg-[var(--color-harvest-gold)]/10 rounded-lg border border-[var(--color-harvest-gold)]/30">
+              <span className="text-white font-medium">Final Amount</span>
+              <span className="text-[var(--color-harvest-gold)] font-bold text-lg">
+                ${calculateFinalAmount().toFixed(2)}
+              </span>
+            </div>
           </div>
         )}
       </div>
@@ -198,7 +239,7 @@ export default function PaymentStep({
                 `}
               >
                 <div className="flex items-center">
-                  <div className={`p-2 rounded-lg mr-3 ${
+                  <div className={`p-2 rounded-lg mr-2 sm:mr-3 ${
                     checkoutData.selectedPayment?.id === payment.id
                       ? 'bg-[var(--color-harvest-gold)] text-black'
                       : 'bg-[#FFD700] text-black'
@@ -207,17 +248,17 @@ export default function PaymentStep({
                   </div>
                   
                   <div className="flex-1">
-                    <div className="flex items-center mb-1">
-                      <span className="text-white font-medium capitalize">
+                    <div className="flex flex-col sm:flex-row sm:items-center mb-1">
+                      <span className="text-white font-medium capitalize text-sm sm:text-base">
                         {payment.brand} •••• {payment.last4}
                       </span>
                       {payment.isDefault && (
-                        <span className="ml-2 px-2 py-1 bg-[var(--color-harvest-gold)] text-black text-xs font-medium rounded">
+                        <span className="mt-1 sm:mt-0 sm:ml-2 px-2 py-1 bg-[var(--color-harvest-gold)] text-black text-xs font-medium rounded self-start">
                           Default
                         </span>
                       )}
                     </div>
-                    <p className="text-[#FFD700] text-sm">
+                    <p className="text-[#FFD700] text-xs sm:text-sm">
                       Expires {payment.expiryMonth.toString().padStart(2, '0')}/{payment.expiryYear}
                     </p>
                   </div>
@@ -240,13 +281,14 @@ export default function PaymentStep({
         {showNewCardForm && (
           <div className="mt-4">
             <StripePaymentForm
-              amount={cartData.total + checkoutData.tip - (checkoutData.useRewards ? checkoutData.rewardsPoints * 0.01 : 0)}
+              amount={calculateFinalAmount()}
               onPaymentSuccess={(paymentIntentId) => {
+                const finalAmount = calculateFinalAmount()
                 onUpdate({ 
                   newPayment: { 
                     type: 'stripe',
                     paymentIntentId,
-                    amount: cartData.total + checkoutData.tip - (checkoutData.useRewards ? checkoutData.rewardsPoints * 0.01 : 0),
+                    amount: finalAmount,
                     status: 'succeeded',
                     last4: '****' // Will be updated after payment
                   },
@@ -256,21 +298,21 @@ export default function PaymentStep({
               }}
               onPaymentError={(error) => {
                 console.error('Payment error:', error)
-                // Clear the new payment form on error
                 setShowNewCardForm(false)
                 onUpdate({
                   selectedPayment: undefined,
                   newPayment: undefined
                 })
-                // TODO: Show error toast to user
               }}
               orderMetadata={{
-                tip: checkoutData.tip.toString(),
+                tip: checkoutData.tip.toFixed(2),
                 rewardsUsed: checkoutData.useRewards.toString(),
                 rewardsPoints: checkoutData.rewardsPoints.toString(),
-                subtotal: cartData.subtotal.toString(),
-                tax: cartData.tax.toString(),
-                deliveryFee: cartData.deliveryFee.toString()
+                rewardsDiscount: (checkoutData.useRewards ? checkoutData.rewardsPoints * 0.01 : 0).toFixed(2),
+                subtotal: cartData.subtotal.toFixed(2),
+                tax: cartData.tax.toFixed(2),
+                deliveryFee: cartData.deliveryFee.toFixed(2),
+                originalTotal: cartData.total.toFixed(2)
               }}
             />
           </div>
@@ -281,7 +323,7 @@ export default function PaymentStep({
       <div>
         <h3 className="text-lg font-semibold text-white mb-4">Add Tip</h3>
         
-        <div className="grid grid-cols-3 md:grid-cols-5 gap-3 mb-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 mb-4">
           {tipOptions.map((tipPercentage) => {
             const tipAmount = cartData.total * tipPercentage
             const isSelected = Math.abs(checkoutData.tip - tipAmount) < 0.01
@@ -291,7 +333,7 @@ export default function PaymentStep({
                 key={tipPercentage}
                 onClick={() => handleTipSelect(tipPercentage)}
                 className={`
-                  p-3 rounded-lg border-2 transition-all text-center
+                  p-2 sm:p-3 rounded-lg border-2 transition-all text-center
                   ${
                     isSelected
                       ? 'border-[var(--color-harvest-gold)] bg-[var(--color-harvest-gold)]/10 text-[var(--color-harvest-gold)]'
@@ -299,7 +341,7 @@ export default function PaymentStep({
                   }
                 `}
               >
-                <div className="font-semibold">
+                <div className="text-sm sm:text-base font-semibold">
                   {tipPercentage === 0 ? 'No Tip' : `${(tipPercentage * 100).toFixed(0)}%`}
                 </div>
                 {tipPercentage > 0 && (
