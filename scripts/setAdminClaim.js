@@ -13,8 +13,15 @@ import dotenv from 'dotenv';
 dotenv.config({ path: '.env.local' });
 
 // Configuration
-const TARGET_EMAIL = 'lou@broski.com';
+const TARGET_EMAIL = process.argv[2] || 'lou@broski.com';
 const ADMIN_ROLE = 'admin';
+
+// Validate email argument
+if (!TARGET_EMAIL || !TARGET_EMAIL.includes('@')) {
+  console.error('❌ Please provide a valid email address as an argument');
+  console.error('   Usage: node scripts/setAdminClaim.js <email@example.com>');
+  process.exit(1);
+}
 
 
 // Initialize Firebase Admin SDK
