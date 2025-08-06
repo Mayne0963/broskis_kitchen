@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Suspense } from 'react'
 import DropCard from '@/components/menu-drops/DropCard'
 import DropSchedule from '@/components/menu-drops/DropSchedule'
