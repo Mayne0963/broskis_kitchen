@@ -144,7 +144,7 @@ export const config: AppConfig = {
     lockoutDurationMinutes: getEnvNumber('LOCKOUT_DURATION_MINUTES', 15),
   },
   admin: {
-    emails: getEnvArray('ADMIN_EMAILS', ['admin@broskiskitchen.com']),
+    emails: getEnvArray('ADMIN_EMAILS', ['00broskis@gmail.com', 'amarikelsaw10@gmail.com']),
     roles: getEnvArray('ADMIN_ROLES', ['admin', 'manager']),
     permissions: getEnvArray('ADMIN_PERMISSIONS', ['read', 'write', 'delete']),
   },
