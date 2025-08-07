@@ -11,6 +11,12 @@ import CartDropdown from "../../components/cart/CartDropdown"
 import { useCart } from "../../lib/context/CartContext"
 import { useAuth } from "../../lib/context/AuthContext"
 import { EmailVerificationBanner } from "../auth/EmailVerificationBanner"
+import { 
+  AccessibleDropdown, 
+  AccessibleMenuItem, 
+  AccessibleMobileMenu, 
+  AccessibleButton 
+} from "../accessibility/AccessibilityEnhancer"
 
 const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -66,21 +72,28 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <nav className={`fixed top-0 w-full bg-black text-white h-20 z-50 shadow-lg border-b border-[#FFD700] transition-transform duration-300 ${
-        isVisible ? 'translate-y-0' : '-translate-y-full'
-      }`}>
+      <nav 
+        id="navigation"
+        role="navigation"
+        aria-label="Main navigation"
+        className={`fixed top-0 w-full bg-black text-white h-20 z-50 shadow-lg border-b border-[#FFD700] transition-transform duration-300 ${
+          isVisible ? 'translate-y-0' : '-translate-y-full'
+        }`}
+      >
       <div className="container mx-auto flex justify-between items-center h-full px-4">
         <Link href="/" className="text-2xl font-bold graffiti-text hover:text-white transition-colors duration-300">
           Broski&apos;s Kitchen
         </Link>
 
-        <button
-          className="md:hidden text-white focus:outline-none hover:text-gold-foil transition-colors"
+        <AccessibleButton
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Toggle menu"
+          ariaLabel={mobileMenuOpen ? "Close mobile menu" : "Open mobile menu"}
+          ariaExpanded={mobileMenuOpen}
+          className="md:hidden text-white hover:text-gold-foil transition-colors bg-transparent border-none p-2"
+          variant="secondary"
         >
           {mobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-        </button>
+        </AccessibleButton>
 
         <div className="hidden md:flex items-center space-x-6">
           <Link href="/menu" className={`nav-link ${pathname === "/menu" ? "nav-link-active" : ""}`}>
@@ -121,46 +134,44 @@ const Navbar: React.FC = () => {
           <CartDropdown />
 
           {user ? (
-            <div className="relative" ref={dropdownRef}>
-              <button 
-                className="btn-outline flex items-center gap-2"
-                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+            <AccessibleDropdown
+              trigger={
+                <div className="btn-outline flex items-center gap-2">
+                  <FaUser /> {user.name.split(" ")[0]}
+                </div>
+              }
+              isOpen={userDropdownOpen}
+              onToggle={() => setUserDropdownOpen(!userDropdownOpen)}
+              onClose={() => setUserDropdownOpen(false)}
+              label={`User menu for ${user.name.split(" ")[0]}`}
+            >
+              <AccessibleMenuItem 
+                href="/dashboard"
+                onClick={() => setUserDropdownOpen(false)}
               >
-                <FaUser /> {user.name.split(" ")[0]}
-              </button>
-              <div className={`absolute right-0 mt-2 w-48 bg-black rounded-md shadow-lg py-1 z-50 border border-[#FFD700] ${userDropdownOpen ? 'block' : 'hidden'}`}>
-                <Link 
-                  href="/dashboard" 
-                  className="block px-4 py-2 text-sm text-white hover:bg-[#333333]"
-                  onClick={() => setUserDropdownOpen(false)}
-                >
-                  Dashboard
-                </Link>
-                <Link 
-                  href="/profile" 
-                  className="block px-4 py-2 text-sm text-white hover:bg-[#333333]"
-                  onClick={() => setUserDropdownOpen(false)}
-                >
-                  Profile
-                </Link>
-                <Link 
-                  href="/orders" 
-                  className="block px-4 py-2 text-sm text-white hover:bg-[#333333]"
-                  onClick={() => setUserDropdownOpen(false)}
-                >
-                  Order History
-                </Link>
-                <button
-                  onClick={async () => {
-                    await logout()
-                    setUserDropdownOpen(false)
-                  }}
-                  className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#333333]"
-                >
-                  Logout
-                </button>
-              </div>
-            </div>
+                Dashboard
+              </AccessibleMenuItem>
+              <AccessibleMenuItem 
+                href="/profile"
+                onClick={() => setUserDropdownOpen(false)}
+              >
+                Profile
+              </AccessibleMenuItem>
+              <AccessibleMenuItem 
+                href="/orders"
+                onClick={() => setUserDropdownOpen(false)}
+              >
+                Order History
+              </AccessibleMenuItem>
+              <AccessibleMenuItem
+                onClick={async () => {
+                  await logout()
+                  setUserDropdownOpen(false)
+                }}
+              >
+                Logout
+              </AccessibleMenuItem>
+            </AccessibleDropdown>
           ) : (
             <Link href="/auth/login" className="btn-outline flex items-center gap-2">
               <FaUser /> Login
@@ -169,10 +180,11 @@ const Navbar: React.FC = () => {
         </div>
       </div>
 
-      <div
-        className={`md:hidden mobile-menu ${mobileMenuOpen ? "open" : ""} bg-black border-t border-[#FFD700] mt-4`}
+      <AccessibleMobileMenu
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        className={mobileMenuOpen ? "open" : ""}
       >
-        <div className="container mx-auto flex flex-col space-y-3 px-4 py-4">
           <Link
             href="/menu"
             className={`py-2 hover:text-gold-foil transition-colors duration-300 flex items-center ${pathname === "/menu" ? "text-gold-foil font-bold" : ""}`}
@@ -297,8 +309,7 @@ const Navbar: React.FC = () => {
               </Link>
             </div>
           )}
-        </div>
-      </div>
+        </AccessibleMobileMenu>
       </nav>
       <EmailVerificationBanner className="fixed top-20 left-0 right-0 z-40 mx-4" />
     </>

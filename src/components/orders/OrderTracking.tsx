@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { LoadingOverlay, ErrorState, useLoadingState } from '../common/EnhancedLoadingStates'
+import { GridSkeleton, EmptyState } from '../common/LoadingStates'
 import { 
   Search, 
   Clock, 
@@ -52,6 +54,7 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
   const [orders, setOrders] = useState<Order[]>(initialOrders)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { isLoading: isRefreshLoading, error: refreshError, withLoading, clearError } = useLoadingState()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | OrderStatus>('all')
   const [orderTypeFilter, setOrderTypeFilter] = useState<'all' | 'delivery' | 'pickup'>('all')
@@ -1184,43 +1187,66 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
   })
 
   const refreshOrders = async () => {
-    setIsLoading(true)
-    try {
-      const response = await fetch(`/api/orders?userId=${userId}`)
-      if (response.ok) {
+    await withLoading(async () => {
+      try {
+        setError(null)
+        clearError()
+        setIsRefreshing(true)
+        
+        const response = await fetch(`/api/orders?userId=${userId}`)
+        if (!response.ok) {
+          throw new Error(`Failed to fetch orders: ${response.status}`)
+        }
+        
         const data = await response.json()
         setOrders(data.orders || [])
+        setLastRefresh(new Date())
+        toast.success('Orders refreshed successfully')
+      } catch (error) {
+        console.error('Error refreshing orders:', error)
+        const errorMessage = error instanceof Error ? error.message : 'Failed to refresh orders'
+        setError(errorMessage)
+        toast.error(errorMessage)
+        throw error
+      } finally {
+        setIsRefreshing(false)
       }
-    } catch (error) {
-      console.error('Error refreshing orders:', error)
-      setError('Failed to refresh orders')
-    } finally {
-      setIsLoading(false)
-    }
+    })
   }
 
   const handleReorder = async (order: Order) => {
-    try {
-      // Create a new order with the same items
-      const reorderData = {
-        items: order.items,
-        orderType: order.orderType,
-        deliveryAddress: order.deliveryAddress,
-        contactInfo: order.contactInfo,
-        specialInstructions: order.specialInstructions
+    await withLoading(async () => {
+      try {
+        toast.loading('Preparing reorder...', { id: 'reorder' })
+        
+        // Create a new order with the same items
+        const reorderData = {
+          items: order.items,
+          orderType: order.orderType,
+          deliveryAddress: order.deliveryAddress,
+          contactInfo: order.contactInfo,
+          specialInstructions: order.specialInstructions
+        }
+        
+        // Simulate validation delay
+        await new Promise(resolve => setTimeout(resolve, 500))
+        
+        // Redirect to checkout with pre-filled data
+        const params = new URLSearchParams({
+          reorder: 'true',
+          data: JSON.stringify(reorderData)
+        })
+        
+        toast.success('Redirecting to checkout...', { id: 'reorder' })
+        window.location.href = `/checkout?${params.toString()}`
+      } catch (error) {
+        console.error('Error reordering:', error)
+        const errorMessage = 'Failed to reorder. Please try again.'
+        setError(errorMessage)
+        toast.error(errorMessage, { id: 'reorder' })
+        throw error
       }
-      
-      // Redirect to checkout with pre-filled data
-      const params = new URLSearchParams({
-        reorder: 'true',
-        data: JSON.stringify(reorderData)
-      })
-      
-      window.location.href = `/checkout?${params.toString()}`
-    } catch (error) {
-      console.error('Error reordering:', error)
-      setError('Failed to reorder. Please try again.')
-    }
+    })
   }
 
   const getOrderProgress = (status: OrderStatus): number => {

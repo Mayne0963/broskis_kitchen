@@ -14,10 +14,16 @@ import ProductionErrorBoundary from "../components/common/ProductionErrorBoundar
 import ErrorMonitor from "../components/common/ErrorMonitor"
 import PerformanceMonitor from "../components/common/PerformanceMonitor"
 import CookieConsent from "../components/gdpr/CookieConsent"
+import SEOAudit from "../components/seo/SEOAudit"
+import SchemaGenerator from "../components/seo/SchemaGenerator"
+import { NetworkStatus } from "../components/common/EnhancedLoadingStates"
 import { Toaster } from "sonner"
 import { ToastProvider } from "../components/common/Toast"
 import { playfair, montserrat } from "./fonts"
 import StructuredData, { OrganizationStructuredData } from "../components/seo/StructuredData"
+import { SkipNavigation } from "../components/accessibility/AccessibilityEnhancer"
+import AccessibilityAudit from "../components/accessibility/AccessibilityAudit"
+import PWAManager from "../components/pwa/PWAManager"
 
 export const metadata: Metadata = {
   title: {
@@ -89,8 +95,15 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#000000" />
+        <meta name="theme-color" content="#FFD700" />
         <meta name="color-scheme" content="dark light" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Broski's Kitchen" />
+        <meta name="application-name" content="Broski's Kitchen" />
+        <meta name="msapplication-TileColor" content="#FFD700" />
+        <meta name="msapplication-config" content="/browserconfig.xml" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
@@ -108,8 +121,9 @@ export default function RootLayout({
               <ToastProvider>
                 <Providers>
                   <OrderProvider>
+                    <SkipNavigation />
                     <ConditionalNavbar />
-                    <main className="flex-grow">{children}</main>
+                    <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
                     <Footer />
                     <MusicPlayer />
                     <Toaster
@@ -123,8 +137,13 @@ export default function RootLayout({
                       }}
                     />
                     <CookieConsent />
+                    <SEOAudit />
+                    <SchemaGenerator />
+                    <NetworkStatus />
                     <ErrorMonitor />
                     <PerformanceMonitor />
+                    <AccessibilityAudit />
+                    <PWAManager />
                   </OrderProvider>
                 </Providers>
               </ToastProvider>

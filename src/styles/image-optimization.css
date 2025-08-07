@@ -1,0 +1,182 @@
+/* Image Optimization Styles */
+
+/* Shimmer animation for loading placeholders */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+/* Smooth image transitions */
+.image-fade-in {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.image-fade-in.loaded {
+  opacity: 1;
+}
+
+/* Progressive image loading */
+.progressive-image {
+  position: relative;
+  overflow: hidden;
+}
+
+.progressive-image::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(26, 26, 26, 0.8) 0%,
+    rgba(42, 42, 42, 0.8) 50%,
+    rgba(26, 26, 26, 0.8) 100%
+  );
+  z-index: 1;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.progressive-image.loaded::before {
+  opacity: 0;
+}
+
+/* Responsive image containers */
+.aspect-ratio-16-9 {
+  aspect-ratio: 16 / 9;
+}
+
+.aspect-ratio-4-3 {
+  aspect-ratio: 4 / 3;
+}
+
+.aspect-ratio-1-1 {
+  aspect-ratio: 1 / 1;
+}
+
+.aspect-ratio-3-2 {
+  aspect-ratio: 3 / 2;
+}
+
+/* Image optimization utilities */
+.image-crisp {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+.image-smooth {
+  image-rendering: auto;
+}
+
+/* Lazy loading placeholder */
+.lazy-placeholder {
+  background: linear-gradient(
+    45deg,
+    #1a1a1a 25%,
+    transparent 25%,
+    transparent 75%,
+    #1a1a1a 75%,
+    #1a1a1a
+  ),
+  linear-gradient(
+    45deg,
+    #1a1a1a 25%,
+    transparent 25%,
+    transparent 75%,
+    #1a1a1a 75%,
+    #1a1a1a
+  );
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+  animation: placeholder-pulse 2s ease-in-out infinite;
+}
+
+@keyframes placeholder-pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Error state styling */
+.image-error {
+  background: #2a2a2a;
+  border: 1px dashed #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  font-size: 0.875rem;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .progressive-image::before {
+    background: #000;
+  }
+  
+  .lazy-placeholder {
+    background: #000;
+    border: 2px solid #fff;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .animate-shimmer,
+  .image-fade-in,
+  .progressive-image::before {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .progressive-image::before,
+  .lazy-placeholder {
+    display: none;
+  }
+}
+
+/* Focus styles for accessibility */
+.image-container:focus-within {
+  outline: 2px solid #FFD700;
+  outline-offset: 2px;
+}
+
+/* WebP support detection */
+.webp .fallback-image {
+  display: none;
+}
+
+.no-webp .webp-image {
+  display: none;
+}
+
+/* Performance optimization classes */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+/* Remove will-change after animation */
+.animation-complete {
+  will-change: auto;
+}

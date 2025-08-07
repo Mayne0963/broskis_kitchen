@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import optimization styles */
+@import '../styles/image-optimization.css';
+@import '../styles/mobile-enhancements.css';
+
 :root {
   /* Layout Variables */
   --navbar-height: 5rem;

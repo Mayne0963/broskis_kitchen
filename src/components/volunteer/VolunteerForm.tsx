@@ -4,13 +4,14 @@ import type React from "react"
 
 import { useState } from "react"
 import { FaTimes, FaEnvelope, FaPhone, FaCheck } from "react-icons/fa"
+import { AccessibleInput, AccessibleTextarea, AccessibleSelect, AccessibleCheckbox, AccessibleRadioGroup, useFormValidation } from "../accessibility/AccessibleForm"
 
 interface VolunteerFormProps {
   onClose: () => void
 }
 
 const VolunteerForm: React.FC<VolunteerFormProps> = ({ onClose }) => {
-  const [formData, setFormData] = useState({
+  const initialValues = {
     firstName: "",
     lastName: "",
     email: "",
@@ -22,11 +23,11 @@ const VolunteerForm: React.FC<VolunteerFormProps> = ({ onClose }) => {
     motivation: "",
     hearAbout: "",
     agreeToTerms: false,
-  })
+  }
 
+  const { values: formData, errors, setValue, validate, reset } = useFormValidation(initialValues)
   const [step, setStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const interestOptions = [
     "Kitchen Assistant",
@@ -53,110 +54,90 @@ const VolunteerForm: React.FC<VolunteerFormProps> = ({ onClose }) => {
       const checkbox = e.target as HTMLInputElement
 
       if (name === "agreeToTerms") {
-        setFormData({
-          ...formData,
-          [name]: checkbox.checked,
-        })
+        setValue("agreeToTerms", checkbox.checked)
       } else if (name.startsWith("interest-")) {
         const interest = name.replace("interest-", "")
-        setFormData({
-          ...formData,
-          interests: checkbox.checked
-            ? [...formData.interests, interest]
-            : formData.interests.filter((i) => i !== interest),
-        })
+        const newInterests = checkbox.checked
+          ? [...formData.interests, interest]
+          : formData.interests.filter((i) => i !== interest)
+        setValue("interests", newInterests)
       } else if (name.startsWith("availability-")) {
         const availability = name.replace("availability-", "")
-        setFormData({
-          ...formData,
-          availability: checkbox.checked
-            ? [...formData.availability, availability]
-            : formData.availability.filter((a) => a !== availability),
-        })
+        const newAvailability = checkbox.checked
+          ? [...formData.availability, availability]
+          : formData.availability.filter((a) => a !== availability)
+        setValue("availability", newAvailability)
       }
     } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      })
+      setValue(name as keyof typeof initialValues, value)
     }
+  }
 
-    // Clear error when field is updated
-    if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: "",
-      })
+  const step1ValidationRules = {
+    firstName: (value: string) => {
+      if (!value.trim()) return "First name is required"
+      return undefined
+    },
+    lastName: (value: string) => {
+      if (!value.trim()) return "Last name is required"
+      return undefined
+    },
+    email: (value: string) => {
+      if (!value.trim()) return "Email is required"
+      if (!/\S+@\S+\.\S+/.test(value)) return "Email is invalid"
+      return undefined
+    },
+    phone: (value: string) => {
+      if (!value.trim()) return "Phone number is required"
+      return undefined
+    },
+    age: (value: string) => {
+      if (!value.trim()) return "Age is required"
+      if (Number.parseInt(value) < 16) return "You must be at least 16 years old to volunteer"
+      return undefined
     }
   }
 
   const validateStep1 = () => {
-    const newErrors: Record<string, string> = {}
+    return validate(step1ValidationRules)
+  }
 
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = "First name is required"
+  const step2ValidationRules = {
+    interests: (value: string[]) => {
+      if (value.length === 0) return "Please select at least one area of interest"
+      return undefined
+    },
+    availability: (value: string[]) => {
+      if (value.length === 0) return "Please select at least one availability option"
+      return undefined
+    },
+    experience: (value: string) => {
+      if (!value.trim()) return "Please share your relevant experience"
+      return undefined
+    },
+    motivation: (value: string) => {
+      if (!value.trim()) return "Please share your motivation for volunteering"
+      return undefined
     }
-
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = "Last name is required"
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required"
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid"
-    }
-
-    if (!formData.phone.trim()) {
-      newErrors.phone = "Phone number is required"
-    }
-
-    if (!formData.age.trim()) {
-      newErrors.age = "Age is required"
-    } else if (Number.parseInt(formData.age) < 16) {
-      newErrors.age = "You must be at least 16 years old to volunteer"
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
   }
 
   const validateStep2 = () => {
-    const newErrors: Record<string, string> = {}
+    return validate(step2ValidationRules)
+  }
 
-    if (formData.interests.length === 0) {
-      newErrors.interests = "Please select at least one area of interest"
+  const step3ValidationRules = {
+    hearAbout: (value: string) => {
+      if (!value.trim()) return "Please let us know how you heard about us"
+      return undefined
+    },
+    agreeToTerms: (value: boolean) => {
+      if (!value) return "You must agree to the terms and conditions"
+      return undefined
     }
-
-    if (formData.availability.length === 0) {
-      newErrors.availability = "Please select at least one availability option"
-    }
-
-    if (!formData.experience.trim()) {
-      newErrors.experience = "Please share your relevant experience"
-    }
-
-    if (!formData.motivation.trim()) {
-      newErrors.motivation = "Please share your motivation for volunteering"
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
   }
 
   const validateStep3 = () => {
-    const newErrors: Record<string, string> = {}
-
-    if (!formData.hearAbout.trim()) {
-      newErrors.hearAbout = "Please let us know how you heard about us"
-    }
-
-    if (!formData.agreeToTerms) {
-      newErrors.agreeToTerms = "You must agree to the terms and conditions"
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    return validate(step3ValidationRules)
   }
 
   const handleNextStep = () => {
@@ -222,99 +203,73 @@ const VolunteerForm: React.FC<VolunteerFormProps> = ({ onClose }) => {
 
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="firstName" className="block text-sm font-medium mb-1">
-                    First Name *
-                  </label>
-                  <input
-                    type="text"
-                    id="firstName"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    className={`input w-full ${errors.firstName ? "border-blood-red" : ""}`}
-                    required
-                  />
-                  {errors.firstName && <p className="mt-1 text-sm text-blood-red">{errors.firstName}</p>}
-                </div>
-
-                <div>
-                  <label htmlFor="lastName" className="block text-sm font-medium mb-1">
-                    Last Name *
-                  </label>
-                  <input
-                    type="text"
-                    id="lastName"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    className={`input w-full ${errors.lastName ? "border-blood-red" : ""}`}
-                    required
-                  />
-                  {errors.lastName && <p className="mt-1 text-sm text-blood-red">{errors.lastName}</p>}
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium mb-1">
-                  Email Address *
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaEnvelope className="text-gray-500" />
-                  </div>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className={`input pl-10 w-full ${errors.email ? "border-blood-red" : ""}`}
-                    required
-                  />
-                </div>
-                {errors.email && <p className="mt-1 text-sm text-blood-red">{errors.email}</p>}
-              </div>
-
-              <div>
-                <label htmlFor="phone" className="block text-sm font-medium mb-1">
-                  Phone Number *
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaPhone className="text-gray-500" />
-                  </div>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className={`input pl-10 w-full ${errors.phone ? "border-blood-red" : ""}`}
-                    required
-                  />
-                </div>
-                {errors.phone && <p className="mt-1 text-sm text-blood-red">{errors.phone}</p>}
-              </div>
-
-              <div>
-                <label htmlFor="age" className="block text-sm font-medium mb-1">
-                  Age *
-                </label>
-                <input
-                  type="number"
-                  id="age"
-                  name="age"
-                  min="16"
-                  max="100"
-                  value={formData.age}
+                <AccessibleInput
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  label="First Name"
+                  value={formData.firstName}
                   onChange={handleChange}
-                  className={`input w-full ${errors.age ? "border-blood-red" : ""}`}
+                  error={errors.firstName}
                   required
+                  placeholder="Enter your first name"
                 />
-                {errors.age && <p className="mt-1 text-sm text-blood-red">{errors.age}</p>}
-                <p className="mt-1 text-xs text-gray-400">You must be at least 16 years old to volunteer.</p>
+
+                <AccessibleInput
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  label="Last Name"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  error={errors.lastName}
+                  required
+                  placeholder="Enter your last name"
+                />
               </div>
+
+              <AccessibleInput
+                id="email"
+                name="email"
+                type="email"
+                label="Email Address"
+                value={formData.email}
+                onChange={handleChange}
+                error={errors.email}
+                required
+                placeholder="your@email.com"
+                description="We'll use this to contact you about volunteer opportunities"
+                className="pl-10"
+              />
+
+              <AccessibleInput
+                id="phone"
+                name="phone"
+                type="tel"
+                label="Phone Number"
+                value={formData.phone}
+                onChange={handleChange}
+                error={errors.phone}
+                required
+                placeholder="(123) 456-7890"
+                description="For urgent volunteer communications"
+                className="pl-10"
+              />
+
+              <AccessibleInput
+                id="age"
+                name="age"
+                type="number"
+                label="Age"
+                value={formData.age}
+                onChange={handleChange}
+                error={errors.age}
+                required
+                min={16}
+                max={100}
+                placeholder="Enter your age"
+                description="You must be at least 16 years old to volunteer"
+              />
             </div>
           </>
         )}
@@ -337,75 +292,65 @@ const VolunteerForm: React.FC<VolunteerFormProps> = ({ onClose }) => {
             </div>
 
             <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium mb-2">Areas of Interest * (Select all that apply)</label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <fieldset>
+                <legend className="block text-sm font-medium mb-2">Areas of Interest * (Select all that apply)</legend>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2" role="group" aria-required="true">
                   {interestOptions.map((interest) => (
-                    <label key={interest} className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        name={`interest-${interest}`}
-                        checked={formData.interests.includes(interest)}
-                        onChange={handleChange}
-                        className="rounded border-[#333333] text-gold-foil focus:ring-gold-foil"
-                      />
-                      <span>{interest}</span>
-                    </label>
+                    <AccessibleCheckbox
+                      key={interest}
+                      id={`interest-${interest}`}
+                      name={`interest-${interest}`}
+                      label={interest}
+                      checked={formData.interests.includes(interest)}
+                      onChange={handleChange}
+                    />
                   ))}
                 </div>
-                {errors.interests && <p className="mt-1 text-sm text-blood-red">{errors.interests}</p>}
-              </div>
+                {errors.interests && <p className="mt-1 text-sm text-red-400" role="alert">{errors.interests}</p>}
+              </fieldset>
 
-              <div>
-                <label className="block text-sm font-medium mb-2">Availability * (Select all that apply)</label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <fieldset>
+                <legend className="block text-sm font-medium mb-2">Availability * (Select all that apply)</legend>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2" role="group" aria-required="true">
                   {availabilityOptions.map((availability) => (
-                    <label key={availability} className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        name={`availability-${availability}`}
-                        checked={formData.availability.includes(availability)}
-                        onChange={handleChange}
-                        className="rounded border-[#333333] text-gold-foil focus:ring-gold-foil"
-                      />
-                      <span>{availability}</span>
-                    </label>
+                    <AccessibleCheckbox
+                      key={availability}
+                      id={`availability-${availability}`}
+                      name={`availability-${availability}`}
+                      label={availability}
+                      checked={formData.availability.includes(availability)}
+                      onChange={handleChange}
+                    />
                   ))}
                 </div>
-                {errors.availability && <p className="mt-1 text-sm text-blood-red">{errors.availability}</p>}
-              </div>
+                {errors.availability && <p className="mt-1 text-sm text-red-400" role="alert">{errors.availability}</p>}
+              </fieldset>
 
-              <div>
-                <label htmlFor="experience" className="block text-sm font-medium mb-1">
-                  Relevant Experience *
-                </label>
-                <textarea
-                  id="experience"
-                  name="experience"
-                  value={formData.experience}
-                  onChange={handleChange}
-                  className={`input w-full h-24 ${errors.experience ? "border-blood-red" : ""}`}
-                  placeholder="Please describe any relevant experience you have (previous volunteer work, culinary experience, etc.)"
-                  required
-                ></textarea>
-                {errors.experience && <p className="mt-1 text-sm text-blood-red">{errors.experience}</p>}
-              </div>
+              <AccessibleTextarea
+                id="experience"
+                name="experience"
+                label="Relevant Experience"
+                value={formData.experience}
+                onChange={handleChange}
+                error={errors.experience}
+                required
+                rows={4}
+                placeholder="Please describe any relevant experience you have (previous volunteer work, culinary experience, etc.)"
+                description="Share any skills or experience that would help you as a volunteer"
+              />
 
-              <div>
-                <label htmlFor="motivation" className="block text-sm font-medium mb-1">
-                  Motivation for Volunteering *
-                </label>
-                <textarea
-                  id="motivation"
-                  name="motivation"
-                  value={formData.motivation}
-                  onChange={handleChange}
-                  className={`input w-full h-24 ${errors.motivation ? "border-blood-red" : ""}`}
-                  placeholder="Why are you interested in volunteering with Broski's Kitchen?"
-                  required
-                ></textarea>
-                {errors.motivation && <p className="mt-1 text-sm text-blood-red">{errors.motivation}</p>}
-              </div>
+              <AccessibleTextarea
+                 id="motivation"
+                 name="motivation"
+                 label="Motivation for Volunteering"
+                 value={formData.motivation}
+                 onChange={handleChange}
+                 error={errors.motivation}
+                 required
+                 rows={4}
+                 placeholder="Why are you interested in volunteering with Broski's Kitchen?"
+                 description="Tell us what motivates you to volunteer with our organization"
+               />
             </div>
           </>
         )}
@@ -426,29 +371,26 @@ const VolunteerForm: React.FC<VolunteerFormProps> = ({ onClose }) => {
             </div>
 
             <div className="space-y-6">
-              <div>
-                <label htmlFor="hearAbout" className="block text-sm font-medium mb-1">
-                  How did you hear about our volunteer program? *
-                </label>
-                <select
-                  id="hearAbout"
-                  name="hearAbout"
-                  value={formData.hearAbout}
-                  onChange={handleChange}
-                  className={`input w-full ${errors.hearAbout ? "border-blood-red" : ""}`}
-                  required
-                >
-                  <option value="">Please select</option>
-                  <option value="Social Media">Social Media</option>
-                  <option value="Friend or Family">Friend or Family</option>
-                  <option value="Website">Website</option>
-                  <option value="Email">Email</option>
-                  <option value="In-Store">In-Store</option>
-                  <option value="Community Event">Community Event</option>
-                  <option value="Other">Other</option>
-                </select>
-                {errors.hearAbout && <p className="mt-1 text-sm text-blood-red">{errors.hearAbout}</p>}
-              </div>
+              <AccessibleSelect
+                id="hearAbout"
+                name="hearAbout"
+                label="How did you hear about our volunteer program?"
+                value={formData.hearAbout}
+                onChange={handleChange}
+                error={errors.hearAbout}
+                required
+                options={[
+                  { value: "", label: "Please select" },
+                  { value: "Social Media", label: "Social Media" },
+                  { value: "Friend or Family", label: "Friend or Family" },
+                  { value: "Website", label: "Website" },
+                  { value: "Email", label: "Email" },
+                  { value: "In-Store", label: "In-Store" },
+                  { value: "Community Event", label: "Community Event" },
+                  { value: "Other", label: "Other" }
+                ]}
+                description="Help us understand how you discovered our volunteer opportunities"
+              />
 
               <div className="bg-[#111111] p-4 rounded-lg">
                 <h3 className="font-bold mb-2">Application Summary</h3>
@@ -474,20 +416,11 @@ const VolunteerForm: React.FC<VolunteerFormProps> = ({ onClose }) => {
                 </div>
               </div>
 
-              <div className="flex items-start">
-                <div className="flex items-center h-5">
-                  <input
-                    id="agreeToTerms"
-                    name="agreeToTerms"
-                    type="checkbox"
-                    checked={formData.agreeToTerms}
-                    onChange={handleChange}
-                    className="h-4 w-4 rounded border-[#333333] text-gold-foil focus:ring-gold-foil"
-                    required
-                  />
-                </div>
-                <div className="ml-3 text-sm">
-                  <label htmlFor="agreeToTerms" className="text-gray-300">
+              <AccessibleCheckbox
+                id="agreeToTerms"
+                name="agreeToTerms"
+                label={
+                  <>
                     I agree to the{" "}
                     <a href="/terms" className="text-gold-foil hover:underline">
                       Volunteer Terms and Conditions
@@ -496,10 +429,13 @@ const VolunteerForm: React.FC<VolunteerFormProps> = ({ onClose }) => {
                     <a href="/privacy" className="text-gold-foil hover:underline">
                       Privacy Policy
                     </a>
-                  </label>
-                  {errors.agreeToTerms && <p className="mt-1 text-sm text-blood-red">{errors.agreeToTerms}</p>}
-                </div>
-              </div>
+                  </>
+                }
+                checked={formData.agreeToTerms}
+                onChange={handleChange}
+                error={errors.agreeToTerms}
+                required
+              />
 
               {errors.form && (
                 <div className="bg-blood-red bg-opacity-20 text-blood-red p-4 rounded-md">{errors.form}</div>

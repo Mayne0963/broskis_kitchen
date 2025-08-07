@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 import { useCart } from '@/lib/context/CartContext'
 import { useAuth } from '@/lib/context/AuthContext'
 import CheckoutClient from '@/components/checkout/CheckoutClient'
+import { PageLoading } from '@/components/common/LoadingStates'
+import { ErrorState, useLoadingState } from '@/components/common/EnhancedLoadingStates'
+import { toast } from 'sonner'
 
 // Mock function to get user addresses - replace with actual implementation
 async function getUserAddresses(userId: string) {
@@ -64,6 +67,7 @@ export default function CheckoutPage() {
   const [paymentMethods, setPaymentMethods] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { isLoading: isDataLoading, error: dataError, withLoading, clearError } = useLoadingState()
   
   // No authentication redirect - allow guest checkout
   // Users can proceed without being logged in
@@ -71,36 +75,45 @@ export default function CheckoutPage() {
   // Load user data (only for authenticated users)
   useEffect(() => {
     const loadUserData = async () => {
-      try {
-        setLoading(true)
-        
-        if (user?.id && isAuthenticated) {
-          // Load saved addresses and payment methods for authenticated users
-          const [addressesData, paymentMethodsData] = await Promise.all([
-            getUserAddresses(user.id),
-            getPaymentMethods(user.id)
-          ])
+      await withLoading(async () => {
+        try {
+          setLoading(true)
+          clearError()
           
-          setAddresses(addressesData)
-          setPaymentMethods(paymentMethodsData)
-        } else {
-          // For guest users, start with empty arrays
-          setAddresses([])
-          setPaymentMethods([])
+          if (user?.id && isAuthenticated) {
+            // Load saved addresses and payment methods for authenticated users
+            toast.loading('Loading your saved information...', { id: 'checkout-loading' })
+            
+            const [addressesData, paymentMethodsData] = await Promise.all([
+              getUserAddresses(user.id),
+              getPaymentMethods(user.id)
+            ])
+            
+            setAddresses(addressesData)
+            setPaymentMethods(paymentMethodsData)
+            toast.success('Information loaded successfully', { id: 'checkout-loading' })
+          } else {
+            // For guest users, start with empty arrays
+            setAddresses([])
+            setPaymentMethods([])
+          }
+        } catch (err) {
+          console.error('Failed to load user data:', err)
+          const errorMessage = 'Failed to load checkout data. Please try again.'
+          setError(errorMessage)
+          toast.error(errorMessage, { id: 'checkout-loading' })
+          throw err
+        } finally {
+          setLoading(false)
         }
-      } catch (err) {
-        console.error('Failed to load user data:', err)
-        setError('Failed to load checkout data. Please try again.')
-      } finally {
-        setLoading(false)
-      }
+      })
     }
     
     // Only load data after auth loading is complete
     if (!authLoading) {
       loadUserData()
     }
-  }, [user?.id, isAuthenticated, authLoading])
+  }, [user?.id, isAuthenticated, authLoading, withLoading, clearError])
   
   // Check if cart is empty
   if (itemCount === 0) {
@@ -120,35 +133,35 @@ export default function CheckoutPage() {
     )
   }
   
-  if (loading) {
+  if (loading || isDataLoading) {
     return (
-      <div className="min-h-screen bg-[var(--color-rich-black)] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-harvest-gold)] mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading checkout...</p>
-        </div>
+      <div className="min-h-screen bg-[var(--color-rich-black)]">
+        <PageLoading message="Loading checkout..." />
       </div>
     )
   }
   
-  if (error) {
+  if (error || dataError) {
     return (
       <div className="min-h-screen bg-[var(--color-rich-black)] flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Unable to Load Checkout</h1>
-          <p className="text-gray-400 mb-6">{error}</p>
-          <button 
-            onClick={() => window.location.reload()}
-            className="bg-[var(--color-harvest-gold)] text-black px-6 py-3 rounded-lg font-semibold hover:bg-[var(--color-harvest-gold)]/90 transition-colors mr-4"
-          >
-            Try Again
-          </button>
-          <a 
-            href="/cart" 
-            className="bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition-colors"
-          >
-            Return to Cart
-          </a>
+        <div className="max-w-md w-full mx-4">
+          <ErrorState
+            title="Unable to Load Checkout"
+            message={error || dataError || 'Failed to load checkout data'}
+            onRetry={() => {
+              setError(null)
+              clearError()
+              window.location.reload()
+            }}
+            action={
+              <a 
+                href="/cart" 
+                className="bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition-colors inline-block mt-4"
+              >
+                Return to Cart
+              </a>
+            }
+          />
         </div>
       </div>
     )

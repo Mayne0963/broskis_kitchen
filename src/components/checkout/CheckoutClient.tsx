@@ -10,6 +10,8 @@ import PaymentStep from './PaymentStep'
 import ReviewStep from './ReviewStep'
 import OrderConfirmation from './OrderConfirmation'
 import { guestOrderUtils } from '@/utils/guestOrderTracking'
+import { LoadingOverlay, ErrorState, ProgressIndicator, useLoadingState } from '../common/EnhancedLoadingStates'
+import { toast } from 'sonner'
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -115,6 +117,8 @@ export default function CheckoutClient({
   const [isProcessing, setIsProcessing] = useState(false)
   const [orderId, setOrderId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const { isLoading: isStepLoading, error: stepError, withLoading, clearError } = useLoadingState()
+  const [processingStep, setProcessingStep] = useState<string>('')
   
   // Load saved checkout data on component mount
   useEffect(() => {
@@ -186,12 +190,17 @@ export default function CheckoutClient({
     }
   }
   
-  const handleNext = () => {
+  const handleNext = async () => {
     const stepIndex = getCurrentStepIndex()
     if (stepIndex < steps.length - 1) {
       if (canProceedToNext()) {
-        setError(null) // Clear any previous errors
-        setCurrentStep(steps[stepIndex + 1].id as CheckoutStep)
+        await withLoading(async () => {
+          setError(null)
+          clearError()
+          // Simulate step transition delay
+          await new Promise(resolve => setTimeout(resolve, 300))
+          setCurrentStep(steps[stepIndex + 1].id as CheckoutStep)
+        })
       } else {
         // Show specific error message based on current step
         let errorMessage = ''
@@ -213,11 +222,16 @@ export default function CheckoutClient({
     }
   }
   
-  const handlePrevious = () => {
+  const handlePrevious = async () => {
     const stepIndex = getCurrentStepIndex()
     if (stepIndex > 0) {
-      setError(null) // Clear any previous errors
-      setCurrentStep(steps[stepIndex - 1].id as CheckoutStep)
+      await withLoading(async () => {
+        setError(null)
+        clearError()
+        // Simulate step transition delay
+        await new Promise(resolve => setTimeout(resolve, 200))
+        setCurrentStep(steps[stepIndex - 1].id as CheckoutStep)
+      })
     }
   }
   
@@ -227,8 +241,12 @@ export default function CheckoutClient({
   
   const handlePlaceOrder = async () => {
     setIsProcessing(true)
+    setError(null)
+    clearError()
     
     try {
+      setProcessingStep('Creating order...')
+      toast.loading('Processing your order...', { id: 'order-processing' })
       // Calculate item prices including customizations
       const calculateItemPrice = (item: CartItem) => {
         let price = item.price
@@ -280,6 +298,7 @@ export default function CheckoutClient({
       }
 
       // Create order
+      setProcessingStep('Creating order...')
       const orderResponse = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -287,7 +306,8 @@ export default function CheckoutClient({
       })
 
       if (!orderResponse.ok) {
-        throw new Error('Failed to create order')
+        const errorData = await orderResponse.json().catch(() => ({}))
+        throw new Error(errorData.message || `Order creation failed: ${orderResponse.status}`)
       }
 
       const { order } = await orderResponse.json()
@@ -304,6 +324,7 @@ export default function CheckoutClient({
        }
       
       // Create payment intent
+      setProcessingStep('Processing payment...')
       const paymentResponse = await fetch('/api/stripe/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -317,7 +338,8 @@ export default function CheckoutClient({
       })
 
       if (!paymentResponse.ok) {
-        throw new Error('Failed to create payment intent')
+        const errorData = await paymentResponse.json().catch(() => ({}))
+        throw new Error(errorData.message || 'Failed to create payment intent')
       }
 
       const { paymentIntentId } = await paymentResponse.json()
@@ -384,8 +406,10 @@ export default function CheckoutClient({
         })
       }
        
+       setProcessingStep('Finalizing order...')
        setOrderId(order.id)
        setCurrentStep('confirmation')
+       toast.success('Order placed successfully!', { id: 'order-processing' })
     } catch (error) {
       console.error('Error placing order:', error)
       let errorMessage = 'Failed to place order. Please try again.'
@@ -395,14 +419,18 @@ export default function CheckoutClient({
           errorMessage = 'Payment processing failed. Please check your payment method and try again.'
         } else if (error.message.includes('network') || error.message.includes('fetch')) {
           errorMessage = 'Network error. Please check your connection and try again.'
+        } else if (error.message.includes('Order creation failed')) {
+          errorMessage = 'Unable to create order. Please verify your information and try again.'
         } else {
           errorMessage = error.message
         }
       }
       
       setError(errorMessage)
+      toast.error(errorMessage, { id: 'order-processing' })
     } finally {
       setIsProcessing(false)
+      setProcessingStep('')
     }
   }
   
@@ -410,34 +438,52 @@ export default function CheckoutClient({
     switch (currentStep) {
       case 'delivery':
         return (
-          <DeliveryStep
-            addresses={addresses}
-            checkoutData={checkoutData}
-            onUpdate={updateCheckoutData}
-            isAuthenticated={isAuthenticated}
-          />
+          <LoadingOverlay isLoading={isStepLoading} message="Loading delivery options...">
+            <DeliveryStep
+              addresses={addresses}
+              checkoutData={checkoutData}
+              onUpdate={updateCheckoutData}
+              isAuthenticated={isAuthenticated}
+            />
+          </LoadingOverlay>
         )
       case 'payment':
         return (
-          <Elements stripe={stripePromise}>
-            <PaymentStep
-              paymentMethods={paymentMethods}
-              checkoutData={checkoutData}
-              cartData={cartData}
-              onUpdate={updateCheckoutData}
-            />
-          </Elements>
+          <LoadingOverlay isLoading={isStepLoading} message="Loading payment options...">
+            <Elements stripe={stripePromise}>
+              <PaymentStep
+                paymentMethods={paymentMethods}
+                checkoutData={checkoutData}
+                cartData={cartData}
+                onUpdate={updateCheckoutData}
+              />
+            </Elements>
+          </LoadingOverlay>
         )
       case 'review':
         return (
-          <ReviewStep
-            cartData={cartData}
-            checkoutData={checkoutData}
-            onUpdate={updateCheckoutData}
-            onPlaceOrder={handlePlaceOrder}
-            onEditStep={handleEditStep}
-            isProcessing={isProcessing}
-          />
+          <LoadingOverlay isLoading={isStepLoading} message="Preparing order review...">
+            <ReviewStep
+              cartData={cartData}
+              checkoutData={checkoutData}
+              onUpdate={updateCheckoutData}
+              onPlaceOrder={handlePlaceOrder}
+              onEditStep={handleEditStep}
+              isProcessing={isProcessing}
+            />
+            {isProcessing && (
+              <div className="mt-6">
+                <ProgressIndicator 
+                  steps={[
+                    'Creating order...',
+                    'Processing payment...',
+                    'Finalizing order...'
+                  ]}
+                  currentStep={processingStep}
+                />
+              </div>
+            )}
+          </LoadingOverlay>
         )
       case 'confirmation':
         return (
@@ -459,18 +505,24 @@ export default function CheckoutClient({
   return (
     <div className="max-w-7xl mx-auto">
       {/* Error Display */}
-      {error && (
-        <div className="mb-6 p-4 bg-red-900/20 border border-red-500/30 rounded-lg">
-          <div className="flex items-center">
-            <div className="text-red-400 font-medium">Error</div>
-            <button 
-              onClick={() => setError(null)}
-              className="ml-auto text-red-400 hover:text-red-300"
-            >
-              ×
-            </button>
-          </div>
-          <p className="text-red-300 text-sm mt-1">{error}</p>
+      {(error || stepError) && (
+        <div className="mb-6">
+          <ErrorState
+            title="Checkout Error"
+            message={error || stepError || 'An unexpected error occurred'}
+            onRetry={() => {
+              setError(null)
+              clearError()
+              // Retry the current step
+              if (currentStep === 'review' && isProcessing) {
+                handlePlaceOrder()
+              }
+            }}
+            onDismiss={() => {
+              setError(null)
+              clearError()
+            }}
+          />
         </div>
       )}
 

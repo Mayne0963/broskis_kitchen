@@ -1,6 +1,6 @@
 "use client"
-
 import { useState, useEffect } from "react"
+import type { Metadata } from "next"
 import Image from "next/image"
 import { useCart } from "../../lib/context/CartContext"
 import { useAgeVerification } from "../../lib/context/AgeVerificationContext"
@@ -10,6 +10,8 @@ import MenuItemCard from "../../components/menu/MenuItemCard"
 import CategoryFilter from "../../components/menu/CategoryFilter"
 import { menuItems, categories } from "../../data/menu-data"
 import type { CustomizationOption } from "../../types"
+import { GridSkeleton, EmptyState, SearchLoading } from "../../components/common/LoadingStates"
+import { LoadingOverlay, useLoadingState } from "../../components/common/EnhancedLoadingStates"
 
 export default function MenuPage() {
   const { addItem } = useCart()
@@ -49,43 +51,64 @@ export default function MenuPage() {
   const [pendingCustomizations, setPendingCustomizations] = useState<
     { [categoryId: string]: CustomizationOption[] } | undefined
   >(undefined)
+  const { isLoading: isSearching, withLoading } = useLoadingState()
+  const [isInitialLoading, setIsInitialLoading] = useState(true)
+
+  // Simulate initial loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitialLoading(false)
+    }, 1000)
+    return () => clearTimeout(timer)
+  }, [])
 
   // Filter menu items based on selected category, search query, and filters
   useEffect(() => {
-    let filtered = [...menuItems]
+    const filterItems = async () => {
+      if (searchQuery) {
+        await withLoading(async () => {
+          // Simulate search delay
+          await new Promise(resolve => setTimeout(resolve, 300))
+        })
+      }
 
-    // Filter by category
-    if (selectedCategory !== "all") {
-      filtered = filtered.filter((item) => item.category === selectedCategory)
+      let filtered = [...menuItems]
+
+      // Filter by category
+      if (selectedCategory !== "all") {
+        filtered = filtered.filter((item) => item.category === selectedCategory)
+      }
+
+      // Filter by search query
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase()
+        filtered = filtered.filter(
+          (item) => item.name.toLowerCase().includes(query) || item.description.toLowerCase().includes(query),
+        )
+      }
+
+      // Filter by price range
+      filtered = filtered.filter((item) => item.price >= priceRange[0] && item.price <= priceRange[1])
+
+      // Filter by dietary preferences
+      if (dietaryFilters.vegetarian) {
+        filtered = filtered.filter((item) => item.dietary?.vegetarian)
+      }
+      if (dietaryFilters.vegan) {
+        filtered = filtered.filter((item) => item.dietary?.vegan)
+      }
+      if (dietaryFilters.glutenFree) {
+        filtered = filtered.filter((item) => item.dietary?.glutenFree)
+      }
+      if (dietaryFilters.dairyFree) {
+        filtered = filtered.filter((item) => item.dietary?.dairyFree)
+      }
+
+      setFilteredItems(filtered)
     }
 
-    // Filter by search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      filtered = filtered.filter(
-        (item) => item.name.toLowerCase().includes(query) || item.description.toLowerCase().includes(query),
-      )
-    }
-
-    // Filter by price range
-    filtered = filtered.filter((item) => item.price >= priceRange[0] && item.price <= priceRange[1])
-
-    // Filter by dietary preferences
-    if (dietaryFilters.vegetarian) {
-      filtered = filtered.filter((item) => item.dietary?.vegetarian)
-    }
-    if (dietaryFilters.vegan) {
-      filtered = filtered.filter((item) => item.dietary?.vegan)
-    }
-    if (dietaryFilters.glutenFree) {
-      filtered = filtered.filter((item) => item.dietary?.glutenFree)
-    }
-    if (dietaryFilters.dairyFree) {
-      filtered = filtered.filter((item) => item.dietary?.dairyFree)
-    }
-
-    setFilteredItems(filtered)
-  }, [selectedCategory, searchQuery, priceRange, dietaryFilters])
+    filterItems()
+  }, [selectedCategory, searchQuery, priceRange, dietaryFilters, withLoading])
 
   // Handle adding item to cart
   const handleAddToCart = (
@@ -284,38 +307,50 @@ export default function MenuPage() {
       {/* Menu Items Section */}
       <section className="py-12">
         <div className="container mx-auto px-4">
-          {filteredItems.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredItems.map((item) => (
-                <MenuItemCard
-                  key={item.id}
-                  item={item}
-                  onAddToCart={(quantity, customizations) => handleAddToCart(item, quantity, customizations)}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-20">
-              <h3 className="text-2xl font-bold mb-4">No items found</h3>
-              <p className="text-gray-400 mb-6">Try adjusting your filters or search query</p>
-              <button
-                className="btn-primary"
-                onClick={() => {
-                  setSelectedCategory("all")
-                  setSearchQuery("")
-                  setPriceRange([0, 50])
-                  setDietaryFilters({
-                    vegetarian: false,
-                    vegan: false,
-                    glutenFree: false,
-                    dairyFree: false,
-                  })
-                }}
-              >
-                Reset Filters
-              </button>
-            </div>
-          )}
+          <LoadingOverlay isLoading={isInitialLoading} message="Loading menu items...">
+            {isSearching && <SearchLoading />}
+            
+            {!isInitialLoading && !isSearching && (
+              <>
+                {filteredItems.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {filteredItems.map((item) => (
+                      <MenuItemCard
+                        key={item.id}
+                        item={item}
+                        onAddToCart={(quantity, customizations) => handleAddToCart(item, quantity, customizations)}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState
+                    title="No items found"
+                    description="No menu items match your current filters. Try adjusting your search criteria."
+                    action={
+                      <button
+                        className="btn-primary"
+                        onClick={() => {
+                          setSelectedCategory("all")
+                          setSearchQuery("")
+                          setPriceRange([0, 50])
+                          setDietaryFilters({
+                            vegetarian: false,
+                            vegan: false,
+                            glutenFree: false,
+                            dairyFree: false,
+                          })
+                        }}
+                      >
+                        Reset Filters
+                      </button>
+                    }
+                  />
+                )}
+              </>
+            )}
+            
+            {isInitialLoading && <GridSkeleton count={6} />}
+          </LoadingOverlay>
         </div>
       </section>
 

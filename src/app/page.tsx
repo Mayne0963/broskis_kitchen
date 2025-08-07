@@ -1,27 +1,42 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FaUtensils, FaMapMarkerAlt, FaCalendarAlt, FaGift, FaFire, FaBars, FaTimes, FaUser, FaShoppingBag, FaPlay, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { usePathname } from "next/navigation";
-import CartDropdown from "../components/cart/CartDropdown";
-import { useCart } from "../lib/context/CartContext";
-import { useAuth } from "../lib/context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { useHeroContent } from "../hooks/useHeroContent";
-// Note: Using direct path in Image src instead of import for Next.js compatibility
+import OptimizedImage, { useImagePreloader } from "../components/performance/ImageOptimizer";
+import PerformanceMonitor from "../components/performance/PerformanceMonitor";
+import MobileEnhancer, { useEnhancedResponsive, TouchButton } from "../components/responsive/MobileEnhancer";
+import { ComponentLoader } from "../components/ui/LoadingSpinner";
+// Lazy load non-critical components
+const CartDropdown = React.lazy(() => import("../components/cart/CartDropdown"));
+const AuthContext = React.lazy(() => import("../lib/context/AuthContext").then(module => ({ default: module.useAuth })));
+const CartContext = React.lazy(() => import("../lib/context/CartContext").then(module => ({ default: module.useCart })));
 
 
 function Page() {
   const [showSaucePopup, setShowSaucePopup] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const { itemCount } = useCart();
+  
+  // Responsive hooks
+  const { isMobile, isTablet, breakpoint } = useEnhancedResponsive();
+  
+  // Preload critical images
+  useImagePreloader([
+    '/images/broskis-gold-logo.png',
+    '/images/HomePageHeroImage.png',
+    '/images/otw-logo.svg'
+  ]);
 
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <MobileEnhancer enableSwipeGestures={true} enableTouchOptimizations={true}>
+      <div className="min-h-screen bg-black text-white">
+        <PerformanceMonitor />
       {/* Hero Section - Fullscreen */}
       <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
         {/* OTW Delivery Button - Top Right Corner */}
@@ -32,12 +47,14 @@ function Page() {
             rel="noopener noreferrer"
             className="broski-otw-gold-button"
           >
-            <Image 
+            <OptimizedImage 
               src="/images/otw-logo.svg" 
               alt="OTW Logo" 
               width={36} 
               height={18} 
               className="filter brightness-110"
+              priority
+              quality={95}
             />
             <span className="text-base font-extrabold tracking-wide">OTW DELIVERY</span>
           </a>
@@ -50,16 +67,16 @@ function Page() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: "easeOut" }}
           >
-            <Image
+            <OptimizedImage
               src="/images/broskis-gold-logo.png"
               alt="Broski's Kitchen Official Gold Logo"
               width={400}
               height={200}
               className="mx-auto drop-shadow-2xl max-w-full h-auto"
               priority
-              loading="eager"
               sizes="(max-width: 768px) 300px, 400px"
               style={{ display: 'block' }}
+              quality={90}
             />
           </motion.div>
 
@@ -109,13 +126,15 @@ function Page() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.9, ease: "easeOut" }}
           >
-            <Link 
-              href="/menu" 
-              className="broski-otw-gold-button"
-              style={{ backgroundColor: '#FFD700', borderColor: '#FFD700' }}
-              aria-label="Order Now Button for Boosie Wings"
-            >
-              Order Now
+            <Link href="/menu" aria-label="Order Now Button for Boosie Wings">
+              <TouchButton 
+                size={isMobile ? 'lg' : 'md'}
+                variant="primary"
+                className="text-xl font-bold px-8 py-4 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                hapticFeedback={true}
+              >
+                Order Now
+              </TouchButton>
             </Link>
           </motion.div>
 
@@ -127,16 +146,16 @@ function Page() {
             transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
           >
             <div className="relative w-full max-w-6xl">
-              <Image
+              <OptimizedImage
                 src="/images/HomePageHeroImage.png"
                 alt="Ultra-realistic Boosie Wings spread across black surface"
                 width={2400}
                 height={900}
                 className="w-full h-auto object-cover shadow-2xl rounded-lg"
                 priority
-                loading="eager"
                 sizes="100vw"
                 style={{ display: 'block', maxWidth: '100%', height: 'auto' }}
+                quality={85}
               />
             </div>
           </motion.div>
@@ -273,7 +292,7 @@ function Page() {
               {/* First set of items */}
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/images/1000009121.png" alt="Boosie Sweet Heat Sauce" fill className="object-cover rounded-lg" />
+                  <OptimizedImage src="/images/1000009121.png" alt="Boosie Sweet Heat Sauce" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Boosie Sweet Heat Sauce</h3>
                 <p className="text-[#FFD700] mb-4">Smooth, saucy, and slightly savage. Our signature sweet heat sauce that brings the perfect balance of flavor and fire.</p>
@@ -286,7 +305,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/images/menu-items/BoosieGoldWings.png" alt="Boosie Gold Wings" fill className="object-cover rounded-lg" />
+                  <OptimizedImage src="/images/menu-items/BoosieGoldWings.png" alt="Boosie Gold Wings" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Boosie Gold Wings</h3>
                 <p className="text-[#FFD700] mb-4">Crispy fried wings coated in our signature honey-gold sauce with a sprinkle of sesame seeds.</p>
@@ -299,7 +318,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/images/menu-items/SexyyRedWings.png" alt="Sexyy Red Wings" fill className="object-cover rounded-lg" />
+                  <OptimizedImage src="/images/menu-items/SexyyRedWings.png" alt="Sexyy Red Wings" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Boosie Red Wings</h3>
                 <p className="text-[#FFD700] mb-4">Crispy wings drenched in our fiery house-made red hot sauce.</p>
@@ -312,7 +331,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/images/1000009265.png" alt="Lotus Cheesecake" fill className="object-cover rounded-lg" />
+                  <OptimizedImage src="/images/1000009265.png" alt="Lotus Cheesecake" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Lotus Cheesecake</h3>
                 <p className="text-[#FFD700] mb-4">Decadent golden brown cheesecake infused with Lotus cookie crumbles, crafted with premium ingredients.</p>
@@ -325,7 +344,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/images/1000008496.webp" alt="Chocolate Cupcake" fill className="object-cover rounded-lg" />
+                  <OptimizedImage src="/images/1000008496.webp" alt="Chocolate Cupcake" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Chocolate Cupcake</h3>
                 <p className="text-[#FFD700] mb-4">Rich chocolate cupcake with dark chocolate drizzle, made with premium cocoa and artisanal craftsmanship.</p>
@@ -338,7 +357,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/images/1000008447.webp" alt="Broski's Badazz Seasoning" fill className="object-cover rounded-lg" />
+                  <OptimizedImage src="/images/1000008447.webp" alt="Broski's Badazz Seasoning" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Broski's Badazz Seasoning</h3>
                 <p className="text-[#FFD700] mb-4">Our signature blend of premium spices and herbs, the secret behind Broski's legendary flavor profile.</p>
@@ -352,7 +371,7 @@ function Page() {
               {/* Duplicate set for seamless loop */}
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/images/1000009121.png" alt="Boosie Sweet Heat Sauce" fill className="object-cover rounded-lg" />
+                  <OptimizedImage src="/images/1000009121.png" alt="Boosie Sweet Heat Sauce" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Boosie Sweet Heat Sauce</h3>
                 <p className="text-gray-300 mb-4">Smooth, saucy, and slightly savage. Our signature sweet heat sauce that brings the perfect balance of flavor and fire.</p>
@@ -365,7 +384,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/images/menu-items/BoosieGoldWings.png" alt="Boosie Gold Wings" fill className="object-cover rounded-lg" />
+                  <OptimizedImage src="/images/menu-items/BoosieGoldWings.png" alt="Boosie Gold Wings" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Boosie Gold Wings</h3>
                 <p className="text-gray-300 mb-4">Crispy fried wings coated in our signature honey-gold sauce with a sprinkle of sesame seeds.</p>
@@ -378,7 +397,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/images/menu-items/SexyyRedWings.png" alt="Sexyy Red Wings" fill className="object-cover rounded-lg" />
+                  <OptimizedImage src="/images/menu-items/SexyyRedWings.png" alt="Sexyy Red Wings" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Boosie Red Wings</h3>
                 <p className="text-gray-300 mb-4">Crispy wings drenched in our fiery house-made red hot sauce.</p>
@@ -391,7 +410,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/images/1000009265.png" alt="Lotus Cheesecake" fill className="object-cover rounded-lg" />
+                  <OptimizedImage src="/images/1000009265.png" alt="Lotus Cheesecake" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Lotus Cheesecake</h3>
                 <p className="text-gray-300 mb-4">Decadent golden brown cheesecake infused with Lotus cookie crumbles, crafted with premium ingredients.</p>
@@ -404,7 +423,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/images/1000008496.webp" alt="Chocolate Cupcake" fill className="object-cover rounded-lg" />
+                  <OptimizedImage src="/images/1000008496.webp" alt="Chocolate Cupcake" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Chocolate Cupcake</h3>
                 <p className="text-gray-300 mb-4">Rich chocolate cupcake with dark chocolate drizzle, made with premium cocoa and artisanal craftsmanship.</p>
@@ -417,7 +436,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/images/1000008447.webp" alt="Broski's Badazz Seasoning" fill className="object-cover rounded-lg" />
+                  <OptimizedImage src="/images/1000008447.webp" alt="Broski's Badazz Seasoning" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Broski's Badazz Seasoning</h3>
                 <p className="text-gray-300 mb-4">Our signature blend of premium spices and herbs, the secret behind Broski's legendary flavor profile.</p>
@@ -457,6 +476,7 @@ function Page() {
 
       {/* Close the main div */}
     </div>
+    </MobileEnhancer>
   );
 }
 

@@ -3,91 +3,94 @@
 import type React from "react"
 
 import { useState } from "react"
-import { FaUser, FaEnvelope, FaPhone, FaComment, FaCheck } from "react-icons/fa"
+import { FaUser, FaEnvelope, FaPhone, FaComment, FaCheck, FaExclamationTriangle } from "react-icons/fa"
+import { AccessibleInput, AccessibleTextarea, AccessibleSelect, useFormValidation } from "../accessibility/AccessibleForm"
+import { FormLoading, ErrorState, useLoadingState } from "../common/EnhancedLoadingStates"
+import { toast } from "sonner"
 
 const ContactForm = () => {
-  const [formData, setFormData] = useState({
+  const initialValues = {
     name: "",
     email: "",
     phone: "",
     subject: "",
     message: "",
-  })
+  }
 
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { values: formData, errors, setValue, validate, reset } = useFormValidation(initialValues)
+  const { isLoading: isSubmitting, error: submitError, withLoading, setError } = useLoadingState()
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [retryCount, setRetryCount] = useState(0)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setFormData({
-      ...formData,
-      [name]: value,
-    })
-
-    // Clear error when field is updated
-    if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: "",
-      })
-    }
+    setValue(name as keyof typeof initialValues, value)
   }
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {}
-
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required"
+  const validationRules = {
+    name: (value: string) => {
+      if (!value.trim()) return "Name is required"
+      return undefined
+    },
+    email: (value: string) => {
+      if (!value.trim()) return "Email is required"
+      if (!/\S+@\S+\.\S+/.test(value)) return "Email is invalid"
+      return undefined
+    },
+    message: (value: string) => {
+      if (!value.trim()) return "Message is required"
+      return undefined
     }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required"
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid"
-    }
-
-    if (!formData.message.trim()) {
-      newErrors.message = "Message is required"
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!validateForm()) {
+    if (!validate(validationRules)) {
+      toast.error('Please fix the errors in the form')
       return
     }
 
-    setIsSubmitting(true)
+    const result = await withLoading(async () => {
+      // Simulate API call with potential failure
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          // Simulate random failure for demo (remove in production)
+          if (Math.random() > 0.7 && retryCount < 2) {
+            reject(new Error('Network error: Failed to send message. Please try again.'))
+          } else {
+            resolve(true)
+          }
+        }, 1500)
+      })
 
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      // Simulate sending to actual API endpoint
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
 
-      // Show success message
+      if (!response.ok) {
+        throw new Error(`Failed to send message: ${response.statusText}`)
+      }
+
+      return response.json()
+    })
+
+    if (result) {
       setIsSubmitted(true)
-
-      // Reset form
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        subject: "",
-        message: "",
-      })
-    } catch (error) {
-      console.error("Form submission error:", error)
-      setErrors({
-        ...errors,
-        form: "An error occurred. Please try again later.",
-      })
-    } finally {
-      setIsSubmitting(false)
+      setRetryCount(0)
+      reset()
+      toast.success('Message sent successfully!')
     }
+  }
+
+  const handleRetry = () => {
+    setRetryCount(prev => prev + 1)
+    setError(null)
   }
 
   const subjectOptions = ["General Inquiry", "Catering", "Events", "Delivery", "Feedback", "Career", "Other"]
@@ -106,112 +109,82 @@ const ContactForm = () => {
           </button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {errors.form && <div className="bg-blood-red bg-opacity-20 text-blood-red p-4 rounded-md">{errors.form}</div>}
+        <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+          <AccessibleInput
+            id="name"
+            name="name"
+            type="text"
+            label="Name"
+            value={formData.name}
+            onChange={handleChange}
+            error={errors.name}
+            required
+            placeholder="Your name"
+            className="pl-10"
+          />
 
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium mb-1">
-              Name *
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaUser className="text-gray-500" />
-              </div>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className={`input pl-10 w-full ${errors.name ? "border-blood-red" : ""}`}
-                placeholder="Your name"
+          <AccessibleInput
+            id="email"
+            name="email"
+            type="email"
+            label="Email"
+            value={formData.email}
+            onChange={handleChange}
+            error={errors.email}
+            required
+            placeholder="your@email.com"
+            className="pl-10"
+          />
+
+          <AccessibleInput
+            id="phone"
+            name="phone"
+            type="tel"
+            label="Phone"
+            value={formData.phone}
+            onChange={handleChange}
+            placeholder="(123) 456-7890"
+            description="Optional - We'll only call if needed"
+            className="pl-10"
+          />
+
+          <AccessibleSelect
+            id="subject"
+            name="subject"
+            label="Subject"
+            value={formData.subject}
+            onChange={handleChange}
+            options={subjectOptions.map(option => ({ value: option, label: option }))}
+            placeholder="Select a subject"
+            description="Choose the category that best describes your inquiry"
+          />
+
+          <AccessibleTextarea
+            id="message"
+            name="message"
+            label="Message"
+            value={formData.message}
+            onChange={handleChange}
+            error={errors.message}
+            required
+            rows={5}
+            placeholder="How can we help you?"
+            description="Please provide as much detail as possible"
+            className="pl-10"
+          />
+
+          {submitError && (
+            <div className="mb-4">
+              <ErrorState
+                error={submitError}
+                onRetry={handleRetry}
+                retryCount={retryCount}
+                maxRetries={3}
+                className="bg-red-900/20 border border-red-500/30 rounded-lg p-4"
               />
             </div>
-            {errors.name && <p className="mt-1 text-sm text-blood-red">{errors.name}</p>}
-          </div>
-
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-1">
-              Email *
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaEnvelope className="text-gray-500" />
-              </div>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className={`input pl-10 w-full ${errors.email ? "border-blood-red" : ""}`}
-                placeholder="your@email.com"
-              />
-            </div>
-            {errors.email && <p className="mt-1 text-sm text-blood-red">{errors.email}</p>}
-          </div>
-
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium mb-1">
-              Phone (Optional)
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaPhone className="text-gray-500" />
-              </div>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                className="input pl-10 w-full"
-                placeholder="(123) 456-7890"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="subject" className="block text-sm font-medium mb-1">
-              Subject
-            </label>
-            <select
-              id="subject"
-              name="subject"
-              value={formData.subject}
-              onChange={handleChange}
-              className="input w-full"
-            >
-              <option value="">Select a subject</option>
-              {subjectOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="message" className="block text-sm font-medium mb-1">
-              Message *
-            </label>
-            <div className="relative">
-              <div className="absolute top-3 left-3 pointer-events-none">
-                <FaComment className="text-gray-500" />
-              </div>
-              <textarea
-                id="message"
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                rows={5}
-                className={`input pl-10 w-full ${errors.message ? "border-blood-red" : ""}`}
-                placeholder="How can we help you?"
-              ></textarea>
-            </div>
-            {errors.message && <p className="mt-1 text-sm text-blood-red">{errors.message}</p>}
-          </div>
-
+          )}
+          
           <button type="submit" className="btn-primary w-full" disabled={isSubmitting}>
             {isSubmitting ? (
               <span className="flex items-center justify-center">
