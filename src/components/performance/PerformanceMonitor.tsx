@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from 'react'
-import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals'
+import { onCLS, onINP, onFCP, onLCP, onTTFB } from 'web-vitals'
 
 interface WebVitalMetric {
   name: string
@@ -63,11 +63,11 @@ export default function PerformanceMonitor() {
     }
 
     // Collect Core Web Vitals
-    getCLS(handleMetric)
-    getFID(handleMetric)
-    getFCP(handleMetric)
-    getLCP(handleMetric)
-    getTTFB(handleMetric)
+    onCLS(handleMetric)
+    onINP(handleMetric)
+    onFCP(handleMetric)
+    onLCP(handleMetric)
+    onTTFB(handleMetric)
 
     // Additional performance monitoring
     if (typeof window !== 'undefined' && 'performance' in window) {
