@@ -11,14 +11,14 @@ const STATIC_ASSETS = [
   '/about',
   '/manifest.json',
   '/offline.html',
-  // Add critical CSS and JS files
-  '/_next/static/css/app/layout.css',
-  '/_next/static/chunks/webpack.js',
   // Add critical images
   '/images/logo.svg',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png'
 ];
+
+// Note: CSS and JS chunks are handled automatically by Next.js
+// and should not be hardcoded as they change with each build
 
 // API endpoints to cache
 const API_CACHE_PATTERNS = [
