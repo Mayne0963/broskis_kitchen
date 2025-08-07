@@ -1,9 +1,11 @@
 # TODO:
 
-- [x] 45: Create new branch 'fix/broskis-css-nosniff-webvitals' (priority: High)
-- [x] 46: Search for hardcoded CSS chunk references and script tags loading CSS (priority: High)
-- [x] 47: Fix CSS nosniff error by removing CSS loaded via script tags (priority: High)
-- [x] 48: Search for web-vitals usage and migrate get* to on* API (priority: High)
-- [x] 50: Build and test locally to verify fixes (priority: High)
-- [x] 49: Update web-vitals to latest version (priority: Medium)
-- [ ] 51: Commit and push changes (**IN PROGRESS**) (priority: Medium)
+- [x] 52: Create new branch 'fix/preview-load-cleanup' (priority: High)
+- [x] 53: Search for hardcoded CSS chunk references and script tags loading CSS (priority: High)
+- [x] 54: Fix CSS-as-script errors by removing improper CSS loading (priority: High)
+- [x] 55: Search for web-vitals usage and fix onFID undefined error (priority: High)
+- [x] 56: Update web-vitals to latest version with proper on* API imports (priority: High)
+- [x] 57: Fix manifest.json 401 error by updating middleware to exclude static assets (priority: High)
+- [x] 58: Provide Firebase domain instructions for preview URL (priority: Medium)
+- [x] 59: Build and test locally to verify all fixes (priority: Medium)
+- [ ] 60: Commit and push all changes (**IN PROGRESS**) (priority: Medium)

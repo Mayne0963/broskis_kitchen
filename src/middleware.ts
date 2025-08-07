@@ -5,8 +5,8 @@ export const config = {
   matcher: [
     // Match all API routes
     '/api/:path*',
-    // Match all pages except static files and images
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    // Match all pages except static files, images, and PWA assets
+    '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.json|icons/|images/|fonts/|assets/|.*\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
 

@@ -64,14 +64,7 @@ export default function MenuPage() {
 
   // Filter menu items based on selected category, search query, and filters
   useEffect(() => {
-    const filterItems = async () => {
-      if (searchQuery) {
-        await withLoading(async () => {
-          // Simulate search delay
-          await new Promise(resolve => setTimeout(resolve, 300))
-        })
-      }
-
+    const filterItems = () => {
       let filtered = [...menuItems]
 
       // Filter by category
@@ -108,7 +101,7 @@ export default function MenuPage() {
     }
 
     filterItems()
-  }, [selectedCategory, searchQuery, priceRange, dietaryFilters, withLoading])
+  }, [selectedCategory, searchQuery, priceRange, dietaryFilters, menuItems])
 
   // Handle adding item to cart
   const handleAddToCart = (
