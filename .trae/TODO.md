@@ -1,9 +1,9 @@
 # TODO:
 
-- [x] 38: Create new hotfix branch 'fix/css-nosniff-and-webvitals' (priority: High)
-- [x] 39: Search for hardcoded CSS chunk references (_next/static/css) (priority: High)
-- [x] 40: Search for incorrect CSS script tags or next/script usage (priority: High)
-- [x] 41: Verify web-vitals migration is complete (no remaining getCLS/getFID) (priority: High)
-- [x] 43: Test build and verify no console errors (priority: High)
-- [x] 42: Update to latest web-vitals version (priority: Medium)
-- [x] 44: Commit changes and push branch (priority: Medium)
+- [x] 45: Create new branch 'fix/broskis-css-nosniff-webvitals' (priority: High)
+- [x] 46: Search for hardcoded CSS chunk references and script tags loading CSS (priority: High)
+- [x] 47: Fix CSS nosniff error by removing CSS loaded via script tags (priority: High)
+- [x] 48: Search for web-vitals usage and migrate get* to on* API (priority: High)
+- [x] 50: Build and test locally to verify fixes (priority: High)
+- [x] 49: Update web-vitals to latest version (priority: Medium)
+- [ ] 51: Commit and push changes (**IN PROGRESS**) (priority: Medium)
