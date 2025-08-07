@@ -536,6 +536,7 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
                 value={currentTime}
                 onChange={handleSeek}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                aria-label="Current time and duration"
               />
             </div>
             
@@ -617,6 +618,7 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
               value={volume}
               onChange={handleVolumeChange}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              aria-label="Volume control"
             />
           </div>
           

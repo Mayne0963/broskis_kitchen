@@ -334,6 +334,7 @@ if (audioRef && audioRef.current) {
                   value={currentTime}
                   onChange={handleSeek}
                   className="absolute top-0 left-0 w-full h-1 opacity-0 cursor-pointer"
+                  aria-label="Seek to position"
                 />
               </div>
               <span className="w-10 font-medium">{formatTime(duration)}</span>

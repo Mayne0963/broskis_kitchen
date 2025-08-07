@@ -240,6 +240,7 @@ export default function PaymentStep({
                   value={checkoutData.rewardsPoints}
                   onChange={(e) => handleRewardsPointsChange(parseInt(e.target.value))}
                   className="flex-1 h-2 bg-[#FFD700] rounded-lg appearance-none cursor-pointer slider"
+                  aria-label="Rewards points to use"
                 />
                 <div className="text-right min-w-[100px]">
                   <div className="text-[var(--color-harvest-gold)] font-bold">

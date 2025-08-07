@@ -245,6 +245,7 @@ export default function MenuPage() {
                     value={priceRange[1]}
                     onChange={(e) => setPriceRange([priceRange[0], Number.parseInt(e.target.value)])}
                     className="w-full h-2 bg-[#333333] rounded-lg appearance-none cursor-pointer"
+                    aria-label="Price range filter"
                   />
                   <span className="text-xs">${priceRange[1]}</span>
                 </div>
