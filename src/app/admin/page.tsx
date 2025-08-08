@@ -1,12 +1,14 @@
-export const dynamic = 'force-dynamic';
+'use client'
 
-import { redirect } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import AdminDashboard from '@/components/admin/AdminDashboard'
-import { verifyAdminAccess } from '@/lib/auth/rbac'
+import { useAuth } from '@/lib/context/AuthContext'
+import { Loader2 } from 'lucide-react'
 
 // Mock function to fetch admin data
-async function getAdminData() {
-  // TODO: Replace with actual database queries
+function getAdminData() {
   return {
     stats: {
       totalOrders: 1247,
@@ -91,15 +93,104 @@ async function getAdminData() {
   }
 }
 
-export default async function AdminPage() {
-  const verification = await verifyAdminAccess()
-  
-  if (!verification.success) {
-    redirect('/auth/login?redirect=/admin')
+export default function AdminPage() {
+  const { user, loading, isAdmin, refreshUserToken } = useAuth()
+  const router = useRouter()
+  const [adminData, setAdminData] = useState(null)
+  const [tokenRefreshed, setTokenRefreshed] = useState(false)
+
+  useEffect(() => {
+    if (!loading && user && !tokenRefreshed) {
+      // Force token refresh to get latest claims
+      refreshUserToken().then(() => {
+        setTokenRefreshed(true)
+      })
+    }
+  }, [user, loading, refreshUserToken, tokenRefreshed])
+
+  useEffect(() => {
+    if (!loading && tokenRefreshed) {
+      if (!user) {
+        router.push('/auth/login?redirect=/admin')
+        return
+      }
+      
+      if (!isAdmin) {
+        console.log('User is not admin:', { user, isAdmin })
+        router.push('/unauthorized')
+        return
+      }
+      
+      // Load admin data
+      setAdminData(getAdminData())
+    }
+  }, [user, loading, isAdmin, router, tokenRefreshed])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading admin dashboard...</p>
+        </div>
+      </div>
+    )
   }
-  
-  const adminData = await getAdminData()
-  
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Admin Access Required</h1>
+          <p className="text-gray-600 mb-6">Please sign in with an admin account to access the dashboard.</p>
+          <Link 
+            href="/auth/login?redirect=/admin" 
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Sign In
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
+          <p className="text-gray-600 mb-4">You don't have admin privileges.</p>
+          <p className="text-sm text-gray-500 mb-6">Current user: {user.email} (Role: {user.role || 'customer'})</p>
+          <div className="space-x-4">
+             <Link 
+               href="/" 
+               className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
+             >
+               Go Home
+             </Link>
+             <Link 
+               href="/test-auth" 
+               className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+             >
+               Debug Auth
+             </Link>
+           </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!adminData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading dashboard data...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <AdminDashboard data={adminData} />

@@ -553,11 +553,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
+  const isAdmin = user?.role === 'admin'
+  
+  // Debug logging for admin status
+  useEffect(() => {
+    if (user) {
+      console.log('AuthContext Debug:', {
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          emailVerified: user.emailVerified
+        },
+        isAdmin,
+        isAuthenticated
+      })
+    }
+  }, [user, isAdmin, isAuthenticated])
+
   const value = {
     user,
     currentUser: user, // Explicitly add currentUser to the value object
     isLoading,
+    loading: isLoading, // Add loading alias for consistency
     isAuthenticated,
+    isAdmin, // Add isAdmin computed property
     login,
     signup,
     resetPassword,

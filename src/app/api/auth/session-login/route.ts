@@ -7,7 +7,18 @@ export async function POST(request: NextRequest) {
   if (process.env.NEXT_PHASE === 'phase-production-build') {
     return NextResponse.json({});
   }
-  const { idToken } = await request.json();
+  
+  let idToken;
+  try {
+    const body = await request.json();
+    idToken = body.idToken;
+  } catch (error) {
+    console.error('Failed to parse request body:', error);
+    return NextResponse.json(
+      { error: 'Invalid request body' },
+      { status: 400 }
+    );
+  }
 
   if (!idToken) {
     return NextResponse.json(

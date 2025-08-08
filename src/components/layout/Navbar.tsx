@@ -202,12 +202,12 @@ const Navbar: React.FC = () => {
             Menu
           </Link>
           <Link
-              href="/infused-menu"
-              className={`py-2 hover:text-gold-foil transition-colors duration-300 flex items-center ${pathname === "/infused-menu" ? "text-gold-foil font-bold" : ""}`}
+            href="/infused-menu"
+            className={`py-2 hover:text-gold-foil transition-colors duration-300 flex items-center ${pathname === "/infused-menu" ? "text-gold-foil font-bold" : ""}`}
             onClick={() => setMobileMenuOpen(false)}
-            >
-              Infused Menu
-            </Link>
+          >
+            Infused Menu
+          </Link>
           <Link
             href="/locations"
             className={`py-2 hover:text-gold-foil transition-colors duration-300 flex items-center ${pathname === "/locations" ? "text-gold-foil font-bold" : ""}`}
@@ -216,21 +216,21 @@ const Navbar: React.FC = () => {
             Locations
           </Link>
           <Link
-              href="/events"
-              className={`py-2 hover:text-gold-foil transition-colors duration-300 flex items-center ${pathname === "/events" ? "text-gold-foil font-bold" : ""}`}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Events
-            </Link>
-            <Link
-              href="/music"
-              className={`py-2 hover:text-gold-foil transition-colors duration-300 flex items-center ${pathname === "/music" ? "text-gold-foil font-bold" : ""}`}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Music
-            </Link>
-            <Link
-              href="/rewards"
+            href="/events"
+            className={`py-2 hover:text-gold-foil transition-colors duration-300 flex items-center ${pathname === "/events" ? "text-gold-foil font-bold" : ""}`}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Events
+          </Link>
+          <Link
+            href="/music"
+            className={`py-2 hover:text-gold-foil transition-colors duration-300 flex items-center ${pathname === "/music" ? "text-gold-foil font-bold" : ""}`}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Music
+          </Link>
+          <Link
+            href="/rewards"
             className={`py-2 hover:text-gold-foil transition-colors duration-300 flex items-center ${pathname === "/rewards" ? "text-gold-foil font-bold" : ""}`}
             onClick={() => setMobileMenuOpen(false)}
           >

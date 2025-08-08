@@ -10,8 +10,11 @@ export interface User {
 // Auth types
 export interface AuthContextType {
   user: User | null
+  currentUser: User | null
   isLoading: boolean
+  loading: boolean
   isAuthenticated: boolean
+  isAdmin: boolean
   login: (email: string, password: string) => Promise<boolean>
   signup: (name: string, email: string, password: string) => Promise<boolean>
   signInWithGoogle: () => Promise<boolean>
