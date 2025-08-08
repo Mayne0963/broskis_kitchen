@@ -78,11 +78,11 @@ const StatCard = ({ title, value, icon: Icon, description, trend }: {
   trend?: string
 }) => (
   <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/50 hover:shadow-xl transition-all duration-300 group">
-    <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+    <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
       <CardTitle className="text-sm font-semibold text-gray-700 tracking-wide">{title}</CardTitle>
-      <div className="p-2 rounded-lg bg-gradient-to-br from-amber-100 to-orange-100 group-hover:from-amber-200 group-hover:to-orange-200 transition-all duration-300">
-        <Icon className="h-5 w-5 text-amber-600" />
+      <div className="p-2 rounded-lg bg-gradient-to-br from-blue-100 to-orange-100 group-hover:from-blue-200 group-hover:to-orange-200 transition-all duration-300">
+        <Icon className="h-5 w-5 text-blue-600" />
       </div>
     </CardHeader>
     <CardContent className="relative z-10">
@@ -92,8 +92,8 @@ const StatCard = ({ title, value, icon: Icon, description, trend }: {
       )}
       {trend && (
         <div className="flex items-center space-x-1">
-          <TrendingUp className="h-3 w-3 text-emerald-500" />
-          <p className="text-sm font-medium text-emerald-600">{trend}</p>
+          <TrendingUp className="h-3 w-3 text-green-600" />
+          <p className="text-sm font-medium text-green-700">{trend}</p>
         </div>
       )}
     </CardContent>
@@ -103,21 +103,21 @@ const StatCard = ({ title, value, icon: Icon, description, trend }: {
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'preparing':
-      return 'bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-800 border border-amber-200'
+      return 'bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-800 border border-yellow-200'
     case 'ready':
-      return 'bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-800 border border-emerald-200'
+      return 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200'
     case 'delivered':
-      return 'bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-200'
+      return 'bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 border border-blue-200'
     case 'cancelled':
-      return 'bg-gradient-to-r from-red-100 to-rose-100 text-red-800 border border-red-200'
+      return 'bg-gradient-to-r from-red-100 to-red-200 text-red-800 border border-red-200'
     case 'active':
-      return 'bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-800 border border-emerald-200'
+      return 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200'
     case 'scheduled':
-      return 'bg-gradient-to-r from-purple-100 to-violet-100 text-purple-800 border border-purple-200'
+      return 'bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-200'
     case 'ended':
-      return 'bg-gradient-to-r from-gray-100 to-slate-100 text-gray-800 border border-gray-200'
+      return 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 border border-gray-200'
     default:
-      return 'bg-gradient-to-r from-gray-100 to-slate-100 text-gray-800 border border-gray-200'
+      return 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 border border-gray-200'
   }
 }
 
@@ -141,12 +141,12 @@ export default function AdminDashboard({ data }: AdminDashboardProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
       {/* Modern Header with Gradient Background */}
-      <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white">
+      <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white">
         <div className="px-6 py-8">
           <div className="flex items-center justify-between">
             <div className="space-y-2">
               <div className="flex items-center space-x-3">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg">
+                <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-orange-500 shadow-lg">
                   <BarChart3 className="h-8 w-8 text-white" />
                 </div>
                 <div>
@@ -164,7 +164,7 @@ export default function AdminDashboard({ data }: AdminDashboardProps) {
                 <Download className="h-4 w-4 mr-2" />
                 Export Data
               </Button>
-              <Button size="sm" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0 shadow-lg">
+              <Button size="sm" className="bg-gradient-to-r from-blue-600 to-orange-500 hover:from-blue-700 hover:to-orange-600 text-white border-0 shadow-lg">
                 <FileText className="h-4 w-4 mr-2" />
                 View Reports
               </Button>
@@ -266,7 +266,7 @@ export default function AdminDashboard({ data }: AdminDashboardProps) {
               <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/50 hover:shadow-xl transition-all duration-300">
                 <CardHeader className="pb-4">
                   <div className="flex items-center space-x-3">
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-blue-100 to-indigo-100">
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-blue-100 to-blue-200">
                       <ShoppingCart className="h-5 w-5 text-blue-600" />
                     </div>
                     <div>
@@ -309,8 +309,8 @@ export default function AdminDashboard({ data }: AdminDashboardProps) {
               <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/50 hover:shadow-xl transition-all duration-300">
                 <CardHeader className="pb-4">
                   <div className="flex items-center space-x-3">
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-purple-100 to-violet-100">
-                      <Zap className="h-5 w-5 text-purple-600" />
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-orange-100 to-orange-200">
+                      <Zap className="h-5 w-5 text-orange-600" />
                     </div>
                     <div>
                       <CardTitle className="text-xl font-bold text-gray-900">Menu Drops Performance</CardTitle>
@@ -336,7 +336,7 @@ export default function AdminDashboard({ data }: AdminDashboardProps) {
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
                           <div 
-                            className="bg-gradient-to-r from-amber-400 to-orange-500 h-3 rounded-full transition-all duration-500 ease-out" 
+                            className="bg-gradient-to-r from-blue-500 to-orange-500 h-3 rounded-full transition-all duration-500 ease-out" 
                             style={{ 
                               width: `${(drop.soldQuantity / drop.totalQuantity) * 100}%` 
                             }}
@@ -356,8 +356,8 @@ export default function AdminDashboard({ data }: AdminDashboardProps) {
             <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/50 hover:shadow-xl transition-all duration-300">
               <CardHeader className="pb-4">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-100 to-green-100">
-                    <Gift className="h-5 w-5 text-emerald-600" />
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-green-100 to-green-200">
+                    <Gift className="h-5 w-5 text-green-600" />
                   </div>
                   <div>
                     <CardTitle className="text-xl font-bold text-gray-900">Rewards Program Summary</CardTitle>
@@ -369,27 +369,27 @@ export default function AdminDashboard({ data }: AdminDashboardProps) {
               </CardHeader>
               <CardContent>
                 <div className="grid gap-6 md:grid-cols-4">
-                  <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100">
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200">
                     <p className="text-sm font-semibold text-blue-700 mb-2">Points Issued</p>
                     <p className="text-3xl font-bold text-blue-900">
                       {data.rewardsData.totalPointsIssued.toLocaleString()}
                     </p>
                   </div>
-                  <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-100">
-                    <p className="text-sm font-semibold text-emerald-700 mb-2">Points Redeemed</p>
-                    <p className="text-3xl font-bold text-emerald-900">
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-green-50 to-green-100 border border-green-200">
+                    <p className="text-sm font-semibold text-green-700 mb-2">Points Redeemed</p>
+                    <p className="text-3xl font-bold text-green-900">
                       {data.rewardsData.totalPointsRedeemed.toLocaleString()}
                     </p>
                   </div>
-                  <div className="p-4 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100">
-                    <p className="text-sm font-semibold text-amber-700 mb-2">Active Offers</p>
-                    <p className="text-3xl font-bold text-amber-900">
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200">
+                    <p className="text-sm font-semibold text-orange-700 mb-2">Active Offers</p>
+                    <p className="text-3xl font-bold text-orange-900">
                       {data.rewardsData.activeOffers}
                     </p>
                   </div>
-                  <div className="p-4 rounded-xl bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-100">
-                    <p className="text-sm font-semibold text-purple-700 mb-2">Total Redemptions</p>
-                    <p className="text-3xl font-bold text-purple-900">
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200">
+                    <p className="text-sm font-semibold text-blue-700 mb-2">Total Redemptions</p>
+                    <p className="text-3xl font-bold text-blue-900">
                       {data.rewardsData.totalRedemptions}
                     </p>
                   </div>
@@ -397,15 +397,15 @@ export default function AdminDashboard({ data }: AdminDashboardProps) {
                 
                 <div className="mt-8">
                   <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center space-x-2">
-                    <Star className="h-5 w-5 text-amber-500" />
+                    <Star className="h-5 w-5 text-orange-500" />
                     <span>Top Redemptions</span>
                   </h4>
                   <div className="space-y-3">
                     {data.rewardsData.topRedemptions.map((redemption, index) => (
                       <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-50 to-white border border-gray-100 hover:shadow-md transition-all duration-200">
                         <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
-                            <span className="text-sm font-bold text-amber-700">#{index + 1}</span>
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-100 to-orange-100 flex items-center justify-center">
+                            <span className="text-sm font-bold text-blue-700">#{index + 1}</span>
                           </div>
                           <span className="font-semibold text-gray-900">{redemption.offer}</span>
                         </div>
