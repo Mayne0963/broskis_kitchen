@@ -1,9 +1,8 @@
 # TODO:
 
-- [x] 61: Add aria-label to time/duration range input in MUSICPLERAY.tsx (priority: High)
-- [x] 62: Add aria-label to volume range input in MUSICPLERAY.tsx (priority: High)
-- [x] 63: Add aria-label to price range input in src/app/menu/page.tsx (priority: High)
-- [x] 64: Add aria-label to price range input in src/app/shop/page.tsx (priority: High)
-- [x] 65: Add aria-label to seek bar range input in MusicPlayer.tsx (priority: High)
-- [x] 66: Add aria-label to rewards points range input in PaymentStep.tsx (priority: High)
-- [x] 67: Test accessibility improvements and verify all range inputs have proper labels (priority: Medium)
+- [x] 68: Create new branch fix/css-nosniff-final (priority: High)
+- [x] 69: Search for hardcoded CSS chunk references in the codebase (priority: High)
+- [x] 70: Check service worker for incorrect CSS script references (priority: High)
+- [x] 71: Verify all CSS files are loaded via link tags not script tags (priority: High)
+- [x] 72: Test the fix and ensure no CSS nosniff errors (priority: Medium)
+- [x] 73: Commit and push changes to the new branch (priority: Medium)
