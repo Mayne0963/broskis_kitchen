@@ -163,6 +163,15 @@ const Navbar: React.FC = () => {
               >
                 Order History
               </AccessibleMenuItem>
+              {user?.role === 'admin' && (
+                <AccessibleMenuItem 
+                  href="/admin"
+                  onClick={() => setUserDropdownOpen(false)}
+                  className="text-red-600 font-medium"
+                >
+                  Admin Dashboard
+                </AccessibleMenuItem>
+              )}
               <AccessibleMenuItem
                 onClick={async () => {
                   await logout()
@@ -288,6 +297,15 @@ const Navbar: React.FC = () => {
               >
                 Order History
               </Link>
+              {user?.role === 'admin' && (
+                <Link
+                  href="/admin"
+                  className="block py-2 hover:text-gold-foil transition-colors duration-300 text-red-600 font-medium"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Admin Dashboard
+                </Link>
+              )}
               <button
                 onClick={async () => {
                   await logout()

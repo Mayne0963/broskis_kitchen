@@ -50,30 +50,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           // Brief delay to ensure auth state stabilization after sign-in
           await new Promise(resolve => setTimeout(resolve, 300));
           
+          // Get Firebase ID token to access custom claims
+          const idTokenResult = await authUser.getIdTokenResult(true); // Force refresh
+          const customClaims = idTokenResult.claims;
+          
           // Get user data from Firestore
+          let userData = null;
           if (db) {
             const userDoc = await getDoc(doc(db, 'users', authUser.uid))
-            const userData = userDoc.data()
-            
-            const appUser: User = {
-              id: authUser.uid,
-              name: userData?.name || authUser.displayName || "User",
-              email: authUser.email || "",
-              emailVerified: authUser.emailVerified,
-              role: userData?.role || 'user',
-            }
-            setUser(appUser)
-          } else {
-            // Fallback when Firestore is not available
-            const appUser: User = {
-              id: authUser.uid,
-              name: authUser.displayName || "User",
-              email: authUser.email || "",
-              emailVerified: authUser.emailVerified,
-              role: 'user',
-            }
-            setUser(appUser)
+            userData = userDoc.data()
           }
+          
+          // Determine user role from custom claims or Firestore
+          let userRole = 'user';
+          if (customClaims.admin === true) {
+            userRole = 'admin';
+          } else if (customClaims.role) {
+            userRole = customClaims.role;
+          } else if (userData?.role) {
+            userRole = userData.role;
+          }
+          
+          const appUser: User = {
+            id: authUser.uid,
+            name: userData?.name || authUser.displayName || "User",
+            email: authUser.email || "",
+            emailVerified: authUser.emailVerified,
+            role: userRole,
+          }
+          
+          console.log('User authenticated with role:', userRole, 'Custom claims:', customClaims);
+          setUser(appUser)
         } catch (error) {
           console.error('Error fetching user data:', error)
           // Fallback to Firebase user data
@@ -501,6 +508,51 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
+  const refreshUserToken = async (): Promise<boolean> => {
+    if (!auth?.currentUser) {
+      console.log('No current user to refresh token for')
+      return false
+    }
+    try {
+      // Force refresh the ID token to get latest custom claims
+      const idTokenResult = await auth.currentUser.getIdTokenResult(true)
+      const customClaims = idTokenResult.claims
+      
+      // Update user role based on refreshed claims
+      if (user) {
+        let userRole = 'user'
+        if (customClaims.admin === true) {
+          userRole = 'admin'
+        } else if (customClaims.role) {
+          userRole = customClaims.role
+        }
+        
+        const updatedUser = {
+          ...user,
+          role: userRole
+        }
+        
+        console.log('Token refreshed, updated role:', userRole, 'Custom claims:', customClaims)
+        setUser(updatedUser)
+        
+        toast({
+          title: "Permissions Updated",
+          description: "Your account permissions have been refreshed.",
+        })
+        return true
+      }
+      return false
+    } catch (error) {
+      console.error('Error refreshing user token:', error)
+      toast({
+        title: "Refresh Failed",
+        description: "Failed to refresh account permissions.",
+        variant: "destructive",
+      })
+      return false
+    }
+  }
+
   const value = {
     user,
     currentUser: user, // Explicitly add currentUser to the value object
@@ -513,6 +565,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signInWithGoogle,
     resendEmailVerification,
     sendVerificationEmail: resendEmailVerification,
+    refreshUserToken,
   }
 
   return (
