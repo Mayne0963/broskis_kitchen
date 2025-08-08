@@ -8,7 +8,7 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useHeroContent } from "../hooks/useHeroContent";
 import OptimizedImage, { useImagePreloader } from "../components/performance/ImageOptimizer";
-import PerformanceMonitor from "../components/performance/PerformanceMonitor";
+
 import MobileEnhancer, { useEnhancedResponsive, TouchButton } from "../components/responsive/MobileEnhancer";
 import { ComponentLoader } from "../components/ui/LoadingSpinner";
 // Lazy load non-critical components
@@ -36,7 +36,7 @@ function Page() {
   return (
     <MobileEnhancer enableSwipeGestures={true} enableTouchOptimizations={true}>
       <div className="min-h-screen bg-black text-white">
-        <PerformanceMonitor />
+
       {/* Hero Section - Fullscreen */}
       <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
         {/* OTW Delivery Button - Top Right Corner */}

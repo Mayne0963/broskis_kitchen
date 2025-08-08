@@ -12,7 +12,7 @@
   ],
   "headers": [
     {
-      "source": "/((?!_next/static|favicon\\.ico|manifest\\.json|sw\\.js|.*\\.(css|js|png|jpg|jpeg|gif|svg|webp|ico|woff|woff2|ttf|eot)).*)",
+      "source": "/((?!_next/static|favicon\\.ico|manifest\\.json|sw\\.js).*)",
       "headers": [
         {
           "key": "X-Content-Type-Options",

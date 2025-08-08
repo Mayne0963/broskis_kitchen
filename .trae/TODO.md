@@ -1,8 +1,12 @@
 # TODO:
 
-- [x] 68: Create new branch fix/css-nosniff-final (priority: High)
-- [x] 69: Search for hardcoded CSS chunk references in the codebase (priority: High)
-- [x] 70: Check service worker for incorrect CSS script references (priority: High)
-- [x] 71: Verify all CSS files are loaded via link tags not script tags (priority: High)
-- [x] 72: Test the fix and ensure no CSS nosniff errors (priority: Medium)
-- [x] 73: Commit and push changes to the new branch (priority: Medium)
+- [x] 1: Create and checkout new branch: fix/css-nosniff-webvitals-manifest (priority: High)
+- [x] 2: Search for /_next/static/css patterns and <script> tags containing .css (priority: High)
+- [x] 3: Remove hard-coded CSS script references and ensure proper CSS imports (priority: High)
+- [x] 4: Search for web-vitals imports and fix onFID/getCLS function errors (priority: High)
+- [x] 5: Either remove web-vitals or upgrade to v3 with on* API consistently (priority: High)
+- [x] 6: Ensure manifest.ts or public/manifest.json exists and is properly configured (priority: High)
+- [x] 7: Update middleware.ts to exclude manifest files from authentication (priority: Medium)
+- [x] 8: Build and verify: no console errors, manifest accessibility (priority: Medium)
+- [ ] 9: Commit and push changes with proper message (**IN PROGRESS**) (priority: Medium)
+- [ ] 10: Create PR with detailed summary and checklist (priority: Low)
