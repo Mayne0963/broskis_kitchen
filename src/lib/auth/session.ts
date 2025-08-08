@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers'
 import { adminAuth } from '@/lib/firebaseAdmin'
+import type { DecodedIdToken } from 'firebase-admin/auth'
 
 export interface SessionUser {
   uid: string
@@ -7,10 +8,12 @@ export interface SessionUser {
   emailVerified: boolean
   name?: string
   role?: string
+  admin?: boolean
+  permissions?: string[]
 }
 
 // Full session verification for API routes (Node.js Runtime)
-export async function getSessionCookie(): Promise<DecodedIdToken | null> {
+export async function getSessionCookie(): Promise<SessionUser | null> {
   try {
     const cookieStore = await cookies()
     const sessionCookie = cookieStore.get('session')?.value
@@ -31,13 +34,21 @@ export async function getSessionCookie(): Promise<DecodedIdToken | null> {
     console.log('Verifying session cookie...');
     const decodedClaims = await auth.verifySessionCookie(sessionCookie, true)
     console.log('Verification successful:', !!decodedClaims);
+    console.log('Custom claims:', decodedClaims.admin, decodedClaims.role);
+
+    // Extract role from custom claims or direct claims
+    const role = decodedClaims.role || (decodedClaims.admin ? 'admin' : 'customer');
+    const isAdmin = decodedClaims.admin === true;
+    const permissions = decodedClaims.permissions || [];
 
     return {
       uid: decodedClaims.uid,
       email: decodedClaims.email || '',
       emailVerified: decodedClaims.email_verified || false,
       name: decodedClaims.name || decodedClaims.email?.split('@')[0],
-      role: decodedClaims.role || decodedClaims.custom_claims?.role || 'customer'
+      role: role,
+      admin: isAdmin,
+      permissions: permissions
     }
   } catch (error) {
     console.error('Error verifying session cookie:', error)
