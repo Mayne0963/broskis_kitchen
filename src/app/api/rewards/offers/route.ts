@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { 
+  getAllRewardOffers,
+  createUserRedemption,
+  getUserRewards,
+  updateUserRewards,
+  addPointsTransaction
+} from '@/lib/services/rewardsService'
 
-// Mock data - replace with actual database operations
+// Mock data fallback
 const mockOffers = [
   {
     id: '1',
@@ -116,7 +123,8 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category')
     const activeOnly = searchParams.get('activeOnly') === 'true'
     
-    let filteredOffers = [...mockOffers]
+    // Get offers from Firebase
+    let filteredOffers = await getAllRewardOffers()
     
     // Filter by type
     if (type) {
@@ -180,8 +188,9 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // Find the offer
-    const offer = mockOffers.find(o => o.id === offerId)
+    // Get all offers to find the specific one
+    const offers = await getAllRewardOffers()
+    const offer = offers.find(o => o.id === offerId)
     
     if (!offer) {
       return NextResponse.json(
@@ -206,17 +215,33 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // TODO: Check user's points balance
-    // For now, assume user has enough points
+    // Check user's points balance
+    const userRewards = await getUserRewards(userId)
+    if (!userRewards || userRewards.points < offer.pointsCost) {
+      return NextResponse.json(
+        { error: 'Insufficient points' },
+        { status: 400 }
+      )
+    }
     
-    // TODO: Replace with actual database operations
-    // 1. Deduct points from user's account
-    // 2. Create redemption record
-    // 3. Update offer redemption count
-    // 4. Send confirmation notification
+    // Deduct points from user's account
+    await addPointsTransaction({
+      userId,
+      type: 'redeemed',
+      points: -offer.pointsCost,
+      description: `Redeemed: ${offer.title}`,
+      date: new Date()
+    })
     
-    const redemption = {
-      id: `red-${Date.now()}`,
+    // Update user rewards
+    await updateUserRewards(userId, {
+      points: userRewards.points - offer.pointsCost,
+      redeemedPoints: userRewards.redeemedPoints + offer.pointsCost
+    })
+    
+    // Create redemption record
+    const redemption = await createUserRedemption({
+      userId,
       offerId: offer.id,
       offerTitle: offer.title,
       pointsUsed: offer.pointsCost,
@@ -224,7 +249,7 @@ export async function POST(request: NextRequest) {
       status: 'active',
       expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
       code: `BK${Math.random().toString(36).substr(2, 8).toUpperCase()}`
-    }
+    })
     
     return NextResponse.json({
       success: true,

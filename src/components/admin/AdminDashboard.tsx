@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -19,22 +19,33 @@ import {
   BarChart3,
   Download,
   FileText,
-  Activity
+  Activity,
+  RefreshCw
 } from 'lucide-react'
 import OrdersTab from './OrdersTab'
 import MenuDropsTab from './MenuDropsTab'
 import RewardsTab from './RewardsTab'
 import UserManagement from './UserManagement'
+import { useRealTimeMetrics } from '@/lib/services/realTimeAnalyticsService'
 
 interface AdminDashboardProps {
   data: {
+    loading?: boolean
+    error?: string | null
     stats: {
       totalOrders: number
       totalRevenue: number
       activeMenuDrops: number
       totalUsers: number
+      activeUsers: number
+      newUsersToday: number
+      newUsersThisWeek: number
+      newUsersThisMonth: number
+      userGrowthRate: number
       rewardsRedeemed: number
       averageOrderValue: number
+      averageOrdersPerUser: number
+      retentionRate: number
     }
     recentOrders: Array<{
       id: string
@@ -66,6 +77,32 @@ interface AdminDashboardProps {
         count: number
         points: number
       }>
+    }
+    userAnalytics: {
+      topCustomers: Array<{
+        id: string
+        name: string
+        email: string
+        totalOrders: number
+        totalSpent: number
+        lastOrderDate: Date
+      }>
+      usersByLocation: Array<{
+        city: string
+        state: string
+        count: number
+      }>
+      userRegistrationTrend: Array<{
+        date: string
+        count: number
+      }>
+    }
+    userActivity: {
+      dailyActiveUsers: number
+      weeklyActiveUsers: number
+      monthlyActiveUsers: number
+      averageSessionDuration: number
+      bounceRate: number
     }
   }
 }
@@ -135,8 +172,21 @@ const formatCurrency = (amount: number) => {
   }).format(amount)
 }
 
-export default function AdminDashboard({ data }: AdminDashboardProps) {
+export default function AdminDashboard({ data, refetch }: AdminDashboardProps & { refetch?: () => void }) {
   const [activeTab, setActiveTab] = useState('overview')
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const { metrics: realTimeMetrics, loading: metricsLoading, error: metricsError } = useRealTimeMetrics()
+
+  const handleRefresh = async () => {
+    if (refetch) {
+      setIsRefreshing(true)
+      try {
+        await refetch()
+      } finally {
+        setIsRefreshing(false)
+      }
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
@@ -160,6 +210,16 @@ export default function AdminDashboard({ data }: AdminDashboardProps) {
               </div>
             </div>
             <div className="flex items-center space-x-3">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className="bg-[#B7985A]/10 border-[#B7985A]/30 text-[#FFD700] hover:bg-[#B7985A]/20 backdrop-blur-sm disabled:opacity-50"
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                {isRefreshing ? 'Refreshing...' : 'Refresh'}
+              </Button>
               <Button variant="outline" size="sm" className="bg-[#B7985A]/10 border-[#B7985A]/30 text-[#FFD700] hover:bg-[#B7985A]/20 backdrop-blur-sm">
                 <Download className="h-4 w-4 mr-2" />
                 Export Data
@@ -174,8 +234,47 @@ export default function AdminDashboard({ data }: AdminDashboardProps) {
       </div>
 
       <div className="px-6 py-8 space-y-8">
+        {/* Real-time Metrics Banner */}
+        {realTimeMetrics && (
+          <div className="bg-gradient-to-r from-[#B7985A]/10 to-[#D2BA6A]/10 border border-[#B7985A]/20 rounded-2xl p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-[#B7985A] to-[#D2BA6A]">
+                  <Activity className="h-5 w-5 text-black" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">Live Metrics</h3>
+                  <p className="text-sm text-gray-300">Real-time dashboard updates</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2 text-sm text-[#FFD700]">
+                <div className="w-2 h-2 bg-[#FFD700] rounded-full animate-pulse"></div>
+                <span>Live</span>
+              </div>
+            </div>
+            <div className="grid gap-4 md:grid-cols-4">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-[#FFD700]">{realTimeMetrics.ordersToday}</p>
+                <p className="text-sm text-gray-300">Orders Today</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-[#FFD700]">{formatCurrency(realTimeMetrics.revenueToday)}</p>
+                <p className="text-sm text-gray-300">Revenue Today</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-[#FFD700]">{realTimeMetrics.activeUsers}</p>
+                <p className="text-sm text-gray-300">Active Users</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-[#FFD700]">{realTimeMetrics.pendingOrders}</p>
+                <p className="text-sm text-gray-300">Pending Orders</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Stats Overview */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-8">
           <StatCard
             title="Total Orders"
             value={data.stats.totalOrders.toLocaleString()}
@@ -201,18 +300,33 @@ export default function AdminDashboard({ data }: AdminDashboardProps) {
             value={data.stats.totalUsers.toLocaleString()}
             icon={Users}
             description="Registered users"
-            trend="+15% from last month"
+            trend={`+${data.stats.userGrowthRate.toFixed(1)}% growth`}
           />
           <StatCard
-            title="Rewards Redeemed"
-            value={data.stats.rewardsRedeemed}
-            icon={Gift}
+            title="Active Users"
+            value={data.stats.activeUsers.toLocaleString()}
+            icon={Activity}
+            description="Monthly active"
+            trend={`${((data.stats.activeUsers / data.stats.totalUsers) * 100).toFixed(1)}% of total`}
+          />
+          <StatCard
+            title="New Users"
+            value={data.stats.newUsersThisMonth}
+            icon={TrendingUp}
             description="This month"
+            trend={`${data.stats.newUsersToday} today`}
+          />
+          <StatCard
+            title="Avg Orders/User"
+            value={data.stats.averageOrdersPerUser.toFixed(1)}
+            icon={BarChart3}
+            description="Per user"
+            trend={`${(data.stats.retentionRate * 100).toFixed(1)}% retention`}
           />
           <StatCard
             title="Avg Order Value"
             value={formatCurrency(data.stats.averageOrderValue)}
-            icon={TrendingUp}
+            icon={DollarSign}
             description="Per order"
             trend="+5% from last month"
           />
@@ -421,6 +535,103 @@ export default function AdminDashboard({ data }: AdminDashboardProps) {
                 </div>
               </CardContent>
             </Card>
+
+            {/* User Analytics Section */}
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* Top Customers */}
+              <Card className="border border-[#B7985A]/20 shadow-lg bg-gradient-to-br from-black to-gray-900/50 hover:shadow-xl hover:shadow-[#B7985A]/20 transition-all duration-300">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-[#B7985A]/20 to-[#D2BA6A]/20">
+                      <Users className="h-5 w-5 text-[#FFD700]" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl font-bold text-white">Top Customers</CardTitle>
+                      <CardDescription className="text-gray-300">
+                        Most valuable customers by orders
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {data.userAnalytics.topCustomers.slice(0, 5).map((customer, index) => (
+                      <div key={customer.id} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-black/50 border border-[#B7985A]/10 hover:shadow-md hover:border-[#B7985A]/30 transition-all duration-200">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#B7985A]/20 to-[#D2BA6A]/20 flex items-center justify-center">
+                            <span className="text-sm font-bold text-[#FFD700]">#{index + 1}</span>
+                          </div>
+                          <div>
+                            <p className="font-semibold text-white">{customer.name}</p>
+                            <p className="text-sm text-gray-300">{customer.email}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-[#FFD700]">{customer.totalOrders} orders</p>
+                          <p className="text-sm text-gray-300">{formatCurrency(customer.totalSpent)}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* User Activity Metrics */}
+              <Card className="border border-[#B7985A]/20 shadow-lg bg-gradient-to-br from-black to-gray-900/50 hover:shadow-xl hover:shadow-[#B7985A]/20 transition-all duration-300">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-[#B7985A]/20 to-[#D2BA6A]/20">
+                      <Activity className="h-5 w-5 text-[#FFD700]" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl font-bold text-white">User Activity</CardTitle>
+                      <CardDescription className="text-gray-300">
+                        User engagement and activity metrics
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    <div className="grid gap-4 md:grid-cols-3">
+                      <div className="p-4 rounded-xl bg-gradient-to-br from-blue-900/20 to-blue-800/20 border border-blue-600/20">
+                        <p className="text-sm font-semibold text-blue-300 mb-2">Daily Active</p>
+                        <p className="text-2xl font-bold text-blue-400">
+                          {data.userActivity.dailyActiveUsers.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="p-4 rounded-xl bg-gradient-to-br from-green-900/20 to-green-800/20 border border-green-600/20">
+                        <p className="text-sm font-semibold text-green-300 mb-2">Weekly Active</p>
+                        <p className="text-2xl font-bold text-green-400">
+                          {data.userActivity.weeklyActiveUsers.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="p-4 rounded-xl bg-gradient-to-br from-purple-900/20 to-purple-800/20 border border-purple-600/20">
+                        <p className="text-sm font-semibold text-purple-300 mb-2">Monthly Active</p>
+                        <p className="text-2xl font-bold text-purple-400">
+                          {data.userActivity.monthlyActiveUsers.toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div className="p-4 rounded-xl bg-gradient-to-br from-[#B7985A]/10 to-[#D2BA6A]/10 border border-[#B7985A]/20">
+                        <p className="text-sm font-semibold text-[#D2BA6A] mb-2">Avg Session Duration</p>
+                        <p className="text-xl font-bold text-[#FFD700]">
+                          {Math.round(data.userActivity.averageSessionDuration / 60)} min
+                        </p>
+                      </div>
+                      <div className="p-4 rounded-xl bg-gradient-to-br from-orange-900/20 to-orange-800/20 border border-orange-600/20">
+                        <p className="text-sm font-semibold text-orange-300 mb-2">Retention Rate</p>
+                        <p className="text-xl font-bold text-orange-400">
+                          {(data.stats.retentionRate * 100).toFixed(1)}%
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="orders">

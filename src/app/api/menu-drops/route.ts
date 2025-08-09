@@ -1,69 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionCookie } from '@/lib/auth/session'
-
-// Mock data - replace with actual database operations
-const mockMenuDrops = [
-  {
-    id: '1',
-    name: 'Truffle Mac & Cheese Drop',
-    description: 'Limited edition truffle-infused mac & cheese with aged gruyere',
-    image: '/images/truffle-fries.jpg',
-    price: 18.99,
-    availableQuantity: 25,
-    totalQuantity: 50,
-    status: 'active',
-    createdAt: new Date().toISOString(),
-    endsAt: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
-    createdBy: 'admin'
-  },
-  {
-    id: '2',
-    name: 'Wagyu Slider Trio',
-    description: 'Three premium wagyu sliders with house-made sauces',
-    image: '/images/wagyu-sandwich.jpg',
-    price: 24.99,
-    availableQuantity: 12,
-    totalQuantity: 30,
-    status: 'active',
-    createdAt: new Date().toISOString(),
-    endsAt: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
-    createdBy: 'admin'
-  },
-  {
-    id: '3',
-    name: 'Infused Brownie Bites',
-    description: 'Premium cannabis-infused chocolate brownies (21+ only)',
-    image: '/images/infused-brownie.jpg',
-    price: 15.99,
-    status: 'scheduled',
-    createdAt: new Date().toISOString(),
-    scheduledFor: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-    createdBy: 'admin'
-  }
-]
+import { 
+  getAllMenuDrops,
+  getMenuDropsByStatus,
+  createMenuDrop,
+  updateMenuDrop,
+  deleteMenuDrop,
+  MenuDrop
+} from '@/lib/services/menuDropsService'
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const status = searchParams.get('status') || 'active'
+    const status = searchParams.get('status')
     
-    // Filter drops based on status
-    const filteredDrops = mockMenuDrops.filter(drop => {
-      if (status === 'active') {
-        return drop.status === 'active' && new Date(drop.endsAt || '') > new Date()
-      }
-      if (status === 'scheduled') {
-        return drop.status === 'scheduled'
-      }
-      if (status === 'expired') {
-        return drop.status === 'active' && new Date(drop.endsAt || '') <= new Date()
-      }
-      return drop.status === status
-    })
+    let drops: MenuDrop[]
+    
+    if (status) {
+      drops = await getMenuDropsByStatus(status)
+    } else {
+      drops = await getAllMenuDrops()
+    }
     
     return NextResponse.json({
-      drops: filteredDrops,
-      total: filteredDrops.length
+      drops,
+      total: drops.length
     })
   } catch (error) {
     console.error('Failed to fetch menu drops:', error)
@@ -99,16 +60,13 @@ export async function POST(request: NextRequest) {
     }
     
     // Create new menu drop
-    const newDrop = {
-      id: Date.now().toString(), // Simple ID generation
+    const newDrop = await createMenuDrop({
       ...dropData,
       createdBy: session.uid,
-      createdAt: new Date().toISOString(),
-      status: dropData.scheduledFor ? 'scheduled' : 'active'
-    }
-    
-    // TODO: Save to database
-    mockMenuDrops.push(newDrop)
+      status: dropData.scheduledFor ? 'scheduled' : 'active',
+      soldQuantity: 0,
+      revenue: 0
+    })
     
     // TODO: Set up scheduling with cron jobs or queue system
     // TODO: Integrate with inventory API for automatic triggers
@@ -147,24 +105,17 @@ export async function PUT(request: NextRequest) {
     
     const updateData = await request.json()
     
-    // TODO: Find and update drop in database
-    const dropIndex = mockMenuDrops.findIndex(drop => drop.id === dropId)
+    // Update the drop
+    const updatedDrop = await updateMenuDrop(dropId, updateData)
     
-    if (dropIndex === -1) {
+    if (!updatedDrop) {
       return NextResponse.json(
         { error: 'Menu drop not found' }, 
         { status: 404 }
       )
     }
     
-    // Update the drop
-    mockMenuDrops[dropIndex] = {
-      ...mockMenuDrops[dropIndex],
-      ...updateData,
-      updatedAt: new Date().toISOString()
-    }
-    
-    return NextResponse.json(mockMenuDrops[dropIndex])
+    return NextResponse.json(updatedDrop)
   } catch (error) {
     console.error('Failed to update menu drop:', error)
     return NextResponse.json(
@@ -195,17 +146,15 @@ export async function DELETE(request: NextRequest) {
       )
     }
     
-    // TODO: Delete from database
-    const dropIndex = mockMenuDrops.findIndex(drop => drop.id === dropId)
+    // Delete from database
+    const deleted = await deleteMenuDrop(dropId)
     
-    if (dropIndex === -1) {
+    if (!deleted) {
       return NextResponse.json(
         { error: 'Menu drop not found' }, 
         { status: 404 }
       )
     }
-    
-    mockMenuDrops.splice(dropIndex, 1)
     
     return NextResponse.json({ message: 'Menu drop deleted successfully' })
   } catch (error) {
