@@ -254,7 +254,7 @@ class RealTimeAnalyticsService {
           },
           {
             type: 'user_registration',
-            message: 'New user registered: john@example.com',
+            message: 'New user registered: j.smith@broskis.com',
             timestamp: new Date(Date.now() - 5 * 60 * 1000),
             userId: 'user123'
           },

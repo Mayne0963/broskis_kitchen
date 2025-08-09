@@ -262,7 +262,7 @@ export const useAdminData = () => {
             {
               id: '1',
               name: 'John Smith',
-              email: 'john@example.com',
+              email: 'j.smith@broskis.com',
               totalOrders: 24,
               totalSpent: 1250.00,
               lastOrderDate: new Date('2024-01-15')
@@ -270,7 +270,7 @@ export const useAdminData = () => {
             {
               id: '2',
               name: 'Sarah Johnson',
-              email: 'sarah@example.com',
+              email: 's.johnson@broskis.com',
               totalOrders: 18,
               totalSpent: 980.50,
               lastOrderDate: new Date('2024-01-14')

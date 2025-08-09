@@ -30,7 +30,7 @@ export async function getSessionCookieForMiddleware(): Promise<SessionUser | nul
       
       return {
         uid: payload.uid || 'middleware-check',
-        email: payload.email || 'user@example.com',
+        email: payload.email || 'user@domain.com',
         emailVerified: payload.email_verified || true,
         name: payload.name || payload.email?.split('@')[0] || 'User',
         role: payload.role || payload.custom_claims?.role || 'customer'
@@ -40,7 +40,7 @@ export async function getSessionCookieForMiddleware(): Promise<SessionUser | nul
       // Fallback for basic session check
       return {
         uid: 'middleware-check',
-        email: 'user@example.com',
+        email: 'user@domain.com',
         emailVerified: true,
         name: 'User',
         role: 'customer'
