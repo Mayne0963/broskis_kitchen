@@ -67,6 +67,13 @@ service cloud.firestore {
     match /verifications/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
+
+    // Each verification document includes:
+    // {
+    //   isVerified: boolean,
+    //   timestamp: timestamp,
+    //   expiryDate: timestamp
+    // }
     
     // Coupons collection
     match /coupons/{couponId} {
