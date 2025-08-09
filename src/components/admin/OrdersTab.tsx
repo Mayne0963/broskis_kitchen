@@ -191,12 +191,12 @@ const canAdvanceStatus = (status: OrderStatus) => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-gradient-to-br from-black via-gray-900 to-black min-h-screen p-6">
       {/* Header and Filters */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Orders Management</h2>
-          <p className="text-muted-foreground">
+          <h2 className="text-2xl font-bold tracking-tight text-white">Orders Management</h2>
+          <p className="text-gray-300">
             Monitor and manage customer orders
           </p>
         </div>
@@ -207,11 +207,12 @@ const canAdvanceStatus = (status: OrderStatus) => {
             size="sm"
             onClick={refreshOrders}
             disabled={isLoading}
+            className="bg-[#B7985A]/10 border-[#B7985A]/30 text-[#FFD700] hover:bg-[#B7985A]/20 backdrop-blur-sm"
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
-          <Button size="sm">
+          <Button size="sm" className="bg-gradient-to-r from-[#B7985A] to-[#D2BA6A] hover:from-[#D2BA6A] hover:to-[#B7985A] text-black border-0 shadow-lg shadow-[#B7985A]/30">
             Export Orders
           </Button>
         </div>
@@ -219,15 +220,15 @@ const canAdvanceStatus = (status: OrderStatus) => {
 
       {/* Error Display */}
       {error && (
-        <Card className="border-red-200 bg-red-50">
+        <Card className="border border-red-500/30 bg-gradient-to-br from-red-900/20 to-red-800/20">
           <CardContent className="flex items-center gap-2 py-4">
-            <AlertCircle className="h-5 w-5 text-red-600" />
-            <span className="text-red-800">{error}</span>
+            <AlertCircle className="h-5 w-5 text-red-400" />
+            <span className="text-red-300">{error}</span>
             <Button 
               variant="outline" 
               size="sm" 
               onClick={refreshOrders}
-              className="ml-auto"
+              className="ml-auto bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20"
             >
               Retry
             </Button>
@@ -239,31 +240,31 @@ const canAdvanceStatus = (status: OrderStatus) => {
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#FFD700] h-4 w-4" />
             <Input
               placeholder="Search orders by ID, customer, or items..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-10 bg-gray-900/50 border-[#B7985A]/30 text-white placeholder-gray-400 focus:border-[#FFD700] focus:ring-[#FFD700]/20"
               disabled={isLoading}
             />
           </div>
           
           <Select value={statusFilter} onValueChange={setStatusFilter} disabled={isLoading}>
-            <SelectTrigger className="w-[180px]">
-              <Filter className="h-4 w-4 mr-2" />
+            <SelectTrigger className="w-[180px] bg-gray-900/50 border-[#B7985A]/30 text-white">
+              <Filter className="h-4 w-4 mr-2 text-[#FFD700]" />
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="confirmed">Confirmed</SelectItem>
-              <SelectItem value="preparing">Preparing</SelectItem>
-              <SelectItem value="ready">Ready</SelectItem>
-              <SelectItem value="out-for-delivery">Out for Delivery</SelectItem>
-              <SelectItem value="delivered">Delivered</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
+            <SelectContent className="bg-gray-900 border-[#B7985A]/30">
+              <SelectItem value="all" className="text-white hover:bg-[#B7985A]/20">All Status</SelectItem>
+              <SelectItem value="pending" className="text-white hover:bg-[#B7985A]/20">Pending</SelectItem>
+              <SelectItem value="confirmed" className="text-white hover:bg-[#B7985A]/20">Confirmed</SelectItem>
+              <SelectItem value="preparing" className="text-white hover:bg-[#B7985A]/20">Preparing</SelectItem>
+              <SelectItem value="ready" className="text-white hover:bg-[#B7985A]/20">Ready</SelectItem>
+              <SelectItem value="out-for-delivery" className="text-white hover:bg-[#B7985A]/20">Out for Delivery</SelectItem>
+              <SelectItem value="delivered" className="text-white hover:bg-[#B7985A]/20">Delivered</SelectItem>
+              <SelectItem value="completed" className="text-white hover:bg-[#B7985A]/20">Completed</SelectItem>
+              <SelectItem value="cancelled" className="text-white hover:bg-[#B7985A]/20">Cancelled</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -271,25 +272,25 @@ const canAdvanceStatus = (status: OrderStatus) => {
         {/* Additional Filters */}
         <div className="flex flex-col sm:flex-row gap-4">
           <Select value={orderTypeFilter} onValueChange={setOrderTypeFilter} disabled={isLoading}>
-            <SelectTrigger className="w-[150px]">
+            <SelectTrigger className="w-[150px] bg-gray-900/50 border-[#B7985A]/30 text-white">
               <SelectValue placeholder="Order Type" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="delivery">Delivery</SelectItem>
-              <SelectItem value="pickup">Pickup</SelectItem>
+            <SelectContent className="bg-gray-900 border-[#B7985A]/30">
+              <SelectItem value="all" className="text-white hover:bg-[#B7985A]/20">All Types</SelectItem>
+              <SelectItem value="delivery" className="text-white hover:bg-[#B7985A]/20">Delivery</SelectItem>
+              <SelectItem value="pickup" className="text-white hover:bg-[#B7985A]/20">Pickup</SelectItem>
             </SelectContent>
           </Select>
           
           <Select value={dateFilter} onValueChange={setDateFilter} disabled={isLoading}>
-            <SelectTrigger className="w-[150px]">
+            <SelectTrigger className="w-[150px] bg-gray-900/50 border-[#B7985A]/30 text-white">
               <SelectValue placeholder="Date Range" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Time</SelectItem>
-              <SelectItem value="today">Today</SelectItem>
-              <SelectItem value="week">Last 7 Days</SelectItem>
-              <SelectItem value="month">Last 30 Days</SelectItem>
+            <SelectContent className="bg-gray-900 border-[#B7985A]/30">
+              <SelectItem value="all" className="text-white hover:bg-[#B7985A]/20">All Time</SelectItem>
+              <SelectItem value="today" className="text-white hover:bg-[#B7985A]/20">Today</SelectItem>
+              <SelectItem value="week" className="text-white hover:bg-[#B7985A]/20">Last 7 Days</SelectItem>
+              <SelectItem value="month" className="text-white hover:bg-[#B7985A]/20">Last 30 Days</SelectItem>
             </SelectContent>
           </Select>
           
@@ -304,7 +305,7 @@ const canAdvanceStatus = (status: OrderStatus) => {
                 setOrderTypeFilter('all')
                 setDateFilter('all')
               }}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 bg-gray-700/50 border-gray-600 text-gray-300 hover:bg-gray-600/50 hover:text-white"
             >
               <RefreshCw className="h-4 w-4" />
               Clear Filters
@@ -316,28 +317,28 @@ const canAdvanceStatus = (status: OrderStatus) => {
       {/* Orders List */}
       <div className="grid gap-4">
         {isLoading ? (
-          <Card>
+          <Card className="bg-gradient-to-br from-gray-900 to-black border-[#B7985A]/30">
             <CardContent className="flex items-center justify-center py-12">
               <div className="text-center">
-                <RefreshCw className="h-12 w-12 text-gray-400 mx-auto mb-4 animate-spin" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                <RefreshCw className="h-12 w-12 text-[#FFD700] mx-auto mb-4 animate-spin" />
+                <h3 className="text-lg font-medium text-white mb-2">
                   Loading orders...
                 </h3>
-                <p className="text-gray-500">
+                <p className="text-gray-400">
                   Please wait while we fetch the latest orders
                 </p>
               </div>
             </CardContent>
           </Card>
         ) : filteredOrders.length === 0 ? (
-          <Card>
+          <Card className="bg-gradient-to-br from-gray-900 to-black border-[#B7985A]/30">
             <CardContent className="flex items-center justify-center py-12">
               <div className="text-center">
-                <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                <Search className="h-12 w-12 text-[#FFD700] mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-white mb-2">
                   No orders found
                 </h3>
-                <p className="text-gray-500">
+                <p className="text-gray-400">
                   {searchTerm || statusFilter !== 'all' 
                     ? 'Try adjusting your search or filter criteria'
                     : 'No orders have been placed yet'
@@ -351,24 +352,24 @@ const canAdvanceStatus = (status: OrderStatus) => {
             const StatusIcon = getStatusIcon(order.status)
             
             return (
-              <Card key={order.id} className="hover:shadow-md transition-shadow">
+              <Card key={order.id} className="bg-gradient-to-br from-gray-900 to-black border-[#B7985A]/30 hover:border-[#FFD700]/50 transition-all duration-300 hover:shadow-lg hover:shadow-[#FFD700]/10">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-semibold text-lg">{order.id}</h3>
+                        <h3 className="font-semibold text-lg text-white">{order.id}</h3>
                         <Badge className={getStatusColorClass(order.status)}>
                           <StatusIcon className="h-3 w-3 mr-1" />
                           {getStatusDisplayName(order.status)}
                         </Badge>
                         {order.orderType === 'delivery' && (
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="outline" className="text-xs bg-[#B7985A]/20 text-[#FFD700] border-[#B7985A]/30">
                             <Truck className="h-3 w-3 mr-1" />
                             Delivery
                           </Badge>
                         )}
                         {order.orderType === 'pickup' && (
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="outline" className="text-xs bg-[#B7985A]/20 text-[#FFD700] border-[#B7985A]/30">
                             <Package className="h-3 w-3 mr-1" />
                             Pickup
                           </Badge>
@@ -377,31 +378,31 @@ const canAdvanceStatus = (status: OrderStatus) => {
                       
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                         <div>
-                          <p className="text-muted-foreground">Customer</p>
-                          <p className="font-medium">{order.contactInfo?.email || 'N/A'}</p>
+                          <p className="text-gray-400">Customer</p>
+                          <p className="font-medium text-white">{order.contactInfo?.email || 'N/A'}</p>
                           {order.contactInfo?.phone && (
-                            <p className="text-xs text-muted-foreground">{order.contactInfo.phone}</p>
+                            <p className="text-xs text-gray-400">{order.contactInfo.phone}</p>
                           )}
                         </div>
                         
                         <div>
-                          <p className="text-muted-foreground">Items ({order.items.length})</p>
-                          <p className="font-medium">
+                          <p className="text-gray-400">Items ({order.items.length})</p>
+                          <p className="font-medium text-white">
                             {order.items.slice(0, 2).map(item => item.name).join(', ')}
                             {order.items.length > 2 && ` +${order.items.length - 2} more`}
                           </p>
                         </div>
                         
                         <div>
-                          <p className="text-muted-foreground">Order Time</p>
-                          <p className="font-medium">{formatDate(order.createdAt)}</p>
+                          <p className="text-gray-400">Order Time</p>
+                          <p className="font-medium text-white">{formatDate(order.createdAt)}</p>
                         </div>
                       </div>
                       
                       {order.estimatedTime && ['preparing', 'ready'].includes(order.status) && (
                         <div className="mt-2 text-sm">
-                          <p className="text-muted-foreground">Estimated Ready</p>
-                          <p className="font-medium text-orange-600">
+                          <p className="text-gray-400">Estimated Ready</p>
+                          <p className="font-medium text-[#FFD700]">
                             {order.estimatedTime}
                           </p>
                         </div>
@@ -409,8 +410,8 @@ const canAdvanceStatus = (status: OrderStatus) => {
                       
                       {order.status === 'delivered' && (
                         <div className="mt-2 text-sm">
-                          <p className="text-muted-foreground">Delivered At</p>
-                          <p className="font-medium text-green-600">
+                          <p className="text-gray-400">Delivered At</p>
+                          <p className="font-medium text-green-400">
                             {formatDate(order.updatedAt)}
                           </p>
                         </div>
@@ -419,9 +420,9 @@ const canAdvanceStatus = (status: OrderStatus) => {
                     
                     <div className="flex flex-col items-end gap-3">
                       <div className="text-right">
-                        <p className="text-2xl font-bold">{formatCurrency(order.total)}</p>
+                        <p className="text-2xl font-bold text-[#FFD700]">{formatCurrency(order.total)}</p>
                         {order.paymentStatus && (
-                          <p className="text-xs text-muted-foreground capitalize">
+                          <p className="text-xs text-gray-400 capitalize">
                             Payment: {order.paymentStatus}
                           </p>
                         )}
@@ -432,6 +433,7 @@ const canAdvanceStatus = (status: OrderStatus) => {
                           variant="outline"
                           size="sm"
                           onClick={() => setSelectedOrder(order)}
+                          className="bg-gray-700/50 border-[#B7985A]/30 text-gray-300 hover:bg-[#B7985A]/20 hover:text-white hover:border-[#FFD700]/50"
                         >
                           <Eye className="h-4 w-4 mr-1" />
                           View
@@ -455,18 +457,18 @@ const canAdvanceStatus = (status: OrderStatus) => {
 
       {/* Order Details Modal */}
       {selectedOrder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-            <CardHeader>
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+          <Card className="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-gray-900 to-black border-[#B7985A]/30">
+            <CardHeader className="border-b border-[#B7985A]/30">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-white">
                     Order Details - {selectedOrder.id}
                     <Badge className={getStatusColorClass(selectedOrder.status)}>
                       {getStatusDisplayName(selectedOrder.status)}
                     </Badge>
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-gray-400">
                     Placed on {formatDate(selectedOrder.createdAt)} • {selectedOrder.orderType === 'delivery' ? 'Delivery' : 'Pickup'}
                   </CardDescription>
                 </div>
@@ -474,6 +476,7 @@ const canAdvanceStatus = (status: OrderStatus) => {
                   variant="ghost"
                   size="sm"
                   onClick={() => setSelectedOrder(null)}
+                  className="text-gray-400 hover:text-white hover:bg-gray-700/50"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -482,38 +485,38 @@ const canAdvanceStatus = (status: OrderStatus) => {
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h4 className="font-medium mb-3">Customer Information</h4>
+                  <h4 className="font-medium mb-3 text-white">Customer Information</h4>
                   <div className="space-y-2">
                     <div>
-                      <p className="text-sm text-muted-foreground">Email</p>
-                      <p className="font-medium">{selectedOrder.contactInfo?.email || 'N/A'}</p>
+                      <p className="text-sm text-gray-400">Email</p>
+                      <p className="font-medium text-white">{selectedOrder.contactInfo?.email || 'N/A'}</p>
                     </div>
                     {selectedOrder.contactInfo?.phone && (
                       <div>
-                        <p className="text-sm text-muted-foreground">Phone</p>
-                        <p className="font-medium">{selectedOrder.contactInfo.phone}</p>
+                        <p className="text-sm text-gray-400">Phone</p>
+                        <p className="font-medium text-white">{selectedOrder.contactInfo.phone}</p>
                       </div>
                     )}
                   </div>
                 </div>
                 
                 <div>
-                  <h4 className="font-medium mb-3">Order Information</h4>
+                  <h4 className="font-medium mb-3 text-white">Order Information</h4>
                   <div className="space-y-2">
                     <div>
-                      <p className="text-sm text-muted-foreground">Order Type</p>
-                      <p className="font-medium capitalize">{selectedOrder.orderType}</p>
+                      <p className="text-sm text-gray-400">Order Type</p>
+                      <p className="font-medium capitalize text-white">{selectedOrder.orderType}</p>
                     </div>
                     {selectedOrder.estimatedTime && (
                       <div>
-                        <p className="text-sm text-muted-foreground">Estimated Ready</p>
-                        <p className="font-medium">{selectedOrder.estimatedTime}</p>
+                        <p className="text-sm text-gray-400">Estimated Ready</p>
+                        <p className="font-medium text-[#FFD700]">{selectedOrder.estimatedTime}</p>
                       </div>
                     )}
                     {selectedOrder.paymentStatus && (
                       <div>
-                        <p className="text-sm text-muted-foreground">Payment Status</p>
-                        <p className="font-medium capitalize">{selectedOrder.paymentStatus}</p>
+                        <p className="text-sm text-gray-400">Payment Status</p>
+                        <p className="font-medium capitalize text-white">{selectedOrder.paymentStatus}</p>
                       </div>
                     )}
                   </div>
@@ -522,20 +525,20 @@ const canAdvanceStatus = (status: OrderStatus) => {
 
               {selectedOrder.orderType === 'delivery' && selectedOrder.deliveryAddress && (
                 <div>
-                  <h4 className="font-medium mb-3">Delivery Address</h4>
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="font-medium">
+                  <h4 className="font-medium mb-3 text-white">Delivery Address</h4>
+                  <div className="bg-gray-800/50 border border-[#B7985A]/30 p-3 rounded-lg">
+                    <p className="font-medium text-white">
                       {selectedOrder.deliveryAddress.firstName} {selectedOrder.deliveryAddress.lastName}
                     </p>
-                    <p>{selectedOrder.deliveryAddress.street}</p>
+                    <p className="text-gray-300">{selectedOrder.deliveryAddress.street}</p>
                     {selectedOrder.deliveryAddress.apartment && (
-                      <p>Apt {selectedOrder.deliveryAddress.apartment}</p>
+                      <p className="text-gray-300">Apt {selectedOrder.deliveryAddress.apartment}</p>
                     )}
-                    <p>
+                    <p className="text-gray-300">
                       {selectedOrder.deliveryAddress.city}, {selectedOrder.deliveryAddress.state} {selectedOrder.deliveryAddress.zipCode}
                     </p>
                     {selectedOrder.deliveryAddress.deliveryInstructions && (
-                      <p className="text-sm text-muted-foreground mt-2">
+                      <p className="text-sm text-gray-400 mt-2">
                         Instructions: {selectedOrder.deliveryAddress.deliveryInstructions}
                       </p>
                     )}
@@ -545,31 +548,31 @@ const canAdvanceStatus = (status: OrderStatus) => {
 
               {selectedOrder.orderType === 'pickup' && selectedOrder.pickupLocation && (
                 <div>
-                  <h4 className="font-medium mb-3">Pickup Location</h4>
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="font-medium">{selectedOrder.pickupLocation}</p>
+                  <h4 className="font-medium mb-3 text-white">Pickup Location</h4>
+                  <div className="bg-gray-800/50 border border-[#B7985A]/30 p-3 rounded-lg">
+                    <p className="font-medium text-white">{selectedOrder.pickupLocation}</p>
                   </div>
                 </div>
               )}
 
               {selectedOrder.specialInstructions && (
                 <div>
-                  <h4 className="font-medium mb-3">Special Instructions</h4>
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <p>{selectedOrder.specialInstructions}</p>
+                  <h4 className="font-medium mb-3 text-white">Special Instructions</h4>
+                  <div className="bg-gray-800/50 border border-[#B7985A]/30 p-3 rounded-lg">
+                    <p className="text-gray-300">{selectedOrder.specialInstructions}</p>
                   </div>
                 </div>
               )}
               
               <div>
-                <h4 className="font-medium mb-3">Order Items</h4>
+                <h4 className="font-medium mb-3 text-white">Order Items</h4>
                 <div className="space-y-3">
                   {selectedOrder.items.map((item, index) => (
-                    <div key={index} className="flex justify-between items-start py-3 border-b last:border-b-0">
+                    <div key={index} className="flex justify-between items-start py-3 border-b border-[#B7985A]/20 last:border-b-0">
                       <div className="flex-1">
-                        <p className="font-medium">{item.name}</p>
+                        <p className="font-medium text-white">{item.name}</p>
                         {item.customizations && Object.keys(item.customizations).length > 0 && (
-                          <div className="text-sm text-muted-foreground mt-1">
+                          <div className="text-sm text-gray-400 mt-1">
                             {Object.values(item.customizations).flat().map((customization, idx) => (
                               <span key={idx} className="mr-2">
                                 {customization.name} (+{formatCurrency(customization.price)})
@@ -579,32 +582,32 @@ const canAdvanceStatus = (status: OrderStatus) => {
                         )}
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">{item.quantity}x</p>
-                        <p className="text-sm text-muted-foreground">{formatCurrency(item.price)}</p>
+                        <p className="font-medium text-white">{item.quantity}x</p>
+                        <p className="text-sm text-gray-400">{formatCurrency(item.price)}</p>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
               
-              <div className="space-y-2 pt-4 border-t">
-                <div className="flex justify-between">
+              <div className="space-y-2 pt-4 border-t border-[#B7985A]/30">
+                <div className="flex justify-between text-gray-300">
                   <span>Subtotal</span>
                   <span>{formatCurrency(selectedOrder.subtotal)}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between text-gray-300">
                   <span>Tax</span>
                   <span>{formatCurrency(selectedOrder.tax)}</span>
                 </div>
                 {selectedOrder.deliveryFee > 0 && (
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-gray-300">
                     <span>Delivery Fee</span>
                     <span>{formatCurrency(selectedOrder.deliveryFee)}</span>
                   </div>
                 )}
-                <div className="flex justify-between items-center pt-2 border-t font-bold text-lg">
-                  <span>Total</span>
-                  <span>{formatCurrency(selectedOrder.total)}</span>
+                <div className="flex justify-between items-center pt-2 border-t border-[#B7985A]/30 font-bold text-lg">
+                  <span className="text-white">Total</span>
+                  <span className="text-[#FFD700]">{formatCurrency(selectedOrder.total)}</span>
                 </div>
               </div>
               
@@ -622,6 +625,7 @@ const canAdvanceStatus = (status: OrderStatus) => {
                 <Button
                   variant="outline"
                   onClick={() => setSelectedOrder(null)}
+                  className="bg-gray-700/50 border-[#B7985A]/30 text-gray-300 hover:bg-gray-600/50 hover:text-white hover:border-[#FFD700]/50"
                 >
                   Close
                 </Button>

@@ -227,17 +227,20 @@ export default function RewardsTab({ rewardsData }: RewardsTabProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-gradient-to-br from-black to-gray-900 min-h-screen p-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Rewards Management</h2>
-          <p className="text-muted-foreground">
+          <h2 className="text-2xl font-bold tracking-tight text-white">Rewards Management</h2>
+          <p className="text-gray-400">
             Manage loyalty program and reward offers
           </p>
         </div>
         
-        <Button onClick={() => setShowCreateForm(true)}>
+        <Button 
+          onClick={() => setShowCreateForm(true)}
+          className="bg-gradient-to-r from-[#B7985A] to-[#FFD700] text-black font-semibold hover:from-[#FFD700] hover:to-[#B7985A] transition-all duration-300"
+        >
           <Plus className="h-4 w-4 mr-2" />
           Create Offer
         </Button>
@@ -245,61 +248,61 @@ export default function RewardsTab({ rewardsData }: RewardsTabProps) {
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
+        <Card className="bg-gradient-to-br from-gray-900 to-black border-[#B7985A]/30">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Points Issued</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-white">Points Issued</CardTitle>
+            <TrendingUp className="h-4 w-4 text-[#FFD700]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold text-[#FFD700]">
               {rewardsData.totalPointsIssued.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-gray-400">
               Total points awarded
             </p>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-gradient-to-br from-gray-900 to-black border-[#B7985A]/30">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Points Redeemed</CardTitle>
-            <Gift className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-white">Points Redeemed</CardTitle>
+            <Gift className="h-4 w-4 text-[#FFD700]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold text-[#FFD700]">
               {rewardsData.totalPointsRedeemed.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-gray-400">
               {Math.round((rewardsData.totalPointsRedeemed / rewardsData.totalPointsIssued) * 100)}% redemption rate
             </p>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-gradient-to-br from-gray-900 to-black border-[#B7985A]/30">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Offers</CardTitle>
-            <Star className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-white">Active Offers</CardTitle>
+            <Star className="h-4 w-4 text-[#FFD700]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold text-[#FFD700]">
               {offers.filter(offer => offer.isActive).length}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-gray-400">
               Currently available
             </p>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-gradient-to-br from-gray-900 to-black border-[#B7985A]/30">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Redemptions</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-white">Total Redemptions</CardTitle>
+            <Users className="h-4 w-4 text-[#FFD700]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold text-[#FFD700]">
               {rewardsData.totalRedemptions}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-gray-400">
               All time redemptions
             </p>
           </CardContent>
@@ -307,10 +310,10 @@ export default function RewardsTab({ rewardsData }: RewardsTabProps) {
       </div>
 
       {/* Top Redemptions */}
-      <Card>
+      <Card className="bg-gradient-to-br from-gray-900 to-black border-[#B7985A]/30">
         <CardHeader>
-          <CardTitle>Top Performing Offers</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-white">Top Performing Offers</CardTitle>
+          <CardDescription className="text-gray-400">
             Most popular reward redemptions
           </CardDescription>
         </CardHeader>
@@ -319,19 +322,19 @@ export default function RewardsTab({ rewardsData }: RewardsTabProps) {
             {rewardsData.topRedemptions.map((redemption, index) => (
               <div key={index} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gold-foil/20 flex items-center justify-center">
-                    <span className="text-sm font-medium text-blue-600">{index + 1}</span>
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#B7985A] to-[#FFD700] flex items-center justify-center">
+                    <span className="text-sm font-medium text-black">{index + 1}</span>
                   </div>
                   <div>
-                    <p className="font-medium">{redemption.offer}</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="font-medium text-white">{redemption.offer}</p>
+                    <p className="text-sm text-gray-400">
                       {redemption.points.toLocaleString()} points each
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium">{redemption.count} redemptions</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-medium text-[#FFD700]">{redemption.count} redemptions</p>
+                  <p className="text-sm text-gray-400">
                     {(redemption.count * redemption.points).toLocaleString()} total points
                   </p>
                 </div>
@@ -343,28 +346,28 @@ export default function RewardsTab({ rewardsData }: RewardsTabProps) {
 
       {/* Offers List */}
       <div className="grid gap-4">
-        <h3 className="text-lg font-semibold">All Offers</h3>
+        <h3 className="text-lg font-semibold text-white">All Offers</h3>
         {offers.map((offer) => {
           const TypeIcon = getTypeIcon(offer.type)
           const redemptionRate = getRedemptionRate(offer.currentRedemptions, offer.maxRedemptions)
           
           return (
-            <Card key={offer.id} className="hover:shadow-md transition-shadow">
+            <Card key={offer.id} className="bg-gradient-to-br from-gray-900 to-black border-[#B7985A]/30 hover:border-[#FFD700]/50 transition-all duration-300">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <TypeIcon className="h-5 w-5 text-muted-foreground" />
+                    <TypeIcon className="h-5 w-5 text-[#FFD700]" />
                     <div>
-                      <h4 className="font-semibold">{offer.title}</h4>
-                      <p className="text-sm text-muted-foreground">{offer.description}</p>
+                      <h4 className="font-semibold text-white">{offer.title}</h4>
+                      <p className="text-sm text-gray-400">{offer.description}</p>
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    <Badge className={getTypeColor(offer.type)}>
+                    <Badge className={`${getTypeColor(offer.type)} bg-black/50`}>
                       {offer.type}
                     </Badge>
-                    <Badge variant={offer.isActive ? 'default' : 'secondary'}>
+                    <Badge variant={offer.isActive ? 'default' : 'secondary'} className={offer.isActive ? 'bg-[#B7985A] text-black' : 'bg-gray-700 text-gray-300'}>
                       {offer.isActive ? 'Active' : 'Inactive'}
                     </Badge>
                   </div>
@@ -372,35 +375,35 @@ export default function RewardsTab({ rewardsData }: RewardsTabProps) {
                 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                   <div>
-                    <p className="text-sm text-muted-foreground">Points Cost</p>
-                    <p className="font-medium">{offer.pointsCost} points</p>
+                    <p className="text-sm text-gray-400">Points Cost</p>
+                    <p className="font-medium text-[#FFD700]">{offer.pointsCost} points</p>
                   </div>
                   
                   <div>
-                    <p className="text-sm text-muted-foreground">Redemptions</p>
-                    <p className="font-medium">{offer.currentRedemptions} / {offer.maxRedemptions}</p>
+                    <p className="text-sm text-gray-400">Redemptions</p>
+                    <p className="font-medium text-white">{offer.currentRedemptions} / {offer.maxRedemptions}</p>
                   </div>
                   
                   <div>
-                    <p className="text-sm text-muted-foreground">Valid Until</p>
-                    <p className="font-medium">{formatDate(offer.validUntil)}</p>
+                    <p className="text-sm text-gray-400">Valid Until</p>
+                    <p className="font-medium text-white">{formatDate(offer.validUntil)}</p>
                   </div>
                   
                   <div>
-                    <p className="text-sm text-muted-foreground">Category</p>
-                    <p className="font-medium capitalize">{offer.category}</p>
+                    <p className="text-sm text-gray-400">Category</p>
+                    <p className="font-medium capitalize text-white">{offer.category}</p>
                   </div>
                 </div>
                 
                 {/* Progress Bar */}
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between text-sm">
-                    <span>Redemption Progress</span>
-                    <span>{Math.round(redemptionRate)}%</span>
+                    <span className="text-gray-400">Redemption Progress</span>
+                    <span className="text-white">{Math.round(redemptionRate)}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-700 rounded-full h-2">
                     <div 
-                      className="bg-gold-foil h-2 rounded-full transition-all duration-300" 
+                      className="bg-gradient-to-r from-[#B7985A] to-[#FFD700] h-2 rounded-full transition-all duration-300" 
                       style={{ width: `${redemptionRate}%` }}
                     />
                   </div>
@@ -411,6 +414,7 @@ export default function RewardsTab({ rewardsData }: RewardsTabProps) {
                     variant="outline"
                     size="sm"
                     onClick={() => handleToggleOffer(offer.id)}
+                    className="border-[#B7985A] text-[#FFD700] hover:bg-[#B7985A]/20 hover:text-[#FFD700]"
                   >
                     {offer.isActive ? 'Deactivate' : 'Activate'}
                   </Button>
@@ -418,6 +422,7 @@ export default function RewardsTab({ rewardsData }: RewardsTabProps) {
                     variant="outline"
                     size="sm"
                     onClick={() => setEditingOffer(offer)}
+                    className="border-[#B7985A] text-[#FFD700] hover:bg-[#B7985A]/20 hover:text-[#FFD700]"
                   >
                     <Edit className="h-4 w-4 mr-1" />
                     Edit
@@ -426,7 +431,7 @@ export default function RewardsTab({ rewardsData }: RewardsTabProps) {
                     variant="outline"
                     size="sm"
                     onClick={() => handleDeleteOffer(offer.id)}
-                    className="text-[var(--color-harvest-gold)] hover:text-[var(--color-harvest-gold)]"
+                    className="border-red-600 text-red-400 hover:bg-red-900/20 hover:text-red-400"
                   >
                     <Trash2 className="h-4 w-4 mr-1" />
                     Delete
@@ -440,13 +445,13 @@ export default function RewardsTab({ rewardsData }: RewardsTabProps) {
 
       {/* Create Offer Modal */}
       {showCreateForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-gray-900 to-black border-[#B7985A]/30">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Create New Reward Offer</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-white">Create New Reward Offer</CardTitle>
+                  <CardDescription className="text-gray-400">
                     Set up a new reward for your loyalty program
                   </CardDescription>
                 </div>
@@ -454,6 +459,7 @@ export default function RewardsTab({ rewardsData }: RewardsTabProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowCreateForm(false)}
+                  className="text-gray-400 hover:text-white hover:bg-gray-800"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -463,36 +469,39 @@ export default function RewardsTab({ rewardsData }: RewardsTabProps) {
               <form onSubmit={handleCreateOffer} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="title">Title</Label>
+                    <Label htmlFor="title" className="text-white">Title</Label>
                     <Input
                       id="title"
                       value={newOffer.title}
                       onChange={(e) => setNewOffer({ ...newOffer, title: e.target.value })}
                       placeholder="e.g., Free Appetizer"
+                      className="bg-gray-800 border-[#B7985A]/30 text-white placeholder:text-gray-500 focus:border-[#FFD700]"
                       required
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="pointsCost">Points Cost</Label>
+                    <Label htmlFor="pointsCost" className="text-white">Points Cost</Label>
                     <Input
                       id="pointsCost"
                       type="number"
                       value={newOffer.pointsCost}
                       onChange={(e) => setNewOffer({ ...newOffer, pointsCost: parseInt(e.target.value) })}
                       placeholder="500"
+                      className="bg-gray-800 border-[#B7985A]/30 text-white placeholder:text-gray-500 focus:border-[#FFD700]"
                       required
                     />
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
+                  <Label htmlFor="description" className="text-white">Description</Label>
                   <Textarea
                     id="description"
                     value={newOffer.description}
                     onChange={(e) => setNewOffer({ ...newOffer, description: e.target.value })}
                     placeholder="Describe the reward offer..."
+                    className="bg-gray-800 border-[#B7985A]/30 text-white placeholder:text-gray-500 focus:border-[#FFD700]"
                     rows={3}
                     required
                   />
@@ -500,27 +509,28 @@ export default function RewardsTab({ rewardsData }: RewardsTabProps) {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="type">Type</Label>
+                    <Label htmlFor="type" className="text-white">Type</Label>
                     <Select value={newOffer.type} onValueChange={(value: any) => setNewOffer({ ...newOffer, type: value })}>
-                      <SelectTrigger>
+                      <SelectTrigger className="bg-gray-800 border-[#B7985A]/30 text-white focus:border-[#FFD700]">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="food">Food</SelectItem>
-                        <SelectItem value="discount">Discount</SelectItem>
-                        <SelectItem value="service">Service</SelectItem>
-                        <SelectItem value="bonus">Bonus</SelectItem>
+                      <SelectContent className="bg-gray-800 border-[#B7985A]/30">
+                        <SelectItem value="food" className="text-white hover:bg-gray-700">Food</SelectItem>
+                        <SelectItem value="discount" className="text-white hover:bg-gray-700">Discount</SelectItem>
+                        <SelectItem value="service" className="text-white hover:bg-gray-700">Service</SelectItem>
+                        <SelectItem value="bonus" className="text-white hover:bg-gray-700">Bonus</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="category">Category</Label>
+                    <Label htmlFor="category" className="text-white">Category</Label>
                     <Input
                       id="category"
                       value={newOffer.category}
                       onChange={(e) => setNewOffer({ ...newOffer, category: e.target.value })}
                       placeholder="e.g., appetizer, delivery"
+                      className="bg-gray-800 border-[#B7985A]/30 text-white placeholder:text-gray-500 focus:border-[#FFD700]"
                       required
                     />
                   </div>
@@ -528,50 +538,58 @@ export default function RewardsTab({ rewardsData }: RewardsTabProps) {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="validDays">Valid for (days)</Label>
+                    <Label htmlFor="validDays" className="text-white">Valid for (days)</Label>
                     <Input
                       id="validDays"
                       type="number"
                       value={newOffer.validDays}
                       onChange={(e) => setNewOffer({ ...newOffer, validDays: parseInt(e.target.value) })}
                       placeholder="30"
+                      className="bg-gray-800 border-[#B7985A]/30 text-white placeholder:text-gray-500 focus:border-[#FFD700]"
                       required
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="maxRedemptions">Max Redemptions</Label>
+                    <Label htmlFor="maxRedemptions" className="text-white">Max Redemptions</Label>
                     <Input
                       id="maxRedemptions"
                       type="number"
                       value={newOffer.maxRedemptions}
                       onChange={(e) => setNewOffer({ ...newOffer, maxRedemptions: parseInt(e.target.value) })}
                       placeholder="100"
+                      className="bg-gray-800 border-[#B7985A]/30 text-white placeholder:text-gray-500 focus:border-[#FFD700]"
                       required
                     />
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="terms">Terms & Conditions</Label>
+                  <Label htmlFor="terms" className="text-white">Terms & Conditions</Label>
                   <Textarea
                     id="terms"
                     value={newOffer.terms}
                     onChange={(e) => setNewOffer({ ...newOffer, terms: e.target.value })}
                     placeholder="Enter terms and conditions..."
+                    className="bg-gray-800 border-[#B7985A]/30 text-white placeholder:text-gray-500 focus:border-[#FFD700]"
                     rows={3}
                     required
                   />
                 </div>
                 
                 <div className="flex gap-2 pt-4">
-                  <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                  <Button 
+                    type="submit" 
+                    className="flex-1 bg-gradient-to-r from-[#B7985A] to-[#FFD700] text-black font-semibold hover:from-[#FFD700] hover:to-[#B7985A] transition-all duration-300" 
+                    disabled={isSubmitting}
+                  >
                     {isSubmitting ? 'Creating...' : 'Create Offer'}
                   </Button>
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setShowCreateForm(false)}
+                    className="border-[#B7985A] text-[#FFD700] hover:bg-[#B7985A]/20 hover:text-[#FFD700]"
                   >
                     Cancel
                   </Button>

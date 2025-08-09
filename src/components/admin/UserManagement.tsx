@@ -163,13 +163,13 @@ export default function UserManagement({ className }: UserManagementProps) {
 
   if (isLoading) {
     return (
-      <Card className={className}>
+      <Card className={`${className} bg-gradient-to-br from-black to-gray-900 border-[#B7985A]/30`}>
         <CardHeader>
-          <CardTitle>User Management</CardTitle>
+          <CardTitle className="text-white">User Management</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold-foil"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FFD700]"></div>
           </div>
         </CardContent>
       </Card>
@@ -177,10 +177,10 @@ export default function UserManagement({ className }: UserManagementProps) {
   }
 
   return (
-    <Card className={className}>
+    <Card className={`${className} bg-gradient-to-br from-black to-gray-900 border-[#B7985A]/30`}>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Shield className="h-5 w-5" />
+        <CardTitle className="flex items-center gap-2 text-white">
+          <Shield className="h-5 w-5 text-[#FFD700]" />
           User Management
         </CardTitle>
       </CardHeader>
@@ -188,58 +188,62 @@ export default function UserManagement({ className }: UserManagementProps) {
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#B7985A]" />
             <Input
               placeholder="Search by email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-10 bg-gray-800 border-[#B7985A]/30 text-white placeholder:text-gray-500 focus:border-[#FFD700]"
             />
           </div>
           <Select value={roleFilter} onValueChange={setRoleFilter}>
-            <SelectTrigger className="w-full sm:w-48">
+            <SelectTrigger className="w-full sm:w-48 bg-gray-800 border-[#B7985A]/30 text-white focus:border-[#FFD700]">
               <SelectValue placeholder="Filter by role" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Roles</SelectItem>
-              <SelectItem value="customer">Customers</SelectItem>
-              <SelectItem value="kitchen">Kitchen Staff</SelectItem>
-              <SelectItem value="admin">Administrators</SelectItem>
+            <SelectContent className="bg-gray-800 border-[#B7985A]/30">
+              <SelectItem value="all" className="text-white hover:bg-gray-700">All Roles</SelectItem>
+              <SelectItem value="customer" className="text-white hover:bg-gray-700">Customers</SelectItem>
+              <SelectItem value="kitchen" className="text-white hover:bg-gray-700">Kitchen Staff</SelectItem>
+              <SelectItem value="admin" className="text-white hover:bg-gray-700">Administrators</SelectItem>
             </SelectContent>
           </Select>
-          <Button onClick={fetchUsers} variant="outline">
+          <Button 
+            onClick={fetchUsers} 
+            variant="outline"
+            className="border-[#B7985A] text-[#FFD700] hover:bg-[#B7985A]/20 hover:text-[#FFD700]"
+          >
             Refresh
           </Button>
         </div>
 
         {/* Users Table */}
-        <div className="rounded-md border">
+        <div className="rounded-md border border-[#B7985A]/30 bg-gray-800/50">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Email Verified</TableHead>
-                <TableHead>Actions</TableHead>
+              <TableRow className="border-[#B7985A]/30 hover:bg-gray-800/50">
+                <TableHead className="text-[#FFD700] font-semibold">Email</TableHead>
+                <TableHead className="text-[#FFD700] font-semibold">Role</TableHead>
+                <TableHead className="text-[#FFD700] font-semibold">Email Verified</TableHead>
+                <TableHead className="text-[#FFD700] font-semibold">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredUsers.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center py-8 text-gray-500">
+                <TableRow className="border-[#B7985A]/30">
+                  <TableCell colSpan={4} className="text-center py-8 text-gray-400">
                     {searchTerm || roleFilter !== 'all' ? 'No users match your filters' : 'No users found'}
                   </TableCell>
                 </TableRow>
               ) : (
                 filteredUsers.map((user) => (
-                  <TableRow key={user.uid}>
-                    <TableCell className="font-medium">
+                  <TableRow key={user.uid} className="border-[#B7985A]/30 hover:bg-gray-800/30">
+                    <TableCell className="font-medium text-white">
                       {user.email}
                     </TableCell>
                     <TableCell>
                       <Badge 
                         variant={getRoleBadgeVariant(user.role)}
-                        className="flex items-center gap-1 w-fit"
+                        className="flex items-center gap-1 w-fit bg-gradient-to-r from-[#B7985A] to-[#FFD700] text-black font-semibold"
                       >
                         {getRoleIcon(user.role)}
                         {user.role}
@@ -247,9 +251,9 @@ export default function UserManagement({ className }: UserManagementProps) {
                     </TableCell>
                     <TableCell>
                       {user.emailVerified ? (
-                        <UserCheck className="h-4 w-4 text-green-600" />
+                        <UserCheck className="h-4 w-4 text-[#FFD700]" />
                       ) : (
-                        <UserX className="h-4 w-4 text-red-600" />
+                        <UserX className="h-4 w-4 text-red-400" />
                       )}
                     </TableCell>
                     <TableCell>
@@ -258,13 +262,13 @@ export default function UserManagement({ className }: UserManagementProps) {
                         onValueChange={(newRole: UserRole) => updateUserRole(user.uid, newRole)}
                         disabled={updatingUsers.has(user.uid)}
                       >
-                        <SelectTrigger className="w-32">
+                        <SelectTrigger className="w-32 bg-gray-800 border-[#B7985A]/30 text-white focus:border-[#FFD700]">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="customer">Customer</SelectItem>
-                          <SelectItem value="kitchen">Kitchen</SelectItem>
-                          <SelectItem value="admin">Admin</SelectItem>
+                        <SelectContent className="bg-gray-800 border-[#B7985A]/30">
+                          <SelectItem value="customer" className="text-white hover:bg-gray-700">Customer</SelectItem>
+                          <SelectItem value="kitchen" className="text-white hover:bg-gray-700">Kitchen</SelectItem>
+                          <SelectItem value="admin" className="text-white hover:bg-gray-700">Admin</SelectItem>
                         </SelectContent>
                       </Select>
                     </TableCell>
@@ -276,11 +280,11 @@ export default function UserManagement({ className }: UserManagementProps) {
         </div>
 
         {/* Summary */}
-        <div className="mt-6 flex flex-wrap gap-4 text-sm text-gray-600">
-          <span>Total Users: {users.length}</span>
-          <span>Customers: {users.filter(u => u.role === 'customer').length}</span>
-          <span>Kitchen Staff: {users.filter(u => u.role === 'kitchen').length}</span>
-          <span>Administrators: {users.filter(u => u.role === 'admin').length}</span>
+        <div className="mt-6 flex flex-wrap gap-4 text-sm text-gray-300">
+          <span className="text-[#FFD700] font-semibold">Total Users: <span className="text-white">{users.length}</span></span>
+          <span className="text-[#FFD700] font-semibold">Customers: <span className="text-white">{users.filter(u => u.role === 'customer').length}</span></span>
+          <span className="text-[#FFD700] font-semibold">Kitchen Staff: <span className="text-white">{users.filter(u => u.role === 'kitchen').length}</span></span>
+          <span className="text-[#FFD700] font-semibold">Administrators: <span className="text-white">{users.filter(u => u.role === 'admin').length}</span></span>
         </div>
       </CardContent>
     </Card>
