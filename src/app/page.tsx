@@ -13,8 +13,6 @@ import MobileEnhancer, { useEnhancedResponsive, TouchButton } from "../component
 import { ComponentLoader } from "../components/ui/LoadingSpinner";
 // Lazy load non-critical components
 const CartDropdown = React.lazy(() => import("../components/cart/CartDropdown"));
-const AuthContext = React.lazy(() => import("../lib/context/AuthContext").then(module => ({ default: module.useAuth })));
-const CartContext = React.lazy(() => import("../lib/context/CartContext").then(module => ({ default: module.useCart })));
 
 
 function Page() {
