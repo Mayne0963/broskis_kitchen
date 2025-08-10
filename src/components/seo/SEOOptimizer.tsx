@@ -152,13 +152,9 @@ export default function SEOOptimizer({
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link rel="dns-prefetch" href="https://www.google-analytics.com" />
       
-      {/* Preload critical above-the-fold resources only */}
-      {pathname === '/' && (
-        <>
-          <link rel="preload" href="/images/broskis-gold-logo.png" as="image" type="image/png" crossOrigin="anonymous" />
-          <link rel="preload" href="/images/HomePageHeroImage.png" as="image" type="image/png" crossOrigin="anonymous" />
-        </>
-      )}
+      {/* Preload critical resources */}
+      <link rel="preload" href="/images/broskis-gold-logo.png" as="image" type="image/png" />
+      <link rel="preload" href="/images/HomePageHeroImage.png" as="image" type="image/png" />
     </Head>
   )
 }

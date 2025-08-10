@@ -84,13 +84,6 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // Skip Firestore endpoints to prevent CORS issues
-  if (url.hostname === 'firestore.googleapis.com' || 
-      url.hostname.includes('firebaseio.com') ||
-      url.hostname.includes('googleapis.com')) {
-    return;
-  }
-  
   event.respondWith(
     handleFetchRequest(request)
   );

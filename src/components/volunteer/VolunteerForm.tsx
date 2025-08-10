@@ -294,7 +294,7 @@ const VolunteerForm: React.FC<VolunteerFormProps> = ({ onClose }) => {
             <div className="space-y-6">
               <fieldset>
                 <legend className="block text-sm font-medium mb-2">Areas of Interest * (Select all that apply)</legend>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2" role="group">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2" role="group" aria-required="true">
                   {interestOptions.map((interest) => (
                     <AccessibleCheckbox
                       key={interest}
@@ -311,7 +311,7 @@ const VolunteerForm: React.FC<VolunteerFormProps> = ({ onClose }) => {
 
               <fieldset>
                 <legend className="block text-sm font-medium mb-2">Availability * (Select all that apply)</legend>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2" role="group">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2" role="group" aria-required="true">
                   {availabilityOptions.map((availability) => (
                     <AccessibleCheckbox
                       key={availability}

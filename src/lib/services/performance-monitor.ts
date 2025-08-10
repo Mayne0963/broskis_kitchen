@@ -88,45 +88,36 @@ class PerformanceMonitor {
     this.initializeDefaultAlerts();
   }
 
-  // Record a performance metric with validation
+  // Record a performance metric
   recordMetric(metric: Omit<PerformanceMetric, 'timestamp' | 'memoryUsage' | 'cpuUsage'>) {
-    // Validate duration to prevent NaN values
-    const validatedDuration = isFinite(metric.duration) && metric.duration >= 0 ? metric.duration : 0;
-    
-    // Add delay for client-side metrics to ensure load event has completed
-    const delay = typeof window !== 'undefined' ? 100 : 0;
-    
-    setTimeout(() => {
-      const now = new Date().toISOString();
-      const memoryUsage = process.memoryUsage();
-      const cpuUsage = process.cpuUsage();
+    const now = new Date().toISOString();
+    const memoryUsage = process.memoryUsage();
+    const cpuUsage = process.cpuUsage();
 
-      const fullMetric: PerformanceMetric = {
-        ...metric,
-        duration: validatedDuration,
-        timestamp: now,
-        memoryUsage: {
-          rss: memoryUsage.rss,
-          heapTotal: memoryUsage.heapTotal,
-          heapUsed: memoryUsage.heapUsed,
-          external: memoryUsage.external
-        },
-        cpuUsage: {
-          user: cpuUsage.user,
-          system: cpuUsage.system
-        }
-      };
-
-      this.metrics.push(fullMetric);
-
-      // Check if we need to flush metrics
-      if (this.metrics.length >= this.maxMetricsInMemory) {
-        this.flushMetrics();
+    const fullMetric: PerformanceMetric = {
+      ...metric,
+      timestamp: now,
+      memoryUsage: {
+        rss: memoryUsage.rss,
+        heapTotal: memoryUsage.heapTotal,
+        heapUsed: memoryUsage.heapUsed,
+        external: memoryUsage.external
+      },
+      cpuUsage: {
+        user: cpuUsage.user,
+        system: cpuUsage.system
       }
+    };
 
-      // Check alert rules
-      this.checkAlerts(fullMetric);
-    }, delay);
+    this.metrics.push(fullMetric);
+
+    // Check if we need to flush metrics
+    if (this.metrics.length >= this.maxMetricsInMemory) {
+      this.flushMetrics();
+    }
+
+    // Check alert rules
+    this.checkAlerts(fullMetric);
   }
 
   // Flush metrics to database
@@ -440,20 +431,13 @@ class PerformanceMonitor {
         };
       }
 
-      // Calculate average response time with NaN protection
-      const totalResponseTime = metrics.reduce((sum, metric) => {
-        const duration = isFinite(metric.duration) ? metric.duration : 0;
-        return sum + duration;
-      }, 0);
-      const averageResponseTime = metrics.length > 0 && isFinite(totalResponseTime) 
-        ? totalResponseTime / metrics.length 
-        : 0;
+      // Calculate average response time
+      const totalResponseTime = metrics.reduce((sum, metric) => sum + metric.duration, 0);
+      const averageResponseTime = totalResponseTime / metrics.length;
 
-      // Calculate error rate with NaN protection
+      // Calculate error rate
       const errorCount = metrics.filter(metric => metric.statusCode >= 400).length;
-      const errorRate = metrics.length > 0 
-        ? (errorCount / metrics.length) * 100 
-        : 0;
+      const errorRate = (errorCount / metrics.length) * 100;
 
       // Find slowest endpoints
       const endpointTimes = new Map<string, number[]>();
@@ -466,16 +450,10 @@ class PerformanceMonitor {
       });
 
       const slowestEndpoints = Array.from(endpointTimes.entries())
-        .map(([endpoint, times]) => {
-          const validTimes = times.filter(time => isFinite(time) && time >= 0);
-          const totalTime = validTimes.reduce((sum, time) => sum + time, 0);
-          const averageTime = validTimes.length > 0 ? totalTime / validTimes.length : 0;
-          return {
-            endpoint,
-            averageTime: isFinite(averageTime) ? averageTime : 0
-          };
-        })
-        .filter(item => item.averageTime > 0)
+        .map(([endpoint, times]) => ({
+          endpoint,
+          averageTime: times.reduce((sum, time) => sum + time, 0) / times.length
+        }))
         .sort((a, b) => b.averageTime - a.averageTime)
         .slice(0, 10);
 

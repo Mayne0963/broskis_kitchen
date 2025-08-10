@@ -191,7 +191,7 @@ const canAdvanceStatus = (status: OrderStatus) => {
   }
 
   return (
-    <div className="space-y-6 bg-gradient-to-br from-black via-gray-900 to-black min-h-screen p-6 text-white">
+    <div className="space-y-6 bg-gradient-to-br from-black via-gray-900 to-black min-h-screen p-6">
       {/* Header and Filters */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div>

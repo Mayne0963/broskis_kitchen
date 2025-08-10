@@ -2,7 +2,6 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 
 // Validate Firebase configuration
 const validateFirebaseConfig = () => {
@@ -15,21 +14,11 @@ const validateFirebaseConfig = () => {
     'NEXT_PUBLIC_FIREBASE_APP_ID'
   ];
 
-  // reCAPTCHA v3 is optional but recommended for App Check
-  const optionalEnvVars = [
-    'NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY'
-  ];
-
   const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
-  const missingOptionalVars = optionalEnvVars.filter(varName => !process.env[varName]);
   
   if (missingVars.length > 0) {
     console.warn('Missing Firebase environment variables:', missingVars);
     return false;
-  }
-
-  if (missingOptionalVars.length > 0) {
-    console.warn('Missing optional Firebase environment variables (App Check may not work):', missingOptionalVars);
   }
 
   return true;
@@ -44,23 +33,6 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
-// Initialize App Check for CORS and security
-const initializeFirebaseAppCheck = (app: any) => {
-  if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY) {
-    try {
-      initializeAppCheck(app, {
-        provider: new ReCaptchaV3Provider(process.env.NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY),
-        isTokenAutoRefreshEnabled: true
-      });
-      console.log('Firebase App Check initialized successfully');
-    } catch (error) {
-      console.warn('Failed to initialize Firebase App Check:', error);
-    }
-  } else {
-    console.warn('App Check not initialized: missing reCAPTCHA v3 site key or running on server');
-  }
-};
-
 // Initialize Firebase - prevent duplicate app error
 let app;
 let isFirebaseConfigured = false;
@@ -72,12 +44,6 @@ try {
     isFirebaseConfigured = false;
   } else {
     app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-    
-    // Initialize App Check after Firebase app initialization
-    if (app) {
-      initializeFirebaseAppCheck(app);
-    }
-    
     isFirebaseConfigured = true;
     console.log('Firebase initialized successfully');
   }
