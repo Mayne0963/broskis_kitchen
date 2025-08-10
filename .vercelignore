@@ -1,0 +1,10 @@
+node_modules
+build
+dist
+.git
+.trae
+.log
+# Exclude documentation files
+*.md
+docs/
+generate_more_images.sh
