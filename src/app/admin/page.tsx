@@ -10,12 +10,39 @@ import { useAuth } from '@/lib/context/AuthContext'
 import { useAuthClaims } from '@/hooks/useAuthClaims'
 import { useAdminData } from '@/hooks/useAdminData'
 import { Loader2 } from 'lucide-react'
+import useSWR from 'swr'
+import { onSnapshot, collection, query, where, Timestamp } from 'firebase/firestore'
+import { db } from '@/lib/firebaseClient'
 
 export default function AdminPage() {
   const { user, loading } = useAuth()
   const { claims, loading: claimsLoading } = useAuthClaims()
   const router = useRouter()
   const { data: adminData, loading: dataLoading, error: dataError, refetch } = useAdminData()
+  
+  // Real-time metrics with SWR
+  const { data: metricsData, mutate } = useSWR(
+    '/api/admin/metrics',
+    (url: string) => fetch(url).then(r => r.json()),
+    { refreshInterval: 5000 }
+  )
+  
+  // Real-time Firestore listener for orders
+  useEffect(() => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    
+    const ordersQuery = query(
+      collection(db, 'orders'),
+      where('createdAt', '>=', Timestamp.fromDate(today))
+    )
+    
+    const unsubscribe = onSnapshot(ordersQuery, () => {
+      mutate() // Trigger SWR revalidation when orders change
+    })
+    
+    return unsubscribe
+  }, [mutate])
 
   const isAdmin = claims?.isAdmin === true
   const totalLoading = loading || claimsLoading
@@ -118,7 +145,7 @@ export default function AdminPage() {
 
   return (
     <main className="min-h-screen bg-[#0B0B0B] text-white">
-      <AdminDashboard data={adminData} refetch={refetch} />
+      <AdminDashboard data={adminData} refetch={refetch} metricsData={metricsData} />
     </main>
   )
 }

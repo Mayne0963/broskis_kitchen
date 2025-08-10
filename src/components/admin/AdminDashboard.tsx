@@ -47,7 +47,21 @@ interface AdminDashboardProps {
       averageOrdersPerUser: number
       retentionRate: number
     }
-    recentOrders: Array<{
+  }
+  metricsData?: {
+    ordersToday: number
+    revenueToday: number
+    pendingOrders: number
+    totalOrders: number
+    totalRevenue: number
+    registeredUsers: number
+    monthlyActive: number
+    newUsersThisMonth: number
+    avgOrdersPerUser: number
+    avgOrderValue: number
+   }
+   refetch?: () => void
+   recentOrders: Array<{
       id: string
       customerName: string
       items: string[]
@@ -105,7 +119,6 @@ interface AdminDashboardProps {
       bounceRate: number
     }
   }
-}
 
 const StatCard = ({ title, value, icon: Icon, description, trend }: {
   title: string
@@ -172,7 +185,7 @@ const formatCurrency = (amount: number) => {
   }).format(amount)
 }
 
-export default function AdminDashboard({ data, refetch }: AdminDashboardProps & { refetch?: () => void }) {
+export default function AdminDashboard({ data, refetch, metricsData }: AdminDashboardProps & { refetch?: () => void }) {
   const [activeTab, setActiveTab] = useState('overview')
   const [isRefreshing, setIsRefreshing] = useState(false)
   const { metrics: realTimeMetrics, loading: metricsLoading, error: metricsError } = useRealTimeMetrics()
@@ -235,7 +248,7 @@ export default function AdminDashboard({ data, refetch }: AdminDashboardProps & 
 
       <div className="px-6 py-8 space-y-8">
         {/* Real-time Metrics Banner */}
-        {realTimeMetrics && (
+        {metricsData && (
           <div className="bg-gradient-to-r from-[#B7985A]/10 to-[#D2BA6A]/10 border border-[#B7985A]/20 rounded-2xl p-6 mb-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
@@ -252,22 +265,26 @@ export default function AdminDashboard({ data, refetch }: AdminDashboardProps & 
                 <span>Live</span>
               </div>
             </div>
-            <div className="grid gap-4 md:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-5">
               <div className="text-center">
-                <p className="text-2xl font-bold text-[#FFD700]">{realTimeMetrics.ordersToday}</p>
+                <p className="text-2xl font-bold text-[#FFD700]">{metricsData.ordersToday}</p>
                 <p className="text-sm text-gray-300">Orders Today</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-[#FFD700]">{formatCurrency(realTimeMetrics.revenueToday)}</p>
+                <p className="text-2xl font-bold text-[#FFD700]">{formatCurrency(metricsData.revenueToday)}</p>
                 <p className="text-sm text-gray-300">Revenue Today</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-[#FFD700]">{realTimeMetrics.activeUsers}</p>
-                <p className="text-sm text-gray-300">Active Users</p>
+                <p className="text-2xl font-bold text-[#FFD700]">{metricsData.monthlyActive}</p>
+                <p className="text-sm text-gray-300">Monthly Active</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-[#FFD700]">{realTimeMetrics.pendingOrders}</p>
+                <p className="text-2xl font-bold text-[#FFD700]">{metricsData.pendingOrders}</p>
                 <p className="text-sm text-gray-300">Pending Orders</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-[#FFD700]">{metricsData.newUsersThisMonth}</p>
+                <p className="text-sm text-gray-300">New Users</p>
               </div>
             </div>
           </div>
@@ -277,14 +294,14 @@ export default function AdminDashboard({ data, refetch }: AdminDashboardProps & 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-8">
           <StatCard
             title="Total Orders"
-            value={data.stats.totalOrders.toLocaleString()}
+            value={(metricsData?.totalOrders || data.stats.totalOrders).toLocaleString()}
             icon={ShoppingCart}
             description="All time orders"
             trend="+12% from last month"
           />
           <StatCard
             title="Revenue"
-            value={formatCurrency(data.stats.totalRevenue)}
+            value={formatCurrency(metricsData?.totalRevenue || data.stats.totalRevenue)}
             icon={DollarSign}
             description="Total revenue"
             trend="+8% from last month"
@@ -297,35 +314,35 @@ export default function AdminDashboard({ data, refetch }: AdminDashboardProps & 
           />
           <StatCard
             title="Total Users"
-            value={data.stats.totalUsers.toLocaleString()}
+            value={(metricsData?.registeredUsers || data.stats.totalUsers).toLocaleString()}
             icon={Users}
             description="Registered users"
             trend={`+${data.stats.userGrowthRate.toFixed(1)}% growth`}
           />
           <StatCard
             title="Active Users"
-            value={data.stats.activeUsers.toLocaleString()}
+            value={(metricsData?.monthlyActive || data.stats.activeUsers).toLocaleString()}
             icon={Activity}
             description="Monthly active"
-            trend={`${((data.stats.activeUsers / data.stats.totalUsers) * 100).toFixed(1)}% of total`}
+            trend={`${(((metricsData?.monthlyActive || data.stats.activeUsers) / (metricsData?.registeredUsers || data.stats.totalUsers)) * 100).toFixed(1)}% of total`}
           />
           <StatCard
             title="New Users"
-            value={data.stats.newUsersThisMonth}
+            value={metricsData?.newUsersThisMonth || data.stats.newUsersThisMonth}
             icon={TrendingUp}
             description="This month"
             trend={`${data.stats.newUsersToday} today`}
           />
           <StatCard
             title="Avg Orders/User"
-            value={data.stats.averageOrdersPerUser.toFixed(1)}
+            value={(metricsData?.avgOrdersPerUser || data.stats.averageOrdersPerUser).toFixed(1)}
             icon={BarChart3}
             description="Per user"
             trend={`${(data.stats.retentionRate * 100).toFixed(1)}% retention`}
           />
           <StatCard
             title="Avg Order Value"
-            value={formatCurrency(data.stats.averageOrderValue)}
+            value={formatCurrency(metricsData?.avgOrderValue || data.stats.averageOrderValue)}
             icon={DollarSign}
             description="Per order"
             trend="+5% from last month"
