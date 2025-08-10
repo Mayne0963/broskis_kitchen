@@ -177,7 +177,7 @@ export default function UserManagement({ className }: UserManagementProps) {
   }
 
   return (
-    <Card className={`${className} bg-gradient-to-br from-black to-gray-900 border-[#B7985A]/30`}>
+    <Card className={`${className} bg-gradient-to-br from-black to-gray-900 border-[#B7985A]/30 text-white`}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-white">
           <Shield className="h-5 w-5 text-[#FFD700]" />

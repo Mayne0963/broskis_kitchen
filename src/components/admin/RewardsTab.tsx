@@ -227,7 +227,7 @@ export default function RewardsTab({ rewardsData }: RewardsTabProps) {
   }
 
   return (
-    <div className="space-y-6 bg-gradient-to-br from-black to-gray-900 min-h-screen p-6">
+    <div className="space-y-6 bg-gradient-to-br from-black to-gray-900 min-h-screen p-6 text-white">
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div>

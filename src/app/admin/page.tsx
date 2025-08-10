@@ -1,5 +1,8 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -120,8 +123,8 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <main className="min-h-screen bg-[#0B0B0B] text-white">
       <AdminDashboard data={adminData} refetch={refetch} />
-    </div>
+    </main>
   )
 }

@@ -189,7 +189,7 @@ export default function AdminDashboard({ data, refetch }: AdminDashboardProps & 
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white">
       {/* Modern Header with Broskis Gold Gradient Background */}
       <div className="bg-gradient-to-r from-black via-gray-900 to-black border-b border-[#B7985A]/20">
         <div className="px-6 py-8">
