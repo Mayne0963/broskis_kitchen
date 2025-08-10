@@ -5,6 +5,8 @@ export const config = {
   matcher: [
     // Match all API routes
     '/api/:path*',
+    // Match admin routes
+    '/admin/:path*',
     // Match all pages except static files, images, and PWA assets
     '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.json|icons/|images/|fonts/|assets/|.*\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
@@ -32,6 +34,14 @@ export function middleware(request: NextRequest) {
   const userAgent = request.headers.get('user-agent') || 'unknown'
   const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown'
   const referer = request.headers.get('referer') || 'direct'
+  
+  // Admin route protection
+  if (pathname.startsWith('/admin')) {
+    const isAdmin = request.cookies.get('isAdmin')?.value === 'true'
+    if (!isAdmin) {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+  }
   
   // Log API requests
   if (pathname.startsWith('/api/')) {
