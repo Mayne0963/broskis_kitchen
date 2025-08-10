@@ -389,7 +389,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         updatedAt: Timestamp.now(),
       }, { merge: true });
   
-      // Create session cookie with retry logic
+      // Create session cookie with exponential backoff retry logic
       let sessionCreated = false;
       let retryCount = 0;
       const maxRetries = 3;
@@ -421,8 +421,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             throw sessionError;
           }
           
-          // Wait before retrying
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          // Exponential backoff: 1s → 2s → 4s (max 30s)
+          const backoffDelay = Math.min(1000 * Math.pow(2, retryCount - 1), 30000);
+          await new Promise(resolve => setTimeout(resolve, backoffDelay));
         }
       }
   
@@ -508,68 +509,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
-  const refreshUserToken = async (): Promise<boolean> => {
-    if (!auth?.currentUser) {
-      console.log('No current user to refresh token for')
-      return false
-    }
-    try {
-      // Force refresh the ID token to get latest custom claims
-      const idTokenResult = await auth.currentUser.getIdTokenResult(true)
-      const customClaims = idTokenResult.claims
-      
-      // Update user role based on refreshed claims
-      if (user) {
-        let userRole = 'user'
-        if (customClaims.admin === true) {
-          userRole = 'admin'
-        } else if (customClaims.role) {
-          userRole = customClaims.role
-        }
-        
-        const updatedUser = {
-          ...user,
-          role: userRole
-        }
-        
-        console.log('Token refreshed, updated role:', userRole, 'Custom claims:', customClaims)
-        setUser(updatedUser)
-        
-        toast({
-          title: "Permissions Updated",
-          description: "Your account permissions have been refreshed.",
-        })
-        return true
-      }
-      return false
-    } catch (error) {
-      console.error('Error refreshing user token:', error)
-      toast({
-        title: "Refresh Failed",
-        description: "Failed to refresh account permissions.",
-        variant: "destructive",
-      })
-      return false
-    }
-  }
+
 
   const isAdmin = user?.role === 'admin'
   
-  // Debug logging for admin status
-  useEffect(() => {
-    if (user) {
-      console.log('AuthContext Debug:', {
-        user: {
-          id: user.id,
-          email: user.email,
-          role: user.role,
-          emailVerified: user.emailVerified
-        },
-        isAdmin,
-        isAuthenticated
-      })
-    }
-  }, [user, isAdmin, isAuthenticated])
+
 
   const value = {
     user,
@@ -585,7 +529,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signInWithGoogle,
     resendEmailVerification,
     sendVerificationEmail: resendEmailVerification,
-    refreshUserToken,
   }
 
   return (

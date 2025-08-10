@@ -2,45 +2,40 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import AdminDashboard from '@/components/admin/AdminDashboard'
 import { useAuth } from '@/lib/context/AuthContext'
+import { useAuthClaims } from '@/hooks/useAuthClaims'
 import { useAdminData } from '@/hooks/useAdminData'
 import { Loader2 } from 'lucide-react'
 
 export default function AdminPage() {
-  const { user, loading, isAdmin, refreshUserToken } = useAuth()
+  const { user, loading } = useAuth()
+  const { claims, loading: claimsLoading } = useAuthClaims()
   const router = useRouter()
   const { data: adminData, loading: dataLoading, error: dataError, refetch } = useAdminData()
-  const [tokenRefreshed, setTokenRefreshed] = useState(false)
+
+  const isAdmin = claims?.isAdmin === true
+  const totalLoading = loading || claimsLoading
 
   useEffect(() => {
-    if (!loading && user && !tokenRefreshed) {
-      // Force token refresh to get latest claims
-      refreshUserToken().then(() => {
-        setTokenRefreshed(true)
-      })
-    }
-  }, [user, loading, refreshUserToken, tokenRefreshed])
-
-  useEffect(() => {
-    if (!loading && tokenRefreshed) {
+    if (!totalLoading) {
       if (!user) {
         router.push('/auth/login?redirect=/admin')
         return
       }
       
       if (!isAdmin) {
-        console.log('User is not admin:', { user, isAdmin })
+        console.log('User is not admin:', { user, claims, isAdmin })
         router.push('/unauthorized')
         return
       }
     }
-  }, [user, loading, isAdmin, router, tokenRefreshed])
+  }, [user, totalLoading, isAdmin, router, claims])
 
-  if (loading || dataLoading) {
+  if (totalLoading || dataLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center">
         <div className="text-center">
