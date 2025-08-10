@@ -1,0 +1,309 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Admin access - full control for admin role
+    match /admin/{document=**} {
+      allow read, write: if request.auth.token.role == 'admin';
+    }
+    
+    // Orders - admin can access all orders
+    match /orders/{document=**} {
+      allow read, write: if request.auth.token.role == 'admin';
+    }
+    
+    // Public data - readable by everyone
+    match /public/{document=**} {
+      allow read: if true;
+    }
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isSignedIn() {
+      return request.auth != null && request.auth.uid != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+    
+    function hasAdminRole() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    function emailVerified() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      allow read: if isOwner(userId) || hasAdminRole() || true; // Allow public read for admin dashboard
+      allow create: if isAuthenticated() && 
+                       isOwner(userId) && 
+                       validateUserData(resource.data) &&
+                       emailVerified();
+      allow update: if isOwner(userId) && 
+                       validateUserData(resource.data) &&
+                       notTooFrequent();
+      allow delete: if isOwner(userId) || hasAdminRole();
+    }
+    
+    // User addresses subcollection
+    match /users/{userId}/addresses/{addressId} {
+      allow read, write: if isOwner(userId) && validateAddressData(resource.data);
+      allow create: if isOwner(userId) && 
+                       validateAddressData(resource.data) &&
+                       notTooFrequent();
+    }
+    
+    // User payment methods subcollection
+    match /users/{userId}/paymentMethods/{paymentId} {
+      allow read, write: if isOwner(userId) && validatePaymentMethodData(resource.data);
+      allow create: if isOwner(userId) && 
+                       validatePaymentMethodData(resource.data) &&
+                       notTooFrequent();
+    }
+    
+    // Orders collection
+    match /orders/{orderId} {
+      allow read: if isOwner(resource.data.userId) || hasAdminRole() || true; // Allow public read for admin dashboard
+      allow create: if isAuthenticated() && 
+                       isOwner(resource.data.userId) && 
+                       validateOrderData(resource.data) &&
+                       notTooFrequent();
+      allow update: if (isOwner(resource.data.userId) || hasAdminRole()) && 
+                       validateOrderUpdateData(resource.data);
+      allow delete: if hasAdminRole();
+    }
+    
+    // Payments collection
+    match /payments/{paymentId} {
+      allow read: if hasAdminRole() || isOwner(resource.data.userId);
+      allow create: if isAuthenticated() && isOwner(resource.data.userId);
+      allow update: if hasAdminRole();
+      allow delete: if hasAdminRole();
+    }
+    
+    // Products collection
+    match /products/{productId} {
+      allow read: if true; // Public read access
+      allow write: if hasAdminRole() && validateProductData(resource.data);
+    }
+    
+    // Categories collection
+    match /categories/{categoryId} {
+      allow read: if true; // Public read access
+      allow write: if hasAdminRole() && validateCategoryData(resource.data);
+    }
+    
+    // Menu items collection
+    match /menuItems/{itemId} {
+      allow read: if true; // Public read access
+      allow write: if hasAdminRole() && validateMenuItemData(resource.data);
+    }
+    
+    // Loyalty collection
+    match /loyalty/{userId} {
+      allow read: if isOwner(userId) || hasAdminRole();
+      allow create: if isAuthenticated() && 
+                       isOwner(userId) && 
+                       validateLoyaltyData(resource.data);
+      allow update: if (isOwner(userId) || hasAdminRole()) && 
+                       validateLoyaltyData(resource.data);
+    }
+    
+    // Rewards collection
+    match /rewards/{rewardId} {
+      allow read: if isAuthenticated();
+      allow write: if hasAdminRole() && validateRewardData(resource.data);
+    }
+    
+    // Events collection
+    match /events/{eventId} {
+      allow read: if true; // Public read access
+      allow write: if hasAdminRole() && validateEventData(resource.data);
+    }
+    
+    // Bookings collection
+    match /bookings/{bookingId} {
+      allow read: if isOwner(resource.data.userId) || hasAdminRole();
+      allow create: if isAuthenticated() && 
+                       isOwner(resource.data.userId) && 
+                       validateBookingData(resource.data) &&
+                       notTooFrequent();
+      allow update: if (isOwner(resource.data.userId) || hasAdminRole()) && 
+                       validateBookingData(resource.data);
+      allow delete: if hasAdminRole();
+    }
+    
+    // Menu Drops collection
+    match /menuDrops/{dropId} {
+      allow read: if true; // Public read access
+      allow write: if hasAdminRole();
+    }
+    
+    // User Rewards collection
+    match /userRewards/{userId} {
+      allow read: if isOwner(userId) || hasAdminRole() || true; // Allow public read for admin dashboard
+      allow write: if isOwner(userId) || hasAdminRole();
+    }
+    
+    // User Redemptions collection
+    match /userRedemptions/{redemptionId} {
+      allow read: if true; // Allow public read for admin dashboard
+      allow write: if hasAdminRole();
+    }
+    
+    // Points Transactions collection
+    match /pointsTransactions/{transactionId} {
+      allow read: if true; // Allow public read for admin dashboard
+      allow write: if hasAdminRole();
+    }
+    
+    // Reward Offers collection
+    match /rewardOffers/{offerId} {
+      allow read: if true; // Allow public read for admin dashboard
+      allow write: if hasAdminRole();
+    }
+    
+    // Test collection for connection testing
+    match /test/{document=**} {
+      allow read, write: if true;
+    }
+    
+    // Validation functions
+    function validateOrderData(data) {
+      return data.keys().hasAll(['userId', 'items', 'total', 'status', 'createdAt']) &&
+             data.userId is string &&
+             data.items is list &&
+             data.items.size() > 0 &&
+             data.items.size() <= 50 &&
+             data.total is number &&
+             data.total > 0 &&
+             data.total <= 10000 &&
+             data.status in ['pending', 'confirmed', 'preparing', 'ready', 'delivered', 'cancelled', 'out_for_delivery', 'ready_for_pickup', 'completed'] &&
+             data.createdAt is timestamp;
+    }
+    
+    function validateOrderUpdateData(data) {
+      return data.keys().hasAny(['status', 'updatedAt']) &&
+             (!data.keys().hasAny(['status']) || data.status in ['pending', 'confirmed', 'preparing', 'ready', 'delivered', 'cancelled', 'out_for_delivery', 'ready_for_pickup', 'completed']) &&
+             (!data.keys().hasAny(['updatedAt']) || data.updatedAt is timestamp);
+    }
+    
+    function validateAddressData(data) {
+      return data.keys().hasAll(['street', 'city', 'state', 'zipCode']) &&
+             data.street is string &&
+             data.street.size() > 0 &&
+             data.street.size() <= 200 &&
+             data.city is string &&
+             data.city.size() > 0 &&
+             data.city.size() <= 100 &&
+             data.state is string &&
+             data.state.size() == 2 &&
+             data.zipCode is string &&
+             data.zipCode.matches('^[0-9]{5}(-[0-9]{4})?$');
+    }
+    
+    function validatePaymentMethodData(data) {
+      return data.keys().hasAll(['type', 'last4']) &&
+             data.type in ['card', 'bank'] &&
+             data.last4 is string &&
+             data.last4.size() == 4 &&
+             data.last4.matches('^[0-9]{4}$');
+    }
+    
+    function validateBookingData(data) {
+      return data.keys().hasAll(['eventId', 'userId', 'partySize', 'date', 'time']) &&
+             data.eventId is string &&
+             data.userId is string &&
+             data.partySize is int &&
+             data.partySize > 0 &&
+             data.partySize <= 20 &&
+             data.date is timestamp &&
+             data.time is string &&
+             data.time.matches('^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$');
+    }
+    
+    function validateUserData(data) {
+      return data.keys().hasAll(['email', 'name']) &&
+             data.email is string &&
+             data.email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$') &&
+             data.name is string &&
+             data.name.size() > 0 &&
+             data.name.size() <= 100;
+    }
+    
+    function validateProductData(data) {
+      return data.keys().hasAll(['name', 'price', 'category']) &&
+             data.name is string &&
+             data.name.size() > 0 &&
+             data.name.size() <= 200 &&
+             data.price is number &&
+             data.price > 0 &&
+             data.price <= 1000 &&
+             data.category is string;
+    }
+    
+    function validateCategoryData(data) {
+      return data.keys().hasAll(['name', 'slug']) &&
+             data.name is string &&
+             data.name.size() > 0 &&
+             data.name.size() <= 100 &&
+             data.slug is string &&
+             data.slug.matches('^[a-z0-9-]+$');
+    }
+    
+    function validateMenuItemData(data) {
+      return data.keys().hasAll(['name', 'description', 'price', 'category']) &&
+             data.name is string &&
+             data.name.size() > 0 &&
+             data.name.size() <= 200 &&
+             data.description is string &&
+             data.description.size() <= 1000 &&
+             data.price is number &&
+             data.price > 0 &&
+             data.price <= 1000 &&
+             data.category is string;
+    }
+    
+    function validateLoyaltyData(data) {
+      return data.keys().hasAll(['points', 'tier']) &&
+             data.points is int &&
+             data.points >= 0 &&
+             data.points <= 100000 &&
+             data.tier in ['bronze', 'silver', 'gold', 'platinum'];
+    }
+    
+    function validateRewardData(data) {
+      return data.keys().hasAll(['name', 'pointsCost', 'description']) &&
+             data.name is string &&
+             data.name.size() > 0 &&
+             data.name.size() <= 200 &&
+             data.pointsCost is int &&
+             data.pointsCost > 0 &&
+             data.pointsCost <= 10000 &&
+             data.description is string &&
+             data.description.size() <= 1000;
+    }
+    
+    function validateEventData(data) {
+      return data.keys().hasAll(['name', 'date', 'maxAttendees']) &&
+             data.name is string &&
+             data.name.size() > 0 &&
+             data.name.size() <= 200 &&
+             data.date is timestamp &&
+             data.maxAttendees is int &&
+             data.maxAttendees > 0 &&
+             data.maxAttendees <= 500;
+    }
+    
+    // Rate limiting function (basic implementation)
+    function notTooFrequent() {
+      return true; // Implement rate limiting logic based on your needs
+    }
+  }
+}

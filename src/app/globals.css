@@ -1,0 +1,1262 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import optimization styles */
+@import '../styles/image-optimization.css';
+@import '../styles/mobile-enhancements.css';
+
+:root {
+  /* Layout Variables */
+  --navbar-height: 5rem;
+  
+  /* Hero Section Matching Color Palette */
+  --color-true-black: #000000;
+  --color-deep-black: #000000;
+  --color-rich-black: #000000;
+  --color-gold-light: #FFD700;
+  --color-gold-rich: #FFD700;
+  --color-harvest-gold: #FFD700;
+  --color-burgundy: #B22222;
+
+  /* Text Colors */
+  --color-off-white: #FFFFFF;
+  --color-warm-gray: #FFD700;
+  --color-text-primary: var(--color-off-white);
+  --color-text-secondary: var(--color-warm-gray);
+  --color-text-gold: var(--color-gold-rich);
+
+  /* Functional Colors */
+  --color-background: var(--color-true-black);
+  --color-surface: var(--color-true-black);
+  --color-border: var(--color-gold-rich);
+  --color-accent: var(--color-gold-light);
+  --color-hover: var(--color-gold-light);
+
+  /* Legacy variables for compatibility */
+  --foreground-rgb: 240, 237, 232;
+  --background-start-rgb: 0, 0, 0;
+  --background-end-rgb: 10, 10, 10;
+  --primary: var(--color-gold-rich);
+  --secondary: var(--color-gold-light);
+  --surface: var(--color-deep-black);
+  --background: var(--color-true-black);
+  --text: var(--color-off-white);
+}
+
+body {
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-family: 'Montserrat', 'Segoe UI', sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* Layout Styles */
+nav {
+  height: var(--navbar-height);
+}
+
+main {
+  padding-top: var(--navbar-height);
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes heartbeat {
+  0%,100% { transform: scale(1); }
+  25%,75% { transform: scale(1.1); }
+}
+
+@keyframes drip {
+  0% {
+    transform: translateY(0) scaleY(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(10px) scaleY(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(20px) scaleY(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes neonFlicker {
+  0%, 100% {
+    text-shadow: 0 0 5px #A31C1C, 0 0 10px #A31C1C, 0 0 15px #A31C1C;
+  }
+  50% {
+    text-shadow: 0 0 10px #A31C1C, 0 0 20px #A31C1C, 0 0 30px #A31C1C, 0 0 40px #A31C1C;
+  }
+}
+
+@keyframes steamRise {
+  0% {
+    opacity: 0.8;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30px) scale(1.5);
+  }
+}
+
+@keyframes ctaGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(163, 28, 28, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(163, 28, 28, 0.8), 0 0 40px rgba(163, 28, 28, 0.6);
+  }
+}
+
+@keyframes stickyNav {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s forwards;
+  opacity: 0;
+}
+
+.animate-pop-in {
+  animation: popIn 0.6s ease-out forwards;
+}
+
+.animate-heartbeat {
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+.animate-drip {
+  animation: drip 2s ease-in-out infinite;
+}
+
+.animate-delay-100 {
+  animation-delay: 0.1s;
+}
+
+.animate-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animate-delay-300 {
+  animation-delay: 0.3s;
+}
+
+.animate-delay-400 {
+    animation-delay: 0.4s;
+  }
+
+  .neon-flicker {
+    animation: neonFlicker 2s ease-in-out infinite;
+  }
+
+  .cta-glow {
+    animation: ctaGlow 3s ease-in-out infinite;
+  }
+
+  .sticky-nav {
+    animation: stickyNav 0.3s ease-out;
+  }
+
+  /* Steam Effect Styles */
+  .steam-effect {
+    pointer-events: none;
+  }
+
+  .steam-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    animation: steamRise 2s ease-out infinite;
+  }
+
+  .steam-1 {
+    left: -2px;
+    animation-delay: 0s;
+  }
+
+  .steam-2 {
+    left: 2px;
+    animation-delay: 0.7s;
+  }
+
+  .steam-3 {
+    left: 6px;
+    animation-delay: 1.4s;
+  }
+
+  /* Wing Container Styles */
+  .wing-container {
+    transition: all 0.3s ease;
+  }
+
+  .wing-container:hover {
+    filter: brightness(1.2) saturate(1.3);
+  }
+
+  /* Responsive font sizing with clamp */
+  .hero-title-1 {
+    font-size: clamp(1.25rem, 3.5vw, 2.5rem);
+    line-height: 1.2;
+  }
+
+  .hero-title-2 {
+    font-size: clamp(2rem, 7vw, 4.5rem);
+    line-height: 1.1;
+  }
+
+  .hero-title-3 {
+    font-size: clamp(1.25rem, 3.5vw, 2.5rem);
+    line-height: 1.2;
+  }
+
+  /* Mobile-first responsive design */
+  @media (max-width: 768px) {
+    .wing-container {
+      width: 80px;
+      height: 60px;
+    }
+    
+    .steam-particle {
+      width: 2px;
+      height: 2px;
+    }
+  }
+
+@layer components {
+  /* Button Styles - Regal Gold Gradient */
+  .btn-primary {
+    background: linear-gradient(135deg, #D2BA6A 0%, #E6C875 100%);
+    @apply text-black;
+    @apply font-bold;
+    @apply py-4;
+    @apply px-10;
+    border-radius: 8px;
+    @apply transition-all;
+    @apply duration-300;
+    border: 2px solid #B7985A;
+    /* Balanced shadows for clean contrast */
+    box-shadow: 
+      0 4px 15px rgba(183, 152, 90, 0.4),
+      0 2px 6px rgba(0, 0, 0, 0.2),
+      0 0 0 1px rgba(183, 152, 90, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    /* Subtle text shadow for definition */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #E6C875 0%, #F0D285 100%);
+    transform: translateY(-3px);
+    border-color: #D2BA6A;
+    box-shadow: 
+      0 8px 35px rgba(183, 152, 90, 0.7),
+      0 4px 15px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(183, 152, 90, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+
+  .btn-secondary {
+    @apply bg-[#0A0A0A];
+    background: linear-gradient(135deg, #B7985A 0%, #D2BA6A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    @apply font-semibold;
+    @apply py-3;
+    @apply px-8;
+    border-radius: 6px;
+    @apply border-2;
+    border-color: #B7985A;
+    @apply hover:shadow-lg;
+    @apply transition-all;
+    @apply duration-300;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-secondary:hover {
+    border-color: #D2BA6A;
+    box-shadow: 0 0 15px rgba(183, 152, 90, 0.3);
+  }
+
+  .btn-outline {
+    @apply border-2;
+    border-color: #D2BA6A;
+    color: #E6C875;
+    @apply font-bold;
+    @apply py-4;
+    @apply px-10;
+    border-radius: 8px;
+    @apply transition-all;
+    @apply duration-300;
+    position: relative;
+    overflow: hidden;
+    /* Semi-transparent background for balanced contrast */
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    box-shadow: 
+      0 3px 12px rgba(0, 0, 0, 0.3),
+      0 1px 4px rgba(0, 0, 0, 0.2),
+      0 0 0 1px rgba(183, 152, 90, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    /* Soft text shadow for clean readability */
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  }
+
+  .btn-outline:hover {
+    background: rgba(183, 152, 90, 0.2);
+    border-color: #E6C875;
+    color: #F0D285;
+    box-shadow: 
+      0 6px 30px rgba(183, 152, 90, 0.4),
+      0 3px 12px rgba(0, 0, 0, 0.4),
+      0 0 0 1px rgba(183, 152, 90, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+  }
+
+  /* Card Styles - Regal Gold Gradient */
+  .card {
+    @apply bg-[#0A0A0A];
+    border-radius: 8px;
+    @apply border;
+    border-color: #B7985A;
+    @apply p-6;
+    @apply shadow-lg;
+    @apply transition-all;
+    @apply duration-300;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(183, 152, 90, 0.2);
+  }
+
+  .card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(183, 152, 90, 0.3);
+    border-color: #D2BA6A;
+  }
+
+  /* Feature Card Styles - Regal Gold Gradient */
+  .feature-card {
+    @apply card;
+    @apply flex;
+    @apply flex-col;
+    @apply items-center;
+    @apply text-center;
+    @apply p-8;
+    @apply transition-all;
+    @apply duration-300;
+    @apply bg-[#000000];
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(183, 152, 90, 0.05) 0%, rgba(210, 186, 106, 0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .feature-card:hover::before {
+    opacity: 1;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-4px);
+    border-color: #D2BA6A;
+  }
+
+  /* Menu Card Styles - Regal Gold Gradient */
+  .menu-card {
+    @apply bg-[#0A0A0A];
+    border-radius: 8px;
+    @apply overflow-hidden;
+    @apply shadow-lg;
+    @apply border;
+    border-color: #B7985A;
+    @apply transition-all;
+    @apply duration-300;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(183, 152, 90, 0.2);
+  }
+
+  .menu-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(183, 152, 90, 0.3);
+    border-color: #D2BA6A;
+  }
+
+  /* Form Styles - Regal Gold Gradient */
+  .input {
+    @apply bg-[#0A0A0A];
+    @apply border;
+    border-color: #B7985A;
+    border-radius: 6px;
+    @apply px-4;
+    @apply py-3;
+    color: #F0EDE8;
+    @apply focus:outline-none;
+    @apply transition-all;
+    @apply duration-300;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .input:focus {
+    border-color: #D2BA6A;
+    box-shadow: 0 0 0 3px rgba(183, 152, 90, 0.1), 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Typography - Elegant Serif Headings */
+  .heading-xl {
+    @apply text-4xl;
+    @apply md:text-5xl;
+    @apply lg:text-6xl;
+    @apply font-bold;
+    font-family: 'Playfair Display', serif;
+    background: linear-gradient(135deg, #B7985A 0%, #D2BA6A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    @apply leading-tight;
+    letter-spacing: -0.02em;
+  }
+
+  .heading-lg {
+    @apply text-3xl;
+    @apply md:text-4xl;
+    @apply font-bold;
+    font-family: 'Playfair Display', serif;
+    background: linear-gradient(135deg, #B7985A 0%, #D2BA6A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    @apply leading-tight;
+    letter-spacing: -0.01em;
+  }
+
+  .heading-md {
+    @apply text-2xl;
+    @apply md:text-3xl;
+    @apply font-semibold;
+    font-family: 'Playfair Display', serif;
+    background: linear-gradient(135deg, #B7985A 0%, #D2BA6A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    @apply leading-tight;
+  }
+
+  .heading-sm {
+    @apply text-xl;
+    @apply md:text-2xl;
+    @apply font-semibold;
+    font-family: 'Playfair Display', serif;
+    background: linear-gradient(135deg, #B7985A 0%, #D2BA6A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    @apply leading-tight;
+  }
+
+  /* Color Utility Classes - Regal Gold Gradient Palette */
+  .text-gold {
+    color: #B7985A;
+  }
+
+  .text-gold-foil {
+    background: linear-gradient(135deg, #B7985A 0%, #D2BA6A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-harvest-gold {
+    color: #D2BA6A;
+  }
+
+  .text-soft-white {
+    color: #F8F5F0;
+    /* Soft outer glow for clean text separation */
+    text-shadow: 
+      0 0 8px rgba(0, 0, 0, 0.8),
+      0 2px 4px rgba(0, 0, 0, 0.6),
+      0 0 16px rgba(0, 0, 0, 0.4);
+    /* Thin text stroke for definition */
+    -webkit-text-stroke: 1px rgba(0, 0, 0, 0.7);
+    font-weight: 700;
+  }
+
+  .text-soft-gray {
+    color: #D0C7B4;
+    /* Soft outer glow for clean text separation */
+    text-shadow: 
+      0 0 6px rgba(0, 0, 0, 0.7),
+      0 1px 3px rgba(0, 0, 0, 0.5),
+      0 0 12px rgba(0, 0, 0, 0.3);
+    /* Thin text stroke for definition */
+    -webkit-text-stroke: 0.8px rgba(0, 0, 0, 0.6);
+    font-weight: 600;
+  }
+
+  .text-burgundy {
+    color: #7A1B1B;
+  }
+
+  .bg-gold {
+    background-color: #B7985A;
+  }
+
+  .bg-gold-foil {
+    background: linear-gradient(135deg, #B7985A 0%, #D2BA6A 100%);
+  }
+
+  .bg-harvest-gold {
+    background-color: #D2BA6A;
+  }
+
+  .bg-deep-black {
+    background-color: #0A0A0A;
+  }
+
+  .bg-true-black {
+    background-color: #000000;
+  }
+
+  .bg-burgundy {
+    background-color: #7A1B1B;
+  }
+
+  /* Special Text Effects - Regal Gold Gradient */
+  .graffiti-text {
+    @apply font-bold;
+    font-family: 'Playfair Display', serif;
+    background: linear-gradient(135deg, #B7985A 0%, #D2BA6A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+  }
+
+  .gritty-shadow {
+    /* Soft outer glow with subtle gold accent */
+    text-shadow: 
+      0 0 10px rgba(0, 0, 0, 0.8),
+      0 2px 4px rgba(0, 0, 0, 0.6),
+      0 0 20px rgba(0, 0, 0, 0.4),
+      0 0 30px rgba(183, 152, 90, 0.2);
+    /* Thin text stroke for clean definition */
+    -webkit-text-stroke: 1.2px rgba(0, 0, 0, 0.6);
+  }
+
+  .elegant-glow {
+    text-shadow: 0 0 10px rgba(183, 152, 90, 0.5), 0 0 20px rgba(183, 152, 90, 0.3);
+  }
+
+  /* Navigation Styles - Regal Gold Gradient */
+  .nav-link {
+    @apply relative;
+    @apply px-4;
+    @apply py-2;
+    color: #BFB8A5;
+    @apply transition-all;
+    @apply duration-300;
+    @apply font-medium;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .nav-link:hover {
+    color: #D2BA6A;
+  }
+
+  .nav-link::after {
+    content: "";
+    @apply absolute;
+    @apply bottom-0;
+    @apply left-0;
+    @apply w-0;
+    @apply h-0.5;
+    background: linear-gradient(90deg, #B7985A 0%, #D2BA6A 100%);
+    @apply transition-all;
+    @apply duration-300;
+  }
+
+  .nav-link:hover::after {
+    @apply w-full;
+  }
+
+  .nav-link-active {
+    color: #B7985A;
+    @apply font-semibold;
+  }
+
+  .nav-link-active::after {
+    content: "";
+    @apply absolute;
+    @apply bottom-0;
+    @apply left-0;
+    @apply w-full;
+    @apply h-0.5;
+    background: linear-gradient(90deg, #B7985A 0%, #D2BA6A 100%);
+  }
+
+  /* Mobile Menu Styles */
+  .mobile-menu {
+    @apply max-h-0;
+    @apply overflow-hidden;
+    @apply transition-all;
+    @apply duration-300;
+    @apply ease-in-out;
+  }
+
+  .mobile-menu.open {
+    @apply max-h-[500px];
+  }
+
+  /* Cart Styles */
+  .cart-dropdown {
+    @apply transform-gpu;
+    @apply origin-top-right;
+    @apply transition-all;
+    @apply duration-200;
+    @apply ease-in-out;
+  }
+
+  .cart-item {
+    @apply transition-colors;
+    @apply duration-200;
+  }
+
+  .cart-item:hover {
+    @apply bg-opacity-5;
+    @apply bg-white;
+  }
+
+  /* Button Animation */
+  .btn {
+    @apply relative;
+    @apply overflow-hidden;
+    @apply transition-all;
+    @apply duration-300;
+  }
+
+  .btn::after {
+    content: "";
+    @apply absolute;
+    @apply inset-0;
+    @apply w-full;
+    @apply h-full;
+    @apply bg-gradient-to-r;
+    @apply from-transparent;
+    @apply via-white;
+    @apply to-transparent;
+    @apply opacity-0;
+    @apply transition-opacity;
+    @apply duration-500;
+  }
+
+  .btn:hover::after {
+    @apply opacity-20;
+    animation: shimmer 1.5s infinite;
+  }
+
+  /* Hero Section Styles - Ultimate Readability Enhancement */
+  .hero-section {
+    @apply relative;
+    @apply h-[85vh];
+    @apply flex;
+    @apply items-center;
+    @apply justify-center;
+    @apply overflow-hidden;
+    background-color: #000000;
+    background: radial-gradient(ellipse at center, rgba(183, 152, 90, 0.05) 0%, rgba(0, 0, 0, 1) 60%);
+    @apply pt-24;
+  }
+
+  .hero-content {
+    @apply relative;
+    @apply z-50;
+    @apply text-center;
+    @apply px-8;
+    @apply py-16;
+    @apply max-w-4xl;
+    @apply mx-auto;
+    /* Semi-transparent blur overlay for text readability while preserving logo visibility */
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 20px;
+    backdrop-filter: blur(8px) saturate(1.2);
+    border: 1px solid rgba(183, 152, 90, 0.15);
+    box-shadow: 
+      0 4px 20px rgba(0, 0, 0, 0.3),
+      0 0 0 1px rgba(183, 152, 90, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .hero-background {
+    @apply absolute;
+    @apply inset-0;
+    @apply z-0;
+    background-image: url("/images/Untitled design-4.png");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .hero-background::before {
+    content: '';
+    @apply absolute;
+    @apply inset-0;
+    /* Subtle vignette for gentle focus while preserving logo visibility */
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.3) 60%, rgba(0, 0, 0, 0.6) 100%);
+    @apply z-10;
+  }
+
+  .hero-logo {
+    @apply absolute;
+    @apply inset-0;
+    @apply flex;
+    @apply items-center;
+    @apply justify-center;
+    @apply z-20;
+    @apply opacity-25;
+    @apply mt-16;
+    filter: drop-shadow(0 0 20px rgba(183, 152, 90, 0.3));
+  }
+
+  .hero-logo svg {
+    @apply w-96;
+    @apply h-96;
+    @apply max-w-[50vw];
+    @apply max-h-[50vh];
+  }
+
+  /* Enhanced hero image styling */
+  .hero-image {
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 0 40px rgba(183, 152, 90, 0.5)) brightness(1.15) contrast(1.1);
+  }
+
+  /* New Hero Section Styles - Image Above, Content Below */
+  .hero-section-new {
+    @apply relative;
+    @apply w-full;
+    background-color: #000000;
+    background: radial-gradient(ellipse at center, rgba(183, 152, 90, 0.05) 0%, rgba(0, 0, 0, 1) 60%);
+    margin-top: 80px;
+  }
+
+  .hero-image-container {
+    @apply relative;
+    @apply w-full;
+    height: 60vh;
+    @apply min-h-[400px];
+    @apply max-h-[600px];
+    @apply flex;
+    @apply items-center;
+    @apply justify-center;
+    @apply overflow-hidden;
+    @apply pt-24;
+    background: radial-gradient(ellipse at center, rgba(183, 152, 90, 0.08) 0%, rgba(0, 0, 0, 0.95) 70%);
+  }
+
+  .hero-content-below {
+    @apply relative;
+    @apply w-full;
+    @apply py-16;
+    @apply text-center;
+    background-color: #000000;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 1) 100%);
+  }
+
+  .hero-content-below .container {
+    @apply max-w-4xl;
+  }
+
+  /* Button pulse animation for hero CTA */
+  .btn-pulse {
+    animation: pulse-glow 2s infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 4px 20px rgba(183, 152, 90, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    50% {
+      box-shadow: 0 4px 25px rgba(183, 152, 90, 0.6), 0 2px 12px rgba(0, 0, 0, 0.4), 0 0 30px rgba(183, 152, 90, 0.3);
+    }
+  }
+}
+
+/* Utility classes - Regal Gold Gradient */
+.text-shadow {
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 4px 16px rgba(183, 152, 90, 0.2);
+}
+
+.glass-effect {
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(183, 152, 90, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.badge {
+  @apply inline-block;
+  @apply px-3;
+  @apply py-1;
+  @apply text-xs;
+  @apply font-semibold;
+  @apply rounded-full;
+  @apply uppercase;
+  @apply tracking-wide;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.badge-new {
+  background: linear-gradient(135deg, #B7985A 0%, #D2BA6A 100%);
+  color: #000000;
+  box-shadow: 0 2px 8px rgba(183, 152, 90, 0.3);
+}
+
+.badge-popular {
+  background: linear-gradient(135deg, #7A1B1B 0%, #A52A2A 100%);
+  color: #F0EDE8;
+  box-shadow: 0 2px 8px rgba(122, 27, 27, 0.3);
+}
+
+/* Shimmer animation */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Infinite Scroll Wheel Styles */
+.infinite-scroll-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.infinite-scroll-track {
+  display: flex;
+  gap: 1.5rem;
+  animation: infiniteScroll 30s linear infinite;
+  width: calc(300px * 12 + 1.5rem * 11); /* 12 items with gaps */
+}
+
+.scroll-item {
+  flex: 0 0 300px;
+  min-width: 300px;
+}
+
+@keyframes infiniteScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-300px * 6 - 1.5rem * 5)); /* Move by 6 items */
+  }
+}
+
+/* Pause animation on hover */
+.infinite-scroll-container:hover .infinite-scroll-track {
+  animation-play-state: paused;
+}
+
+.specialty-card {
+  @apply bg-deep-black;
+  @apply p-6;
+  @apply rounded-lg;
+  @apply transition-all;
+  @apply duration-300;
+  @apply hover:transform;
+  @apply hover:scale-105;
+  border: 2px solid rgba(183, 152, 90, 0.3);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(183, 152, 90, 0.1);
+  background: linear-gradient(145deg, rgba(0, 0, 0, 0.95) 0%, rgba(20, 20, 20, 0.98) 100%);
+}
+
+.specialty-card:hover {
+  border-color: rgba(183, 152, 90, 0.6);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5), 0 6px 20px rgba(183, 152, 90, 0.2);
+}
+
+/* Slide-in animation from left */
+@keyframes slideInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.8s ease-out forwards;
+}
+
+.specialty-title {
+  @apply text-xl;
+  @apply font-bold;
+  @apply mb-2;
+  background: linear-gradient(135deg, #D2BA6A 0%, #B7985A 30%, #F4E4A6 60%, #B7985A 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gold-foil-shimmer 3s ease-in-out infinite;
+  text-shadow: 0 2px 4px rgba(183, 152, 90, 0.3);
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+@keyframes gold-foil-shimmer {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.specialty-btn {
+  @apply inline-block;
+  @apply px-4;
+  @apply py-2;
+  @apply text-sm;
+  @apply font-semibold;
+  @apply rounded-lg;
+  @apply transition-all;
+  @apply duration-300;
+  @apply text-center;
+  background: transparent;
+  color: #B7985A;
+  border: 2px solid #B7985A;
+  text-decoration: none;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.specialty-btn:hover {
+  background: linear-gradient(135deg, #B7985A 0%, #D2BA6A 100%);
+  color: #000000;
+  border-color: #D2BA6A;
+  box-shadow: 0 4px 15px rgba(183, 152, 90, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Pulse animation for hero CTA - Regal Gold Gradient */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(183, 152, 90, 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(183, 152, 90, 0);
+  }
+}
+
+.btn-pulse {
+  animation: pulse 2s infinite;
+}
+
+/* Gold shimmer effect for premium elements */
+@keyframes goldShimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.gold-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(183, 152, 90, 0.4), transparent);
+  background-size: 200% 100%;
+  animation: goldShimmer 2s infinite;
+}
+
+/* Additional gradient utilities */
+.bg-gradient-radial {
+  background: radial-gradient(ellipse at center, var(--tw-gradient-stops));
+}
+
+.bg-charcoal-black {
+  background-color: #000000;
+}
+
+/* Black and Gold Theme Utilities */
+.bg-black-gold {
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+}
+
+.text-gold {
+  color: #FFD700;
+}
+
+.text-black-gold {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.border-gold {
+  border-color: #FFD700;
+}
+
+.bg-gold {
+  background-color: #FFD700;
+}
+
+.bg-gold-gradient {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+}
+
+/* Enhanced hero image styling with floating animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.hero-image {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Broski's OTW Gold Button Styling */
+.broski-otw-gold-button {
+  background: linear-gradient(135deg, #BA8939, #FDCE66, #FFE076, #E0AD53, #FFEF88);
+  color: #000000;
+  font-weight: bold;
+  font-family: 'Montserrat', sans-serif;
+  text-transform: uppercase;
+  padding: 12px 30px;
+  border: 2px solid #C5A100;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.broski-otw-gold-button:hover {
+  background: linear-gradient(135deg, #C5A100, #A98600, #7F6000);
+  color: #FFF8DC;
+  transform: scale(1.05);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+  border-color: #C5A100;
+}
+
+/* Hero Section Button Styles - Applied Site-wide */
+.btn-primary, .btn-primary:link, .btn-primary:visited {
+  background: linear-gradient(135deg, #BA8939, #FDCE66, #FFE076, #E0AD53, #FFEF88);
+  color: #000000;
+  font-weight: bold;
+  font-family: 'Montserrat', sans-serif;
+  text-transform: uppercase;
+  padding: 12px 30px;
+  border: 2px solid #C5A100;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #C5A100, #A98600, #7F6000);
+  color: #FFF8DC;
+  transform: scale(1.05);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+  border-color: #C5A100;
+}
+
+.btn-secondary, .btn-secondary:link, .btn-secondary:visited {
+  background: #B22222;
+  color: #FFFFFF;
+  font-weight: bold;
+  font-family: 'Montserrat', sans-serif;
+  text-transform: uppercase;
+  padding: 12px 30px;
+  border: 2px solid #B22222;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: #8B1818;
+  color: #FFFFFF;
+  transform: scale(1.05);
+  box-shadow: 0 6px 14px rgba(178, 34, 34, 0.6);
+  border-color: #DC143C;
+}
+
+.btn-outline, .btn-outline:link, .btn-outline:visited {
+  background: transparent;
+  color: #FFD700;
+  font-weight: bold;
+  font-family: 'Montserrat', sans-serif;
+  text-transform: uppercase;
+  padding: 12px 30px;
+  border: 2px solid #FFD700;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.btn-outline:hover {
+  background: linear-gradient(135deg, #BA8939, #FDCE66, #FFE076, #E0AD53, #FFEF88);
+  color: #000000;
+  transform: scale(1.05);
+  box-shadow: 0 6px 14px rgba(255, 215, 0, 0.4);
+  border-color: #C5A100;
+}
+
+/* Button size variants */
+.btn-sm {
+  padding: 8px 20px;
+  font-size: 14px;
+}
+
+.btn-lg {
+  padding: 16px 40px;
+  font-size: 18px;
+}
+
+/* Disabled button state */
+.btn-primary:disabled, .btn-secondary:disabled, .btn-outline:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary:disabled:hover, .btn-secondary:disabled:hover, .btn-outline:disabled:hover {
+  transform: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Optional flame shimmer effect on hover */
+.broski-otw-gold-button:hover::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
+  animation: flameShimmer 1.5s ease-in-out;
+}
+
+@keyframes flameShimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Mobile adjustments for OTW button */
+@media (max-width: 480px) {
+  .broski-otw-gold-button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .hero-image-container {
+    height: 50vh;
+    min-height: 300px;
+  }
+  
+  .heading-xl {
+    font-size: 2.5rem;
+  }
+  
+  .hero-content-below {
+    padding: 2rem 0;
+  }
+}
