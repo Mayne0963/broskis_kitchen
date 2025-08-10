@@ -74,6 +74,11 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
   
+  // Skip Firestore requests to avoid CORS/service worker conflicts
+  if (url.hostname.endsWith('firestore.googleapis.com')) {
+    return;
+  }
+  
   // Skip non-GET requests
   if (request.method !== 'GET') {
     return;
