@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth, db } from '@/lib/firebaseAdmin';
+import { auth, adb } from '@/lib/firebaseAdmin';
 
 interface ChatMessage {
   id?: string;
@@ -64,7 +64,7 @@ export async function POST(
     }
 
     // Get delivery to verify access
-    const deliveryDoc = await db.collection('deliveries').doc(deliveryId).get();
+    const deliveryDoc = await adb.collection('deliveries').doc(deliveryId).get();
     if (!deliveryDoc.exists) {
       return NextResponse.json(
         { error: 'Delivery not found' },
@@ -126,11 +126,11 @@ export async function POST(
     }
 
     // Save message to database
-    const messageRef = await db.collection('delivery_chat_messages').add(chatMessage);
+    const messageRef = await adb.collection('delivery_chat_messages').add(chatMessage);
     const messageId = messageRef.id;
 
     // Update delivery with last message info
-    await db.collection('deliveries').doc(deliveryId).update({
+    await adb.collection('deliveries').doc(deliveryId).update({
       lastChatMessage: {
         messageId,
         senderId,
@@ -207,7 +207,7 @@ export async function GET(
     }
 
     // Get delivery to verify access
-    const deliveryDoc = await db.collection('deliveries').doc(deliveryId).get();
+    const deliveryDoc = await adb.collection('deliveries').doc(deliveryId).get();
     if (!deliveryDoc.exists) {
       return NextResponse.json(
         { error: 'Delivery not found' },
@@ -230,7 +230,7 @@ export async function GET(
     }
 
     // Build query for messages
-    let query = db.collection('delivery_chat_messages')
+    let query = adb.collection('delivery_chat_messages')
       .where('deliveryId', '==', deliveryId)
       .orderBy('timestamp', 'desc')
       .limit(limit);
@@ -307,7 +307,7 @@ async function notifyParticipants(deliveryData: any, message: ChatMessage, messa
     // Send notifications to each participant
     for (const participant of participants) {
       // Create notification record
-      await db.collection('notifications').add({
+      await adb.collection('notifications').add({
         userId: participant.userId,
         type: 'chat_message',
         title: `New message from ${message.senderType}`,
@@ -333,7 +333,7 @@ async function notifyParticipants(deliveryData: any, message: ChatMessage, messa
 // Helper function to update chat statistics
 async function updateChatStats(deliveryId: string, senderType: string) {
   try {
-    const statsRef = db.collection('delivery_chat_stats').doc(deliveryId);
+    const statsRef = adb.collection('delivery_chat_stats').doc(deliveryId);
     const statsDoc = await statsRef.get();
     
     const currentStats = statsDoc.exists ? statsDoc.data() : {
@@ -362,12 +362,12 @@ async function updateChatStats(deliveryId: string, senderType: string) {
 // Helper function to mark messages as read
 async function markMessagesAsRead(deliveryId: string, userId: string, messageIds: string[]) {
   try {
-    const batch = db.batch();
+    const batch = adb.batch();
     
     for (const messageId of messageIds) {
-      const messageRef = db.collection('delivery_chat_messages').doc(messageId);
+      const messageRef = adb.collection('delivery_chat_messages').doc(messageId);
       batch.update(messageRef, {
-        readBy: db.FieldValue.arrayUnion(userId)
+        readBy: adb.FieldValue.arrayUnion(userId)
       });
     }
     
@@ -384,7 +384,7 @@ async function getParticipants(deliveryData: any) {
     
     // Get customer info
     if (deliveryData.customerId) {
-      const customerDoc = await db.collection('users').doc(deliveryData.customerId).get();
+      const customerDoc = await adb.collection('users').doc(deliveryData.customerId).get();
       if (customerDoc.exists) {
         const customerData = customerDoc.data();
         participants.push({
@@ -398,7 +398,7 @@ async function getParticipants(deliveryData: any) {
     
     // Get driver info
     if (deliveryData.driverId) {
-      const driverDoc = await db.collection('drivers').doc(deliveryData.driverId).get();
+      const driverDoc = await adb.collection('drivers').doc(deliveryData.driverId).get();
       if (driverDoc.exists) {
         const driverData = driverDoc.data();
         participants.push({
@@ -420,7 +420,7 @@ async function getParticipants(deliveryData: any) {
 // Helper function to get unread message count
 async function getUnreadCount(deliveryId: string, userId: string) {
   try {
-    const unreadSnapshot = await db.collection('delivery_chat_messages')
+    const unreadSnapshot = await adb.collection('delivery_chat_messages')
       .where('deliveryId', '==', deliveryId)
       .where('senderId', '!=', userId)
       .get();

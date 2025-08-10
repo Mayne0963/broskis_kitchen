@@ -1,4 +1,4 @@
-import { db } from '@/lib/firebaseAdmin';
+import { adb } from '@/lib/firebaseAdmin';
 
 interface CacheEntry<T> {
   data: T;
@@ -205,7 +205,7 @@ class FirebaseCache {
 
     // Set in Firebase for persistence
     try {
-      await db.collection(this.collectionName).doc(key).set({
+      await adb.collection(this.collectionName).doc(key).set({
         ...entry,
         expiresAt: new Date(now + entry.ttl)
       });
@@ -223,7 +223,7 @@ class FirebaseCache {
 
     // Try Firebase cache
     try {
-      const doc = await db.collection(this.collectionName).doc(key).get();
+      const doc = await adb.collection(this.collectionName).doc(key).get();
       
       if (!doc.exists) {
         return null;
@@ -253,7 +253,7 @@ class FirebaseCache {
     this.memoryCache.delete(key);
     
     try {
-      await db.collection(this.collectionName).doc(key).delete();
+      await adb.collection(this.collectionName).doc(key).delete();
       return true;
     } catch (error) {
       console.error('Error deleting cache from Firebase:', error);
@@ -265,8 +265,8 @@ class FirebaseCache {
     this.memoryCache.clear();
     
     try {
-      const batch = db.batch();
-      const snapshot = await db.collection(this.collectionName).get();
+      const batch = adb.batch();
+      const snapshot = await adb.collection(this.collectionName).get();
       
       snapshot.docs.forEach(doc => {
         batch.delete(doc.ref);
@@ -282,11 +282,11 @@ class FirebaseCache {
     const memoryCount = this.memoryCache.invalidateByTag(tag);
     
     try {
-      const snapshot = await db.collection(this.collectionName)
+      const snapshot = await adb.collection(this.collectionName)
         .where('tags', 'array-contains', tag)
         .get();
       
-      const batch = db.batch();
+      const batch = adb.batch();
       snapshot.docs.forEach(doc => {
         batch.delete(doc.ref);
       });
