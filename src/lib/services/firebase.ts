@@ -36,6 +36,7 @@ let app: FirebaseApp
 let auth: Auth
 let db: Firestore
 let storage: FirebaseStorage
+let adminStorage: FirebaseStorage
 let isFirebaseConfigured = false
 
 try {
@@ -66,6 +67,9 @@ try {
   }
   
   storage = getStorage(app)
+    adminStorage = process.env.NEXT_PUBLIC_FIREBASE_ADMIN_STORAGE_BUCKET
+    ? getStorage(app, process.env.NEXT_PUBLIC_FIREBASE_ADMIN_STORAGE_BUCKET)
+    : storage
   isFirebaseConfigured = true
 } catch (error: any) {
   console.error("Firebase initialization failed:", error)
@@ -301,4 +305,14 @@ if (isFirebaseConfigured && auth) {
   })
 }
 
-export { app, auth, db, storage, isFirebaseConfigured, googleProvider, GoogleAuthProvider, getIdToken }
+export {
+  app,
+  auth,
+  db,
+  storage,
+  adminStorage,
+  isFirebaseConfigured,
+  googleProvider,
+  GoogleAuthProvider,
+  getIdToken,
+}

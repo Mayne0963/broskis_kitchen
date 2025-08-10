@@ -11,8 +11,12 @@ service firebase.storage {
     }
     
     function isAdmin() {
-      return request.auth != null && 
+      return request.auth != null &&
              request.auth.token.admin == true;
+    }
+
+    function isAdminBucket() {
+      return bucket == 'broskis-kitchen-admin.appspot.com';
     }
     
     function isValidImageType() {
@@ -96,7 +100,7 @@ service firebase.storage {
     
     // Admin uploads
     match /admin/{allPaths=**} {
-      allow read, write: if isAdmin();
+      allow read, write: if isAdmin() && isAdminBucket();
     }
     
     // Temporary uploads (24 hour expiry)
