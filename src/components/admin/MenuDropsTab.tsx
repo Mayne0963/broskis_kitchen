@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -18,23 +18,33 @@ import {
   Calendar,
   DollarSign,
   Package,
-  TrendingUp
+  TrendingUp,
+  Search,
+  Filter
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { db, isFirebaseConfigured } from '@/lib/services/firebase'
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, Timestamp, where } from 'firebase/firestore'
 
 interface MenuDrop {
   id: string
   name: string
+  description?: string
   status: 'active' | 'scheduled' | 'ended'
   startTime: Date
   endTime: Date
   totalQuantity: number
   soldQuantity: number
   revenue: number
+  price: number
+  category?: string
+  image?: string
+  createdAt: Date
+  updatedAt: Date
 }
 
 interface MenuDropsTabProps {
-  menuDrops: MenuDrop[]
+  initialMenuDrops?: MenuDrop[]
 }
 
 interface NewMenuDrop {
@@ -89,10 +99,17 @@ const formatCurrency = (amount: number) => {
   }).format(amount)
 }
 
-export default function MenuDropsTab({ menuDrops }: MenuDropsTabProps) {
+export default function MenuDropsTab({ initialMenuDrops = [] }: MenuDropsTabProps) {
+  const [menuDrops, setMenuDrops] = useState<MenuDrop[]>(initialMenuDrops)
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [editingDrop, setEditingDrop] = useState<MenuDrop | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'scheduled' | 'ended'>('all')
+  const [categoryFilter, setCategoryFilter] = useState<'all' | 'special' | 'seasonal' | 'limited'>('all')
+  const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all')
   const [newDrop, setNewDrop] = useState<NewMenuDrop>({
     name: '',
     description: '',
@@ -103,37 +120,132 @@ export default function MenuDropsTab({ menuDrops }: MenuDropsTabProps) {
     image: ''
   })
 
+  // Set up real-time Firebase listener
+  useEffect(() => {
+    if (!isFirebaseConfigured || !db) {
+      setIsLoading(false)
+      setMenuDrops(initialMenuDrops)
+      return
+    }
+
+    const menuDropsRef = collection(db, 'menuDrops')
+    const q = query(menuDropsRef, orderBy('createdAt', 'desc'))
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const menuDropsData: MenuDrop[] = []
+        snapshot.forEach((doc) => {
+          const data = doc.data()
+          menuDropsData.push({
+            id: doc.id,
+            ...data,
+            startTime: data.startTime?.toDate() || new Date(),
+            endTime: data.endTime?.toDate() || new Date(),
+            createdAt: data.createdAt?.toDate() || new Date(),
+            updatedAt: data.updatedAt?.toDate() || new Date()
+          } as MenuDrop)
+        })
+        setMenuDrops(menuDropsData)
+        setIsLoading(false)
+        setError(null)
+      },
+      (error) => {
+        console.error('Error listening to menu drops:', error)
+        setError('Failed to load menu drops')
+        setIsLoading(false)
+        setMenuDrops(initialMenuDrops)
+      }
+    )
+
+    return () => unsubscribe()
+  }, [initialMenuDrops])
+
+  // Filter menu drops based on search, status, category, and date
+  const filteredMenuDrops = menuDrops.filter(drop => {
+    const matchesSearch = 
+      drop.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      drop.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    
+    const matchesStatus = statusFilter === 'all' || drop.status === statusFilter
+    const matchesCategory = categoryFilter === 'all' || drop.category === categoryFilter
+    
+    // Date filtering
+    let matchesDate = true
+    if (dateFilter !== 'all') {
+      const dropDate = new Date(drop.createdAt)
+      const now = new Date()
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      
+      switch (dateFilter) {
+        case 'today':
+          matchesDate = dropDate >= today
+          break
+        case 'week':
+          const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
+          matchesDate = dropDate >= weekAgo
+          break
+        case 'month':
+          const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
+          matchesDate = dropDate >= monthAgo
+          break
+      }
+    }
+    
+    return matchesSearch && matchesStatus && matchesCategory && matchesDate
+  })
+
   const handleCreateDrop = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
 
     try {
-      // TODO: Replace with actual API call
-      const response = await fetch('/api/menu-drops', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newDrop)
+      if (!isFirebaseConfigured || !db) {
+        throw new Error('Firebase not configured')
+      }
+
+      const menuDropsRef = collection(db, 'menuDrops')
+      const now = new Date()
+      const startTime = new Date(newDrop.startTime)
+      const endTime = new Date(newDrop.endTime)
+      
+      // Determine status based on start/end times
+      let status: 'active' | 'scheduled' | 'ended' = 'scheduled'
+      if (now >= startTime && now <= endTime) {
+        status = 'active'
+      } else if (now > endTime) {
+        status = 'ended'
+      }
+
+      await addDoc(menuDropsRef, {
+        name: newDrop.name,
+        description: newDrop.description,
+        price: newDrop.price,
+        totalQuantity: newDrop.quantity,
+        soldQuantity: 0,
+        revenue: 0,
+        status,
+        startTime: Timestamp.fromDate(startTime),
+        endTime: Timestamp.fromDate(endTime),
+        image: newDrop.image,
+        category: 'special', // Default category
+        createdAt: Timestamp.fromDate(now),
+        updatedAt: Timestamp.fromDate(now)
       })
 
-      if (response.ok) {
-        toast.success('Menu drop created successfully!')
-        setShowCreateForm(false)
-        setNewDrop({
-          name: '',
-          description: '',
-          price: 0,
-          quantity: 0,
-          startTime: '',
-          endTime: '',
-          image: ''
-        })
-        // TODO: Refresh the menu drops list
-      } else {
-        throw new Error('Failed to create menu drop')
-      }
+      toast.success('Menu drop created successfully!')
+      setShowCreateForm(false)
+      setNewDrop({
+        name: '',
+        description: '',
+        price: 0,
+        quantity: 0,
+        startTime: '',
+        endTime: '',
+        image: ''
+      })
     } catch (error) {
+      console.error('Error creating menu drop:', error)
       toast.error('Failed to create menu drop')
     } finally {
       setIsSubmitting(false)
@@ -146,18 +258,15 @@ export default function MenuDropsTab({ menuDrops }: MenuDropsTabProps) {
     }
 
     try {
-      // TODO: Replace with actual API call
-      const response = await fetch(`/api/menu-drops/${dropId}`, {
-        method: 'DELETE'
-      })
-
-      if (response.ok) {
-        toast.success('Menu drop deleted successfully!')
-        // TODO: Refresh the menu drops list
-      } else {
-        throw new Error('Failed to delete menu drop')
+      if (!isFirebaseConfigured || !db) {
+        throw new Error('Firebase not configured')
       }
+
+      const dropRef = doc(db, 'menuDrops', dropId)
+      await deleteDoc(dropRef)
+      toast.success('Menu drop deleted successfully!')
     } catch (error) {
+      console.error('Error deleting menu drop:', error)
       toast.error('Failed to delete menu drop')
     }
   }
@@ -186,6 +295,55 @@ export default function MenuDropsTab({ menuDrops }: MenuDropsTabProps) {
         </Button>
       </div>
 
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Input
+            placeholder="Search menu drops..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 bg-gray-800 border-[#B7985A]/30 text-white placeholder:text-gray-500 focus:border-[#FFD700]"
+          />
+        </div>
+        
+        <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
+          <SelectTrigger className="w-[140px] bg-gray-800 border-[#B7985A]/30 text-white focus:border-[#FFD700]">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent className="bg-gray-800 border-[#B7985A]/30">
+            <SelectItem value="all" className="text-white hover:bg-gray-700">All Status</SelectItem>
+            <SelectItem value="active" className="text-white hover:bg-gray-700">Active</SelectItem>
+            <SelectItem value="scheduled" className="text-white hover:bg-gray-700">Scheduled</SelectItem>
+            <SelectItem value="ended" className="text-white hover:bg-gray-700">Ended</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        <Select value={categoryFilter} onValueChange={(value: any) => setCategoryFilter(value)}>
+          <SelectTrigger className="w-[140px] bg-gray-800 border-[#B7985A]/30 text-white focus:border-[#FFD700]">
+            <SelectValue placeholder="Category" />
+          </SelectTrigger>
+          <SelectContent className="bg-gray-800 border-[#B7985A]/30">
+            <SelectItem value="all" className="text-white hover:bg-gray-700">All Categories</SelectItem>
+            <SelectItem value="special" className="text-white hover:bg-gray-700">Special</SelectItem>
+            <SelectItem value="seasonal" className="text-white hover:bg-gray-700">Seasonal</SelectItem>
+            <SelectItem value="limited" className="text-white hover:bg-gray-700">Limited</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        <Select value={dateFilter} onValueChange={(value: any) => setDateFilter(value)}>
+          <SelectTrigger className="w-[140px] bg-gray-800 border-[#B7985A]/30 text-white focus:border-[#FFD700]">
+            <SelectValue placeholder="Date" />
+          </SelectTrigger>
+          <SelectContent className="bg-gray-800 border-[#B7985A]/30">
+            <SelectItem value="all" className="text-white hover:bg-gray-700">All Time</SelectItem>
+            <SelectItem value="today" className="text-white hover:bg-gray-700">Today</SelectItem>
+            <SelectItem value="week" className="text-white hover:bg-gray-700">This Week</SelectItem>
+            <SelectItem value="month" className="text-white hover:bg-gray-700">This Month</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">
         <Card className="bg-gradient-to-br from-gray-900 to-black border-[#B7985A]/30">
@@ -195,7 +353,7 @@ export default function MenuDropsTab({ menuDrops }: MenuDropsTabProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#FFD700]">
-              {menuDrops.filter(drop => drop.status === 'active').length}
+              {filteredMenuDrops.filter(drop => drop.status === 'active').length}
             </div>
           </CardContent>
         </Card>
@@ -207,7 +365,7 @@ export default function MenuDropsTab({ menuDrops }: MenuDropsTabProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#FFD700]">
-              {menuDrops.filter(drop => drop.status === 'scheduled').length}
+              {filteredMenuDrops.filter(drop => drop.status === 'scheduled').length}
             </div>
           </CardContent>
         </Card>
@@ -219,7 +377,7 @@ export default function MenuDropsTab({ menuDrops }: MenuDropsTabProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#FFD700]">
-              {formatCurrency(menuDrops.reduce((sum, drop) => sum + drop.revenue, 0))}
+              {formatCurrency(filteredMenuDrops.reduce((sum, drop) => sum + drop.revenue, 0))}
             </div>
           </CardContent>
         </Card>
@@ -231,15 +389,29 @@ export default function MenuDropsTab({ menuDrops }: MenuDropsTabProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#FFD700]">
-              {menuDrops.reduce((sum, drop) => sum + drop.soldQuantity, 0)}
+              {filteredMenuDrops.reduce((sum, drop) => sum + drop.soldQuantity, 0)}
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Menu Drops List */}
-      <div className="grid gap-4">
-        {menuDrops.map((drop) => {
+      {isLoading ? (
+        <div className="flex items-center justify-center py-8">
+          <div className="text-white">Loading menu drops...</div>
+        </div>
+      ) : error ? (
+        <div className="flex items-center justify-center py-8">
+          <div className="text-red-400">{error}</div>
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          {filteredMenuDrops.length === 0 ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-gray-400">No menu drops found</div>
+            </div>
+          ) : (
+            filteredMenuDrops.map((drop) => {
           const StatusIcon = getStatusIcon(drop.status)
           const progressPercentage = getProgressPercentage(drop.soldQuantity, drop.totalQuantity)
           
@@ -315,8 +487,10 @@ export default function MenuDropsTab({ menuDrops }: MenuDropsTabProps) {
               </CardContent>
             </Card>
           )
-        })}
-      </div>
+        })
+      )}
+    </div>
+  )}
 
       {/* Create Menu Drop Modal */}
       {showCreateForm && (
