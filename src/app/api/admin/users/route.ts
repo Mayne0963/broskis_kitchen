@@ -16,7 +16,8 @@ export async function GET(request: NextRequest) {
 
     // Get query parameters
     const { searchParams } = new URL(request.url)
-    const maxResults = parseInt(searchParams.get('limit') || '100')
+    const maxResults = parseInt(searchParams.get('limit') || '1000')
+    const emailSearch = searchParams.get('email') || ''
 
     // Get all users with roles
     const result = await getAllUsersWithRoles(maxResults)
@@ -28,9 +29,18 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Filter users by email if search parameter is provided
+    let filteredUsers = result.users || []
+    if (emailSearch) {
+      filteredUsers = filteredUsers.filter(user => 
+        user.email.toLowerCase().includes(emailSearch.toLowerCase())
+      )
+    }
+
     return NextResponse.json({
       success: true,
-      users: result.users
+      users: filteredUsers,
+      total: filteredUsers.length
     })
   } catch (error) {
     console.error('Error in GET /api/admin/users:', error)

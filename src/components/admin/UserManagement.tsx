@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import useSWR from 'swr'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -35,38 +36,49 @@ interface UserManagementProps {
   className?: string
 }
 
+// Fetcher function for SWR
+const fetcher = async (url: string) => {
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error('Failed to fetch users')
+  }
+  const data = await response.json()
+  return data.users || []
+}
+
 export default function UserManagement({ className }: UserManagementProps) {
-  const [users, setUsers] = useState<UserWithRole[]>([])
-  const [filteredUsers, setFilteredUsers] = useState<UserWithRole[]>([])
-  const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState<string>('all')
   const [updatingUsers, setUpdatingUsers] = useState<Set<string>>(new Set())
   const { toast } = useToast()
 
-  // Fetch users
-  const fetchUsers = async () => {
-    try {
-      setIsLoading(true)
-      const response = await fetch('/api/admin/users')
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch users')
+  // Build API URL with search parameter
+  const apiUrl = searchTerm 
+    ? `/api/admin/users?email=${encodeURIComponent(searchTerm)}`
+    : '/api/admin/users'
+
+  // Use SWR for data fetching
+  const { data: users = [], error, isLoading, mutate } = useSWR<UserWithRole[]>(
+    apiUrl,
+    fetcher,
+    {
+      refreshInterval: 30000, // Refresh every 30 seconds
+      revalidateOnFocus: true,
+      onError: (error) => {
+        console.error('Error fetching users:', error)
+        toast({
+          title: 'Error',
+          description: 'Failed to fetch users',
+          variant: 'destructive'
+        })
       }
-      
-      const data = await response.json()
-      setUsers(data.users || [])
-    } catch (error) {
-      console.error('Error fetching users:', error)
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch users',
-        variant: 'destructive'
-      })
-    } finally {
-      setIsLoading(false)
     }
-  }
+  )
+
+  // Filter users by role (email filtering is handled by the API)
+  const filteredUsers = roleFilter === 'all' 
+    ? users 
+    : users.filter(user => user.role === roleFilter)
 
   // Update user role
   const updateUserRole = async (uid: string, newRole: UserRole) => {
@@ -86,10 +98,13 @@ export default function UserManagement({ className }: UserManagementProps) {
         throw new Error(error.error || 'Failed to update user role')
       }
       
-      // Update local state
-      setUsers(prev => prev.map(user => 
-        user.uid === uid ? { ...user, role: newRole } : user
-      ))
+      // Optimistically update the cache
+      mutate(
+        users.map(user => 
+          user.uid === uid ? { ...user, role: newRole } : user
+        ),
+        false // Don't revalidate immediately
+      )
       
       toast({
         title: 'Success',
@@ -102,6 +117,8 @@ export default function UserManagement({ className }: UserManagementProps) {
         description: error instanceof Error ? error.message : 'Failed to update user role',
         variant: 'destructive'
       })
+      // Revalidate on error to get the correct state
+      mutate()
     } finally {
       setUpdatingUsers(prev => {
         const newSet = new Set(prev)
@@ -111,29 +128,10 @@ export default function UserManagement({ className }: UserManagementProps) {
     }
   }
 
-  // Filter users based on search and role filter
-  useEffect(() => {
-    let filtered = users
-    
-    // Apply search filter
-    if (searchTerm) {
-      filtered = filtered.filter(user => 
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    }
-    
-    // Apply role filter
-    if (roleFilter !== 'all') {
-      filtered = filtered.filter(user => user.role === roleFilter)
-    }
-    
-    setFilteredUsers(filtered)
-  }, [users, searchTerm, roleFilter])
-
-  // Load users on component mount
-  useEffect(() => {
-    fetchUsers()
-  }, [])
+  // Refresh function for manual refresh
+  const refreshUsers = () => {
+    mutate()
+  }
 
   // Get role badge variant
   const getRoleBadgeVariant = (role: UserRole) => {
@@ -176,6 +174,21 @@ export default function UserManagement({ className }: UserManagementProps) {
     )
   }
 
+  if (error) {
+    return (
+      <Card className={`${className} bg-gradient-to-br from-black to-gray-900 border-[#B7985A]/30`}>
+        <CardHeader>
+          <CardTitle className="text-white">User Management</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center py-8">
+            <div className="text-red-400">Failed to load users. Please try again.</div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card className={`${className} bg-gradient-to-br from-black to-gray-900 border-[#B7985A]/30`}>
       <CardHeader>
@@ -208,7 +221,7 @@ export default function UserManagement({ className }: UserManagementProps) {
             </SelectContent>
           </Select>
           <Button 
-            onClick={fetchUsers} 
+            onClick={refreshUsers} 
             variant="outline"
             className="border-[#B7985A] text-[#FFD700] hover:bg-[#B7985A]/20 hover:text-[#FFD700]"
           >
