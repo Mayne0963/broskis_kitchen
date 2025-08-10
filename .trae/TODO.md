@@ -5,4 +5,4 @@
 - [x] 3: Test Menu Drop creation with image uploads to new bucket and stores publicUrl (priority: High)
 - [x] 4: Verify Vercel logs show no db.batch errors (priority: High)
 - [x] 5: Test /api/admin/users returns 200 for admin and 403 for non-admin (priority: High)
-- [ ] 6: Push to main with commit: feat(admin): realtime metrics, uploads, admin link, api guard, batch fix (**IN PROGRESS**) (priority: Medium)
+- [x] 6: Push to main with commit: feat(admin): realtime metrics, uploads, admin link, api guard, batch fix (priority: Medium)

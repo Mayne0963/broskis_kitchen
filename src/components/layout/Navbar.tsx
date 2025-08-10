@@ -25,7 +25,8 @@ const Navbar: React.FC = () => {
   const { itemCount } = useCart()
   const pathname = usePathname()
   const { user, logout } = useAuth()
-  const { claims, loading } = useAuthClaims()
+  const { claims } = useAuthClaims()
+  const isAdmin = user?.role === 'admin' || Boolean(claims?.isAdmin)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const [isScrolled, setIsScrolled] = useState(false)
   const [lastScrollY, setLastScrollY] = useState(0)
@@ -165,8 +166,8 @@ const Navbar: React.FC = () => {
               >
                 Order History
               </AccessibleMenuItem>
-              {!loading && claims?.isAdmin && (
-                <AccessibleMenuItem 
+              {isAdmin && (
+                <AccessibleMenuItem
                   href="/admin"
                   onClick={() => setUserDropdownOpen(false)}
                   className="text-red-600 font-medium"
@@ -299,7 +300,7 @@ const Navbar: React.FC = () => {
               >
                 Order History
               </Link>
-              {!loading && claims?.isAdmin && (
+              {isAdmin && (
                 <Link
                   href="/admin"
                   className="block py-2 hover:text-gold-foil transition-colors duration-300 text-red-600 font-medium"

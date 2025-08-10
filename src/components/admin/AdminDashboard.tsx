@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -26,7 +26,8 @@ import OrdersTab from './OrdersTab'
 import MenuDropsTab from './MenuDropsTab'
 import RewardsTab from './RewardsTab'
 import UserManagement from './UserManagement'
-import { useRealTimeMetrics } from '@/lib/services/realTimeAnalyticsService'
+import { useRealTimeMetrics } from '@/hooks/useRealTimeMetrics'
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 interface AdminDashboardProps {
   data: {
@@ -248,7 +249,7 @@ export default function AdminDashboard({ data, refetch, metricsData }: AdminDash
 
       <div className="px-6 py-8 space-y-8">
         {/* Real-time Metrics Banner */}
-        {metricsData && (
+        {realTimeMetrics && (
           <div className="bg-gradient-to-r from-[#B7985A]/10 to-[#D2BA6A]/10 border border-[#B7985A]/20 rounded-2xl p-6 mb-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
@@ -265,28 +266,36 @@ export default function AdminDashboard({ data, refetch, metricsData }: AdminDash
                 <span>Live</span>
               </div>
             </div>
-            <div className="grid gap-4 md:grid-cols-5">
+            <div className="grid gap-4 md:grid-cols-4">
               <div className="text-center">
-                <p className="text-2xl font-bold text-[#FFD700]">{metricsData.ordersToday}</p>
+                <p className="text-2xl font-bold text-[#FFD700]">{realTimeMetrics.orders.length}</p>
                 <p className="text-sm text-gray-300">Orders Today</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-[#FFD700]">{formatCurrency(metricsData.revenueToday)}</p>
+                <p className="text-2xl font-bold text-[#FFD700]">{formatCurrency(realTimeMetrics.revenue)}</p>
                 <p className="text-sm text-gray-300">Revenue Today</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-[#FFD700]">{metricsData.monthlyActive}</p>
-                <p className="text-sm text-gray-300">Monthly Active</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-[#FFD700]">{metricsData.pendingOrders}</p>
-                <p className="text-sm text-gray-300">Pending Orders</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-[#FFD700]">{metricsData.newUsersThisMonth}</p>
+                <p className="text-2xl font-bold text-[#FFD700]">{realTimeMetrics.signUps.length}</p>
                 <p className="text-sm text-gray-300">New Users</p>
               </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-[#FFD700]">{realTimeMetrics.rewardRedemptions.length}</p>
+                <p className="text-sm text-gray-300">Reward Redemptions</p>
+              </div>
             </div>
+            {realTimeMetrics.orders.length > 0 && (
+              <div className="mt-4 h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={realTimeMetrics.orders.map(o => ({ time: o.createdAt.toLocaleTimeString(), total: o.total }))}>
+                    <XAxis dataKey="time" hide />
+                    <YAxis hide />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="total" stroke="#FFD700" strokeWidth={2} dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </div>
         )}
 

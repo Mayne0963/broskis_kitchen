@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Camera } from "lucide-react";
-import { storage } from "@/lib/services/firebase";
+import { storage, adminStorage } from "@/lib/services/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { updateProfile } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
@@ -26,7 +26,7 @@ type ProfileForm = z.infer<typeof profileSchema>;
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, logout, isLoading } = useAuth();
+  const { user, logout, isLoading, isAdmin } = useAuth();
 
   if (!isLoading && !user) {
     router.push("/auth/login");
@@ -68,7 +68,8 @@ export default function ProfilePage() {
     setUploading(true);
     try {
       const file = e.target.files[0];
-      const storageRef = ref(storage, `avatars/${user.uid}`);
+      const activeStorage = isAdmin ? adminStorage : storage;
+      const storageRef = ref(activeStorage, `avatars/${user.uid}`);
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
       await updateProfile(user, { photoURL: url });

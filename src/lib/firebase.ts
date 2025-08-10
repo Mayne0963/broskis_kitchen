@@ -2,6 +2,7 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
+import { getStorage } from 'firebase/storage';
 import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 
 // Validate Firebase configuration
@@ -71,6 +72,14 @@ try {
 // Initialize Firebase services with error handling
 export const db = isFirebaseConfigured && app ? getFirestore(app) : null;
 export const auth = isFirebaseConfigured && app ? getAuth(app) : null;
+export const storage =
+  isFirebaseConfigured && app ? getStorage(app) : null;
+export const adminStorage =
+  isFirebaseConfigured &&
+  app &&
+  process.env.NEXT_PUBLIC_FIREBASE_ADMIN_STORAGE_BUCKET
+    ? getStorage(app, process.env.NEXT_PUBLIC_FIREBASE_ADMIN_STORAGE_BUCKET)
+    : storage;
 
 // Export configuration status
 export { isFirebaseConfigured };

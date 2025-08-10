@@ -8,8 +8,8 @@ const app = getApps()[0] || initializeApp({
     clientEmail: process.env.FIREBASE_CLIENT_EMAIL!,
     privateKey: process.env.FIREBASE_PRIVATE_KEY!.replace(/\\n/g, '\n')
   }),
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET_UPLOADS || process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!
+  storageBucket: process.env.FIREBASE_ADMIN_STORAGE_BUCKET || process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!
 });
 
 export const adb = getFirestore(app);
-export const aBucket = getStorage(app).bucket();
+export const adminBucket = getStorage(app, process.env.FIREBASE_ADMIN_STORAGE_BUCKET).bucket();

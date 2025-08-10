@@ -1,22 +1,18 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { db, isFirebaseConfigured } from '@/lib/firebase'
-import { 
-  collection, 
-  query, 
-  orderBy, 
-  limit, 
-  onSnapshot, 
-  where,
-  getDocs,
+import {
+  collection,
+  query,
+  orderBy,
+  limit,
+  onSnapshot,
   Timestamp
 } from 'firebase/firestore'
 import { Order } from '@/types/order'
-import { getAllOrders } from '@/lib/services/orderService'
-import { getAllMenuDrops } from '@/lib/services/menuDropsService'
 import { getRewardsAnalytics } from '@/lib/services/rewardsService'
-import { getUserAnalytics, getUserActivity, getTotalUserCount } from '@/lib/services/userAnalyticsService'
+import { getUserAnalytics, getUserActivity } from '@/lib/services/userAnalyticsService'
 
 interface AdminStats {
   totalOrders: number
@@ -121,43 +117,7 @@ export const useAdminData = () => {
     }
   }, [])
 
-  // Fetch menu drops data
-  const fetchMenuDrops = useCallback(async (): Promise<MenuDrop[]> => {
-    try {
-      if (!isFirebaseConfigured || !db) {
-        return []
-      }
-
-      const q = query(
-        collection(db, 'menuDrops'),
-        orderBy('startTime', 'desc')
-      )
-      
-      const querySnapshot = await getDocs(q)
-      const menuDrops: MenuDrop[] = []
-      
-      querySnapshot.forEach((doc) => {
-        const data = doc.data()
-        menuDrops.push({
-          id: doc.id,
-          name: data.name,
-          status: data.status,
-          startTime: data.startTime.toDate(),
-          endTime: data.endTime.toDate(),
-          totalQuantity: data.totalQuantity || 0,
-          soldQuantity: data.soldQuantity || 0,
-          revenue: data.revenue || 0
-        })
-      })
-      
-      return menuDrops
-    } catch (error) {
-      console.error('Error fetching menu drops:', error)
-      return []
-    }
-  }, [])
-
-  // Fetch rewards data
+  // Fetch rewards analytics
   const fetchRewardsData = useCallback(async (): Promise<RewardsData> => {
     try {
       return await getRewardsAnalytics()
@@ -173,56 +133,59 @@ export const useAdminData = () => {
     }
   }, [])
 
+  const ordersRef = useRef<Order[]>([])
+  const menuDropsRef = useRef<MenuDrop[]>([])
+  const unsubRef = useRef<() => void>(() => {})
 
+  // Combine various pieces of data into final admin state
+  const updateAdminData = useCallback(
+    async (
+      ordersData: Order[] = ordersRef.current,
+      menuDropsData: MenuDrop[] = menuDropsRef.current
+    ) => {
+      try {
+        setLoading(true)
+        setError(null)
 
-  // Fetch all admin data
-  const fetchAdminData = useCallback(async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      // Fetch all data in parallel
-      const [orders, menuDrops, rewardsData, userAnalytics, userActivity] = await Promise.all([
-        getAllOrders(),
-        fetchMenuDrops(),
+      const [rewardsData, userAnalytics, userActivity] = await Promise.all([
         fetchRewardsData(),
         getUserAnalytics(),
         getUserActivity()
       ])
 
-      // Calculate stats
-      const stats = calculateStats(orders, userAnalytics, userActivity)
-      stats.activeMenuDrops = menuDrops.filter(drop => drop.status === 'active').length
-      stats.rewardsRedeemed = rewardsData.totalRedemptions
+        const stats = calculateStats(ordersData, userAnalytics, userActivity)
+        stats.activeMenuDrops = menuDropsData.filter(drop => drop.status === 'active').length
+        stats.rewardsRedeemed = rewardsData.totalRedemptions
 
-      // Get recent orders (last 10)
-      const recentOrders = orders.slice(0, 10)
+        const recentOrders = ordersData.slice(0, 10)
 
-      setData({
-        stats,
-        recentOrders,
-        menuDrops,
-        rewardsData,
-        userAnalytics: {
-          topCustomers: userAnalytics.topCustomers,
-          usersByLocation: userAnalytics.usersByLocation,
-          userRegistrationTrend: userAnalytics.userRegistrationTrend
-        },
-        userActivity: {
-          dailyActiveUsers: userActivity.dailyActiveUsers,
-          weeklyActiveUsers: userActivity.weeklyActiveUsers,
-          monthlyActiveUsers: userActivity.monthlyActiveUsers,
-          averageSessionDuration: userActivity.averageSessionDuration,
-          bounceRate: userActivity.bounceRate
-        }
-      })
-    } catch (error) {
-      console.error('Error fetching admin data:', error)
-      setError('Failed to fetch admin data')
-    } finally {
-      setLoading(false)
-    }
-  }, [calculateStats, fetchMenuDrops, fetchRewardsData])
+        setData({
+          stats,
+          recentOrders,
+          menuDrops: menuDropsData,
+          rewardsData,
+          userAnalytics: {
+            topCustomers: userAnalytics.topCustomers,
+            usersByLocation: userAnalytics.usersByLocation,
+            userRegistrationTrend: userAnalytics.userRegistrationTrend
+          },
+          userActivity: {
+            dailyActiveUsers: userActivity.dailyActiveUsers,
+            weeklyActiveUsers: userActivity.weeklyActiveUsers,
+            monthlyActiveUsers: userActivity.monthlyActiveUsers,
+            averageSessionDuration: userActivity.averageSessionDuration,
+            bounceRate: userActivity.bounceRate
+          }
+        })
+      } catch (error) {
+        console.error('Error fetching admin data:', error)
+        setError('Failed to fetch admin data')
+      } finally {
+        setLoading(false)
+      }
+    },
+    [calculateStats, fetchRewardsData]
+  )
 
   // Set up real-time listeners for all data
   useEffect(() => {
@@ -305,18 +268,32 @@ export const useAdminData = () => {
 
     const unsubscribers: (() => void)[] = []
 
-    // Set up real-time listener for orders
+    // Orders listener
     const ordersQuery = query(
       collection(db, 'orders'),
       orderBy('createdAt', 'desc'),
-      limit(50) // Limit for performance
+      limit(50)
     )
 
     const ordersUnsubscribe = onSnapshot(
       ordersQuery,
       (snapshot) => {
-        console.log('Orders updated, refreshing admin data...')
-        fetchAdminData()
+        const drops: MenuDrop[] = []
+        snapshot.forEach(doc => {
+          const data = doc.data() as any
+          drops.push({
+            id: doc.id,
+            name: data.name,
+            status: data.status,
+            startTime: data.startTime?.toDate(),
+            endTime: data.endTime?.toDate(),
+            totalQuantity: data.totalQuantity || 0,
+            soldQuantity: data.soldQuantity || 0,
+            revenue: data.revenue || 0
+          })
+        })
+        menuDropsRef.current = drops
+        updateAdminData(ordersRef.current, drops)
       },
       (error) => {
         console.error('Error listening to orders:', error)
@@ -325,7 +302,7 @@ export const useAdminData = () => {
     )
     unsubscribers.push(ordersUnsubscribe)
 
-    // Set up real-time listener for menu drops
+    // User rewards listener
     const menuDropsQuery = query(
       collection(db, 'menuDrops'),
       orderBy('startTime', 'desc')
@@ -333,9 +310,8 @@ export const useAdminData = () => {
 
     const menuDropsUnsubscribe = onSnapshot(
       menuDropsQuery,
-      (snapshot) => {
-        console.log('Menu drops updated, refreshing admin data...')
-        fetchAdminData()
+      () => {
+        updateAdminData()
       },
       (error) => {
         console.error('Error listening to menu drops:', error)
@@ -343,7 +319,7 @@ export const useAdminData = () => {
     )
     unsubscribers.push(menuDropsUnsubscribe)
 
-    // Set up real-time listener for user rewards
+    // Users listener
     const rewardsQuery = query(
       collection(db, 'userRedemptions'),
       orderBy('redeemedAt', 'desc'),
@@ -352,9 +328,8 @@ export const useAdminData = () => {
 
     const rewardsUnsubscribe = onSnapshot(
       rewardsQuery,
-      (snapshot) => {
-        console.log('Rewards updated, refreshing admin data...')
-        fetchAdminData()
+      () => {
+        updateAdminData()
       },
       (error) => {
         console.error('Error listening to rewards:', error)
@@ -371,9 +346,8 @@ export const useAdminData = () => {
 
     const usersUnsubscribe = onSnapshot(
       usersQuery,
-      (snapshot) => {
-        console.log('Users updated, refreshing admin data...')
-        fetchAdminData()
+      () => {
+        updateAdminData()
       },
       (error) => {
         console.error('Error listening to users:', error)
@@ -382,18 +356,22 @@ export const useAdminData = () => {
     unsubscribers.push(usersUnsubscribe)
 
     // Initial data fetch
-    fetchAdminData()
+    updateAdminData()
 
     // Cleanup function
-    return () => {
+    const cleanup = () => {
       unsubscribers.forEach(unsubscribe => unsubscribe())
     }
-  }, [fetchAdminData])
+    unsubRef.current = cleanup
+    return cleanup
+  }, [updateAdminData])
+
 
   return {
     data,
     loading,
     error,
-    refetch: fetchAdminData
+    refetch: updateAdminData,
+    unsubscribe: unsubRef.current
   }
 }
