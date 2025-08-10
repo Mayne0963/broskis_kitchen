@@ -1,4 +1,4 @@
-import { db } from '@/lib/firebaseAdmin';
+import { adb } from '@/lib/firebaseAdmin';
 
 interface PerformanceMetric {
   id?: string;
@@ -125,12 +125,12 @@ class PerformanceMonitor {
     if (this.metrics.length === 0) return;
 
     try {
-      const batch = db.batch();
+      const batch = adb.batch();
       const metricsToFlush = [...this.metrics];
       this.metrics = [];
 
       metricsToFlush.forEach(metric => {
-        const docRef = db.collection('performance_metrics').doc();
+        const docRef = adb.collection('performance_metrics').doc();
         batch.set(docRef, metric);
       });
 
@@ -176,7 +176,7 @@ class PerformanceMonitor {
         }
       }
 
-      await db.collection('system_health').add(healthMetric);
+      await adb.collection('system_health').add(healthMetric);
     } catch (error) {
       console.error('Error collecting system health:', error);
     }

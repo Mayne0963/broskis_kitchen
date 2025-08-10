@@ -1,4 +1,4 @@
-import { db } from '@/lib/firebaseAdmin';
+import { adb } from '@/lib/firebaseAdmin';
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 
@@ -161,9 +161,9 @@ class Logger {
     // Write to Firebase
     if (this.config.enableFirebase) {
       try {
-        const batch = db.batch();
+        const batch = adb.batch();
         logsToFlush.forEach(log => {
-          const docRef = db.collection('application_logs').doc();
+          const docRef = adb.collection('application_logs').doc();
           batch.set(docRef, log);
         });
         await batch.commit();
