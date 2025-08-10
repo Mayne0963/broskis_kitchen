@@ -2,6 +2,7 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 
 // Validate Firebase configuration
 const validateFirebaseConfig = () => {
@@ -11,7 +12,8 @@ const validateFirebaseConfig = () => {
     'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
     'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET',
     'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
-    'NEXT_PUBLIC_FIREBASE_APP_ID'
+    'NEXT_PUBLIC_FIREBASE_APP_ID',
+    'NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY'
   ];
 
   const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
@@ -44,6 +46,20 @@ try {
     isFirebaseConfigured = false;
   } else {
     app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+    
+    // Initialize App Check for client-side only
+    if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY) {
+      try {
+        initializeAppCheck(app, {
+          provider: new ReCaptchaV3Provider(process.env.NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY),
+          isTokenAutoRefreshEnabled: true,
+        });
+        console.log('Firebase App Check initialized successfully');
+      } catch (error) {
+        console.warn('Firebase App Check initialization failed:', error);
+      }
+    }
+    
     isFirebaseConfigured = true;
     console.log('Firebase initialized successfully');
   }
