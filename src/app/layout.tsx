@@ -17,8 +17,7 @@ import CookieConsent from "../components/gdpr/CookieConsent"
 import SEOAudit from "../components/seo/SEOAudit"
 import SchemaGenerator from "../components/seo/SchemaGenerator"
 import { NetworkStatus } from "../components/common/EnhancedLoadingStates"
-import { ToastContainer } from "@/components/ui/use-toast"
-import { ToastProvider } from "../components/common/Toast"
+import { Toaster } from "@/components/ui/toaster"
 import { playfair, montserrat } from "./fonts"
 import StructuredData, { OrganizationStructuredData } from "../components/seo/StructuredData"
 import { SkipNavigation } from "../components/accessibility/AccessibilityEnhancer"
@@ -118,26 +117,24 @@ export default function RootLayout({
           <ErrorBoundary>
             <ResourceErrorBoundary>
               <ChunkErrorHandler />
-              <ToastProvider>
-                <Providers>
-                  <OrderProvider>
-                    <SkipNavigation />
-                    <ConditionalNavbar />
-                    <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
-                    <Footer />
-                    <MusicPlayer />
-                    <ToastContainer />
-                    <CookieConsent />
-                    <SEOAudit />
-                    <SchemaGenerator />
-                    <NetworkStatus />
-                    <ErrorMonitor />
-                    <PerformanceMonitor />
-                    <AccessibilityAudit />
-                    <PWAManager />
-                  </OrderProvider>
-                </Providers>
-              </ToastProvider>
+              <Providers>
+                <OrderProvider>
+                  <SkipNavigation />
+                  <ConditionalNavbar />
+                  <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
+                  <Footer />
+                  <MusicPlayer />
+                  <Toaster />
+                  <CookieConsent />
+                  <SEOAudit />
+                  <SchemaGenerator />
+                  <NetworkStatus />
+                  <ErrorMonitor />
+                  <PerformanceMonitor />
+                  <AccessibilityAudit />
+                  <PWAManager />
+                </OrderProvider>
+              </Providers>
             </ResourceErrorBoundary>
           </ErrorBoundary>
         </ProductionErrorBoundary>

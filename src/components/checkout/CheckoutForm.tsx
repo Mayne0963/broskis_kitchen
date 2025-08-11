@@ -7,7 +7,6 @@ import { useOrder } from '../../lib/context/OrderContext'
 import { useAuth } from '../../lib/context/AuthContext'
 import { useRewards } from '../../lib/context/RewardsContext'
 import { OrderFormData, DeliveryAddress, PaymentInfo } from '../../types/order'
-import { toast } from '../../components/ui/use-toast'
 import { FaCreditCard, FaLock, FaMapMarkerAlt, FaClock, FaPhone, FaEnvelope } from 'react-icons/fa'
 import StripePaymentForm from './StripePaymentForm'
 
