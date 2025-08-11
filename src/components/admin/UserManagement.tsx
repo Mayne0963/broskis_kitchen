@@ -21,7 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useToast } from '@/hooks/use-toast'
+import { toast } from '@/hooks/use-toast'
 import { Search, UserCheck, UserX, Shield, ChefHat, User } from 'lucide-react'
 import { type UserRole } from '@/lib/auth/rbac'
 
@@ -50,7 +50,6 @@ export default function UserManagement({ className }: UserManagementProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState<string>('all')
   const [updatingUsers, setUpdatingUsers] = useState<Set<string>>(new Set())
-  const { toast } = useToast()
 
   // Build API URL with search parameter
   const apiUrl = searchTerm 
