@@ -312,11 +312,6 @@ export const useAdminData = () => {
       orderBy('redeemedAt', 'desc'),
       limit(20)
     )
-    const usersQuery = query(
-      collection(db, 'users'),
-      orderBy('createdAt', 'desc'),
-      limit(10)
-    )
 
     const ordersUnsubscribe = onSnapshot(
       ordersQuery,
