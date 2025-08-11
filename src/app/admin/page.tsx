@@ -39,10 +39,11 @@ export default function AdminPage() {
     
     const unsubscribe = onSnapshot(ordersQuery, () => {
       mutate() // Trigger SWR revalidation when orders change
+      refetch() // Refresh admin hook data
     })
     
     return unsubscribe
-  }, [mutate])
+  }, [mutate, refetch])
 
   const isAdmin = claims?.isAdmin === true
   const totalLoading = loading || claimsLoading

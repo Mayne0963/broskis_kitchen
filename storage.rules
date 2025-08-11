@@ -16,7 +16,7 @@ service firebase.storage {
     }
 
     function isAdminBucket() {
-      return bucket == 'broskis-kitchen-admin.appspot.com';
+      return bucket == 'broskis-kitchen-uploads.appspot.com';
     }
     
     function isValidImageType() {
