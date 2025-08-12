@@ -8,7 +8,7 @@ import { FaSearch, FaFilter, FaStar, FaFire, FaLeaf } from "react-icons/fa"
 import AgeVerificationModal from "../../components/modals/AgeVerificationModal"
 import MenuItemCard from "../../components/menu/MenuItemCard"
 import CategoryFilter from "../../components/menu/CategoryFilter"
-import { menuItems, categories } from "../../data/menu-data"
+import { useMenuData } from "../../hooks/useMenuData"
 import type { CustomizationOption } from "../../types"
 import { GridSkeleton, EmptyState, SearchLoading } from "../../components/common/LoadingStates"
 import { LoadingOverlay, useLoadingState } from "../../components/common/EnhancedLoadingStates"
@@ -17,6 +17,7 @@ export default function MenuPage() {
   const { addItem } = useCart()
   const { ageVerified } = useAgeVerification()
   const [showAgeModal, setShowAgeModal] = useState(false)
+  const { menuItems, categories, loading: menuLoading } = useMenuData()
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [filteredItems, setFilteredItems] = useState(menuItems)
@@ -52,15 +53,10 @@ export default function MenuPage() {
     { [categoryId: string]: CustomizationOption[] } | undefined
   >(undefined)
   const { isLoading: isSearching, withLoading } = useLoadingState()
-  const [isInitialLoading, setIsInitialLoading] = useState(true)
-
-  // Simulate initial loading
+  const [isInitialLoading, setIsInitialLoading] = useState(menuLoading)
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsInitialLoading(false)
-    }, 1000)
-    return () => clearTimeout(timer)
-  }, [])
+    setIsInitialLoading(menuLoading)
+  }, [menuLoading])
 
   // Filter menu items based on selected category, search query, and filters
   useEffect(() => {
