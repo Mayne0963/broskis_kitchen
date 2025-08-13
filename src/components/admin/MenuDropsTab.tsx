@@ -23,8 +23,7 @@ import {
   Filter
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { db, isFirebaseConfigured } from '@/lib/services/firebase'
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, Timestamp, where } from 'firebase/firestore'
+import { useAuth } from '@/lib/context/AuthContext'
 
 interface MenuDrop {
   id: string
@@ -120,46 +119,58 @@ export default function MenuDropsTab({ initialMenuDrops = [] }: MenuDropsTabProp
     image: ''
   })
 
-  // Set up real-time Firebase listener
-  useEffect(() => {
-    if (!isFirebaseConfigured || !db) {
+  const { user } = useAuth()
+
+  // Fetch menu drops from API endpoint
+  const fetchMenuDrops = async () => {
+    if (!user) {
       setIsLoading(false)
-      setMenuDrops(initialMenuDrops)
       return
     }
 
-    const menuDropsRef = collection(db, 'menuDrops')
-    const q = query(menuDropsRef, orderBy('createdAt', 'desc'))
+    try {
+      setIsLoading(true)
+      const token = await user.getIdToken()
+      const response = await fetch('/api/admin/menu-drops', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
 
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const menuDropsData: MenuDrop[] = []
-        snapshot.forEach((doc) => {
-          const data = doc.data()
-          menuDropsData.push({
-            id: doc.id,
-            ...data,
-            startTime: data.startTime?.toDate() || new Date(),
-            endTime: data.endTime?.toDate() || new Date(),
-            createdAt: data.createdAt?.toDate() || new Date(),
-            updatedAt: data.updatedAt?.toDate() || new Date()
-          } as MenuDrop)
-        })
-        setMenuDrops(menuDropsData)
-        setIsLoading(false)
-        setError(null)
-      },
-      (error) => {
-        console.error('Error listening to menu drops:', error)
-        setError('Failed to load menu drops')
-        setIsLoading(false)
-        setMenuDrops(initialMenuDrops)
+      if (!response.ok) {
+        throw new Error('Failed to fetch menu drops')
       }
-    )
 
-    return () => unsubscribe()
-  }, [initialMenuDrops])
+      const data = await response.json()
+      const menuDropsData = data.menuDrops.map((drop: any) => ({
+        ...drop,
+        startTime: new Date(drop.startTime),
+        endTime: new Date(drop.endTime),
+        createdAt: new Date(drop.createdAt),
+        updatedAt: new Date(drop.updatedAt)
+      }))
+      
+      setMenuDrops(menuDropsData)
+      setError(null)
+    } catch (error) {
+      console.error('Error fetching menu drops:', error)
+      setError('Failed to load menu drops')
+      setMenuDrops(initialMenuDrops)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Set up periodic data fetching
+  useEffect(() => {
+    fetchMenuDrops()
+    
+    // Refresh every 30 seconds
+    const intervalId = setInterval(fetchMenuDrops, 30000)
+    
+    return () => clearInterval(intervalId)
+  }, [user])
 
   // Filter menu drops based on search, status, category, and date
   const filteredMenuDrops = menuDrops.filter(drop => {

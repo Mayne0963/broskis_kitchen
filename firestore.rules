@@ -40,7 +40,7 @@ service cloud.firestore {
     
     // Users collection
     match /users/{userId} {
-      allow read: if isOwner(userId) || hasAdminRole() || true; // Allow public read for admin dashboard
+      allow read: if isOwner(userId) || hasAdminRole();
       allow create: if isAuthenticated() && 
                        isOwner(userId) && 
                        validateUserData(resource.data) &&
@@ -69,7 +69,7 @@ service cloud.firestore {
     
     // Orders collection
     match /orders/{orderId} {
-      allow read: if isOwner(resource.data.userId) || hasAdminRole() || true; // Allow public read for admin dashboard
+      allow read: if isOwner(resource.data.userId) || hasAdminRole();
       allow create: if isAuthenticated() && 
                        isOwner(resource.data.userId) && 
                        validateOrderData(resource.data) &&
@@ -117,13 +117,13 @@ service cloud.firestore {
     
     // Rewards collection
     match /rewards/{rewardId} {
-      allow read: if isAuthenticated();
+      allow read: if hasAdminRole();
       allow write: if hasAdminRole() && validateRewardData(resource.data);
     }
     
     // Events collection
     match /events/{eventId} {
-      allow read: if true; // Public read access
+      allow read: if isAuthenticated();
       allow write: if hasAdminRole() && validateEventData(resource.data);
     }
     
@@ -141,31 +141,49 @@ service cloud.firestore {
     
     // Menu Drops collection
     match /menuDrops/{dropId} {
-      allow read: if true; // Public read access
+      allow read: if isAuthenticated();
       allow write: if hasAdminRole();
     }
     
     // User Rewards collection
     match /userRewards/{userId} {
-      allow read: if isOwner(userId) || hasAdminRole() || true; // Allow public read for admin dashboard
+      allow read: if isOwner(userId) || hasAdminRole();
       allow write: if isOwner(userId) || hasAdminRole();
     }
     
     // User Redemptions collection
     match /userRedemptions/{redemptionId} {
-      allow read: if true; // Allow public read for admin dashboard
+      allow read: if isOwner(resource.data.userId) || hasAdminRole();
       allow write: if hasAdminRole();
     }
     
     // Points Transactions collection
     match /pointsTransactions/{transactionId} {
-      allow read: if true; // Allow public read for admin dashboard
+      allow read: if isOwner(resource.data.userId) || hasAdminRole();
       allow write: if hasAdminRole();
     }
     
     // Reward Offers collection
     match /rewardOffers/{offerId} {
-      allow read: if true; // Allow public read for admin dashboard
+      allow read: if isAuthenticated();
+      allow write: if hasAdminRole();
+    }
+    
+    // Offers collection (admin managed)
+    match /offers/{offerId} {
+      allow read: if isAuthenticated();
+      allow write: if hasAdminRole();
+    }
+    
+    // Coupons collection (admin managed)
+    match /coupons/{couponId} {
+      allow read: if isAuthenticated();
+      allow write: if hasAdminRole();
+    }
+    
+    // Reward Transactions collection
+    match /rewardTransactions/{transactionId} {
+      allow read: if isOwner(resource.data.userId) || hasAdminRole();
       allow write: if hasAdminRole();
     }
     

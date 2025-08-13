@@ -23,8 +23,7 @@ import {
   Filter
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { db, isFirebaseConfigured } from '@/lib/services/firebase'
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, Timestamp, where } from 'firebase/firestore'
+import { useAuth } from '@/lib/context/AuthContext'
 
 interface RewardOffer {
   id: string
@@ -138,45 +137,57 @@ export default function RewardsTab({ rewardsData = defaultRewardsData, initialOf
     terms: ''
   })
 
-  // Set up real-time Firebase listener
-  useEffect(() => {
-    if (!isFirebaseConfigured || !db) {
+  const { user } = useAuth()
+
+  // Fetch offers from API endpoint
+  const fetchOffers = async () => {
+    if (!user) {
       setIsLoading(false)
-      setOffers(initialOffers)
       return
     }
 
-    const offersRef = collection(db, 'rewardOffers')
-    const q = query(offersRef, orderBy('createdAt', 'desc'))
+    try {
+      setIsLoading(true)
+      const token = await user.getIdToken()
+      const response = await fetch('/api/admin/offers', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
 
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const offersData: RewardOffer[] = []
-        snapshot.forEach((doc) => {
-          const data = doc.data()
-          offersData.push({
-            id: doc.id,
-            ...data,
-            validUntil: data.validUntil?.toDate() || new Date(),
-            createdAt: data.createdAt?.toDate() || new Date(),
-            updatedAt: data.updatedAt?.toDate() || new Date()
-          } as RewardOffer)
-        })
-        setOffers(offersData)
-        setIsLoading(false)
-        setError(null)
-      },
-      (error) => {
-        console.error('Error listening to reward offers:', error)
-        setError('Failed to load reward offers')
-        setIsLoading(false)
-        setOffers(initialOffers)
+      if (!response.ok) {
+        throw new Error('Failed to fetch offers')
       }
-    )
 
-    return () => unsubscribe()
-  }, [initialOffers])
+      const data = await response.json()
+      const offersData = data.offers.map((offer: any) => ({
+        ...offer,
+        validUntil: new Date(offer.endsAt || offer.validUntil),
+        createdAt: new Date(offer.createdAt),
+        updatedAt: new Date(offer.updatedAt || offer.createdAt)
+      }))
+      
+      setOffers(offersData)
+      setError(null)
+    } catch (error) {
+      console.error('Error fetching offers:', error)
+      setError('Failed to load offers')
+      setOffers(initialOffers)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Set up periodic data fetching
+  useEffect(() => {
+    fetchOffers()
+    
+    // Refresh every 30 seconds
+    const intervalId = setInterval(fetchOffers, 30000)
+    
+    return () => clearInterval(intervalId)
+  }, [user])
 
   // Filter offers based on search, status, type, and date
   const filteredOffers = offers.filter(offer => {
