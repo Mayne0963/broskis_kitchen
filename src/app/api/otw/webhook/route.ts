@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { otwService } from '@/lib/services/otw-service';
-import { db } from '@/lib/firebase';
-import { doc, updateDoc, getDoc, query, collection, where, getDocs } from 'firebase/firestore';
+import { adb } from '@/lib/firebaseAdmin';
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,12 +26,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Find order by OTW delivery ID
-    const ordersQuery = query(
-      collection(db, 'orders'),
-      where('deliveryInfo.otwDeliveryId', '==', deliveryUpdate.deliveryId)
-    );
-    
-    const ordersSnap = await getDocs(ordersQuery);
+    const ordersSnap = await adb.collection('orders')
+      .where('deliveryInfo.otwDeliveryId', '==', deliveryUpdate.deliveryId)
+      .get();
     
     if (ordersSnap.empty) {
       console.warn(`No order found for delivery ID: ${deliveryUpdate.deliveryId}`);
@@ -102,7 +98,7 @@ export async function POST(request: NextRequest) {
       updateData.estimatedTime = Math.max(0, estimatedMinutes);
     }
 
-    await updateDoc(doc(db, 'orders', orderId), updateData);
+    await adb.collection('orders').doc(orderId).update(updateData);
 
     // Note: Email and SMS notifications have been disabled
     // Push notifications can be implemented via Firebase Cloud Messaging

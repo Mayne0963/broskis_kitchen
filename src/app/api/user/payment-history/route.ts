@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionCookie } from '@/lib/auth/session';
 import Stripe from 'stripe';
-import { db } from '@/lib/services/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { adb } from '@/lib/firebaseAdmin';
 
 let stripe: Stripe | null = null;
 if (process.env.STRIPE_SECRET_KEY) {
@@ -13,8 +12,8 @@ if (process.env.STRIPE_SECRET_KEY) {
 
 // Helper to get Stripe customer ID
 async function getStripeCustomerId(userId: string) {
-  const userRef = doc(db, 'users', userId);
-  const userSnap = await getDoc(userRef);
+  const userRef = adb.collection('users').doc(userId);
+  const userSnap = await userRef.get();
   return userSnap.data()?.stripeCustomerId;
 }
 

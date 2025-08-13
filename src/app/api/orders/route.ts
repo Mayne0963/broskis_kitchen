@@ -1,21 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Order, OrderStatus } from '@/types/order'
-import { db, isFirebaseConfigured } from '@/lib/services/firebase'
-import { 
-  collection, 
-  addDoc, 
-  doc, 
-  updateDoc, 
-  getDocs, 
-  query, 
-  where, 
-  orderBy, 
-  Timestamp,
-  deleteDoc
-} from 'firebase/firestore'
+import { adb } from '@/lib/firebaseAdmin'
 import { withErrorHandler } from '@/lib/middleware/error-handler'
 import { logger } from '@/lib/services/logging-service'
-
 // Collection name for orders
 const ORDERS_COLLECTION = 'orders'
 
@@ -48,25 +35,22 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
       fetchType: orderId ? 'single' : userId ? 'user_orders' : 'all_orders'
     })
 
-    // Try Firebase first
-    if (isFirebaseConfigured && db) {
-      try {
-        if (orderId) {
-          // Get specific order from Firebase
-          const q = query(
-            collection(db, ORDERS_COLLECTION),
-            where('id', '==', orderId)
-          )
-          const querySnapshot = await getDocs(q)
+    // Try Firebase Admin first
+    try {
+      if (orderId) {
+        // Get specific order from Firebase
+        const querySnapshot = await adb.collection(ORDERS_COLLECTION)
+          .where('id', '==', orderId)
+          .get()
           
-          if (!querySnapshot.empty) {
-            const doc = querySnapshot.docs[0]
-            const data = doc.data()
-            const order = {
-              ...data,
-              createdAt: data.createdAt.toDate(),
-              updatedAt: data.updatedAt.toDate()
-            } as Order
+        if (!querySnapshot.empty) {
+          const doc = querySnapshot.docs[0]
+          const data = doc.data()
+          const order = {
+            ...data,
+            createdAt: data.createdAt.toDate(),
+            updatedAt: data.updatedAt.toDate()
+          } as Order
             
             logger.logBusinessEvent('order_fetch_success', {
               orderId,
@@ -76,53 +60,48 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
             
             return NextResponse.json({ order })
           }
-        } else if (userId) {
-          // Get user orders from Firebase
-          const q = query(
-            collection(db, ORDERS_COLLECTION),
-            where('userId', '==', userId),
-            orderBy('createdAt', 'desc')
-          )
-          const querySnapshot = await getDocs(q)
-          const userOrders: Order[] = []
-          
-          querySnapshot.forEach((doc) => {
-            const data = doc.data()
-            userOrders.push({
-              ...data,
-              createdAt: data.createdAt.toDate(),
-              updatedAt: data.updatedAt.toDate()
-            } as Order)
-          })
-          
-          return NextResponse.json({ orders: userOrders })
-        } else {
-          // Get all orders from Firebase
-          const q = query(
-            collection(db, ORDERS_COLLECTION),
-            orderBy('createdAt', 'desc')
-          )
-          const querySnapshot = await getDocs(q)
-          const allOrders: Order[] = []
-          
-          querySnapshot.forEach((doc) => {
-            const data = doc.data()
-            allOrders.push({
-              ...data,
-              createdAt: data.createdAt.toDate(),
-              updatedAt: data.updatedAt.toDate()
-            } as Order)
-          })
-          
-          return NextResponse.json({ orders: allOrders })
-        }
-      } catch (firebaseError) {
-        logger.error('Firebase fetch failed, using fallback', {
-          error: firebaseError,
-          userId,
-          orderId
+      } else if (userId) {
+        // Get user orders from Firebase
+        const querySnapshot = await adb.collection(ORDERS_COLLECTION)
+          .where('userId', '==', userId)
+          .orderBy('createdAt', 'desc')
+          .get()
+        const userOrders: Order[] = []
+        
+        querySnapshot.forEach((doc) => {
+          const data = doc.data()
+          userOrders.push({
+            ...data,
+            createdAt: data.createdAt.toDate(),
+            updatedAt: data.updatedAt.toDate()
+          } as Order)
         })
+        
+        return NextResponse.json({ orders: userOrders })
+      } else {
+        // Get all orders from Firebase
+        const querySnapshot = await adb.collection(ORDERS_COLLECTION)
+          .orderBy('createdAt', 'desc')
+          .get()
+        const allOrders: Order[] = []
+        
+        querySnapshot.forEach((doc) => {
+          const data = doc.data()
+          allOrders.push({
+            ...data,
+            createdAt: data.createdAt.toDate(),
+            updatedAt: data.updatedAt.toDate()
+          } as Order)
+        })
+        
+        return NextResponse.json({ orders: allOrders })
       }
+    } catch (firebaseError) {
+      logger.error('Firebase fetch failed, using fallback', {
+        error: firebaseError,
+        userId,
+        orderId
+      })
     }
 
     // Fallback to in-memory storage
@@ -247,38 +226,27 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
     }
 
     // Try to save to Firebase first
-    if (isFirebaseConfigured && db) {
-      try {
-        const orderDoc = {
-          ...newOrder,
-          createdAt: Timestamp.fromDate(newOrder.createdAt),
-          updatedAt: Timestamp.fromDate(newOrder.updatedAt)
-        }
-        
-        await addDoc(collection(db, ORDERS_COLLECTION), orderDoc)
-        logger.logBusinessEvent('order_created_firebase', {
-          orderId: newOrder.id,
-          orderType: newOrder.orderType,
-          total: newOrder.total,
-          userId: newOrder.userId
-        })
-      } catch (firebaseError) {
-        logger.error('Failed to save order to Firebase, using fallback', {
-          error: firebaseError,
-          orderId: newOrder.id,
-          userId: newOrder.userId
-        })
-        // Add to in-memory storage as fallback
-        orders.unshift(newOrder)
-        logger.logBusinessEvent('order_created_memory', {
-          orderId: newOrder.id,
-          orderType: newOrder.orderType,
-          total: newOrder.total,
-          userId: newOrder.userId
-        })
+    try {
+      const orderDoc = {
+        ...newOrder,
+        createdAt: new Date(newOrder.createdAt),
+        updatedAt: new Date(newOrder.updatedAt)
       }
-    } else {
-      // Add to in-memory storage
+      
+      await adb.collection(ORDERS_COLLECTION).add(orderDoc)
+      logger.logBusinessEvent('order_created_firebase', {
+        orderId: newOrder.id,
+        orderType: newOrder.orderType,
+        total: newOrder.total,
+        userId: newOrder.userId
+      })
+    } catch (firebaseError) {
+      logger.error('Failed to save order to Firebase, using fallback', {
+        error: firebaseError,
+        orderId: newOrder.id,
+        userId: newOrder.userId
+      })
+      // Add to in-memory storage as fallback
       orders.unshift(newOrder)
       logger.logBusinessEvent('order_created_memory', {
         orderId: newOrder.id,
@@ -348,45 +316,41 @@ export const PUT = withErrorHandler(async (request: NextRequest) => {
     let updatedOrder: Order | null = null
 
     // Try Firebase first
-    if (isFirebaseConfigured && db) {
-      try {
-        const q = query(
-          collection(db, ORDERS_COLLECTION),
-          where('id', '==', orderId)
-        )
-        const querySnapshot = await getDocs(q)
-        
-        if (!querySnapshot.empty) {
-          const orderDoc = querySnapshot.docs[0]
-          const updateData = {
-            status: status as OrderStatus,
-            estimatedTime,
-            updatedAt: Timestamp.now()
-          }
-          
-          await updateDoc(orderDoc.ref, updateData)
-          
-          // Get updated order
-          const updatedData = { ...orderDoc.data(), ...updateData }
-          updatedOrder = {
-            ...updatedData,
-            createdAt: updatedData.createdAt.toDate(),
-            updatedAt: updatedData.updatedAt.toDate()
-          } as Order
-          
-          logger.logBusinessEvent('order_updated_firebase', {
-            orderId,
-            newStatus: status,
-            estimatedTime
-          })
+    try {
+      const querySnapshot = await adb.collection(ORDERS_COLLECTION)
+        .where('id', '==', orderId)
+        .get()
+      
+      if (!querySnapshot.empty) {
+        const orderDoc = querySnapshot.docs[0]
+        const updateData = {
+          status: status as OrderStatus,
+          estimatedTime,
+          updatedAt: new Date()
         }
-      } catch (firebaseError) {
-        logger.error('Failed to update order in Firebase, using fallback', {
-          error: firebaseError,
+        
+        await orderDoc.ref.update(updateData)
+        
+        // Get updated order
+        const updatedData = { ...orderDoc.data(), ...updateData }
+        updatedOrder = {
+          ...updatedData,
+          createdAt: updatedData.createdAt.toDate(),
+          updatedAt: updatedData.updatedAt.toDate()
+        } as Order
+        
+        logger.logBusinessEvent('order_updated_firebase', {
           orderId,
-          status
+          newStatus: status,
+          estimatedTime
         })
       }
+    } catch (firebaseError) {
+      logger.error('Failed to update order in Firebase, using fallback', {
+        error: firebaseError,
+        orderId,
+        status
+      })
     }
 
     // Fallback to in-memory storage if Firebase failed or not configured
@@ -450,55 +414,51 @@ export const DELETE = withErrorHandler(async (request: NextRequest) => {
     let cancelledOrder: Order | null = null
 
     // Try Firebase first
-    if (isFirebaseConfigured && db) {
-      try {
-        const q = query(
-          collection(db, ORDERS_COLLECTION),
-          where('id', '==', orderId)
-        )
-        const querySnapshot = await getDocs(q)
+    try {
+      const querySnapshot = await adb.collection(ORDERS_COLLECTION)
+        .where('id', '==', orderId)
+        .get()
+      
+      if (!querySnapshot.empty) {
+        const orderDoc = querySnapshot.docs[0]
+        const orderData = orderDoc.data() as Order
         
-        if (!querySnapshot.empty) {
-          const orderDoc = querySnapshot.docs[0]
-          const orderData = orderDoc.data() as Order
-          
-          // Check if order can be cancelled
-          if (['delivered', 'completed', 'cancelled'].includes(orderData.status)) {
-            logger.logBusinessEvent('order_cancellation_failed', {
-              reason: 'invalid_status',
-              orderId,
-              currentStatus: orderData.status
-            })
-            return NextResponse.json(
-              { error: 'Order cannot be cancelled' },
-              { status: 400 }
-            )
-          }
-          
-          const updateData = {
-            status: 'cancelled' as OrderStatus,
-            updatedAt: Timestamp.now()
-          }
-          
-          await updateDoc(orderDoc.ref, updateData)
-          
-          cancelledOrder = {
-            ...orderData,
-            status: 'cancelled' as OrderStatus,
-            updatedAt: new Date()
-          }
-          
-          logger.logBusinessEvent('order_cancelled_firebase', {
+        // Check if order can be cancelled
+        if (['delivered', 'completed', 'cancelled'].includes(orderData.status)) {
+          logger.logBusinessEvent('order_cancellation_failed', {
+            reason: 'invalid_status',
             orderId,
-            previousStatus: orderData.status
+            currentStatus: orderData.status
           })
+          return NextResponse.json(
+            { error: 'Order cannot be cancelled' },
+            { status: 400 }
+          )
         }
-      } catch (firebaseError) {
-        logger.error('Failed to cancel order in Firebase, using fallback', {
-          error: firebaseError,
-          orderId
+        
+        const updateData = {
+          status: 'cancelled' as OrderStatus,
+          updatedAt: new Date()
+        }
+        
+        await orderDoc.ref.update(updateData)
+        
+        cancelledOrder = {
+          ...orderData,
+          status: 'cancelled' as OrderStatus,
+          updatedAt: new Date()
+        }
+        
+        logger.logBusinessEvent('order_cancelled_firebase', {
+          orderId,
+          previousStatus: orderData.status
         })
       }
+    } catch (firebaseError) {
+      logger.error('Failed to cancel order in Firebase, using fallback', {
+        error: firebaseError,
+        orderId
+      })
     }
 
     // Fallback to in-memory storage if Firebase failed or not configured

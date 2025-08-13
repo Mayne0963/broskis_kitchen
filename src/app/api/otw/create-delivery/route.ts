@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { otwService } from '@/lib/services/otw-service';
-import { db } from '@/lib/firebase';
-import { doc, updateDoc, getDoc } from 'firebase/firestore';
+import { adb } from '@/lib/firebaseAdmin';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,8 +16,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Get order details from Firebase
-    const orderRef = doc(db, 'orders', orderId);
-    const orderSnap = await getDoc(orderRef);
+    const orderRef = adb.collection('orders').doc(orderId);
+    const orderSnap = await orderRef.get();
     
     if (!orderSnap.exists()) {
       return NextResponse.json(
@@ -72,7 +71,7 @@ export async function POST(request: NextRequest) {
     const deliveryResponse = await otwService.createDelivery(deliveryRequest);
 
     // Update order with delivery information
-    await updateDoc(orderRef, {
+    await orderRef.update({
       deliveryInfo: {
         otwDeliveryId: deliveryResponse.deliveryId,
         status: deliveryResponse.status,

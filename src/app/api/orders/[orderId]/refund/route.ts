@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { refundService } from '@/lib/services/refund-service';
-import { auth } from '@/lib/firebaseAdmin';
-import { db } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { auth, adb } from '@/lib/firebaseAdmin';
 
 export async function POST(request: NextRequest, { params }: { params: { orderId: string } }) {
   try {
@@ -33,8 +31,7 @@ export async function POST(request: NextRequest, { params }: { params: { orderId
     }
 
     // Get order to verify ownership or admin access
-    const orderRef = doc(db, 'orders', orderId);
-    const orderSnap = await getDoc(orderRef);
+    const orderSnap = await adb.collection('orders').doc(orderId).get();
     
     if (!orderSnap.exists()) {
       return NextResponse.json(

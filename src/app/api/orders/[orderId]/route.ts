@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db, isFirebaseConfigured } from '@/lib/firebase'
-import { collection, query, where, getDocs } from 'firebase/firestore'
+import { adb } from '@/lib/firebaseAdmin'
 
 // In-memory fallback storage
 let orders: any[] = []
@@ -24,27 +23,22 @@ export async function GET(
     let foundOrder = null
 
     // Try Firebase first
-    if (isFirebaseConfigured && db) {
-      try {
-        const q = query(
-          collection(db, ORDERS_COLLECTION),
-          where('id', '==', orderId)
-        )
-        const querySnapshot = await getDocs(q)
+    try {
+      const ordersRef = adb.collection(ORDERS_COLLECTION)
+      const querySnapshot = await ordersRef.where('id', '==', orderId).get()
+      
+      if (!querySnapshot.empty) {
+        const orderDoc = querySnapshot.docs[0]
+        const orderData = orderDoc.data()
         
-        if (!querySnapshot.empty) {
-          const orderDoc = querySnapshot.docs[0]
-          const orderData = orderDoc.data()
-          
-          foundOrder = {
-            ...orderData,
-            createdAt: orderData.createdAt.toDate(),
-            updatedAt: orderData.updatedAt.toDate()
-          }
+        foundOrder = {
+          ...orderData,
+          createdAt: orderData.createdAt.toDate(),
+          updatedAt: orderData.updatedAt.toDate()
         }
-      } catch (firebaseError) {
-        console.warn('Failed to search Firebase, using fallback:', firebaseError)
       }
+    } catch (firebaseError) {
+      console.warn('Failed to search Firebase, using fallback:', firebaseError)
     }
 
     // Fallback to in-memory storage if Firebase failed or not configured

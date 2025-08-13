@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionCookie } from '@/lib/auth/session';
 import Stripe from 'stripe';
-import { db } from '@/lib/services/firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { adb } from '@/lib/firebaseAdmin';
 
 let stripe: Stripe | null = null;
 if (process.env.STRIPE_SECRET_KEY) {
@@ -18,14 +17,14 @@ async function getStripeCustomerId(userId: string) {
   if (!stripe) {
     throw new Error('Stripe not configured');
   }
-  const userRef = doc(db, 'users', userId);
-  const userSnap = await getDoc(userRef);
+  const userRef = adb.collection('users').doc(userId);
+  const userSnap = await userRef.get();
   let customerId = userSnap.data()?.stripeCustomerId;
 
   if (!customerId) {
     const customer = await stripe.customers.create({});
     customerId = customer.id;
-    await setDoc(userRef, { stripeCustomerId: customerId }, { merge: true });
+    await userRef.set({ stripeCustomerId: customerId }, { merge: true });
   }
   return customerId;
 }
