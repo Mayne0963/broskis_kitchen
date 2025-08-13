@@ -1,278 +1,210 @@
-import { NextRequest, NextResponse } from "next/server";
-import { adminDb } from "@/lib/firebase/admin";
-import { requireAdmin } from "@/lib/auth/adminOnly";
-import { Timestamp } from "firebase-admin/firestore";
+/**
+ * Admin Offers API endpoint
+ * GET /api/admin/offers - Retrieve offers with filtering
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/auth/adminOnly';
+import { adminCollections } from '@/lib/firebase/collections';
+import { Offer, OffersQuery, OffersResponse } from '@/types/firestore';
+import { Timestamp } from 'firebase-admin/firestore';
 
 export async function GET(request: NextRequest) {
   try {
     // Verify admin authentication
     await requireAdmin(request);
-
+    
     const { searchParams } = new URL(request.url);
     
-    // Extract query parameters
-    const activeOnly = searchParams.get('activeOnly') === 'true';
-    const cursor = searchParams.get('cursor');
-    const limit = parseInt(searchParams.get('limit') || '20');
-    const sort = searchParams.get('sort') || 'createdAt';
-    const dir = searchParams.get('dir') || 'desc';
-    const includeExpired = searchParams.get('includeExpired') === 'true';
-
+    // Parse query parameters
+    const query: OffersQuery = {
+      activeOnly: searchParams.get('activeOnly') === 'true',
+      cursor: searchParams.get('cursor') || undefined,
+      limit: parseInt(searchParams.get('limit') || '20')
+    };
+    
     // Validate limit
-    const pageLimit = Math.min(Math.max(limit, 1), 100);
-
-    // Build query
-    let query = adminDb.collection('offers');
-
-    // Apply active filter
-    if (activeOnly) {
-      query = query.where('active', '==', true);
-      
-      // Also filter by date range if activeOnly is true
-      if (!includeExpired) {
-        const now = Timestamp.now();
-        query = query.where('startsAt', '<=', now)
-                    .where('endsAt', '>=', now);
-      }
+    if (query.limit > 100) {
+      query.limit = 100;
     }
-
-    // Apply sorting
-    const sortDirection = dir === 'asc' ? 'asc' : 'desc';
-    query = query.orderBy(sort, sortDirection);
-
-    // Apply cursor-based pagination
-    if (cursor) {
+    
+    // Build Firestore query
+    let firestoreQuery = adminCollections.offers.orderBy('createdAt', 'desc');
+    
+    // Apply active filter
+    if (query.activeOnly) {
+      const now = Timestamp.now();
+      firestoreQuery = firestoreQuery
+        .where('active', '==', true)
+        .where('startsAt', '<=', now)
+        .where('endsAt', '>', now);
+    }
+    
+    // Apply cursor for pagination
+    if (query.cursor) {
       try {
-        const cursorDoc = await adminDb.collection('offers').doc(cursor).get();
+        const cursorDoc = await adminCollections.offers.doc(query.cursor).get();
         if (cursorDoc.exists) {
-          query = query.startAfter(cursorDoc);
+          firestoreQuery = firestoreQuery.startAfter(cursorDoc);
         }
       } catch (error) {
-        console.error('Invalid cursor:', error);
+        console.warn('Invalid cursor provided:', query.cursor);
       }
     }
-
-    // Apply limit
-    query = query.limit(pageLimit);
-
+    
+    // Apply limit (fetch one extra to check if there are more results)
+    firestoreQuery = firestoreQuery.limit(query.limit + 1);
+    
     // Execute query
-    const snapshot = await query.get();
+    const snapshot = await firestoreQuery.get();
     
-    // Transform results and add computed fields
-    const now = new Date();
-    const offers = snapshot.docs.map(doc => {
-      const data = doc.data();
-      const startsAt = data.startsAt?.toDate?.() || new Date(data.startsAt);
-      const endsAt = data.endsAt?.toDate?.() || new Date(data.endsAt);
-      
-      // Calculate offer status
-      const isCurrentlyActive = data.active && 
-                               startsAt <= now && 
-                               endsAt >= now;
-      
-      const isExpired = endsAt < now;
-      const isUpcoming = startsAt > now;
-      
-      let status = 'inactive';
-      if (isCurrentlyActive) status = 'active';
-      else if (isExpired) status = 'expired';
-      else if (isUpcoming) status = 'upcoming';
-      
-      // Calculate time remaining
-      let timeRemaining = null;
-      if (isCurrentlyActive) {
-        const msRemaining = endsAt.getTime() - now.getTime();
-        const daysRemaining = Math.ceil(msRemaining / (1000 * 60 * 60 * 24));
-        timeRemaining = {
-          days: daysRemaining,
-          hours: Math.ceil(msRemaining / (1000 * 60 * 60)),
-          milliseconds: msRemaining
-        };
+    // Process results
+    const offers: Offer[] = [];
+    let hasMore = false;
+    let nextCursor: string | undefined;
+    
+    snapshot.docs.forEach((doc, index) => {
+      if (index < query.limit) {
+        const data = doc.data();
+        offers.push({
+          id: doc.id,
+          ...data,
+          // Convert Firestore Timestamps to JavaScript Dates for JSON serialization
+          startsAt: data.startsAt,
+          endsAt: data.endsAt,
+          createdAt: data.createdAt,
+          updatedAt: data.updatedAt
+        } as Offer);
+      } else {
+        // We have more results
+        hasMore = true;
+        nextCursor = snapshot.docs[query.limit - 1].id;
       }
-
-      return {
-        id: doc.id,
-        ...data,
-        startsAt: startsAt.toISOString(),
-        endsAt: endsAt.toISOString(),
-        createdAt: data.createdAt?.toDate?.()?.toISOString() || data.createdAt,
-        updatedAt: data.updatedAt?.toDate?.()?.toISOString() || data.updatedAt,
-        status,
-        isCurrentlyActive,
-        isExpired,
-        isUpcoming,
-        timeRemaining
-      };
     });
-
-    // Get summary statistics
-    const stats = {
-      total: offers.length,
-      active: offers.filter(o => o.isCurrentlyActive).length,
-      expired: offers.filter(o => o.isExpired).length,
-      upcoming: offers.filter(o => o.isUpcoming).length,
-      inactive: offers.filter(o => o.status === 'inactive').length
-    };
-
-    // Prepare pagination info
-    const hasMore = offers.length === pageLimit;
-    const nextCursor = hasMore && offers.length > 0 ? offers[offers.length - 1].id : null;
-
-    return NextResponse.json({
-      success: true,
+    
+    // Prepare response
+    const response: OffersResponse = {
       data: offers,
-      stats,
-      pagination: {
-        limit: pageLimit,
-        hasMore,
-        nextCursor,
-        count: offers.length
-      },
-      filters: {
-        activeOnly,
-        includeExpired,
-        sort,
-        dir
-      }
-    });
-
-  } catch (error) {
-    console.error('Error fetching offers:', error);
+      hasMore,
+      nextCursor: hasMore ? nextCursor : undefined,
+      total: undefined
+    };
     
-    if (error instanceof Response) {
+    return NextResponse.json(response);
+    
+  } catch (error) {
+    console.error('Admin offers API error:', error);
+    
+    // Handle authentication errors
+    if (error instanceof NextResponse) {
       return error;
     }
-
+    
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Failed to fetch offers',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
-      },
+      { error: 'Failed to fetch offers', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
 }
 
-// POST /api/admin/offers - Create or update offer
+// POST endpoint for creating/updating offers
 export async function POST(request: NextRequest) {
   try {
     // Verify admin authentication
-    const adminUser = await requireAdmin(request);
-
-    const body = await request.json();
-    const { 
-      id, 
-      title, 
-      description, 
-      active, 
-      startsAt, 
-      endsAt, 
-      rewardBonus,
-      imageUrl,
-      terms,
-      priority
-    } = body;
-
-    // Validation
-    if (!title || !description) {
-      return NextResponse.json(
-        { success: false, error: 'Title and description are required' },
-        { status: 400 }
-      );
-    }
-
-    // Validate dates
-    const startDate = new Date(startsAt || Date.now());
-    const endDate = new Date(endsAt);
+    await requireAdmin(request);
     
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+    const body = await request.json();
+    
+    // Validate required fields
+    const requiredFields = ['title', 'description', 'startsAt', 'endsAt'];
+    const missingFields = requiredFields.filter(field => !(field in body));
+    
+    if (missingFields.length > 0) {
       return NextResponse.json(
-        { success: false, error: 'Invalid date format' },
+        { error: `Missing required fields: ${missingFields.join(', ')}` },
         { status: 400 }
       );
     }
-
-    if (endDate <= startDate) {
+    
+    // Validate dates
+    const startsAt = Timestamp.fromDate(new Date(body.startsAt));
+    const endsAt = Timestamp.fromDate(new Date(body.endsAt));
+    
+    if (startsAt.toDate() >= endsAt.toDate()) {
       return NextResponse.json(
-        { success: false, error: 'End date must be after start date' },
+        { error: 'endsAt must be after startsAt' },
         { status: 400 }
       );
     }
-
+    
+    // Validate target audience
+    if (body.targetAudience && !['all', 'new', 'loyal', 'vip'].includes(body.targetAudience)) {
+      return NextResponse.json(
+        { error: 'targetAudience must be one of: all, new, loyal, vip' },
+        { status: 400 }
+      );
+    }
+    
     // Prepare offer data
-    const offerData = {
-      title: title.trim(),
-      description: description.trim(),
-      active: Boolean(active),
-      startsAt: Timestamp.fromDate(startDate),
-      endsAt: Timestamp.fromDate(endDate),
-      rewardBonus: rewardBonus || null,
-      imageUrl: imageUrl || null,
-      terms: terms || '',
-      priority: priority || 0,
-      updatedAt: Timestamp.now(),
-      updatedBy: adminUser.uid
+    const now = Timestamp.now();
+    const offerData: Partial<Offer> = {
+      title: body.title.trim(),
+      description: body.description.trim(),
+      active: body.active !== undefined ? body.active : true,
+      startsAt,
+      endsAt,
+      rewardBonus: body.rewardBonus || 0,
+      imageUrl: body.imageUrl || '',
+      terms: body.terms || '',
+      targetAudience: body.targetAudience || 'all',
+      updatedAt: now
     };
-
-    let offerId;
-    let operation;
-
-    if (id) {
+    
+    let offerId: string;
+    
+    if (body.id) {
       // Update existing offer
-      offerId = id;
-      operation = 'updated';
-      
-      // Preserve original creation data
-      const existingDoc = await adminDb.collection('offers').doc(id).get();
-      if (existingDoc.exists) {
-        const existingData = existingDoc.data();
-        offerData.createdAt = existingData.createdAt;
-        offerData.createdBy = existingData.createdBy;
-      }
-      
-      await adminDb.collection('offers').doc(id).set(offerData, { merge: true });
+      offerId = body.id;
+      await adminCollections.offers.doc(offerId).update(offerData);
     } else {
       // Create new offer
-      operation = 'created';
-      offerData.createdAt = Timestamp.now();
-      offerData.createdBy = adminUser.uid;
-      
-      const docRef = await adminDb.collection('offers').add(offerData);
+      offerData.createdAt = now;
+      const docRef = await adminCollections.offers.add(offerData);
       offerId = docRef.id;
     }
-
-    // Fetch the created/updated offer
-    const offerDoc = await adminDb.collection('offers').doc(offerId).get();
-    const offerResult = {
-      id: offerDoc.id,
-      ...offerDoc.data(),
-      startsAt: offerData.startsAt.toDate().toISOString(),
-      endsAt: offerData.endsAt.toDate().toISOString(),
-      createdAt: offerData.createdAt.toDate().toISOString(),
-      updatedAt: offerData.updatedAt.toDate().toISOString()
-    };
-
-    return NextResponse.json({
-      success: true,
-      data: offerResult,
-      message: `Offer ${operation} successfully`
-    });
-
-  } catch (error) {
-    console.error('Error creating/updating offer:', error);
     
-    if (error instanceof Response) {
+    // Fetch and return the created/updated offer
+    const offerDoc = await adminCollections.offers.doc(offerId).get();
+    const offer = {
+      id: offerDoc.id,
+      ...offerDoc.data()
+    } as Offer;
+    
+    return NextResponse.json(offer, { status: body.id ? 200 : 201 });
+    
+  } catch (error) {
+    console.error('Admin offers POST API error:', error);
+    
+    // Handle authentication errors
+    if (error instanceof NextResponse) {
       return error;
     }
-
+    
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Failed to create/update offer',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
-      },
+      { error: 'Failed to create/update offer', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
+}
+
+// OPTIONS handler for CORS
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
 }

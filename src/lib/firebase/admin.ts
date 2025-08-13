@@ -1,68 +1,78 @@
-import { cert, getApps, initializeApp, getApp } from "firebase-admin/app";
-import { getAuth as getAdminAuth } from "firebase-admin/auth";
-import { getFirestore } from "firebase-admin/firestore";
-import { getStorage } from "firebase-admin/storage";
+/**
+ * Firebase Admin SDK configuration for server-side operations
+ * Used in API routes and server-side functions
+ */
 
-// Validate required environment variables
-const requiredEnvVars = [
-  'FIREBASE_PROJECT_ID',
-  'FIREBASE_CLIENT_EMAIL',
-  'FIREBASE_PRIVATE_KEY'
-];
+import { cert, getApps, initializeApp, getApp } from 'firebase-admin/app';
+import { getAuth as getAdminAuth } from 'firebase-admin/auth';
+import { getFirestore } from 'firebase-admin/firestore';
+import { getValidatedAdminConfig } from './env-validation';
 
-const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
-if (missingVars.length > 0) {
-  throw new Error(`Missing required Firebase Admin environment variables: ${missingVars.join(', ')}`);
+// Initialize Firebase Admin app
+let app;
+try {
+  const config = getValidatedAdminConfig();
+  
+  app = getApps().length === 0
+    ? initializeApp({
+        credential: cert({
+          projectId: config.projectId,
+          clientEmail: config.clientEmail,
+          privateKey: config.privateKey
+        })
+      })
+    : getApp();
+} catch (error) {
+  console.error('Failed to initialize Firebase Admin SDK:', error);
+  throw error;
 }
-
-// Initialize Firebase Admin SDK
-const app = getApps().length
-  ? getApp()
-  : initializeApp({
-      credential: cert({
-        projectId: process.env.FIREBASE_PROJECT_ID!,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL!,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY!.replace(/\\n/g, "\n"),
-      }),
-      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-    });
 
 // Export Firebase Admin services
 export const adminDb = getFirestore(app);
 export const adminAuth = getAdminAuth(app);
-export const adminStorage = getStorage(app);
 
-// Verify ID token function
-export async function verifyIdToken(idToken: string) {
+/**
+ * Verifies a Firebase ID token and returns the decoded token
+ * @param idToken - The Firebase ID token to verify
+ * @param checkRevoked - Whether to check if the token has been revoked
+ * @returns Promise<DecodedIdToken> - The decoded token with user claims
+ */
+export async function verifyIdToken(idToken: string, checkRevoked: boolean = true) {
   try {
-    return await adminAuth.verifyIdToken(idToken, true);
+    return await adminAuth.verifyIdToken(idToken, checkRevoked);
   } catch (error) {
-    console.error('Error verifying ID token:', error);
-    throw new Error('Invalid or expired token');
+    console.error('Token verification failed:', error);
+    throw error;
   }
 }
 
-// Helper function to check if user is admin
-export async function isUserAdmin(uid: string): Promise<boolean> {
+/**
+ * Sets custom claims for a user (e.g., admin role)
+ * @param uid - User ID
+ * @param claims - Custom claims to set
+ */
+export async function setCustomUserClaims(uid: string, claims: Record<string, any>) {
   try {
-    const userRecord = await adminAuth.getUser(uid);
-    return userRecord.customClaims?.admin === true || userRecord.customClaims?.role === 'admin';
+    await adminAuth.setCustomUserClaims(uid, claims);
   } catch (error) {
-    console.error('Error checking admin status:', error);
-    return false;
+    console.error('Failed to set custom claims:', error);
+    throw error;
   }
 }
 
-// Set admin claims for a user
-export async function setAdminClaims(uid: string, isAdmin: boolean = true) {
+/**
+ * Gets a user by their UID
+ * @param uid - User ID
+ * @returns Promise<UserRecord> - The user record
+ */
+export async function getUser(uid: string) {
   try {
-    await adminAuth.setCustomUserClaims(uid, { admin: isAdmin, role: isAdmin ? 'admin' : 'user' });
-    return true;
+    return await adminAuth.getUser(uid);
   } catch (error) {
-    console.error('Error setting admin claims:', error);
-    throw new Error('Failed to set admin claims');
+    console.error('Failed to get user:', error);
+    throw error;
   }
 }
 
-// Export app instance
+// Export the app instance
 export default app;

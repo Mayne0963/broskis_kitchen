@@ -33,15 +33,11 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "status",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "userId",
-          "order": "ASCENDING"
-        },
-        {
           "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "total",
           "order": "DESCENDING"
         }
       ]
@@ -125,8 +121,12 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "email",
+          "fieldPath": "roles.admin",
           "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
         }
       ]
     },
@@ -135,8 +135,12 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "displayName",
+          "fieldPath": "rewardTier",
           "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "rewardPoints",
+          "order": "DESCENDING"
         }
       ]
     }

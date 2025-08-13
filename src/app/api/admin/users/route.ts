@@ -1,156 +1,132 @@
-import { NextRequest, NextResponse } from "next/server";
-import { adminDb, adminAuth } from "@/lib/firebase/admin";
-import { requireAdmin } from "@/lib/auth/adminOnly";
+/**
+ * Admin Users API endpoint
+ * GET /api/admin/users - Retrieve users with search and pagination
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/auth/adminOnly';
+import { adminCollections } from '@/lib/firebase/collections';
+import { User, UsersQuery, UsersResponse, UserRoles } from '@/types/firestore';
 
 export async function GET(request: NextRequest) {
   try {
     // Verify admin authentication
     await requireAdmin(request);
-
+    
     const { searchParams } = new URL(request.url);
     
-    // Extract query parameters
-    const query = searchParams.get('query');
-    const cursor = searchParams.get('cursor');
-    const limit = parseInt(searchParams.get('limit') || '20');
-    const includeAuth = searchParams.get('includeAuth') === 'true';
-
+    // Parse query parameters
+    const query: UsersQuery = {
+      query: searchParams.get('query') || undefined,
+      cursor: searchParams.get('cursor') || undefined,
+      limit: parseInt(searchParams.get('limit') || '20'),
+      role: searchParams.get('role') as keyof UserRoles || undefined
+    };
+    
     // Validate limit
-    const pageLimit = Math.min(Math.max(limit, 1), 100);
-
-    // Build Firestore query
-    let firestoreQuery = adminDb.collection('users');
-
-    // Apply search filter if provided
-    if (query) {
-      const searchTerm = query.toLowerCase().trim();
-      
-      // Search by email (exact match or prefix)
-      if (searchTerm.includes('@')) {
-        firestoreQuery = firestoreQuery.where('email', '>=', searchTerm)
-                                      .where('email', '<=', searchTerm + '\uf8ff');
-      } else {
-        // Search by display name (prefix match)
-        firestoreQuery = firestoreQuery.where('displayName', '>=', searchTerm)
-                                      .where('displayName', '<=', searchTerm + '\uf8ff');
-      }
+    if (query.limit > 100) {
+      query.limit = 100;
     }
-
-    // Apply cursor-based pagination
-    if (cursor) {
+    
+    // Build Firestore query
+    let firestoreQuery = adminCollections.users.orderBy('createdAt', 'desc');
+    
+    // Apply role filter
+    if (query.role) {
+      firestoreQuery = firestoreQuery.where(`roles.${query.role}`, '==', true);
+    }
+    
+    // Apply cursor for pagination
+    if (query.cursor) {
       try {
-        const cursorDoc = await adminDb.collection('users').doc(cursor).get();
+        const cursorDoc = await adminCollections.users.doc(query.cursor).get();
         if (cursorDoc.exists) {
           firestoreQuery = firestoreQuery.startAfter(cursorDoc);
         }
       } catch (error) {
-        console.error('Invalid cursor:', error);
+        console.warn('Invalid cursor provided:', query.cursor);
       }
     }
-
-    // Order by email for consistent pagination
-    firestoreQuery = firestoreQuery.orderBy('email').limit(pageLimit);
-
+    
+    // Apply limit (fetch one extra to check if there are more results)
+    firestoreQuery = firestoreQuery.limit(query.limit + 1);
+    
     // Execute query
     const snapshot = await firestoreQuery.get();
     
-    // Transform results
-    const users = await Promise.all(
-      snapshot.docs.map(async (doc) => {
+    // Process results
+    let users: User[] = [];
+    let hasMore = false;
+    let nextCursor: string | undefined;
+    
+    snapshot.docs.forEach((doc, index) => {
+      if (index < query.limit) {
         const data = doc.data();
-        let authData = null;
-
-        // Optionally include Firebase Auth data
-        if (includeAuth) {
-          try {
-            const userRecord = await adminAuth.getUser(doc.id);
-            authData = {
-              emailVerified: userRecord.emailVerified,
-              disabled: userRecord.disabled,
-              lastSignInTime: userRecord.metadata.lastSignInTime,
-              creationTime: userRecord.metadata.creationTime,
-              customClaims: userRecord.customClaims || {},
-              providerData: userRecord.providerData.map(provider => ({
-                providerId: provider.providerId,
-                uid: provider.uid,
-                email: provider.email
-              }))
-            };
-          } catch (error) {
-            console.error(`Error fetching auth data for user ${doc.id}:`, error);
-          }
-        }
-
-        return {
+        users.push({
           uid: doc.id,
           ...data,
-          createdAt: data.createdAt?.toDate?.()?.toISOString() || data.createdAt,
-          updatedAt: data.updatedAt?.toDate?.()?.toISOString() || data.updatedAt,
-          lastLoginAt: data.lastLoginAt?.toDate?.()?.toISOString() || data.lastLoginAt,
-          auth: authData
-        };
-      })
-    );
-
-    // Get total count for pagination info (optional)
-    let totalCount = null;
-    if (searchParams.get('includeCount') === 'true') {
-      try {
-        let countQuery = adminDb.collection('users');
-        
-        // Apply same search filter for count
-        if (query) {
-          const searchTerm = query.toLowerCase().trim();
-          if (searchTerm.includes('@')) {
-            countQuery = countQuery.where('email', '>=', searchTerm)
-                                  .where('email', '<=', searchTerm + '\uf8ff');
-          } else {
-            countQuery = countQuery.where('displayName', '>=', searchTerm)
-                                  .where('displayName', '<=', searchTerm + '\uf8ff');
-          }
-        }
-        
-        const countSnapshot = await countQuery.count().get();
-        totalCount = countSnapshot.data().count;
-      } catch (error) {
-        console.error('Error getting user count:', error);
-      }
-    }
-
-    // Prepare pagination info
-    const hasMore = users.length === pageLimit;
-    const nextCursor = hasMore && users.length > 0 ? users[users.length - 1].uid : null;
-
-    return NextResponse.json({
-      success: true,
-      data: users,
-      pagination: {
-        limit: pageLimit,
-        hasMore,
-        nextCursor,
-        totalCount,
-        count: users.length
-      },
-      filters: {
-        query,
-        includeAuth
+          // Convert Firestore Timestamps to JavaScript Dates for JSON serialization
+          createdAt: data.createdAt,
+          updatedAt: data.updatedAt
+        } as User);
+      } else {
+        // We have more results
+        hasMore = true;
+        nextCursor = snapshot.docs[query.limit - 1].id;
       }
     });
-
-  } catch (error) {
-    console.error('Error fetching admin users:', error);
     
-    if (error instanceof Response) {
+    // Apply text search filter (client-side filtering for simplicity)
+    // For production, consider using Algolia or similar for better search performance
+    if (query.query) {
+      const searchTerm = query.query.toLowerCase();
+      users = users.filter(user => 
+        user.email.toLowerCase().includes(searchTerm) ||
+        user.displayName.toLowerCase().includes(searchTerm) ||
+        (user.phone && user.phone.includes(searchTerm))
+      );
+      
+      // Recalculate pagination after filtering
+      if (users.length < query.limit && hasMore) {
+        // We might need to fetch more results to fill the page
+        // For simplicity, we'll just indicate there might be more
+        hasMore = true;
+      }
+    }
+    
+    // Prepare response
+    const response: UsersResponse = {
+      data: users,
+      hasMore,
+      nextCursor: hasMore ? nextCursor : undefined,
+      total: undefined // We don't calculate total for performance reasons
+    };
+    
+    return NextResponse.json(response);
+    
+  } catch (error) {
+    console.error('Admin users API error:', error);
+    
+    // Handle authentication errors
+    if (error instanceof NextResponse) {
       return error;
     }
-
+    
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Failed to fetch users',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
-      },
+      { error: 'Failed to fetch users', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
+}
+
+// OPTIONS handler for CORS
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
 }

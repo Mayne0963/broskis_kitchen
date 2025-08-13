@@ -1,53 +1,35 @@
+/**
+ * Firebase client configuration for public reads
+ * Used in client-side components and pages
+ */
+
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
+import { getValidatedClientConfig } from './env-validation';
 
-// Validate required environment variables
-const requiredEnvVars = [
-  'NEXT_PUBLIC_FIREBASE_API_KEY',
-  'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
-  'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
-  'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET',
-  'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
-  'NEXT_PUBLIC_FIREBASE_APP_ID'
-];
-
-const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
-if (missingVars.length > 0) {
-  throw new Error(`Missing required Firebase environment variables: ${missingVars.join(', ')}`);
+// Initialize Firebase client app
+let app;
+try {
+  const config = getValidatedClientConfig();
+  app = getApps().length === 0 ? initializeApp(config) : getApp();
+} catch (error) {
+  console.error('Failed to initialize Firebase client:', error);
+  throw error;
 }
 
-// Firebase client configuration
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
-};
-
-// Initialize Firebase app (prevent duplicate initialization)
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-
-// Initialize Firebase services for client-side use
+// Export Firebase services for client-side use
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-export const storage = getStorage(app);
 
 // Export the app instance
 export default app;
 
-// Helper function to check if Firebase is ready
-export const isFirebaseReady = () => {
-  return !!app && !!auth && !!db && !!storage;
+// Helper function to check if Firebase is properly initialized
+export const isFirebaseInitialized = () => {
+  try {
+    return !!app && !!auth && !!db;
+  } catch {
+    return false;
+  }
 };
-
-// Export configuration for debugging
-export const getFirebaseConfig = () => ({
-  projectId: firebaseConfig.projectId,
-  authDomain: firebaseConfig.authDomain,
-  storageBucket: firebaseConfig.storageBucket
-});

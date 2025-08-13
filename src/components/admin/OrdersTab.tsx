@@ -22,7 +22,8 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Order, OrderStatus } from '@/types/order'
-import { useAuth } from '@/lib/context/AuthContext'
+import { db, isFirebaseConfigured } from '@/lib/services/firebase'
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, Timestamp } from 'firebase/firestore'
 import OrderStatusUpdate from '@/components/orders/OrderStatusUpdate'
 import { STATUS_INFO, getStatusColorClass } from '@/lib/utils/orderStatusValidation'
 
@@ -87,56 +88,44 @@ export default function OrdersTab({ initialOrders = [] }: OrdersTabProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const { user } = useAuth()
-
-  // Fetch orders from API endpoint
-  const fetchOrders = async () => {
-    if (!user) {
+  // Set up real-time Firebase listener
+  useEffect(() => {
+    if (!isFirebaseConfigured || !db) {
       setIsLoading(false)
+      setOrders(initialOrders)
       return
     }
 
-    try {
-      setIsLoading(true)
-      const token = await user.getIdToken()
-      const response = await fetch('/api/admin/orders?limit=100&sort=createdAt&dir=desc', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      })
+    const ordersRef = collection(db, 'orders')
+    const q = query(ordersRef, orderBy('createdAt', 'desc'))
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch orders')
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const ordersData: Order[] = []
+        snapshot.forEach((doc) => {
+          const data = doc.data()
+          ordersData.push({
+            ...data,
+            createdAt: data.createdAt?.toDate() || new Date(),
+            updatedAt: data.updatedAt?.toDate() || new Date()
+          } as Order)
+        })
+        setOrders(ordersData)
+        setIsLoading(false)
+        setError(null)
+      },
+      (error) => {
+        console.error('Error listening to orders:', error)
+        setError('Failed to load orders')
+        setIsLoading(false)
+        // Fallback to initial orders
+        setOrders(initialOrders)
       }
+    )
 
-      const data = await response.json()
-      const ordersData = data.orders.map((order: any) => ({
-        ...order,
-        createdAt: new Date(order.createdAt),
-        updatedAt: new Date(order.updatedAt)
-      }))
-      
-      setOrders(ordersData)
-      setError(null)
-    } catch (error) {
-      console.error('Error fetching orders:', error)
-      setError('Failed to load orders')
-      setOrders(initialOrders)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  // Set up periodic data fetching
-  useEffect(() => {
-    fetchOrders()
-    
-    // Refresh every 30 seconds
-    const intervalId = setInterval(fetchOrders, 30000)
-    
-    return () => clearInterval(intervalId)
-  }, [user])
+    return () => unsubscribe()
+  }, [initialOrders])
 
   // Filter orders based on search, status, order type, and date
   const filteredOrders = orders.filter(order => {
@@ -180,8 +169,17 @@ export default function OrdersTab({ initialOrders = [] }: OrdersTabProps) {
   }
 
   const refreshOrders = async () => {
-    await fetchOrders()
-    toast.success('Orders refreshed')
+    try {
+      const response = await fetch('/api/orders')
+      if (response.ok) {
+        const data = await response.json()
+        setOrders(data.orders || [])
+        toast.success('Orders refreshed')
+      }
+    } catch (error) {
+      console.error('Error refreshing orders:', error)
+      toast.error('Failed to refresh orders')
+    }
   }
 
 const canAdvanceStatus = (status: OrderStatus) => {

@@ -1,6 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
-import { adminDb } from "@/lib/firebase/admin";
-import { requireAdmin } from "@/lib/auth/adminOnly";
+/**
+ * Admin Rewards Summary API endpoint
+ * GET /api/admin/rewards/[userId]/summary - Get reward summary for a specific user
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/auth/adminOnly';
+import { adminCollections } from '@/lib/firebase/collections';
+import { RewardSummary, RewardTransaction } from '@/types/firestore';
 
 interface RouteParams {
   params: {
@@ -12,150 +18,93 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     // Verify admin authentication
     await requireAdmin(request);
-
+    
     const { userId } = params;
-    const { searchParams } = new URL(request.url);
-    const transactionLimit = parseInt(searchParams.get('transactionLimit') || '10');
-
+    
     if (!userId) {
       return NextResponse.json(
-        { success: false, error: 'User ID is required' },
+        { error: 'User ID is required' },
         { status: 400 }
       );
     }
-
-    // Fetch user data
-    const userDoc = await adminDb.collection('users').doc(userId).get();
+    
+    // Get user document to fetch current reward points and tier
+    const userDoc = await adminCollections.users.doc(userId).get();
     
     if (!userDoc.exists) {
       return NextResponse.json(
-        { success: false, error: 'User not found' },
+        { error: 'User not found' },
         { status: 404 }
       );
     }
-
+    
     const userData = userDoc.data();
     
-    // Get recent reward transactions
-    const transactionsQuery = adminDb
-      .collection('rewardTransactions')
+    // Get recent reward transactions (last 50)
+    const recentTransactionsSnapshot = await adminCollections.rewardTransactions
       .where('userId', '==', userId)
       .orderBy('createdAt', 'desc')
-      .limit(Math.min(transactionLimit, 50));
-
-    const transactionsSnapshot = await transactionsQuery.get();
-    
-    const recentTransactions = transactionsSnapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        ...data,
-        createdAt: data.createdAt?.toDate?.()?.toISOString() || data.createdAt
-      };
-    });
-
-    // Calculate reward statistics
-    const totalEarned = recentTransactions
-      .filter(t => t.delta > 0)
-      .reduce((sum, t) => sum + t.delta, 0);
-    
-    const totalSpent = recentTransactions
-      .filter(t => t.delta < 0)
-      .reduce((sum, t) => sum + Math.abs(t.delta), 0);
-
-    // Determine reward tier based on points
-    const rewardPoints = userData?.rewardPoints || 0;
-    let rewardTier = 'Bronze';
-    
-    if (rewardPoints >= 1000) {
-      rewardTier = 'Platinum';
-    } else if (rewardPoints >= 500) {
-      rewardTier = 'Gold';
-    } else if (rewardPoints >= 200) {
-      rewardTier = 'Silver';
-    }
-
-    // Get tier benefits
-    const tierBenefits = {
-      Bronze: { discount: 0, pointsMultiplier: 1 },
-      Silver: { discount: 5, pointsMultiplier: 1.2 },
-      Gold: { discount: 10, pointsMultiplier: 1.5 },
-      Platinum: { discount: 15, pointsMultiplier: 2 }
-    };
-
-    // Calculate points needed for next tier
-    let pointsToNextTier = null;
-    if (rewardTier === 'Bronze') pointsToNextTier = 200 - rewardPoints;
-    else if (rewardTier === 'Silver') pointsToNextTier = 500 - rewardPoints;
-    else if (rewardTier === 'Gold') pointsToNextTier = 1000 - rewardPoints;
-
-    // Get order-related reward statistics
-    const ordersWithRewards = await adminDb
-      .collection('orders')
-      .where('userId', '==', userId)
-      .where('rewardPointsEarned', '>', 0)
-      .orderBy('rewardPointsEarned', 'desc')
-      .limit(5)
+      .limit(50)
       .get();
-
-    const topRewardOrders = ordersWithRewards.docs.map(doc => {
-      const data = doc.data();
-      return {
-        orderId: doc.id,
-        rewardPointsEarned: data.rewardPointsEarned,
-        total: data.total,
-        createdAt: data.createdAt?.toDate?.()?.toISOString() || data.createdAt
-      };
-    });
-
-    const summary = {
-      userId,
-      userInfo: {
-        email: userData?.email,
-        displayName: userData?.displayName,
-        phone: userData?.phone
-      },
-      rewards: {
-        currentPoints: rewardPoints,
-        rewardTier,
-        tierBenefits: tierBenefits[rewardTier],
-        pointsToNextTier,
-        lifetimeEarned: totalEarned,
-        lifetimeSpent: totalSpent,
-        netPoints: totalEarned - totalSpent
-      },
-      recentTransactions,
-      topRewardOrders,
-      statistics: {
-        totalTransactions: recentTransactions.length,
-        averageTransactionValue: recentTransactions.length > 0 
-          ? recentTransactions.reduce((sum, t) => sum + Math.abs(t.delta), 0) / recentTransactions.length 
-          : 0,
-        lastActivity: recentTransactions.length > 0 
-          ? recentTransactions[0].createdAt 
-          : null
-      }
-    };
-
-    return NextResponse.json({
-      success: true,
-      data: summary
-    });
-
-  } catch (error) {
-    console.error('Error fetching reward summary:', error);
     
-    if (error instanceof Response) {
+    const recentTransactions: RewardTransaction[] = recentTransactionsSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: doc.data().createdAt
+    })) as RewardTransaction[];
+    
+    // Calculate total earned and spent
+    const allTransactionsSnapshot = await adminCollections.rewardTransactions
+      .where('userId', '==', userId)
+      .get();
+    
+    let totalEarned = 0;
+    let totalSpent = 0;
+    
+    allTransactionsSnapshot.docs.forEach(doc => {
+      const transaction = doc.data();
+      if (transaction.delta > 0) {
+        totalEarned += transaction.delta;
+      } else {
+        totalSpent += Math.abs(transaction.delta);
+      }
+    });
+    
+    // Prepare response
+    const summary: RewardSummary = {
+      userId,
+      rewardPoints: userData.rewardPoints || 0,
+      rewardTier: userData.rewardTier || 'bronze',
+      recentTransactions,
+      totalEarned,
+      totalSpent
+    };
+    
+    return NextResponse.json(summary);
+    
+  } catch (error) {
+    console.error('Admin rewards summary API error:', error);
+    
+    // Handle authentication errors
+    if (error instanceof NextResponse) {
       return error;
     }
-
+    
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Failed to fetch reward summary',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
-      },
+      { error: 'Failed to fetch reward summary', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
+}
+
+// OPTIONS handler for CORS
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
 }

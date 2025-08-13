@@ -1,287 +1,259 @@
-import { NextRequest, NextResponse } from "next/server";
-import { adminDb } from "@/lib/firebase/admin";
-import { requireAdmin } from "@/lib/auth/adminOnly";
-import { Timestamp } from "firebase-admin/firestore";
+/**
+ * Admin Coupons API endpoints
+ * GET /api/admin/coupons - Retrieve coupons with filtering
+ * POST /api/admin/coupons - Create or update coupons
+ */
 
-// GET /api/admin/coupons - Fetch coupons with filtering
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/auth/adminOnly';
+import { adminCollections } from '@/lib/firebase/collections';
+import { Coupon, CouponsQuery, CouponsResponse } from '@/types/firestore';
+import { Timestamp } from 'firebase-admin/firestore';
+
 export async function GET(request: NextRequest) {
   try {
     // Verify admin authentication
     await requireAdmin(request);
-
+    
     const { searchParams } = new URL(request.url);
     
-    // Extract query parameters
-    const active = searchParams.get('active');
-    const code = searchParams.get('code');
-    const cursor = searchParams.get('cursor');
-    const limit = parseInt(searchParams.get('limit') || '20');
-    const sort = searchParams.get('sort') || 'createdAt';
-    const dir = searchParams.get('dir') || 'desc';
-
+    // Parse query parameters
+    const query: CouponsQuery = {
+      active: searchParams.get('active') === 'true' ? true : searchParams.get('active') === 'false' ? false : undefined,
+      code: searchParams.get('code') || undefined,
+      cursor: searchParams.get('cursor') || undefined,
+      limit: parseInt(searchParams.get('limit') || '20')
+    };
+    
     // Validate limit
-    const pageLimit = Math.min(Math.max(limit, 1), 100);
-
-    // Build query
-    let query = adminDb.collection('coupons');
-
-    // Apply filters
-    if (active !== null) {
-      const isActive = active === 'true';
-      query = query.where('isActive', '==', isActive);
+    if (query.limit > 100) {
+      query.limit = 100;
     }
-
-    if (code) {
-      // Exact code match
-      query = query.where('code', '==', code.toUpperCase());
+    
+    // Build Firestore query
+    let firestoreQuery = adminCollections.coupons.orderBy('createdAt', 'desc');
+    
+    // Apply active filter
+    if (query.active !== undefined) {
+      firestoreQuery = firestoreQuery.where('isActive', '==', query.active);
     }
-
-    // Apply sorting
-    const sortDirection = dir === 'asc' ? 'asc' : 'desc';
-    query = query.orderBy(sort, sortDirection);
-
-    // Apply cursor-based pagination
-    if (cursor) {
+    
+    // Apply code filter (exact match)
+    if (query.code) {
+      firestoreQuery = firestoreQuery.where('code', '==', query.code.toUpperCase());
+    }
+    
+    // Apply cursor for pagination
+    if (query.cursor) {
       try {
-        const cursorDoc = await adminDb.collection('coupons').doc(cursor).get();
+        const cursorDoc = await adminCollections.coupons.doc(query.cursor).get();
         if (cursorDoc.exists) {
-          query = query.startAfter(cursorDoc);
+          firestoreQuery = firestoreQuery.startAfter(cursorDoc);
         }
       } catch (error) {
-        console.error('Invalid cursor:', error);
+        console.warn('Invalid cursor provided:', query.cursor);
       }
     }
-
-    // Apply limit
-    query = query.limit(pageLimit);
-
-    // Execute query
-    const snapshot = await query.get();
     
-    // Transform results and check expiration
-    const now = new Date();
-    const coupons = snapshot.docs.map(doc => {
-      const data = doc.data();
-      const startsAt = data.startsAt?.toDate?.() || new Date(data.startsAt);
-      const endsAt = data.endsAt?.toDate?.() || new Date(data.endsAt);
-      
-      // Calculate if coupon is currently valid
-      const isCurrentlyValid = data.isActive && 
-                              startsAt <= now && 
-                              endsAt >= now &&
-                              (data.usageLimit === null || data.usageCount < data.usageLimit);
-
-      return {
-        id: doc.id,
-        ...data,
-        startsAt: startsAt.toISOString(),
-        endsAt: endsAt.toISOString(),
-        createdAt: data.createdAt?.toDate?.()?.toISOString() || data.createdAt,
-        updatedAt: data.updatedAt?.toDate?.()?.toISOString() || data.updatedAt,
-        isCurrentlyValid,
-        remainingUses: data.usageLimit ? Math.max(0, data.usageLimit - data.usageCount) : null
-      };
-    });
-
-    // Prepare pagination info
-    const hasMore = coupons.length === pageLimit;
-    const nextCursor = hasMore && coupons.length > 0 ? coupons[coupons.length - 1].id : null;
-
-    return NextResponse.json({
-      success: true,
-      data: coupons,
-      pagination: {
-        limit: pageLimit,
-        hasMore,
-        nextCursor,
-        count: coupons.length
-      },
-      filters: {
-        active,
-        code,
-        sort,
-        dir
+    // Apply limit (fetch one extra to check if there are more results)
+    firestoreQuery = firestoreQuery.limit(query.limit + 1);
+    
+    // Execute query
+    const snapshot = await firestoreQuery.get();
+    
+    // Process results
+    const coupons: Coupon[] = [];
+    let hasMore = false;
+    let nextCursor: string | undefined;
+    
+    snapshot.docs.forEach((doc, index) => {
+      if (index < query.limit) {
+        const data = doc.data();
+        coupons.push({
+          id: doc.id,
+          ...data,
+          // Convert Firestore Timestamps to JavaScript Dates for JSON serialization
+          startsAt: data.startsAt,
+          endsAt: data.endsAt,
+          createdAt: data.createdAt,
+          updatedAt: data.updatedAt
+        } as Coupon);
+      } else {
+        // We have more results
+        hasMore = true;
+        nextCursor = snapshot.docs[query.limit - 1].id;
       }
     });
-
-  } catch (error) {
-    console.error('Error fetching coupons:', error);
     
-    if (error instanceof Response) {
+    // Prepare response
+    const response: CouponsResponse = {
+      data: coupons,
+      hasMore,
+      nextCursor: hasMore ? nextCursor : undefined,
+      total: undefined
+    };
+    
+    return NextResponse.json(response);
+    
+  } catch (error) {
+    console.error('Admin coupons GET API error:', error);
+    
+    // Handle authentication errors
+    if (error instanceof NextResponse) {
       return error;
     }
-
+    
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Failed to fetch coupons',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
-      },
+      { error: 'Failed to fetch coupons', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
 }
 
-// POST /api/admin/coupons - Create or update coupon
 export async function POST(request: NextRequest) {
   try {
     // Verify admin authentication
-    const adminUser = await requireAdmin(request);
-
+    await requireAdmin(request);
+    
     const body = await request.json();
-    const { 
-      id, 
-      code, 
-      discountType, 
-      value, 
-      isActive, 
-      startsAt, 
-      endsAt, 
-      usageLimit,
-      description,
-      minimumOrderValue,
-      maxDiscountAmount
-    } = body;
-
-    // Validation
-    if (!code || !discountType || value === undefined) {
-      return NextResponse.json(
-        { success: false, error: 'Code, discountType, and value are required' },
-        { status: 400 }
-      );
-    }
-
-    if (!['percentage', 'fixed'].includes(discountType)) {
-      return NextResponse.json(
-        { success: false, error: 'discountType must be "percentage" or "fixed"' },
-        { status: 400 }
-      );
-    }
-
-    if (typeof value !== 'number' || value <= 0) {
-      return NextResponse.json(
-        { success: false, error: 'Value must be a positive number' },
-        { status: 400 }
-      );
-    }
-
-    if (discountType === 'percentage' && value > 100) {
-      return NextResponse.json(
-        { success: false, error: 'Percentage discount cannot exceed 100%' },
-        { status: 400 }
-      );
-    }
-
-    // Normalize and validate dates
-    const startDate = new Date(startsAt || Date.now());
-    const endDate = new Date(endsAt);
     
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid date format' },
-        { status: 400 }
-      );
-    }
-
-    if (endDate <= startDate) {
-      return NextResponse.json(
-        { success: false, error: 'End date must be after start date' },
-        { status: 400 }
-      );
-    }
-
-    const normalizedCode = code.toUpperCase().trim();
-
-    // Check for duplicate codes (excluding current coupon if updating)
-    const existingCouponQuery = adminDb.collection('coupons').where('code', '==', normalizedCode);
-    const existingCoupons = await existingCouponQuery.get();
+    // Validate required fields
+    const requiredFields = ['code', 'discountType', 'value', 'startsAt', 'endsAt', 'usageLimit'];
+    const missingFields = requiredFields.filter(field => !(field in body));
     
-    if (!existingCoupons.empty) {
-      const duplicateExists = existingCoupons.docs.some(doc => doc.id !== id);
-      if (duplicateExists) {
+    if (missingFields.length > 0) {
+      return NextResponse.json(
+        { error: `Missing required fields: ${missingFields.join(', ')}` },
+        { status: 400 }
+      );
+    }
+    
+    // Validate field values
+    if (!['percentage', 'fixed'].includes(body.discountType)) {
+      return NextResponse.json(
+        { error: 'discountType must be either "percentage" or "fixed"' },
+        { status: 400 }
+      );
+    }
+    
+    if (typeof body.value !== 'number' || body.value <= 0) {
+      return NextResponse.json(
+        { error: 'value must be a positive number' },
+        { status: 400 }
+      );
+    }
+    
+    if (body.discountType === 'percentage' && body.value > 100) {
+      return NextResponse.json(
+        { error: 'percentage discount cannot exceed 100%' },
+        { status: 400 }
+      );
+    }
+    
+    if (typeof body.usageLimit !== 'number' || body.usageLimit < 0) {
+      return NextResponse.json(
+        { error: 'usageLimit must be a non-negative number' },
+        { status: 400 }
+      );
+    }
+    
+    // Normalize and validate code
+    const code = body.code.toUpperCase().trim();
+    if (!/^[A-Z0-9]{3,20}$/.test(code)) {
+      return NextResponse.json(
+        { error: 'code must be 3-20 characters long and contain only letters and numbers' },
+        { status: 400 }
+      );
+    }
+    
+    // Check for duplicate codes (unless updating existing coupon)
+    if (!body.id) {
+      const existingCoupon = await adminCollections.coupons
+        .where('code', '==', code)
+        .limit(1)
+        .get();
+      
+      if (!existingCoupon.empty) {
         return NextResponse.json(
-          { success: false, error: 'Coupon code already exists' },
+          { error: 'A coupon with this code already exists' },
           { status: 409 }
         );
       }
     }
-
+    
+    // Validate dates
+    const startsAt = Timestamp.fromDate(new Date(body.startsAt));
+    const endsAt = Timestamp.fromDate(new Date(body.endsAt));
+    
+    if (startsAt.toDate() >= endsAt.toDate()) {
+      return NextResponse.json(
+        { error: 'endsAt must be after startsAt' },
+        { status: 400 }
+      );
+    }
+    
     // Prepare coupon data
-    const couponData = {
-      code: normalizedCode,
-      discountType,
-      value,
-      isActive: Boolean(isActive),
-      startsAt: Timestamp.fromDate(startDate),
-      endsAt: Timestamp.fromDate(endDate),
-      usageLimit: usageLimit || null,
-      usageCount: 0,
-      description: description || '',
-      minimumOrderValue: minimumOrderValue || 0,
-      maxDiscountAmount: maxDiscountAmount || null,
-      updatedAt: Timestamp.now(),
-      updatedBy: adminUser.uid
+    const now = Timestamp.now();
+    const couponData: Partial<Coupon> = {
+      code,
+      discountType: body.discountType,
+      value: body.value,
+      isActive: body.isActive !== undefined ? body.isActive : true,
+      startsAt,
+      endsAt,
+      usageLimit: body.usageLimit,
+      usageCount: body.usageCount || 0,
+      description: body.description || '',
+      minimumOrderValue: body.minimumOrderValue || 0,
+      applicableItems: body.applicableItems || [],
+      updatedAt: now
     };
-
-    let couponId;
-    let operation;
-
-    if (id) {
+    
+    let couponId: string;
+    
+    if (body.id) {
       // Update existing coupon
-      couponId = id;
-      operation = 'updated';
-      
-      // Preserve original creation data
-      const existingDoc = await adminDb.collection('coupons').doc(id).get();
-      if (existingDoc.exists) {
-        const existingData = existingDoc.data();
-        couponData.createdAt = existingData.createdAt;
-        couponData.createdBy = existingData.createdBy;
-        couponData.usageCount = existingData.usageCount || 0;
-      }
-      
-      await adminDb.collection('coupons').doc(id).set(couponData, { merge: true });
+      couponId = body.id;
+      await adminCollections.coupons.doc(couponId).update(couponData);
     } else {
       // Create new coupon
-      operation = 'created';
-      couponData.createdAt = Timestamp.now();
-      couponData.createdBy = adminUser.uid;
-      
-      const docRef = await adminDb.collection('coupons').add(couponData);
+      couponData.createdAt = now;
+      const docRef = await adminCollections.coupons.add(couponData);
       couponId = docRef.id;
     }
-
-    // Fetch the created/updated coupon
-    const couponDoc = await adminDb.collection('coupons').doc(couponId).get();
-    const couponResult = {
-      id: couponDoc.id,
-      ...couponDoc.data(),
-      startsAt: couponData.startsAt.toDate().toISOString(),
-      endsAt: couponData.endsAt.toDate().toISOString(),
-      createdAt: couponData.createdAt.toDate().toISOString(),
-      updatedAt: couponData.updatedAt.toDate().toISOString()
-    };
-
-    return NextResponse.json({
-      success: true,
-      data: couponResult,
-      message: `Coupon ${operation} successfully`
-    });
-
-  } catch (error) {
-    console.error('Error creating/updating coupon:', error);
     
-    if (error instanceof Response) {
+    // Fetch and return the created/updated coupon
+    const couponDoc = await adminCollections.coupons.doc(couponId).get();
+    const coupon = {
+      id: couponDoc.id,
+      ...couponDoc.data()
+    } as Coupon;
+    
+    return NextResponse.json(coupon, { status: body.id ? 200 : 201 });
+    
+  } catch (error) {
+    console.error('Admin coupons POST API error:', error);
+    
+    // Handle authentication errors
+    if (error instanceof NextResponse) {
       return error;
     }
-
+    
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Failed to create/update coupon',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
-      },
+      { error: 'Failed to create/update coupon', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
+}
+
+// OPTIONS handler for CORS
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
 }

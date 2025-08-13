@@ -8,16 +8,17 @@ import Link from 'next/link'
 import AdminDashboard from '@/components/admin/AdminDashboard'
 import { useAuth } from '@/lib/context/AuthContext'
 import { useAuthClaims } from '@/hooks/useAuthClaims'
-import { useAdminData } from '@/hooks/useAdminData'
+import { useAdminApiData } from '@/hooks/useAdminApiData'
 import { Loader2 } from 'lucide-react'
 import useSWR from 'swr'
-// Removed direct Firestore imports - now using API endpoints via useAdminData hook
+import { onSnapshot, collection, query, where, Timestamp } from 'firebase/firestore'
+import { db } from '@/lib/firebaseClient'
 
 export default function AdminPage() {
   const { user, loading } = useAuth()
   const { claims, loading: claimsLoading } = useAuthClaims()
   const router = useRouter()
-  const { data: adminData, loading: dataLoading, error: dataError, refetch } = useAdminData()
+  const { data: adminData, loading: dataLoading, error: dataError, refetch } = useAdminApiData()
   
   // Real-time metrics with SWR
   const { data: metricsData, mutate } = useSWR(
@@ -26,14 +27,22 @@ export default function AdminPage() {
     { refreshInterval: 5000 }
   )
   
-  // Periodic refresh for metrics data
+  // Real-time Firestore listener for orders
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      mutate() // Trigger SWR revalidation periodically
-      refetch() // Refresh admin hook data
-    }, 30000) // Refresh every 30 seconds
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
     
-    return () => clearInterval(intervalId)
+    const ordersQuery = query(
+      collection(db, 'orders'),
+      where('createdAt', '>=', Timestamp.fromDate(today))
+    )
+    
+    const unsubscribe = onSnapshot(ordersQuery, () => {
+      mutate() // Trigger SWR revalidation when orders change
+      refetch() // Refresh admin hook data
+    })
+    
+    return unsubscribe
   }, [mutate, refetch])
 
   const isAdmin = claims?.isAdmin === true

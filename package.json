@@ -3,22 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@10.0.0",
   "scripts": {
-    "preinstall": "corepack enable",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "vercel-build": "next build",
     "validate-env": "node scripts/validate-env.js",
-    "prebuild": "node -e \"const fs=require('fs');const p='firebase.json';if(fs.existsSync(p)){console.log('Generating Data Connect…');process.exit(0)}\" && exit 0",
+    "prebuild": "echo 'Skipping validation for development build'",
     "security-check": "npm audit && npm run validate-env",
     "set-admin": "node scripts/setAdminClaim.js amarikelsaw10@gmail.com",
     "set-admin-mock": "node scripts/setAdminClaim-mock.js amarikelsaw10@gmail.com"
   },
   "dependencies": {
-    "@firebasegen/default-connector": "file:dataconnect-generated/js/default-connector",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
@@ -95,6 +92,6 @@
     "typescript": "^5.7.2"
   },
   "engines": {
-    "node": "20.x"
+    "node": ">=18.0.0"
   }
 }

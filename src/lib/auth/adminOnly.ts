@@ -1,88 +1,106 @@
-import { NextResponse } from "next/server";
-import { verifyIdToken, isUserAdmin } from "@/lib/firebase/admin";
-import { cookies } from "next/headers";
+/**
+ * Server-only authentication gate for admin access
+ * Validates Firebase ID tokens and ensures admin privileges
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { verifyIdToken } from '@/lib/firebase/admin';
+import { cookies } from 'next/headers';
 
 /**
- * Extract ID token from request headers or cookies
+ * Extracts ID token from request headers or cookies
+ * @param request - Next.js request object
+ * @returns ID token string or null
  */
-function extractToken(req: Request): string | null {
+function extractIdToken(request: NextRequest): string | null {
   // Try Authorization header first
-  const authHeader = req.headers.get("authorization");
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    return authHeader.replace("Bearer ", "");
+  const authHeader = request.headers.get('authorization');
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    return authHeader.replace('Bearer ', '');
   }
 
-  // Try cookie as fallback
+  // Try session cookie
   const cookieStore = cookies();
-  const tokenCookie = cookieStore.get("firebase-token");
-  if (tokenCookie) {
-    return tokenCookie.value;
+  const sessionCookie = cookieStore.get('session');
+  if (sessionCookie) {
+    return sessionCookie.value;
+  }
+
+  // Try __session cookie (Firebase hosting)
+  const firebaseSession = cookieStore.get('__session');
+  if (firebaseSession) {
+    return firebaseSession.value;
   }
 
   return null;
 }
 
 /**
- * Middleware to require admin authentication
- * Throws 401 if no token, 403 if not admin
+ * Requires admin authentication for API routes
+ * @param request - Next.js request object
+ * @returns Promise<DecodedIdToken> - Decoded token with admin claims
+ * @throws NextResponse with 401/403 status if unauthorized
  */
-export async function requireAdmin(req: Request) {
-  const token = extractToken(req);
-  
-  if (!token) {
-    throw NextResponse.json(
-      { error: "Unauthorized - No token provided" }, 
-      { status: 401 }
-    );
-  }
-
+export async function requireAdmin(request: NextRequest) {
   try {
-    const decoded = await verifyIdToken(token);
+    const idToken = extractIdToken(request);
     
-    // Check if user has admin claims
-    const hasAdminClaim = decoded.admin === true || decoded.role === 'admin';
-    
-    // Double-check with user record if no claims found
-    if (!hasAdminClaim) {
-      const isAdmin = await isUserAdmin(decoded.uid);
-      if (!isAdmin) {
-        throw NextResponse.json(
-          { error: "Forbidden - Admin access required" }, 
-          { status: 403 }
-        );
-      }
+    if (!idToken) {
+      throw NextResponse.json(
+        { error: 'Unauthorized - No authentication token provided' },
+        { status: 401 }
+      );
     }
 
-    return decoded;
+    // Verify the ID token
+    const decodedToken = await verifyIdToken(idToken);
+    
+    // Check for admin claim
+    const isAdmin = decodedToken.admin === true || 
+                   decodedToken.role === 'admin' ||
+                   (decodedToken.roles && decodedToken.roles.admin === true);
+    
+    if (!isAdmin) {
+      throw NextResponse.json(
+        { error: 'Forbidden - Admin access required' },
+        { status: 403 }
+      );
+    }
+
+    return decodedToken;
   } catch (error) {
-    if (error instanceof Response) {
-      throw error; // Re-throw NextResponse errors
+    // If error is already a NextResponse, throw it
+    if (error instanceof NextResponse) {
+      throw error;
     }
     
-    console.error('Token verification failed:', error);
+    // Handle token verification errors
+    console.error('Admin authentication failed:', error);
     throw NextResponse.json(
-      { error: "Unauthorized - Invalid token" }, 
+      { error: 'Unauthorized - Invalid or expired token' },
       { status: 401 }
     );
   }
 }
 
 /**
- * Wrapper for API routes that require admin access
+ * Middleware wrapper for admin-only API routes
+ * @param handler - The API route handler function
+ * @returns Wrapped handler with admin authentication
  */
-export function withAdminAuth(handler: (req: Request, context: any, user: any) => Promise<Response>) {
-  return async (req: Request, context: any) => {
+export function withAdminAuth<T extends any[]>(
+  handler: (request: NextRequest, ...args: T) => Promise<NextResponse>
+) {
+  return async (request: NextRequest, ...args: T): Promise<NextResponse> => {
     try {
-      const user = await requireAdmin(req);
-      return await handler(req, context, user);
+      await requireAdmin(request);
+      return handler(request, ...args);
     } catch (error) {
-      if (error instanceof Response) {
+      if (error instanceof NextResponse) {
         return error;
       }
-      
-      console.error('Admin auth wrapper error:', error);
       return NextResponse.json(
-        { error: "Internal server error" }, 
+        { error: 'Internal server error' },
         { status: 500 }
       );
     }
@@ -90,17 +108,15 @@ export function withAdminAuth(handler: (req: Request, context: any, user: any) =
 }
 
 /**
- * Check if request has valid admin token (non-throwing version)
+ * Checks if a user has admin privileges without throwing
+ * @param request - Next.js request object
+ * @returns Promise<boolean> - True if user is admin
  */
-export async function checkAdminAuth(req: Request): Promise<{ isAdmin: boolean; user?: any; error?: string }> {
+export async function isAdmin(request: NextRequest): Promise<boolean> {
   try {
-    const user = await requireAdmin(req);
-    return { isAdmin: true, user };
-  } catch (error) {
-    if (error instanceof Response) {
-      const errorData = await error.json();
-      return { isAdmin: false, error: errorData.error };
-    }
-    return { isAdmin: false, error: 'Authentication failed' };
+    await requireAdmin(request);
+    return true;
+  } catch {
+    return false;
   }
 }
