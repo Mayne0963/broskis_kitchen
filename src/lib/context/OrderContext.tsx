@@ -1,7 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
-import { toast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import { Order, OrderStatus, OrderContextType } from '@/types/order'
 import { 
   saveOrder, 
@@ -66,10 +66,8 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
         setCurrentOrder(createdOrder)
       }
 
-      toast({
-        title: 'Order placed successfully!',
+      toast.success('Order placed successfully!', {
         description: `Your order #${createdOrder.id} has been placed and is being processed.`,
-        duration: 5000,
       })
 
       return createdOrder.id
@@ -93,19 +91,14 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
           setCurrentOrder(createdOrder)
         }
 
-        toast({
-          title: 'Order placed successfully!',
+        toast.success('Order placed successfully!', {
           description: `Your order #${orderId} has been placed and is being processed.`,
-          duration: 5000,
         })
 
         return orderId
       } catch (fallbackError) {
-        toast({
-          title: 'Order failed',
+        toast.error('Order failed', {
           description: 'There was an error placing your order. Please try again.',
-          variant: 'destructive',
-          duration: 5000,
         })
         
         throw fallbackError
@@ -131,18 +124,13 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
         setCurrentOrder(prev => prev ? { ...prev, status, updatedAt: new Date() } : null)
       }
       
-      toast({
-        title: 'Order updated',
+      toast.success('Order updated', {
         description: `Order #${orderId} status updated to ${status}`,
-        duration: 3000,
       })
     } catch (error) {
       console.error('Failed to update order status:', error)
-      toast({
-        title: 'Update failed',
+      toast.error('Update failed', {
         description: 'Failed to update order status',
-        variant: 'destructive',
-        duration: 3000,
       })
     }
   }
@@ -209,18 +197,13 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
         setCurrentOrder(prev => prev ? { ...prev, status: 'cancelled' as OrderStatus, updatedAt: new Date() } : null)
       }
       
-      toast({
-        title: 'Order cancelled',
+      toast.success('Order cancelled', {
         description: `Order #${orderId} has been cancelled`,
-        duration: 3000,
       })
     } catch (error) {
       console.error('Failed to cancel order:', error)
-      toast({
-        title: 'Cancellation failed',
+      toast.error('Cancellation failed', {
         description: 'Failed to cancel order',
-        variant: 'destructive',
-        duration: 3000,
       })
     }
   }

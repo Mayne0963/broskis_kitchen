@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { FaTimes } from "react-icons/fa"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 
 interface AgeVerificationModalProps {
   isOpen: boolean

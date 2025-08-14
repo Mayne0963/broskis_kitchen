@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label'
 import AuthLayout from '@/components/auth/AuthLayout'
 import { validateEmail } from '../../../lib/utils/validation'
 import { useAuth } from '@/lib/context/AuthContext'
-import { toast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState('')

@@ -4,7 +4,7 @@ import type React from "react"
 
 import { createContext, useState, useContext, useEffect, type ReactNode } from "react"
 import type { CartContextType, CartItem } from "@/types"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 
 // Create the context with a default undefined value
 const CartContext = createContext<CartContextType | undefined>(undefined)
@@ -26,10 +26,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setItems((currentItems) => {
       // For customized items, we don't want to combine them
       if (newItem.customizations && Object.keys(newItem.customizations).length > 0) {
-        toast({
-          title: "Customized item added to cart",
+        toast.success("Customized item added to cart", {
           description: `${newItem.name} added to your cart`,
-          duration: 3000,
         })
         return [...currentItems, newItem]
       }
@@ -44,19 +42,15 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const updatedItems = [...currentItems]
         updatedItems[existingItemIndex].quantity += newItem.quantity
 
-        toast({
-          title: "Item updated in cart",
+        toast.success("Item updated in cart", {
           description: `${newItem.name} quantity increased to ${updatedItems[existingItemIndex].quantity}`,
-          duration: 3000,
         })
 
         return updatedItems
       } else {
         // Add new item if it doesn't exist
-        toast({
-          title: "Item added to cart",
+        toast.success("Item added to cart", {
           description: `${newItem.name} added to your cart`,
-          duration: 3000,
         })
 
         return [...currentItems, newItem]
@@ -69,10 +63,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setItems((currentItems) => {
       const itemToRemove = currentItems.find((item) => item.id === id)
       if (itemToRemove) {
-        toast({
-          title: "Item removed from cart",
+        toast.success("Item removed from cart", {
           description: `${itemToRemove.name} removed from your cart`,
-          duration: 3000,
         })
       }
       return currentItems.filter((item) => item.id !== id)
@@ -92,10 +84,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Clear cart
   const clearCart = () => {
     setItems([])
-    toast({
-      title: "Cart cleared",
+    toast.success("Cart cleared", {
       description: "All items have been removed from your cart",
-      duration: 3000,
     })
   }
 

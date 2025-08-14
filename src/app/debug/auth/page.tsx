@@ -2,6 +2,21 @@
 
 import { useAuth } from '@/lib/context/AuthContext'
 import { useState } from 'react'
+import { toast } from 'sonner'
+
+// Toast throttling to prevent spam
+let lastToastAt = 0
+function safeToast(kind: "success" | "error", title: string, description?: string) {
+  const now = Date.now()
+  if (now - lastToastAt < 5000) return
+  lastToastAt = now
+  if (kind === "success") toast.success(title, { description })
+  else toast.error(title, { description })
+}
+
+// Backoff state for quota exceeded errors
+let quotaExceededBackoff = false
+let backoffUntil = 0
 
 export default function AuthDebugPage() {
   const { user, loading } = useAuth()
@@ -24,6 +39,13 @@ export default function AuthDebugPage() {
 
   const refreshUserToken = async () => {
     if (user) {
+      // Check if we're in backoff period
+      const now = Date.now()
+      if (quotaExceededBackoff && now < backoffUntil) {
+        safeToast("error", "Refresh Failed", "Please wait before trying again due to rate limits.")
+        return
+      }
+      
       try {
         // Force refresh the user token
         const auth = (await import('firebase/auth')).getAuth()
@@ -43,14 +65,28 @@ export default function AuthDebugPage() {
           
           if (response.ok) {
             console.log('Session cookie updated successfully')
+            safeToast("success", "Permissions Updated", "Your account permissions have been refreshed.")
+            // Reset backoff state on success
+            quotaExceededBackoff = false
+            backoffUntil = 0
             // Refresh debug data
             fetchDebugData()
           } else {
             console.error('Failed to update session cookie')
+            safeToast("error", "Refresh Failed", "Failed to update session cookie.")
           }
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to refresh token:', error)
+        
+        // Check for quota exceeded error and implement backoff
+        if (error?.code === 'auth/quota-exceeded') {
+          quotaExceededBackoff = true
+          backoffUntil = now + 60000 // 1 minute backoff
+          safeToast("error", "Refresh Failed", "Rate limit exceeded. Please wait before trying again.")
+        } else {
+          safeToast("error", "Refresh Failed", "Failed to refresh account permissions.")
+        }
       }
     }
   }

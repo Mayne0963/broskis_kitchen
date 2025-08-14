@@ -21,7 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { toast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import { Search, UserCheck, UserX, Shield, ChefHat, User } from 'lucide-react'
 import { type UserRole } from '@/lib/auth/rbac'
 
@@ -65,11 +65,7 @@ export default function UserManagement({ className }: UserManagementProps) {
       revalidateOnFocus: true,
       onError: (error) => {
         console.error('Error fetching users:', error)
-        toast({
-          title: 'Error',
-          description: 'Failed to fetch users',
-          variant: 'destructive'
-        })
+        toast.error('Error', { description: 'Failed to fetch users' })
       }
     }
   )
@@ -105,17 +101,10 @@ export default function UserManagement({ className }: UserManagementProps) {
         false // Don't revalidate immediately
       )
       
-      toast({
-        title: 'Success',
-        description: `User role updated to ${newRole}`,
-      })
+      toast.success('Success', { description: `User role updated to ${newRole}` })
     } catch (error) {
       console.error('Error updating user role:', error)
-      toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to update user role',
-        variant: 'destructive'
-      })
+      toast.error('Error', { description: error instanceof Error ? error.message : 'Failed to update user role' })
       // Revalidate on error to get the correct state
       mutate()
     } finally {
