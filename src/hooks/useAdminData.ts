@@ -14,6 +14,7 @@ import { COLLECTIONS } from '@/lib/firebase/collections'
 import { Order } from '@/types/order'
 import { getRewardsAnalytics } from '@/lib/services/rewardsService'
 import { getUserAnalytics, getUserActivity } from '@/lib/services/userAnalyticsService'
+import { useRole } from '@/context/RoleContext'
 
 interface AdminStats {
   totalOrders: number
@@ -91,6 +92,18 @@ export const useAdminData = () => {
   const [data, setData] = useState<AdminData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const role = useRole()
+
+  // Early return if user is not an admin
+  if (role !== 'admin') {
+    return {
+      data: null,
+      loading: false,
+      error: 'Access denied: Admin role required',
+      refetch: () => Promise.resolve(),
+      unsubscribe: () => {}
+    }
+  }
 
   // Calculate stats from orders and user analytics
   const calculateStats = useCallback((orders: Order[], userAnalytics: any, userActivity: any): AdminStats => {

@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/lib/context/AuthContext'
+import { useRole } from '@/context/RoleContext'
 import { Order, User, RewardSummary, Coupon, Offer } from '@/types/firestore'
 
 interface AdminStats {
@@ -86,6 +87,17 @@ export const useAdminApiData = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { user, getIdToken } = useAuth()
+  const role = useRole()
+
+  // Early return if user is not an admin
+  if (role !== 'admin') {
+    return {
+      data: null,
+      loading: false,
+      error: 'Access denied: Admin role required',
+      refetch: () => Promise.resolve()
+    }
+  }
 
   // Helper function to make authenticated API calls
   const makeAuthenticatedRequest = useCallback(async (url: string, options: RequestInit = {}) => {

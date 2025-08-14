@@ -10,7 +10,7 @@ import { FaBars, FaTimes, FaUser, FaShoppingBag } from "react-icons/fa"
 import CartDropdown from "../../components/cart/CartDropdown"
 import { useCart } from "../../lib/context/CartContext"
 import { useAuth } from "../../lib/context/AuthContext"
-import { useAuthClaims } from "../../hooks/useAuthClaims"
+import { useRole } from "@/context/RoleContext"
 import { EmailVerificationBanner } from "../auth/EmailVerificationBanner"
 import { 
   AccessibleDropdown, 
@@ -25,8 +25,8 @@ const Navbar: React.FC = () => {
   const { itemCount } = useCart()
   const pathname = usePathname()
   const { user, logout } = useAuth()
-  const { claims } = useAuthClaims()
-  const isAdmin = user?.role === 'admin' || Boolean(claims?.isAdmin)
+  const role = useRole()
+  const isAdmin = role === 'admin'
   const dropdownRef = useRef<HTMLDivElement>(null)
   const [isScrolled, setIsScrolled] = useState(false)
   const [lastScrollY, setLastScrollY] = useState(0)
@@ -166,7 +166,7 @@ const Navbar: React.FC = () => {
               >
                 Order History
               </AccessibleMenuItem>
-              {isAdmin && (
+              {role === 'admin' && (
                 <AccessibleMenuItem
                   href="/admin"
                   onClick={() => setUserDropdownOpen(false)}
@@ -300,7 +300,7 @@ const Navbar: React.FC = () => {
               >
                 Order History
               </Link>
-              {isAdmin && (
+              {role === 'admin' && (
                 <Link
                   href="/admin"
                   className="block py-2 hover:text-gold-foil transition-colors duration-300 text-red-600 font-medium"

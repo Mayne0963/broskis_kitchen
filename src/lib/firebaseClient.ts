@@ -1,4 +1,5 @@
 import { initializeApp, getApps } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
@@ -10,6 +11,7 @@ const c = {
 };
 
 export const app = getApps()[0] || initializeApp(c);
+export const auth = getAuth(app);
 export const db = getFirestore(app);
 const uploadsBucket =
   process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET_UPLOADS || c.storageBucket;
