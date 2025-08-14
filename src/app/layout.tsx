@@ -20,8 +20,7 @@ import { NetworkStatus } from "../components/common/EnhancedLoadingStates"
 import { playfair, montserrat } from "./fonts"
 import StructuredData, { OrganizationStructuredData } from "../components/seo/StructuredData"
 import { SkipNavigation } from "../components/accessibility/AccessibilityEnhancer"
-import ClientProviders from "./providers"
-import { RoleProvider } from "@/context/RoleContext"
+import ClientProviders from '@/components/ClientProviders'
 
 export const metadata: Metadata = {
   title: {
@@ -118,20 +117,19 @@ export default function RootLayout({
               <ChunkErrorHandler />
               <Providers>
                 <OrderProvider>
-                  <RoleProvider>
+                  <ClientProviders>
                     <SkipNavigation />
                     <ConditionalNavbar />
                     <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
                     <Footer />
                     <MusicPlayer />
-                    <ClientProviders />
                     <CookieConsent />
                     <SEOAudit />
                     <SchemaGenerator />
                     <NetworkStatus />
                     <ErrorMonitor />
                     <PerformanceMonitor />
-                  </RoleProvider>
+                  </ClientProviders>
                 </OrderProvider>
               </Providers>
             </ResourceErrorBoundary>

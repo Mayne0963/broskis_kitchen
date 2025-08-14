@@ -9,21 +9,15 @@ export function initAdmin() {
     const projectId = process.env.FIREBASE_PROJECT_ID;
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
     const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
-    if (!projectId || !clientEmail || !privateKey) {
-      throw new Error('Missing Firebase Admin env vars');
-    }
+    if (!projectId || !clientEmail || !privateKey) throw new Error('Missing Firebase Admin env vars');
     app = initializeApp({ credential: cert({ projectId, clientEmail, privateKey }) });
   }
   return app!;
 }
 
-// Initialize admin app and export services
+// Initialize and export services
 initAdmin();
-
-// Export auth service
 export const auth = getAuth();
 export const adminAuth = getAuth();
-
-// Export firestore service
 export const db = getFirestore();
 export const adb = getFirestore();

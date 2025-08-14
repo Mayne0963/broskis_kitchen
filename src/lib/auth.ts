@@ -1,7 +1,6 @@
 import { onAuthStateChanged, onIdTokenChanged, getIdToken, getIdTokenResult } from 'firebase/auth';
 import { auth } from '@/lib/firebaseClient';
-
-type Role = 'admin' | 'manager' | 'user' | null;
+import type { Role } from '@/context/RoleContext';
 
 export function subscribeToAuth(onRole: (r: Role) => void) {
   let forced = false;
