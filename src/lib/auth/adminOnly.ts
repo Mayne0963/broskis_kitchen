@@ -130,3 +130,10 @@ export async function isAdmin(request: NextRequest): Promise<boolean> {
     return false;
   }
 }
+
+/**
+ * Alias for requireAdmin for backward compatibility
+ * @param request - Next.js request object
+ * @returns Promise<DecodedIdToken> - Decoded token with admin claims
+ */
+export const verifyAdminAuth = requireAdmin;

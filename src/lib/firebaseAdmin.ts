@@ -4,12 +4,12 @@ import { getAuth } from 'firebase-admin/auth';
 
 export function initAdmin() {
   if (!getApps().length) {
-    const projectId = process.env.FIREBASE_PROJECT_ID;
-    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+    const projectId = process.env.FIREBASE_ADMIN_PROJECT_ID;
+    const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL;
+    const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n');
     
     if (!projectId || !clientEmail || !privateKey) {
-      throw new Error('Missing Firebase Admin env vars');
+      throw new Error('Missing Firebase Admin env vars: FIREBASE_ADMIN_PROJECT_ID, FIREBASE_ADMIN_CLIENT_EMAIL, FIREBASE_ADMIN_PRIVATE_KEY');
     }
     
     initializeApp({
@@ -25,8 +25,11 @@ export function initAdmin() {
 // Initialize admin and export services
 initAdmin();
 
-// Export Firebase Admin services
-export const db = getFirestore();
-export const adb = getFirestore(); // Alternative alias
+// Export services with new names
+export const adminDb = getFirestore();
+export const adminAuth = getAuth();
+
+// Export services with legacy names for backward compatibility
+export const adb = getFirestore();
 export const auth = getAuth();
-export const adminAuth = getAuth(); // Alternative alias
+export const db = getFirestore();
