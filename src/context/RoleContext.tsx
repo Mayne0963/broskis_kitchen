@@ -1,8 +1,9 @@
+'use client'
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { subscribeToAuth } from '@/lib/auth';
 
 type Role = 'admin' | 'manager' | 'user' | null;
-
 const RoleCtx = createContext<Role>(null);
 export const useRole = () => useContext(RoleCtx);
 

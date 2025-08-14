@@ -21,6 +21,7 @@ import { playfair, montserrat } from "./fonts"
 import StructuredData, { OrganizationStructuredData } from "../components/seo/StructuredData"
 import { SkipNavigation } from "../components/accessibility/AccessibilityEnhancer"
 import ClientProviders from "./providers"
+import { RoleProvider } from "@/context/RoleContext"
 
 export const metadata: Metadata = {
   title: {
@@ -117,18 +118,20 @@ export default function RootLayout({
               <ChunkErrorHandler />
               <Providers>
                 <OrderProvider>
-                  <SkipNavigation />
-                  <ConditionalNavbar />
-                  <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
-                  <Footer />
-                  <MusicPlayer />
-                  <ClientProviders />
-                  <CookieConsent />
-                  <SEOAudit />
-                  <SchemaGenerator />
-                  <NetworkStatus />
-                  <ErrorMonitor />
-                  <PerformanceMonitor />
+                  <RoleProvider>
+                    <SkipNavigation />
+                    <ConditionalNavbar />
+                    <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
+                    <Footer />
+                    <MusicPlayer />
+                    <ClientProviders />
+                    <CookieConsent />
+                    <SEOAudit />
+                    <SchemaGenerator />
+                    <NetworkStatus />
+                    <ErrorMonitor />
+                    <PerformanceMonitor />
+                  </RoleProvider>
                 </OrderProvider>
               </Providers>
             </ResourceErrorBoundary>
