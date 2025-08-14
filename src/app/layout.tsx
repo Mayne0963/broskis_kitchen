@@ -1,4 +1,3 @@
-"use client";
 import type React from "react"
 import type { Metadata } from "next"
 import "./globals.css"
@@ -18,12 +17,10 @@ import CookieConsent from "../components/gdpr/CookieConsent"
 import SEOAudit from "../components/seo/SEOAudit"
 import SchemaGenerator from "../components/seo/SchemaGenerator"
 import { NetworkStatus } from "../components/common/EnhancedLoadingStates"
-import { Toaster } from "sonner"
 import { playfair, montserrat } from "./fonts"
 import StructuredData, { OrganizationStructuredData } from "../components/seo/StructuredData"
 import { SkipNavigation } from "../components/accessibility/AccessibilityEnhancer"
-import AccessibilityAudit from "../components/accessibility/AccessibilityAudit"
-import PWAManager from "../components/pwa/PWAManager"
+import ClientProviders from "./providers"
 
 export const metadata: Metadata = {
   title: {
@@ -125,15 +122,13 @@ export default function RootLayout({
                   <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
                   <Footer />
                   <MusicPlayer />
-                  <Toaster richColors position="top-right" closeButton />
+                  <ClientProviders />
                   <CookieConsent />
                   <SEOAudit />
                   <SchemaGenerator />
                   <NetworkStatus />
                   <ErrorMonitor />
                   <PerformanceMonitor />
-                  <AccessibilityAudit />
-                  <PWAManager />
                 </OrderProvider>
               </Providers>
             </ResourceErrorBoundary>
