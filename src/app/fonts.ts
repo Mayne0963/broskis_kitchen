@@ -1,4 +1,4 @@
-import { Playfair_Display, Montserrat } from 'next/font/google'
+import { Playfair_Display, Montserrat, Inter } from 'next/font/google'
 
 // Playfair Display font with comprehensive fallbacks
 export const playfair = Playfair_Display({
@@ -19,3 +19,6 @@ export const montserrat = Montserrat({
   preload: true,
   adjustFontFallback: true
 })
+
+// Inter font as specified in requirements
+export const inter = Inter({ subsets: ['latin'] })
