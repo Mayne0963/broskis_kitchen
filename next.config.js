@@ -1,4 +1,10 @@
 /** @type {import('next').NextConfig} */
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
@@ -81,6 +87,9 @@ const nextConfig = {
       net: false,
       tls: false,
     };
+    
+    // Add webpack alias for @ pointing to src/
+    config.resolve.alias['@'] = path.resolve(__dirname, 'src');
     
     return config;
   },
