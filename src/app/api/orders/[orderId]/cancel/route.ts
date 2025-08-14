@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { refundService } from '@/lib/services/refund-service';
 import { auth, adb } from '@/lib/firebaseAdmin';
+import { COLLECTIONS } from '@/lib/firebase/collections';
 
 export async function POST(request: NextRequest, { params }: { params: { orderId: string } }) {
   try {
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest, { params }: { params: { orderId
     }
 
     // Get order to verify ownership or admin access
-    const orderSnap = await adb.collection('orders').doc(orderId).get();
+    const orderSnap = await adb.collection(COLLECTIONS.ORDERS).doc(orderId).get();
     
     if (!orderSnap.exists()) {
       return NextResponse.json(
@@ -153,7 +154,7 @@ export async function GET(request: NextRequest, { params }: { params: { orderId:
     }
 
     // Get order
-    const orderSnap = await adb.collection('orders').doc(orderId).get();
+    const orderSnap = await adb.collection(COLLECTIONS.ORDERS).doc(orderId).get();
     
     if (!orderSnap.exists()) {
       return NextResponse.json(

@@ -24,6 +24,7 @@ import { toast } from 'sonner'
 import { Order, OrderStatus } from '@/types/order'
 import { db, isFirebaseConfigured } from '@/lib/services/firebase'
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, Timestamp } from 'firebase/firestore'
+import { COLLECTIONS } from '@/lib/firebase/collections'
 import OrderStatusUpdate from '@/components/orders/OrderStatusUpdate'
 import { STATUS_INFO, getStatusColorClass } from '@/lib/utils/orderStatusValidation'
 
@@ -96,7 +97,7 @@ export default function OrdersTab({ initialOrders = [] }: OrdersTabProps) {
       return
     }
 
-    const ordersRef = collection(db, 'orders')
+    const ordersRef = collection(db, COLLECTIONS.ORDERS)
     const q = query(ordersRef, orderBy('createdAt', 'desc'))
 
     const unsubscribe = onSnapshot(

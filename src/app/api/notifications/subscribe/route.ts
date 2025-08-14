@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth, db } from '@/lib/firebaseAdmin';
+import { COLLECTIONS } from '@/lib/firebase/collections';
 
 interface SubscriptionRequest {
   userId: string;
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
     await db.collection('push_subscriptions').doc(subscriptionId).set(subscriptionData);
 
     // Update user's notification preferences
-    await db.collection('users').doc(userId).update({
+    await db.collection(COLLECTIONS.USERS).doc(userId).update({
       'notificationPreferences.pushNotifications': true,
       'notificationPreferences.lastSubscribed': new Date().toISOString()
     });

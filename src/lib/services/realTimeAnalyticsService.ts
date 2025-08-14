@@ -10,6 +10,7 @@ import {
   limit,
   Timestamp
 } from 'firebase/firestore'
+import { COLLECTIONS } from '@/lib/firebase/collections'
 
 export interface OrderMetric {
   id: string
@@ -89,7 +90,7 @@ class RealTimeAnalyticsService {
     today.setHours(0, 0, 0, 0)
 
     const ordersQuery = query(
-      collection(db, 'orders'),
+      collection(db, COLLECTIONS.ORDERS),
       where('createdAt', '>=', Timestamp.fromDate(today)),
       orderBy('createdAt', 'desc'),
       limit(20)

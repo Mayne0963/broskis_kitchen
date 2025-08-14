@@ -12,7 +12,8 @@ import { useAdminApiData } from '@/hooks/useAdminApiData'
 import { Loader2 } from 'lucide-react'
 import useSWR from 'swr'
 import { onSnapshot, collection, query, where, Timestamp } from 'firebase/firestore'
-import { db } from '@/lib/firebaseClient'
+import { db } from '@/lib/firebase/client'
+import { COLLECTIONS } from '@/lib/firebase/collections'
 
 export default function AdminPage() {
   const { user, loading } = useAuth()
@@ -33,7 +34,7 @@ export default function AdminPage() {
     today.setHours(0, 0, 0, 0)
     
     const ordersQuery = query(
-      collection(db, 'orders'),
+      collection(db, COLLECTIONS.ORDERS),
       where('createdAt', '>=', Timestamp.fromDate(today))
     )
     

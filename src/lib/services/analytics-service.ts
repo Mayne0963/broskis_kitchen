@@ -1,5 +1,16 @@
-import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs, orderBy, limit, startAfter, Timestamp } from 'firebase/firestore';
+import { db, isFirebaseConfigured } from '@/lib/firebase';
+import { 
+  collection, 
+  query, 
+  where, 
+  orderBy, 
+  limit, 
+  getDocs,
+  Timestamp,
+  startAfter,
+  endBefore
+} from 'firebase/firestore'
+import { COLLECTIONS } from '@/lib/firebase/collections'
 
 interface DateRange {
   startDate: Date;
@@ -65,7 +76,7 @@ class AnalyticsService {
   async getOrderMetrics(dateRange: DateRange): Promise<OrderMetrics> {
     try {
       const ordersQuery = query(
-        collection(db, 'orders'),
+        collection(db, COLLECTIONS.ORDERS),
         where('createdAt', '>=', Timestamp.fromDate(dateRange.startDate)),
         where('createdAt', '<=', Timestamp.fromDate(dateRange.endDate))
       );
@@ -105,7 +116,7 @@ class AnalyticsService {
   async getRevenueMetrics(dateRange: DateRange): Promise<RevenueMetrics> {
     try {
       const ordersQuery = query(
-        collection(db, 'orders'),
+        collection(db, COLLECTIONS.ORDERS),
         where('createdAt', '>=', Timestamp.fromDate(dateRange.startDate)),
         where('createdAt', '<=', Timestamp.fromDate(dateRange.endDate)),
         where('status', 'in', ['delivered', 'completed'])
@@ -149,7 +160,7 @@ class AnalyticsService {
   async getPopularItems(dateRange: DateRange, limitCount: number = 10): Promise<PopularItem[]> {
     try {
       const ordersQuery = query(
-        collection(db, 'orders'),
+        collection(db, COLLECTIONS.ORDERS),
         where('createdAt', '>=', Timestamp.fromDate(dateRange.startDate)),
         where('createdAt', '<=', Timestamp.fromDate(dateRange.endDate)),
         where('status', 'in', ['delivered', 'completed'])
@@ -197,7 +208,7 @@ class AnalyticsService {
   async getCustomerMetrics(dateRange: DateRange): Promise<CustomerMetrics> {
     try {
       const ordersQuery = query(
-        collection(db, 'orders'),
+        collection(db, COLLECTIONS.ORDERS),
         where('createdAt', '>=', Timestamp.fromDate(dateRange.startDate)),
         where('createdAt', '<=', Timestamp.fromDate(dateRange.endDate))
       );
@@ -236,7 +247,7 @@ class AnalyticsService {
   async getDeliveryMetrics(dateRange: DateRange): Promise<DeliveryMetrics> {
     try {
       const ordersQuery = query(
-        collection(db, 'orders'),
+        collection(db, COLLECTIONS.ORDERS),
         where('createdAt', '>=', Timestamp.fromDate(dateRange.startDate)),
         where('createdAt', '<=', Timestamp.fromDate(dateRange.endDate)),
         where('deliveryType', '==', 'delivery')
@@ -294,7 +305,7 @@ class AnalyticsService {
       endOfDay.setHours(23, 59, 59, 999);
 
       const ordersQuery = query(
-        collection(db, 'orders'),
+        collection(db, COLLECTIONS.ORDERS),
         where('createdAt', '>=', Timestamp.fromDate(startOfDay)),
         where('createdAt', '<=', Timestamp.fromDate(endOfDay))
       );
@@ -330,7 +341,7 @@ class AnalyticsService {
   async getDailyData(dateRange: DateRange): Promise<DailyData[]> {
     try {
       const ordersQuery = query(
-        collection(db, 'orders'),
+        collection(db, COLLECTIONS.ORDERS),
         where('createdAt', '>=', Timestamp.fromDate(dateRange.startDate)),
         where('createdAt', '<=', Timestamp.fromDate(dateRange.endDate)),
         orderBy('createdAt', 'asc')

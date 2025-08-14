@@ -10,6 +10,7 @@ import {
   onSnapshot,
   getDocs
 } from 'firebase/firestore'
+import { COLLECTIONS } from '@/lib/firebase/collections'
 import { Order } from '@/types/order'
 import { getRewardsAnalytics } from '@/lib/services/rewardsService'
 import { getUserAnalytics, getUserActivity } from '@/lib/services/userAnalyticsService'
@@ -142,15 +143,16 @@ export const useAdminData = () => {
       setError(null)
 
       const ordersQuery = query(
-        collection(db, 'orders'),
+        collection(db, COLLECTIONS.ORDERS),
         orderBy('createdAt', 'desc'),
         limit(50)
       )
 
-      const menuDropsQuery = query(
-        collection(db, 'menuDrops'),
-        orderBy('startTime', 'desc')
-      )
+      // Note: menuDrops collection not defined in COLLECTIONS - removing for now
+        // const menuDropsQuery = query(
+        //   collection(db, 'menuDrops'),
+        //   orderBy('startTime', 'desc')
+        // )
 
       const [
         ordersSnapshot,
@@ -299,19 +301,20 @@ export const useAdminData = () => {
     const unsubscribers: (() => void)[] = []
 
     const ordersQuery = query(
-      collection(db, 'orders'),
+      collection(db, COLLECTIONS.ORDERS),
       orderBy('createdAt', 'desc'),
       limit(50)
     )
-    const menuDropsQuery = query(
-      collection(db, 'menuDrops'),
-      orderBy('startTime', 'desc')
-    )
-    const rewardsQuery = query(
-      collection(db, 'userRedemptions'),
-      orderBy('redeemedAt', 'desc'),
-      limit(20)
-    )
+    // Note: menuDrops and userRedemptions collections not defined in COLLECTIONS - removing for now
+      // const menuDropsQuery = query(
+      //   collection(db, 'menuDrops'),
+      //   orderBy('startTime', 'desc')
+      // )
+      // const rewardsQuery = query(
+      //   collection(db, 'userRedemptions'),
+      //   orderBy('redeemedAt', 'desc'),
+      //   limit(20)
+      // )
 
     const ordersUnsubscribe = onSnapshot(
       ordersQuery,
@@ -343,7 +346,7 @@ export const useAdminData = () => {
 
     // Users listener
     const usersQuery = query(
-      collection(db, 'users'),
+      collection(db, COLLECTIONS.USERS),
       orderBy('createdAt', 'desc'),
       limit(10)
     )

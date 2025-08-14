@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { otwService } from '@/lib/services/otw-service';
 import { adb } from '@/lib/firebaseAdmin';
+import { COLLECTIONS } from '@/lib/firebase/collections';
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Find order by OTW delivery ID
-    const ordersSnap = await adb.collection('orders')
+    const ordersSnap = await adb.collection(COLLECTIONS.ORDERS)
       .where('deliveryInfo.otwDeliveryId', '==', deliveryUpdate.deliveryId)
       .get();
     
@@ -98,7 +99,7 @@ export async function POST(request: NextRequest) {
       updateData.estimatedTime = Math.max(0, estimatedMinutes);
     }
 
-    await adb.collection('orders').doc(orderId).update(updateData);
+    await adb.collection(COLLECTIONS.ORDERS).doc(orderId).update(updateData);
 
     // Note: Email and SMS notifications have been disabled
     // Push notifications can be implemented via Firebase Cloud Messaging

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth, db } from '@/lib/firebaseAdmin';
+import { COLLECTIONS } from '@/lib/firebase/collections';
 
 // PUT - Update driver location
 export async function PUT(
@@ -228,7 +229,7 @@ async function notifyCustomerLocationUpdate(deliveryId: string, location: any) {
     if (!customerId) return;
 
     // Check if customer wants location updates
-    const userDoc = await db.collection('users').doc(customerId).get();
+    const userDoc = await db.collection(COLLECTIONS.USERS).doc(customerId).get();
     const userData = userDoc.data();
     const wantsLocationUpdates = userData?.notificationPreferences?.push?.orderUpdates !== false;
     

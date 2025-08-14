@@ -12,6 +12,7 @@ import {
   startAfter,
   endBefore
 } from 'firebase/firestore'
+import { COLLECTIONS } from '@/lib/firebase/collections'
 
 export interface UserAnalytics {
   totalUsers: number
@@ -126,12 +127,12 @@ export const getUserAnalytics = async (): Promise<UserAnalytics> => {
     const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
 
     // Get total users
-    const usersSnapshot = await getDocs(collection(db, 'users'))
+    const usersSnapshot = await getDocs(collection(db, COLLECTIONS.USERS))
     const totalUsers = usersSnapshot.size
 
     // Get new users today
     const newUsersTodayQuery = query(
-      collection(db, 'users'),
+      collection(db, COLLECTIONS.USERS),
       where('createdAt', '>=', Timestamp.fromDate(today))
     )
     const newUsersTodaySnapshot = await getDocs(newUsersTodayQuery)
@@ -139,7 +140,7 @@ export const getUserAnalytics = async (): Promise<UserAnalytics> => {
 
     // Get new users this week
     const newUsersWeekQuery = query(
-      collection(db, 'users'),
+      collection(db, COLLECTIONS.USERS),
       where('createdAt', '>=', Timestamp.fromDate(weekAgo))
     )
     const newUsersWeekSnapshot = await getDocs(newUsersWeekQuery)
@@ -147,7 +148,7 @@ export const getUserAnalytics = async (): Promise<UserAnalytics> => {
 
     // Get new users this month
     const newUsersMonthQuery = query(
-      collection(db, 'users'),
+      collection(db, COLLECTIONS.USERS),
       where('createdAt', '>=', Timestamp.fromDate(monthAgo))
     )
     const newUsersMonthSnapshot = await getDocs(newUsersMonthQuery)
@@ -155,7 +156,7 @@ export const getUserAnalytics = async (): Promise<UserAnalytics> => {
 
     // Get active users (users with orders in last 30 days)
     const activeUsersQuery = query(
-      collection(db, 'orders'),
+      collection(db, COLLECTIONS.ORDERS),
       where('createdAt', '>=', Timestamp.fromDate(monthAgo))
     )
     const activeOrdersSnapshot = await getDocs(activeUsersQuery)
@@ -171,7 +172,7 @@ export const getUserAnalytics = async (): Promise<UserAnalytics> => {
     // Calculate user growth rate
     const previousMonth = new Date(monthAgo.getTime() - 30 * 24 * 60 * 60 * 1000)
     const previousMonthQuery = query(
-      collection(db, 'users'),
+      collection(db, COLLECTIONS.USERS),
       where('createdAt', '>=', Timestamp.fromDate(previousMonth)),
       where('createdAt', '<', Timestamp.fromDate(monthAgo))
     )
@@ -182,7 +183,7 @@ export const getUserAnalytics = async (): Promise<UserAnalytics> => {
       : 0
 
     // Get all orders for calculations
-    const ordersSnapshot = await getDocs(collection(db, 'orders'))
+    const ordersSnapshot = await getDocs(collection(db, COLLECTIONS.ORDERS))
     const ordersByUser: { [userId: string]: any[] } = {}
     const userSpending: { [userId: string]: number } = {}
     
@@ -247,7 +248,7 @@ export const getUserActivity = async (): Promise<UserActivity> => {
 
     // Get daily active users (users with orders today)
     const dailyActiveQuery = query(
-      collection(db, 'orders'),
+      collection(db, COLLECTIONS.ORDERS),
       where('createdAt', '>=', Timestamp.fromDate(today))
     )
     const dailyActiveSnapshot = await getDocs(dailyActiveQuery)
@@ -262,7 +263,7 @@ export const getUserActivity = async (): Promise<UserActivity> => {
 
     // Get weekly active users
     const weeklyActiveQuery = query(
-      collection(db, 'orders'),
+      collection(db, COLLECTIONS.ORDERS),
       where('createdAt', '>=', Timestamp.fromDate(weekAgo))
     )
     const weeklyActiveSnapshot = await getDocs(weeklyActiveQuery)
@@ -277,7 +278,7 @@ export const getUserActivity = async (): Promise<UserActivity> => {
 
     // Get monthly active users
     const monthlyActiveQuery = query(
-      collection(db, 'orders'),
+      collection(db, COLLECTIONS.ORDERS),
       where('createdAt', '>=', Timestamp.fromDate(monthAgo))
     )
     const monthlyActiveSnapshot = await getDocs(monthlyActiveQuery)
@@ -293,7 +294,7 @@ export const getUserActivity = async (): Promise<UserActivity> => {
     // Calculate retention rate (users who made orders in both this month and last month)
     const lastMonth = new Date(monthAgo.getTime() - 30 * 24 * 60 * 60 * 1000)
     const lastMonthQuery = query(
-      collection(db, 'orders'),
+      collection(db, COLLECTIONS.ORDERS),
       where('createdAt', '>=', Timestamp.fromDate(lastMonth)),
       where('createdAt', '<', Timestamp.fromDate(monthAgo))
     )
@@ -344,7 +345,7 @@ const getTopCustomers = async (
       try {
         // Get user details
         const userQuery = query(
-          collection(db, 'users'),
+          collection(db, COLLECTIONS.USERS),
           where('__name__', '==', userId)
         )
         const userSnapshot = await getDocs(userQuery)
@@ -390,7 +391,7 @@ const getUserRegistrationTrend = async () => {
       const nextDate = new Date(date.getTime() + 24 * 60 * 60 * 1000)
       
       const dayQuery = query(
-        collection(db, 'users'),
+        collection(db, COLLECTIONS.USERS),
         where('createdAt', '>=', Timestamp.fromDate(date)),
         where('createdAt', '<', Timestamp.fromDate(nextDate))
       )
@@ -419,7 +420,7 @@ export const getTotalUserCount = async (): Promise<number> => {
   }
 
   try {
-    const usersSnapshot = await getDocs(collection(db, 'users'))
+    const usersSnapshot = await getDocs(collection(db, COLLECTIONS.USERS))
     return usersSnapshot.size
   } catch (error) {
     console.error('Error fetching user count:', error)
@@ -438,7 +439,7 @@ export const getActiveUserCount = async (): Promise<number> => {
   try {
     const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
     const activeUsersQuery = query(
-      collection(db, 'orders'),
+      collection(db, COLLECTIONS.ORDERS),
       where('createdAt', '>=', Timestamp.fromDate(monthAgo))
     )
     

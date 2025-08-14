@@ -3,6 +3,9 @@ import { logger } from '@/lib/services/logging-service';
 import { saveOrder, getOrderById, updateOrderStatus, trackOrder, cancelOrder } from '@/lib/services/orderService';
 import { NotificationService } from '@/lib/services/notification-service';
 import { DriverCommunicationService } from '@/lib/services/driver-communication-service';
+import { OrderService } from '@/lib/services/order-service';
+import { PaymentService } from '@/lib/services/payment-service';
+import { COLLECTIONS } from '@/lib/firebase/collections';
 
 interface TestResult {
   testName: string;
@@ -152,7 +155,7 @@ class OrderFlowTestSuite {
   }
 
   private async createTestUser(user: TestUser): Promise<void> {
-    await db.collection('users').doc(user.id).set({
+    await db.collection(COLLECTIONS.USERS).doc(user.id).set({
       email: user.email,
       phone: user.phone,
       name: user.name,
@@ -162,7 +165,7 @@ class OrderFlowTestSuite {
     });
 
     this.cleanup.push(async () => {
-      await db.collection('users').doc(user.id).delete();
+      await db.collection(COLLECTIONS.USERS).doc(user.id).delete();
     });
   }
 
@@ -487,7 +490,7 @@ class OrderFlowTestSuite {
         }
 
         // Verify status was updated
-        const orderDoc = await db.collection('orders').doc(this.testOrders[0].id).get();
+        const orderDoc = await db.collection(COLLECTIONS.ORDERS).doc(this.testOrders[0].id).get();
         const orderData = orderDoc.data();
 
         if (orderData?.status !== status) {
@@ -542,7 +545,7 @@ class OrderFlowTestSuite {
       cancellationOrderId = order.id!;
       
       this.cleanup.push(async () => {
-        await db.collection('orders').doc(cancellationOrderId).delete();
+        await db.collection(COLLECTIONS.ORDERS).doc(cancellationOrderId).delete();
       });
 
       return { orderId: cancellationOrderId };

@@ -5,6 +5,7 @@ import { Clock, CheckCircle, Truck, ChefHat, Package, AlertCircle } from 'lucide
 import { Order, OrderStatus } from '@/types/order'
 import { db, isFirebaseConfigured } from '@/lib/services/firebase'
 import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore'
+import { COLLECTIONS } from '@/lib/firebase/collections'
 import { useAuth } from '@/lib/context/AuthContext'
 
 interface RealTimeOrderStatusProps {
@@ -38,7 +39,7 @@ export default function RealTimeOrderStatus({ orderId, onOrderUpdate }: RealTime
         if (isFirebaseConfigured && db && isAuthenticated && user) {
           // Set up Firebase real-time listener with authentication
           const q = query(
-            collection(db, 'orders'),
+            collection(db, COLLECTIONS.ORDERS),
             where('id', '==', orderId)
           )
 

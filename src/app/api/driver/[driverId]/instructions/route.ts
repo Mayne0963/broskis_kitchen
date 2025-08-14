@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth, db } from '@/lib/firebaseAdmin';
+import { COLLECTIONS } from '@/lib/firebase/collections';
 
 interface DeliveryInstructions {
   id?: string;
@@ -125,7 +126,7 @@ export async function GET(
     }
 
     // Get order details for context
-    const orderDoc = await db.collection('orders').doc(deliveryData.orderId).get();
+    const orderDoc = await db.collection(COLLECTIONS.ORDERS).doc(deliveryData.orderId).get();
     const orderData = orderDoc.exists ? orderDoc.data() : null;
 
     return NextResponse.json({

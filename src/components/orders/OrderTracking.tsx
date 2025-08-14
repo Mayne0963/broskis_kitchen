@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { LoadingOverlay, ErrorState, useLoadingState } from '../common/EnhancedLoadingStates'
 import { GridSkeleton, EmptyState } from '../common/LoadingStates'
+import { COLLECTIONS } from '@/lib/firebase/collections'
 import { 
   Search, 
   Clock, 
@@ -152,7 +153,7 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
     setError(null)
 
     try {
-      const ordersRef = collection(db, 'orders')
+      const ordersRef = collection(db, COLLECTIONS.ORDERS)
       const q = query(
         ordersRef,
         where('userId', '==', userId),

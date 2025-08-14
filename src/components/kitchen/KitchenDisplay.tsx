@@ -20,6 +20,7 @@ import {
 import { Order, OrderStatus } from '@/types/order'
 import { db, isFirebaseConfigured } from '@/lib/firebase'
 import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, Timestamp } from 'firebase/firestore'
+import { COLLECTIONS } from '@/lib/firebase/collections'
 import OrderStatusUpdate from '@/components/orders/OrderStatusUpdate'
 import { STATUS_INFO, getStatusColorClass } from '@/lib/utils/orderStatusValidation'
 
@@ -52,7 +53,7 @@ export default function KitchenDisplay({ initialOrders = [] }: KitchenDisplayPro
     setError(null)
 
     try {
-      const ordersRef = collection(db, 'orders')
+      const ordersRef = collection(db, COLLECTIONS.ORDERS)
       const q = query(
         ordersRef,
         where('status', 'in', ['confirmed', 'preparing', 'ready']),

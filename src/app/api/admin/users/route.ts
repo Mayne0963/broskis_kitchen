@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth/adminOnly';
-import { adminCollections } from '@/lib/firebase/collections';
+import { adminCollections } from '@/lib/firebase/admin-collections';
 import { User, UsersQuery, UsersResponse, UserRoles } from '@/types/firestore';
 
 export async function GET(request: NextRequest) {

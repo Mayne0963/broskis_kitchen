@@ -13,6 +13,7 @@ import {
   limit,
   Timestamp 
 } from 'firebase/firestore'
+import { COLLECTIONS } from '@/lib/firebase/collections'
 
 // Types
 export interface UserRewards {
@@ -76,7 +77,7 @@ export interface UserRedemption {
 
 // Collections
 const USER_REWARDS_COLLECTION = 'userRewards'
-const POINTS_TRANSACTIONS_COLLECTION = 'pointsTransactions'
+const POINTS_TRANSACTIONS_COLLECTION = COLLECTIONS.REWARD_TRANSACTIONS
 const REWARD_OFFERS_COLLECTION = 'rewardOffers'
 const USER_REDEMPTIONS_COLLECTION = 'userRedemptions'
 

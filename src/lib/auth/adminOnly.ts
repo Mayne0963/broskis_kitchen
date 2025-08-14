@@ -4,7 +4,17 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyIdToken } from '@/lib/firebase/admin';
+import { adminAuth } from '@/lib/firebaseAdmin';
+
+// Inline verifyIdToken function to avoid duplicate admin config
+async function verifyIdToken(idToken: string, checkRevoked: boolean = true) {
+  try {
+    return await adminAuth.verifyIdToken(idToken, checkRevoked);
+  } catch (error) {
+    console.error('Token verification failed:', error);
+    throw error;
+  }
+}
 import { cookies } from 'next/headers';
 
 /**

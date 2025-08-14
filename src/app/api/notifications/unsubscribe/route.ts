@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth, db } from '@/lib/firebaseAdmin';
+import { COLLECTIONS } from '@/lib/firebase/collections';
 
 interface UnsubscribeRequest {
   userId: string;
@@ -75,7 +76,7 @@ export async function POST(request: NextRequest) {
 
     // If no active subscriptions, update user preferences
     if (activeSubscriptionsSnapshot.empty) {
-      await db.collection('users').doc(userId).update({
+      await db.collection(COLLECTIONS.USERS).doc(userId).update({
         'notificationPreferences.pushNotifications': false,
         'notificationPreferences.lastUnsubscribed': new Date().toISOString()
       });

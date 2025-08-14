@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth, adb } from '@/lib/firebaseAdmin';
+import { COLLECTIONS } from '@/lib/firebase/collections';
 
 interface ChatMessage {
   id?: string;
@@ -384,7 +385,7 @@ async function getParticipants(deliveryData: any) {
     
     // Get customer info
     if (deliveryData.customerId) {
-      const customerDoc = await adb.collection('users').doc(deliveryData.customerId).get();
+      const customerDoc = await adb.collection(COLLECTIONS.USERS).doc(deliveryData.customerId).get();
       if (customerDoc.exists) {
         const customerData = customerDoc.data();
         participants.push({

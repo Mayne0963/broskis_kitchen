@@ -1,5 +1,19 @@
 import { db, isFirebaseConfigured } from './firebase'
-import { collection, addDoc, doc, updateDoc, query, where, getDocs, Timestamp } from 'firebase/firestore'
+import { 
+  collection, 
+  doc, 
+  addDoc, 
+  updateDoc, 
+  deleteDoc, 
+  getDocs, 
+  getDoc,
+  query, 
+  where, 
+  orderBy, 
+  limit,
+  Timestamp 
+} from 'firebase/firestore'
+import { COLLECTIONS } from '@/lib/firebase/collections'
 import type { Reward } from '../../types/reward'
 
 export interface Coupon {
@@ -47,7 +61,7 @@ export const createCoupon = async (
 
     if (isFirebaseConfigured && db) {
       try {
-        const docRef = await addDoc(collection(db, 'coupons'), couponData)
+        const docRef = await addDoc(collection(db, COLLECTIONS.COUPONS), couponData)
         
         const coupon: Coupon = {
           id: docRef.id,
@@ -105,7 +119,7 @@ export const useCoupon = async (
   try {
     if (isFirebaseConfigured && db) {
       try {
-        const couponsRef = collection(db, 'coupons')
+        const couponsRef = collection(db, COLLECTIONS.COUPONS)
         const q = query(couponsRef, where('code', '==', code))
         const querySnapshot = await getDocs(q)
 
@@ -140,7 +154,7 @@ export const useCoupon = async (
         }
 
         // Mark coupon as used
-        await updateDoc(doc(db, 'coupons', couponDoc.id), {
+        await updateDoc(doc(db, COLLECTIONS.COUPONS, couponDoc.id), {
           isUsed: true,
           usedAt: Timestamp.now(),
           orderIds: [...(coupon.orderIds || []), orderId]
@@ -219,7 +233,7 @@ export const getUserCoupons = async (userId: string): Promise<Coupon[]> => {
   try {
     if (isFirebaseConfigured && db) {
       try {
-        const couponsRef = collection(db, 'coupons')
+        const couponsRef = collection(db, COLLECTIONS.COUPONS)
         const q = query(couponsRef, where('userId', '==', userId))
         const querySnapshot = await getDocs(q)
 
@@ -276,7 +290,7 @@ export const validateCoupon = async (
   try {
     if (isFirebaseConfigured && db) {
       try {
-        const couponsRef = collection(db, 'coupons')
+        const couponsRef = collection(db, COLLECTIONS.COUPONS)
         const q = query(couponsRef, where('code', '==', code))
         const querySnapshot = await getDocs(q)
 

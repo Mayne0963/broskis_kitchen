@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth, db } from '@/lib/firebaseAdmin';
+import { COLLECTIONS } from '@/lib/firebase/collections';
 
 interface NotificationPreferences {
   email: {
@@ -76,7 +77,7 @@ export async function GET(request: NextRequest) {
     const userId = decodedToken.uid;
 
     // Get user's notification preferences
-    const userDoc = await db.collection('users').doc(userId).get();
+    const userDoc = await db.collection(COLLECTIONS.USERS).doc(userId).get();
     
     if (!userDoc.exists) {
       // Create user document with default preferences
@@ -86,7 +87,7 @@ export async function GET(request: NextRequest) {
         updatedAt: new Date().toISOString()
       };
       
-      await db.collection('users').doc(userId).set(userData);
+      await db.collection(COLLECTIONS.USERS).doc(userId).set(userData);
       
       return NextResponse.json({
         preferences: defaultPreferences,
@@ -194,7 +195,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Merge with existing preferences to preserve any fields not included in the update
-    const existingDoc = await db.collection('users').doc(userId).get();
+    const existingDoc = await db.collection(COLLECTIONS.USERS).doc(userId).get();
     const existingData = existingDoc.exists ? existingDoc.data() : {};
     const existingPreferences = existingData?.notificationPreferences || {};
 
@@ -221,9 +222,9 @@ export async function PUT(request: NextRequest) {
     // If document doesn't exist, create it
     if (!existingDoc.exists) {
       updateData.createdAt = new Date().toISOString();
-      await db.collection('users').doc(userId).set(updateData);
+      await db.collection(COLLECTIONS.USERS).doc(userId).set(updateData);
     } else {
-      await db.collection('users').doc(userId).update(updateData);
+      await db.collection(COLLECTIONS.USERS).doc(userId).update(updateData);
     }
 
     // Log preference changes for analytics
@@ -282,7 +283,7 @@ export async function DELETE(request: NextRequest) {
       updatedAt: new Date().toISOString()
     };
 
-    await db.collection('users').doc(userId).update(updateData);
+    await db.collection(COLLECTIONS.USERS).doc(userId).update(updateData);
 
     // Log the reset action
     await db.collection('user_activity_logs').add({

@@ -1,113 +1,77 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adb } from '@/lib/firebaseAdmin';
-import { requireAdmin } from '../../_lib/requireAdmin';
+import { verifyAdminAuth } from '@/lib/auth/adminOnly';
+import { getOrderMetrics, getUserMetrics, checkRateLimit } from '@/lib/services/quota-friendly-metrics';
 
 export async function GET(request: NextRequest) {
   // Check admin authentication
-  const adminCheck = await requireAdmin();
+  const adminCheck = await verifyAdminAuth(request);
   if (adminCheck instanceof Response) {
     return adminCheck;
   }
+  
+  // Rate limiting check
+  const clientId = request.headers.get('x-forwarded-for') || 'unknown';
+  if (!checkRateLimit(clientId)) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded. Please try again later.' },
+      { status: 429 }
+    );
+  }
 
   try {
-    const now = new Date();
-    const todayStart = new Date(now);
-    todayStart.setHours(0, 0, 0, 0);
+    // Get query parameters for customization
+    const { searchParams } = new URL(request.url);
+    const timeRange = searchParams.get('timeRange') || 'month';
+    const useCache = searchParams.get('cache') !== 'false';
     
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    
-    // Get orders collection reference
-    const ordersRef = adb.collection('orders');
-    const usersRef = adb.collection('users');
-    
-    // Parallel queries for better performance
-    const [
-      ordersToday,
-      allOrders,
-      pendingOrders,
-      allUsers,
-      monthlyActiveUsers,
-      newUsersThisMonth
-    ] = await Promise.all([
-      // Orders today
-      ordersRef.where('createdAt', '>=', todayStart).get(),
-      
-      // All orders
-      ordersRef.get(),
-      
-      // Pending orders
-      ordersRef.where('status', '==', 'pending').get(),
-      
-      // All users
-      usersRef.get(),
-      
-      // Monthly active users (users who placed orders this month)
-      ordersRef.where('createdAt', '>=', monthStart).get(),
-      
-      // New users this month
-      usersRef.where('createdAt', '>=', monthStart).get()
+    // Fetch metrics using quota-friendly service
+    const [orderMetrics, userMetrics] = await Promise.all([
+      getOrderMetrics({ 
+        useCache, 
+        timeRange: timeRange as any,
+        maxDocuments: 1000 
+      }),
+      getUserMetrics({ 
+        useCache, 
+        timeRange: timeRange as any,
+        maxDocuments: 500 
+      })
     ]);
-
-    // Calculate metrics
-    let revenueToday = 0;
-    let totalRevenue = 0;
-    let totalOrdersCount = 0;
-    let avgOrderValue = 0;
     
-    // Process today's orders
-    ordersToday.docs.forEach(doc => {
-      const order = doc.data();
-      if (order.total && typeof order.total === 'number') {
-        revenueToday += order.total;
-      }
-    });
+    // Get today's metrics separately for dashboard
+    const todayMetrics = timeRange !== 'today' ? await getOrderMetrics({
+      useCache,
+      timeRange: 'today',
+      maxDocuments: 200
+    }) : orderMetrics;
     
-    // Process all orders
-    const userOrderCounts = new Map<string, number>();
-    allOrders.docs.forEach(doc => {
-      const order = doc.data();
-      totalOrdersCount++;
+    const combinedMetrics = {
+      // Today's metrics
+      ordersToday: todayMetrics.totalOrders,
+      revenueToday: todayMetrics.totalRevenue,
       
-      if (order.total && typeof order.total === 'number') {
-        totalRevenue += order.total;
-      }
+      // Period metrics
+      totalOrders: orderMetrics.totalOrders,
+      totalRevenue: orderMetrics.totalRevenue,
+      pendingOrders: orderMetrics.pendingOrders,
+      avgOrderValue: orderMetrics.avgOrderValue,
       
-      // Count orders per user
-      if (order.userId) {
-        userOrderCounts.set(order.userId, (userOrderCounts.get(order.userId) || 0) + 1);
-      }
-    });
-    
-    // Calculate average order value
-    avgOrderValue = totalOrdersCount > 0 ? totalRevenue / totalOrdersCount : 0;
-    
-    // Calculate average orders per user
-    const totalUsersWithOrders = userOrderCounts.size;
-    const avgOrdersPerUser = totalUsersWithOrders > 0 ? totalOrdersCount / totalUsersWithOrders : 0;
-    
-    // Get unique active users this month
-    const monthlyActiveUserIds = new Set();
-    monthlyActiveUsers.docs.forEach(doc => {
-      const order = doc.data();
-      if (order.userId) {
-        monthlyActiveUserIds.add(order.userId);
-      }
-    });
-    
-    const metrics = {
-      ordersToday: ordersToday.size,
-      revenueToday: Math.round(revenueToday * 100) / 100, // Round to 2 decimal places
-      pendingOrders: pendingOrders.size,
-      totalOrders: totalOrdersCount,
-      totalRevenue: Math.round(totalRevenue * 100) / 100,
-      registeredUsers: allUsers.size,
-      monthlyActive: monthlyActiveUserIds.size,
-      newUsersThisMonth: newUsersThisMonth.size,
-      avgOrdersPerUser: Math.round(avgOrdersPerUser * 100) / 100,
-      avgOrderValue: Math.round(avgOrderValue * 100) / 100
+      // User metrics
+      registeredUsers: userMetrics.totalUsers,
+      newUsersThisMonth: userMetrics.newUsers,
+      
+      // Customer insights
+      uniqueCustomers: orderMetrics.uniqueCustomers,
+      avgOrdersPerCustomer: orderMetrics.avgOrdersPerCustomer,
+      
+      // Performance metadata
+      timeRange,
+      documentsRead: orderMetrics.documentsRead + userMetrics.documentsRead,
+      fromCache: orderMetrics.fromCache && userMetrics.fromCache,
+      timestamp: new Date().toISOString()
     };
     
-    return NextResponse.json(metrics);
+    return NextResponse.json(combinedMetrics);
     
   } catch (error) {
     console.error('Error fetching admin metrics:', error);

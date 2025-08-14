@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { otwService } from '@/lib/services/otw-service';
 import { adb } from '@/lib/firebaseAdmin';
+import { COLLECTIONS } from '@/lib/firebase/collections';
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,7 +17,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get order details from Firebase
-    const orderRef = adb.collection('orders').doc(orderId);
+    const orderRef = adb.collection(COLLECTIONS.ORDERS).doc(orderId);
     const orderSnap = await orderRef.get();
     
     if (!orderSnap.exists()) {
