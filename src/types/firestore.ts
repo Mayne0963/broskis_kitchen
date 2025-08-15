@@ -167,4 +167,5 @@ export interface OffersQuery {
 // Error response type
 export interface ApiError {
   error: string;
-  details
+  details?: string;
+}
