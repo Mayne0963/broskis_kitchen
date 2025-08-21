@@ -6,21 +6,48 @@ export async function POST(req: Request) {
   try {
     const { uid, role } = await req.json();
     
-    if (!uid || !role) {
+    if (!uid) {
       return NextResponse.json(
-        { ok: false, error: 'uid/role required' },
+        { error: 'Missing uid' },
         { status: 400 }
       );
     }
     
     initAdmin();
-    await getAuth().setCustomUserClaims(uid, { role });
+    const auth = getAuth();
+    await auth.setCustomUserClaims(uid, { admin: true });
     
-    return NextResponse.json({ ok: true });
-  } catch (e: any) {
     return NextResponse.json(
-      { ok: false, error: String(e?.message || e) },
+      { message: 'Permissions Updated' },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    console.error('Error setting custom claims:', error);
+    return NextResponse.json(
+      { error: error.message || 'Failed to refresh permissions' },
       { status: 500 }
     );
   }
+}
+
+// Handle non-POST requests
+export async function GET() {
+  return NextResponse.json(
+    { error: 'Method not allowed' },
+    { status: 405 }
+  );
+}
+
+export async function PUT() {
+  return NextResponse.json(
+    { error: 'Method not allowed' },
+    { status: 405 }
+  );
+}
+
+export async function DELETE() {
+  return NextResponse.json(
+    { error: 'Method not allowed' },
+    { status: 405 }
+  );
 }
