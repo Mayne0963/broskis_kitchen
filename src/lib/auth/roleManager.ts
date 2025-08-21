@@ -6,13 +6,8 @@ import { UserRole } from './rbac'
  */
 export async function setUserRole(uid: string, role: UserRole): Promise<{ success: boolean; error?: string }> {
   try {
-    const auth = adminAuth()
-    if (!auth) {
-      return { success: false, error: 'Firebase Admin not initialized' }
-    }
-
     // Set custom claims
-    await auth.setCustomUserClaims(uid, { role })
+    await adminAuth.setCustomUserClaims(uid, { role })
     
     return { success: true }
   } catch (error) {
@@ -26,12 +21,7 @@ export async function setUserRole(uid: string, role: UserRole): Promise<{ succes
  */
 export async function getUserRole(uid: string): Promise<{ success: boolean; role?: UserRole; error?: string }> {
   try {
-    const auth = adminAuth()
-    if (!auth) {
-      return { success: false, error: 'Firebase Admin not initialized' }
-    }
-
-    const userRecord = await auth.getUser(uid)
+    const userRecord = await adminAuth.getUser(uid)
     const role = userRecord.customClaims?.role as UserRole || 'customer'
     
     return { success: true, role }
@@ -79,12 +69,7 @@ export async function getAllUsersWithRoles(maxResults: number = 1000): Promise<{
   error?: string;
 }> {
   try {
-    const auth = adminAuth()
-    if (!auth) {
-      return { success: false, error: 'Firebase Admin not initialized' }
-    }
-
-    const listUsersResult = await auth.listUsers(maxResults)
+    const listUsersResult = await adminAuth.listUsers(maxResults)
     
     const users = listUsersResult.users.map(userRecord => ({
       uid: userRecord.uid,
