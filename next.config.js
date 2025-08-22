@@ -32,9 +32,8 @@ const nextConfig = {
     loader: 'default',
     path: '/_next/image',
   },
-  // Use standalone output for better API route support (production only)
+  // Enhanced configuration for Vercel deployment
   trailingSlash: false,
-  ...(process.env.NODE_ENV === 'production' && { output: 'standalone' }),
   // Enhanced webpack configuration to prevent chunk loading errors
   webpack: (config, { dev, isServer }) => {
     // Optimize chunk splitting for better loading reliability
