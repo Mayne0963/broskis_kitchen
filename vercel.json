@@ -61,7 +61,7 @@
     }
   ],
   "functions": {
-    "src/app/api/**/*.ts": { "runtime": "nodejs22.x" },
-    "pages/api/**/*.ts": { "runtime": "nodejs22.x" }
+    "src/app/api/**/*.ts": { "runtime": "nodejs20.x" },
+    "pages/api/**/*.ts": { "runtime": "nodejs20.x" }
   }
 }
