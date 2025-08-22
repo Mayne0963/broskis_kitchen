@@ -5,8 +5,9 @@
   "description": "Generated SDK For default",
   "license": "Apache-2.0",
   "engines": {
-    "node": " >=18.0"
+    "node": "22.x"
   },
+  "packageManager": "pnpm@9.12.3",
   "typings": "index.d.ts",
   "main": "index.cjs.js",
   "module": "esm/index.esm.js",
