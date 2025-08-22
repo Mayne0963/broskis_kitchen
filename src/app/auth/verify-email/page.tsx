@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Mail, CheckCircle, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/lib/context/AuthContext'
-import { toast, Toaster } from 'sonner'
+import { toast } from 'sonner'
 
 export const dynamic = 'force-dynamic'
 
@@ -53,7 +53,6 @@ export default function VerifyEmailPage() {
 
   return (
     <>
-      <Toaster position="top-center" richColors />
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[var(--color-harvest-gold)]/10 to-[var(--color-rich-black)]/5 p-4">
         <Card className="w-full max-w-md">
         <CardHeader className="text-center">

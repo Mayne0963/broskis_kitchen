@@ -2,8 +2,7 @@ import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app"
 import { getAuth, onAuthStateChanged, Auth, User, GoogleAuthProvider, getIdToken } from "firebase/auth"
 import { getFirestore, doc, setDoc, getDoc, Timestamp, Firestore, connectFirestoreEmulator } from "firebase/firestore"
 import { getStorage, FirebaseStorage } from "firebase/storage"
-// Avoid importing client-side toast library on the server
-import { toast } from "sonner"
+import { toast } from 'sonner'
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -164,7 +163,10 @@ export const createUserDocument = async (user: { uid: string; email?: string; di
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
       })
-      toast.success("User profile created successfully!")
+      // Only show toast on client-side
+      if (typeof window !== 'undefined') {
+        toast.success("User profile created successfully!")
+      }
     }
     
     return userRef

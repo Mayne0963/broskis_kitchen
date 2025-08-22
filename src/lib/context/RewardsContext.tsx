@@ -3,6 +3,7 @@
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 import type { Reward, RewardHistory } from "@/types"
+import { rewards as rewardsData } from "@/data/rewards-data"
 
 interface RewardsContextType {
   points: number
@@ -45,25 +46,8 @@ export const RewardsProvider: React.FC<RewardsProviderProps> = ({ children }) =>
       if (savedTier) setTier(savedTier)
       if (savedHistory) setHistory(JSON.parse(savedHistory))
 
-      // Fetch rewards from API or use static data with retry logic
-      // For now, we'll use static data with error handling
-      const loadRewardsData = async (retries = 3) => {
-        try {
-          const data = await import("../../data/rewards-data")
-          setRewards(data.rewards)
-        } catch (error) {
-          console.error('Failed to load rewards data:', error)
-          if (retries > 0) {
-            console.log(`Retrying... ${retries} attempts left`)
-            setTimeout(() => loadRewardsData(retries - 1), 1000)
-          } else {
-            // Fallback to empty array or default data
-            setRewards([])
-          }
-        }
-      }
-      
-      loadRewardsData()
+      // Load static rewards data
+      setRewards(rewardsData)
     }
   }, [])
 

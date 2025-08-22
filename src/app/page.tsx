@@ -12,7 +12,7 @@ import OptimizedImage, { useImagePreloader } from "../components/performance/Ima
 import MobileEnhancer, { useEnhancedResponsive, TouchButton } from "../components/responsive/MobileEnhancer";
 import { ComponentLoader } from "../components/ui/LoadingSpinner";
 // Lazy load non-critical components
-const CartDropdown = React.lazy(() => import("../components/cart/CartDropdown"));
+
 
 
 function Page() {

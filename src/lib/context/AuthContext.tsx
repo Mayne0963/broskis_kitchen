@@ -109,7 +109,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     if (!auth || !db) {
-      toast.error("Authentication Error", { description: "Firebase not configured - login disabled" })
+      toast.error("Firebase not configured - login disabled")
       return false
     }
     try {
@@ -118,7 +118,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       // Check if email is verified
       if (!userCredential.user.emailVerified) {
-        toast.error("Email Not Verified", { description: "Please verify your email address before signing in. Check your inbox for a verification link." })
+        toast.error("Please verify your email address before signing in. Check your inbox for a verification link.")
         // Don't sign out, let them verify their email
         return false
       }
@@ -140,7 +140,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error(errorData.error || 'Failed to create session')
       }
       
-      toast.success("Login Successful", { description: "Welcome back to Broski's Kitchen!" })
+      toast.success("Welcome back to Broski's Kitchen!")
       return true
     } catch (error: unknown) {
       console.error("Login error:", error)
@@ -150,7 +150,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         errorMessage = error.message
       }
 
-      toast.error("Login Error", { description: errorMessage })
+      toast.error(errorMessage)
       
       // Handle specific Firebase error codes
       const firebaseError = error as { code?: string }
@@ -181,7 +181,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           errorMessage = (error as Error).message || "Invalid email or password"
       }
       
-      toast.error("Login Failed", { description: errorMessage })
+      toast.error(errorMessage)
       return false
     } finally {
       setIsLoading(false)
@@ -190,11 +190,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signup = async (name: string, email: string, password: string): Promise<boolean> => {
     if (!auth || !db) {
-      toast({
-        title: "Authentication Error",
-        description: "Firebase not configured - signup disabled",
-        variant: "destructive",
-      })
+      toast.error("Firebase not configured - signup disabled")
       return false
     }
     try {
@@ -218,7 +214,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         updatedAt: Timestamp.now(),
       })
 
-      toast.success("Signup Successful", { description: "Account created! Please verify your email address." })
+      toast.success("Account created! Please verify your email address.")
       return true
     } catch (error: unknown) {
       console.error("Signup error:", error)
@@ -245,7 +241,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           errorMessage = (error as Error).message || "Failed to create account."
       }
 
-      toast.error("Signup Failed", { description: errorMessage })
+      toast.error(errorMessage)
       return false
     } finally {
       setIsLoading(false)
@@ -254,12 +250,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const resetPassword = async (email: string): Promise<boolean> => {
     if (!auth) {
-      toast.error("Authentication Error", { description: "Firebase not configured - password reset disabled" })
+      toast.error("Firebase not configured - password reset disabled")
       return false
     }
     try {
       await sendPasswordResetEmail(auth, email)
-      toast.success("Password Reset Email Sent", { description: "Please check your inbox for instructions to reset your password." })
+      toast.success("Please check your inbox for instructions to reset your password.")
       return true
     } catch (error: unknown) {
       console.error("Password reset error:", error)
@@ -280,7 +276,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           errorMessage = (error as Error).message || "Failed to send password reset email."
       }
 
-      toast.error("Password Reset Failed", { description: errorMessage })
+      toast.error(errorMessage)
       return false
     } finally {
       setIsLoading(false)
@@ -289,14 +285,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async (): Promise<void> => {
     if (!auth) {
-      toast.error("Authentication Error", { description: "Firebase not configured - logout disabled" })
+      toast.error("Firebase not configured - logout disabled")
       return
     }
     try {
       await signOut(auth)
       // Clear session cookie
       await fetch('/api/auth/session-logout', { method: 'POST' })
-      toast.success("Logged Out", { description: "You have been successfully logged out." })
+      toast.success("You have been successfully logged out.")
       return
     } catch (error: unknown) {
       console.error("Logout error:", error)
@@ -311,7 +307,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           errorMessage = (error as Error).message || "Failed to log out."
       }
 
-      toast.error("Logout Failed", { description: errorMessage })
+      toast.error(errorMessage)
       return
     } finally {
       setIsLoading(false)
@@ -320,7 +316,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signInWithGoogle = async (): Promise<boolean> => {
     if (!auth || !googleProvider) {
-      toast.error("Authentication Error", { description: "Firebase or Google Provider not configured - Google Sign-In disabled" })
+      toast.error("Firebase or Google Provider not configured - Google Sign-In disabled")
       return false;
     }
     try {
@@ -381,7 +377,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       }
   
-      toast.success("Google Sign-In Successful", { description: "Welcome to Broski's Kitchen!" });
+      toast.success("Welcome to Broski's Kitchen!");
       return true;
     } catch (error: unknown) {
       console.error("Google Sign-In error:", error);
@@ -408,7 +404,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           errorMessage = (error as Error).message || "Failed to sign in with Google.";
       }
   
-      toast.error("Google Sign-In Failed", { description: errorMessage });
+      toast.error(errorMessage);
       return false;
     } finally {
       setIsLoading(false);
@@ -417,13 +413,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const resendEmailVerification = async (): Promise<boolean> => {
     if (!auth || !auth.currentUser) {
-      toast.error("Authentication Error", { description: "No authenticated user found to resend verification email." })
+      toast.error("No authenticated user found to resend verification email.")
       return false
     }
     try {
       setIsLoading(true)
       await sendEmailVerification(auth.currentUser)
-      toast.success("Verification Email Sent", { description: "A new verification email has been sent to your inbox." })
+      toast.success("A new verification email has been sent to your inbox.")
       return true
     } catch (error: unknown) {
       console.error("Resend email verification error:", error)
@@ -441,7 +437,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           errorMessage = (error as Error).message || "Failed to resend verification email."
       }
 
-      toast.error("Resend Verification Failed", { description: errorMessage })
+      toast.error(errorMessage)
       return false
     } finally {
       setIsLoading(false)

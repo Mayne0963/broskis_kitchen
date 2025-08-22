@@ -65,7 +65,7 @@ export default function UserManagement({ className }: UserManagementProps) {
       revalidateOnFocus: true,
       onError: (error) => {
         console.error('Error fetching users:', error)
-        toast.error('Error', { description: 'Failed to fetch users' })
+        toast.error('Failed to fetch users')
       }
     }
   )
@@ -101,10 +101,10 @@ export default function UserManagement({ className }: UserManagementProps) {
         false // Don't revalidate immediately
       )
       
-      toast.success('Success', { description: `User role updated to ${newRole}` })
+      toast.success(`User role updated to ${newRole}`)
     } catch (error) {
       console.error('Error updating user role:', error)
-      toast.error('Error', { description: error instanceof Error ? error.message : 'Failed to update user role' })
+      toast.error(error instanceof Error ? error.message : 'Failed to update user role')
       // Revalidate on error to get the correct state
       mutate()
     } finally {

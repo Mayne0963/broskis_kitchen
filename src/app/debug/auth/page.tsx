@@ -6,12 +6,13 @@ import { toast } from 'sonner'
 
 // Toast throttling to prevent spam
 let lastToastAt = 0
-function safeToast(kind: "success" | "error", title: string, description?: string) {
+function safeToast(kind: "success" | "error", message: string, description?: string) {
   const now = Date.now()
   if (now - lastToastAt < 5000) return
   lastToastAt = now
-  if (kind === "success") toast.success(title, { description })
-  else toast.error(title, { description })
+  const fullMessage = description ? `${message}: ${description}` : message
+  if (kind === "success") toast.success(fullMessage)
+  else toast.error(fullMessage)
 }
 
 // Backoff state for quota exceeded errors

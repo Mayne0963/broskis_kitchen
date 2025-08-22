@@ -20,7 +20,7 @@ import { NetworkStatus } from "../components/common/EnhancedLoadingStates"
 import { playfair, montserrat } from "./fonts"
 import StructuredData, { OrganizationStructuredData } from "../components/seo/StructuredData"
 import { SkipNavigation } from "../components/accessibility/AccessibilityEnhancer"
-import ClientProviders from '@/components/ClientProviders'
+import ClientProviders from './providers'
 
 export const metadata: Metadata = {
   title: {
