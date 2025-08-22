@@ -1,9 +1,6 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "framework": "nextjs",
-  "installCommand": "pnpm install",
-  "devCommand": "npm run dev",
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
   "rewrites": [
     {
       "source": "/api/(.*)",
@@ -63,13 +60,8 @@
       ]
     }
   ],
-  "env": {
-    "NODE_ENV": "production"
-  },
   "functions": {
-    "src/app/api/**/*.ts": {
-      "runtime": "nodejs22.x",
-      "maxDuration": 30
-    }
+    "src/app/api/**/*.ts": { "runtime": "nodejs22.x" },
+    "pages/api/**/*.ts": { "runtime": "nodejs22.x" }
   }
 }
