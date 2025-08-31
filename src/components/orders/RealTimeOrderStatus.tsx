@@ -23,7 +23,7 @@ interface StatusStep {
 }
 
 export default function RealTimeOrderStatus({ orderId, onOrderUpdate }: RealTimeOrderStatusProps) {
-  const { user, isAuthenticated } = useAuth()
+  const { user, claims, isAuthenticated } = useAuth()
   const [order, setOrder] = useState<Order | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -55,7 +55,7 @@ export default function RealTimeOrderStatus({ orderId, onOrderUpdate }: RealTime
                 } as Order
                 
                 // Verify user has permission to view this order
-                if (orderData.userId === user.id || user.role === 'admin') {
+                if (orderData.userId === user.id || claims.admin || claims.role === 'admin') {
                   setOrder(orderData)
                   setLastUpdate(new Date())
                   onOrderUpdate?.(orderData)

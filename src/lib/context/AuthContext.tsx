@@ -16,6 +16,7 @@ import {
 import { doc, setDoc, getDoc, updateDoc, Timestamp } from "firebase/firestore"
 import { toast } from "sonner"
 import type { User, AuthContextType } from "@/types"
+import type { Claims } from "@/types/auth"
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
@@ -33,69 +34,66 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
+  const [claims, setClaims] = useState<Claims>({})
   const [isLoading, setIsLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   useEffect(() => {
-    if (!auth || !db) {
-      // If Firebase is not configured, user remains null
-      setUser(null)
+    if (!auth) {
+      console.warn("Firebase auth not configured - authentication disabled")
       setIsLoading(false)
-
+      return
     }
-    
-    const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
-      if (authUser) {
+
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
         try {
-          // Brief delay to ensure auth state stabilization after sign-in
-          await new Promise(resolve => setTimeout(resolve, 300));
+          // Get custom claims from Firebase Auth
+          const tokenResult = await firebaseUser.getIdTokenResult(true)
+          const userClaims = (tokenResult.claims ?? {}) as Claims
           
-          // Get Firebase ID token to access custom claims
-          const idTokenResult = await authUser.getIdTokenResult(true); // Force refresh
-          const customClaims = idTokenResult.claims;
+          // Get user document from Firestore for basic profile data
+          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
           
-          // Get user data from Firestore
-          let userData = null;
-          if (db) {
-            const userDoc = await getDoc(doc(db, 'users', authUser.uid))
-            userData = userDoc.data()
+          if (userDoc.exists()) {
+            const userData = userDoc.data()
+            const userWithId: User = {
+              id: firebaseUser.uid,
+              name: userData.name || firebaseUser.displayName || '',
+              email: firebaseUser.email || '',
+              role: userClaims.role || userData.role || 'customer',
+              emailVerified: firebaseUser.emailVerified,
+            }
+            setUser(userWithId)
+          } else {
+            // If no user document exists, create a basic user object
+            const basicUser: User = {
+              id: firebaseUser.uid,
+              name: firebaseUser.displayName || '',
+              email: firebaseUser.email || '',
+              role: userClaims.role || 'customer',
+              emailVerified: firebaseUser.emailVerified,
+            }
+            setUser(basicUser)
           }
           
-          // Determine user role from custom claims or Firestore
-          let userRole = 'user';
-          if (customClaims.admin === true) {
-            userRole = 'admin';
-          } else if (customClaims.role) {
-            userRole = customClaims.role;
-          } else if (userData?.role) {
-            userRole = userData.role;
-          }
-          
-          const appUser: User = {
-            id: authUser.uid,
-            name: userData?.name || authUser.displayName || "User",
-            email: authUser.email || "",
-            emailVerified: authUser.emailVerified,
-            role: userRole,
-          }
-          
-          console.log('User authenticated with role:', userRole, 'Custom claims:', customClaims);
-          setUser(appUser)
+          setClaims(userClaims)
         } catch (error) {
           console.error('Error fetching user data:', error)
-          // Fallback to Firebase user data
-          const appUser: User = {
-            id: authUser.uid,
-            name: authUser.displayName || "User",
-            email: authUser.email || "",
-            emailVerified: authUser.emailVerified,
-            role: 'user',
+          // Fallback to basic user object if Firestore fails
+          const basicUser: User = {
+            id: firebaseUser.uid,
+            name: firebaseUser.displayName || '',
+            email: firebaseUser.email || '',
+            role: 'customer',
+            emailVerified: firebaseUser.emailVerified,
           }
-          setUser(appUser)
+          setUser(basicUser)
+          setClaims({})
         }
       } else {
-        // No authenticated user
         setUser(null)
+        setClaims({})
       }
       setIsLoading(false)
     })
@@ -444,15 +442,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
+  const refreshUserToken = async (): Promise<boolean> => {
+    if (!auth || !auth.currentUser) {
+      return false
+    }
+    try {
+      const tokenResult = await getIdTokenResult(auth.currentUser, true)
+      const userClaims = (tokenResult.claims ?? {}) as Claims
+      setClaims(userClaims)
+      return true
+    } catch (error) {
+      console.error('Error refreshing user token:', error)
+      return false
+    }
+  }
 
 
-  const isAdmin = user?.role === 'admin'
+
+  const isAdmin = !!claims.admin || claims.role === 'admin'
   
 
 
   const value = {
     user,
     currentUser: user, // Explicitly add currentUser to the value object
+    claims,
     isLoading,
     loading: isLoading, // Add loading alias for consistency
     isAuthenticated,
@@ -464,6 +478,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signInWithGoogle,
     resendEmailVerification,
     sendVerificationEmail: resendEmailVerification,
+    refreshUserToken,
   }
 
   return (

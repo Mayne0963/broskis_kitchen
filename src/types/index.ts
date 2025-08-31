@@ -11,6 +11,7 @@ export interface User {
 export interface AuthContextType {
   user: User | null
   currentUser: User | null
+  claims: import('@/types/auth').Claims
   isLoading: boolean
   loading: boolean
   isAuthenticated: boolean

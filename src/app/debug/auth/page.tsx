@@ -20,7 +20,7 @@ let quotaExceededBackoff = false
 let backoffUntil = 0
 
 export default function AuthDebugPage() {
-  const { user, loading } = useAuth()
+  const { user, claims, loading } = useAuth()
   const [debugData, setDebugData] = useState<any>(null)
   const [debugLoading, setDebugLoading] = useState(false)
 
@@ -108,10 +108,10 @@ export default function AuthDebugPage() {
                 <>
                   <p><strong>Email:</strong> {user.email}</p>
                   <p><strong>Name:</strong> {user.name}</p>
-                  <p><strong>Role:</strong> {user.role}</p>
-                  <p><strong>Admin:</strong> {user.admin ? 'Yes' : 'No'}</p>
+                  <p><strong>Role:</strong> {claims.role || 'None'}</p>
+                  <p><strong>Admin:</strong> {claims.admin ? 'Yes' : 'No'}</p>
                   <p><strong>Email Verified:</strong> {user.emailVerified ? 'Yes' : 'No'}</p>
-                  <p><strong>Permissions:</strong> {user.permissions?.join(', ') || 'None'}</p>
+                  <p><strong>Kitchen Access:</strong> {claims.kitchen ? 'Yes' : 'No'}</p>
                 </>
               )}
             </div>
