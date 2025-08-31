@@ -418,8 +418,7 @@ export function validateArrayNotEmpty<T>(array: T[], fieldName: string): void {
 export async function requireAuth(request: NextRequest): Promise<{
   uid: string;
   email?: string;
-  role?: string;
-  admin?: boolean;
+  claims?: { admin?: boolean; role?: string; kitchen?: boolean };
 }> {
   const authHeader = request.headers.get('authorization');
   if (!authHeader?.startsWith('Bearer ')) {
@@ -432,8 +431,11 @@ export async function requireAuth(request: NextRequest): Promise<{
     return {
       uid: decodedToken.uid,
       email: decodedToken.email,
-      role: decodedToken.role,
-      admin: decodedToken.admin
+      claims: {
+        admin: decodedToken.admin,
+        role: decodedToken.role,
+        kitchen: decodedToken.kitchen
+      }
     };
   } catch (error) {
     throw new AuthenticationError('Invalid authentication token');
@@ -441,23 +443,23 @@ export async function requireAuth(request: NextRequest): Promise<{
 }
 
 // Authorization helpers
-export function requireAdmin(user: { admin?: boolean }): void {
-  if (!user.admin) {
+export function requireAdmin(user: { claims?: { admin?: boolean } }): void {
+  if (!user.claims?.admin) {
     throw new AuthorizationError('Admin access required');
   }
 }
 
-export function requireRole(user: { role?: string }, requiredRole: string): void {
-  if (user.role !== requiredRole) {
+export function requireRole(user: { claims?: { role?: string } }, requiredRole: string): void {
+  if (user.claims?.role !== requiredRole) {
     throw new AuthorizationError(`${requiredRole} role required`);
   }
 }
 
 export function requireOwnershipOrAdmin(
-  user: { uid: string; admin?: boolean },
+  user: { uid: string; claims?: { admin?: boolean } },
   resourceOwnerId: string
 ): void {
-  if (!user.admin && user.uid !== resourceOwnerId) {
+  if (!user.claims?.admin && user.uid !== resourceOwnerId) {
     throw new AuthorizationError('Access denied. You can only access your own resources');
   }
 }

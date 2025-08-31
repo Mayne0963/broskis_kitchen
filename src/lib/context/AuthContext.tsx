@@ -11,6 +11,7 @@ import {
   onAuthStateChanged,
   updateProfile,
   getIdToken,
+  getIdTokenResult,
   signInWithPopup,
 } from "firebase/auth"
 import { doc, setDoc, getDoc, updateDoc, Timestamp } from "firebase/firestore"

@@ -126,16 +126,13 @@ export async function verifyRole(requiredRole: UserRole | UserRole[]): Promise<{
       return { success: false, error: 'Email verification required' }
     }
 
+    // Admin users have all permissions
+    if (user.claims?.admin === true) {
+      return { success: true, user: { ...user, role: 'admin' } }
+    }
+
     const userRole = user.role as UserRole || 'customer'
     const allowedRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole]
-    
-    // Check if user has admin privileges (either role='admin' or admin=true)
-    const isUserAdmin = user.admin === true || userRole === 'admin'
-    
-    // If admin role is required and user has admin privileges, allow access
-    if (allowedRoles.includes('admin') && isUserAdmin) {
-      return { success: true, user: { ...user, role: userRole } }
-    }
     
     if (!allowedRoles.includes(userRole)) {
       return { success: false, error: 'Insufficient permissions' }

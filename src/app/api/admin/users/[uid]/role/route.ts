@@ -38,7 +38,7 @@ export async function PUT(
     }
 
     // Check if admin can assign this role
-    const adminRole = verification.user.role as UserRole
+    const adminRole = verification.user.claims?.role as UserRole
     if (!canAssignRole(adminRole, role)) {
       return NextResponse.json(
         { error: 'Insufficient permissions to assign this role' },
