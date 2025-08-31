@@ -7,8 +7,7 @@ export interface SessionUser {
   email: string
   emailVerified: boolean
   name?: string
-  role?: string
-  admin?: boolean
+  role: string
   permissions?: string[]
 }
 
@@ -34,11 +33,10 @@ export async function getSessionCookie(): Promise<SessionUser | null> {
     console.log('Verifying session cookie...');
     const decodedClaims = await auth.verifySessionCookie(sessionCookie, true)
     console.log('Verification successful:', !!decodedClaims);
-    console.log('Custom claims:', decodedClaims.admin, decodedClaims.role);
+    console.log('Custom claims role:', decodedClaims.role);
 
-    // Extract role from custom claims or direct claims
-    const role = decodedClaims.role || (decodedClaims.admin ? 'admin' : 'customer');
-    const isAdmin = decodedClaims.admin === true;
+    // Extract role from custom claims, default to 'customer'
+    const role = decodedClaims.role || 'customer';
     const permissions = decodedClaims.permissions || [];
 
     return {
@@ -47,7 +45,6 @@ export async function getSessionCookie(): Promise<SessionUser | null> {
       emailVerified: decodedClaims.email_verified || false,
       name: decodedClaims.name || decodedClaims.email?.split('@')[0],
       role: role,
-      admin: isAdmin,
       permissions: permissions
     }
   } catch (error) {

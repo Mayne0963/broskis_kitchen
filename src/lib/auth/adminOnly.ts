@@ -22,7 +22,7 @@ import { cookies } from 'next/headers';
  * @param request - Next.js request object
  * @returns ID token string or null
  */
-function extractIdToken(request: NextRequest): string | null {
+async function extractIdToken(request: NextRequest): Promise<string | null> {
   // Try Authorization header first
   const authHeader = request.headers.get('authorization');
   if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -30,7 +30,7 @@ function extractIdToken(request: NextRequest): string | null {
   }
 
   // Try session cookie
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionCookie = cookieStore.get('session');
   if (sessionCookie) {
     return sessionCookie.value;
@@ -48,15 +48,14 @@ function extractIdToken(request: NextRequest): string | null {
 /**
  * Requires admin authentication for API routes
  * @param request - Next.js request object
- * @returns Promise<DecodedIdToken> - Decoded token with admin claims
- * @throws NextResponse with 401/403 status if unauthorized
+ * @returns Promise<DecodedIdToken | NextResponse> - Decoded token with admin claims or error response
  */
 export async function requireAdmin(request: NextRequest) {
   try {
-    const idToken = extractIdToken(request);
+    const idToken = await extractIdToken(request);
     
     if (!idToken) {
-      throw NextResponse.json(
+      return NextResponse.json(
         { error: 'Unauthorized - No authentication token provided' },
         { status: 401 }
       );
@@ -65,13 +64,11 @@ export async function requireAdmin(request: NextRequest) {
     // Verify the ID token
     const decodedToken = await verifyIdToken(idToken);
     
-    // Check for admin claim
-    const isAdmin = decodedToken.admin === true || 
-                   decodedToken.role === 'admin' ||
-                   (decodedToken.roles && decodedToken.roles.admin === true);
+    // Check for admin role
+    const isAdmin = decodedToken.role === 'admin';
     
     if (!isAdmin) {
-      throw NextResponse.json(
+      return NextResponse.json(
         { error: 'Forbidden - Admin access required' },
         { status: 403 }
       );
@@ -86,7 +83,7 @@ export async function requireAdmin(request: NextRequest) {
     
     // Handle token verification errors
     console.error('Admin authentication failed:', error);
-    throw NextResponse.json(
+    return NextResponse.json(
       { error: 'Unauthorized - Invalid or expired token' },
       { status: 401 }
     );
@@ -103,12 +100,12 @@ export function withAdminAuth<T extends any[]>(
 ) {
   return async (request: NextRequest, ...args: T): Promise<NextResponse> => {
     try {
-      await requireAdmin(request);
+      const adminCheck = await requireAdmin(request);
+      if (adminCheck instanceof NextResponse) {
+        return adminCheck;
+      }
       return handler(request, ...args);
     } catch (error) {
-      if (error instanceof NextResponse) {
-        return error;
-      }
       return NextResponse.json(
         { error: 'Internal server error' },
         { status: 500 }
@@ -124,8 +121,8 @@ export function withAdminAuth<T extends any[]>(
  */
 export async function isAdmin(request: NextRequest): Promise<boolean> {
   try {
-    await requireAdmin(request);
-    return true;
+    const result = await requireAdmin(request);
+    return !(result instanceof NextResponse);
   } catch {
     return false;
   }

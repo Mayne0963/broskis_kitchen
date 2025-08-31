@@ -13,7 +13,8 @@ export const COLLECTIONS = {
   USERS: 'users',
   REWARD_TRANSACTIONS: 'rewardTransactions',
   COUPONS: 'coupons',
-  OFFERS: 'offers'
+  OFFERS: 'offers',
+  MENU_DROPS: 'menuDrops'
 } as const;
 
 // Client-side collection references (for public reads)

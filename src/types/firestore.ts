@@ -42,18 +42,12 @@ export interface Order {
 }
 
 // User related types
-export interface UserRoles {
-  admin: boolean;
-  kitchen?: boolean;
-  delivery?: boolean;
-}
-
 export interface User {
   uid: string;
   email: string;
   displayName: string;
   phone?: string;
-  roles: UserRoles;
+  role: 'admin' | 'manager' | 'kitchen' | 'customer';
   rewardPoints: number;
   rewardTier: 'bronze' | 'silver' | 'gold' | 'platinum';
   createdAt: Timestamp;
@@ -61,6 +55,17 @@ export interface User {
   preferences?: {
     notifications: boolean;
     marketing: boolean;
+  };
+}
+
+// Admin-specific user data with loyalty stats
+export interface AdminUser extends User {
+  loyaltyStats?: {
+    points: number;
+    redeemedPoints: number;
+    lifetimePoints: number;
+    orderCount: number;
+    totalSpent: number;
   };
 }
 
@@ -139,7 +144,7 @@ export interface UsersQuery {
   query?: string; // Search by email or displayName
   cursor?: string;
   limit?: number;
-  role?: keyof UserRoles;
+  role?: 'admin' | 'manager' | 'kitchen' | 'customer';
 }
 
 export interface RewardSummary {

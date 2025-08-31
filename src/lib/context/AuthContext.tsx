@@ -460,7 +460,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 
 
-  const isAdmin = !!claims.admin || claims.role === 'admin'
+  const isAdmin = claims.role === 'admin'
   
 
 

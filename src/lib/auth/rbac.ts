@@ -126,11 +126,6 @@ export async function verifyRole(requiredRole: UserRole | UserRole[]): Promise<{
       return { success: false, error: 'Email verification required' }
     }
 
-    // Admin users have all permissions
-    if (user.admin === true) {
-      return { success: true, user: { ...user, role: 'admin' } }
-    }
-
     const userRole = user.role as UserRole || 'customer'
     const allowedRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole]
     

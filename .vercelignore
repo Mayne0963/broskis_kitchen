@@ -4,7 +4,22 @@ dist
 .git
 .trae
 .log
+# Exclude all cache and build artifacts
+.next/cache/**
+.next/standalone/**
+.next/static/chunks/**
+.next/trace
+.next/BUILD_ID
+.next/export-marker.json
+.next/prerender-manifest.json
+.next/routes-manifest.json
+.next/images-manifest.json
 # Exclude documentation files
 *.md
 docs/
 generate_more_images.sh
+# Exclude development files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
