@@ -5,8 +5,12 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth/adminOnly';
-import { adminCollections } from '@/lib/firebase/admin-collections';
+import { db } from '@/lib/firebase/admin';
 import { User, UsersQuery, UsersResponse, UserRoles } from '@/types/firestore';
+import { COLLECTIONS } from '@/lib/firebase/collections';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,7 +33,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Build Firestore query
-    let firestoreQuery = adminCollections.users.orderBy('createdAt', 'desc');
+    let firestoreQuery = db.collection(COLLECTIONS.USERS).orderBy('createdAt', 'desc');
     
     // Apply role filter
     if (query.role) {
@@ -39,7 +43,7 @@ export async function GET(request: NextRequest) {
     // Apply cursor for pagination
     if (query.cursor) {
       try {
-        const cursorDoc = await adminCollections.users.doc(query.cursor).get();
+        const cursorDoc = await db.collection(COLLECTIONS.USERS).doc(query.cursor).get();
         if (cursorDoc.exists) {
           firestoreQuery = firestoreQuery.startAfter(cursorDoc);
         }

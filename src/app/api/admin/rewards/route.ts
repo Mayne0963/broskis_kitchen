@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth/adminOnly'
-import { adb } from '@/lib/firebaseAdmin'
+import { db } from '@/lib/firebase/admin'
 import { COLLECTIONS } from '@/lib/firebase/collections'
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,8 +13,8 @@ export async function GET(request: NextRequest) {
 
     // Get rewards data from Firestore
     const [offersSnapshot, rewardTransactionsSnapshot] = await Promise.all([
-      adb.collection(COLLECTIONS.OFFERS).limit(100).get(),
-      adb.collection(COLLECTIONS.REWARD_TRANSACTIONS).limit(500).get()
+      db.collection(COLLECTIONS.OFFERS).limit(100).get(),
+      db.collection(COLLECTIONS.REWARD_TRANSACTIONS).limit(500).get()
     ])
 
     // Calculate rewards statistics

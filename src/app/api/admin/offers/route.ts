@@ -5,9 +5,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth/adminOnly';
-import { adminCollections } from '@/lib/firebase/admin-collections';
+import { db } from '@/lib/firebase/admin';
 import { Offer, OffersQuery, OffersResponse } from '@/types/firestore';
+import { COLLECTIONS } from '@/lib/firebase/collections';
 import { Timestamp } from 'firebase-admin/firestore';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,7 +33,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Build Firestore query
-    let firestoreQuery = adminCollections.offers.orderBy('createdAt', 'desc');
+    let firestoreQuery = db.collection(COLLECTIONS.OFFERS).orderBy('createdAt', 'desc');
     
     // Apply active filter
     if (query.activeOnly) {
@@ -43,7 +47,7 @@ export async function GET(request: NextRequest) {
     // Apply cursor for pagination
     if (query.cursor) {
       try {
-        const cursorDoc = await adminCollections.offers.doc(query.cursor).get();
+        const cursorDoc = await db.collection(COLLECTIONS.OFFERS).doc(query.cursor).get();
         if (cursorDoc.exists) {
           firestoreQuery = firestoreQuery.startAfter(cursorDoc);
         }

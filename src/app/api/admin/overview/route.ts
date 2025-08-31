@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminOnly';
-import { adb } from '@/lib/firebaseAdmin';
+import { db } from '@/lib/firebase/admin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 // Cache configuration
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
@@ -60,19 +63,19 @@ export async function GET(request: NextRequest) {
       menuDropsSnapshot
     ] = await Promise.all([
       // All orders
-      adb.collection(COLLECTIONS.ORDERS).limit(1000).get(),
+      db.collection(COLLECTIONS.ORDERS).limit(1000).get(),
       
       // All users
-      adb.collection(COLLECTIONS.USERS).limit(500).get(),
+      db.collection(COLLECTIONS.USERS).limit(500).get(),
       
       // Active users (users with orders in last 30 days)
-      adb.collection(COLLECTIONS.ORDERS)
+      db.collection(COLLECTIONS.ORDERS)
         .where('createdAt', '>=', thirtyDaysAgo)
         .limit(500)
         .get(),
       
       // Menu drops (if collection exists)
-      adb.collection('menuDrops').limit(100).get().catch(() => ({ docs: [] }))
+      db.collection('menuDrops').limit(100).get().catch(() => ({ docs: [] }))
     ]);
 
     // Process orders data

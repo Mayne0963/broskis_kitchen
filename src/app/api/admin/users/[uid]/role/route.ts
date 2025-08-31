@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { verifyAdminAccess, type UserRole } from '@/lib/auth/rbac'
 import { setUserRole, getUserRole, canAssignRole } from '@/lib/auth/roleManager'
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 // PUT /api/admin/users/[uid]/role - Update user role
 export async function PUT(
   request: NextRequest,

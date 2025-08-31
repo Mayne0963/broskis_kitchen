@@ -5,8 +5,12 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth/adminOnly';
-import { adminCollections } from '@/lib/firebase/admin-collections';
+import { db } from '@/lib/firebase/admin';
+import { COLLECTIONS } from '@/lib/firebase/collections';
 import { RewardSummary, RewardTransaction } from '@/types/firestore';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 interface RouteParams {
   params: {
@@ -29,7 +33,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
     
     // Get user document to fetch current reward points and tier
-    const userDoc = await adminCollections.users.doc(userId).get();
+    const userDoc = await db.collection(COLLECTIONS.USERS).doc(userId).get();
     
     if (!userDoc.exists) {
       return NextResponse.json(
@@ -41,7 +45,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const userData = userDoc.data();
     
     // Get recent reward transactions (last 50)
-    const recentTransactionsSnapshot = await adminCollections.rewardTransactions
+    const recentTransactionsSnapshot = await db.collection(COLLECTIONS.REWARD_TRANSACTIONS)
       .where('userId', '==', userId)
       .orderBy('createdAt', 'desc')
       .limit(50)
@@ -54,7 +58,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     })) as RewardTransaction[];
     
     // Calculate total earned and spent
-    const allTransactionsSnapshot = await adminCollections.rewardTransactions
+    const allTransactionsSnapshot = await db.collection(COLLECTIONS.REWARD_TRANSACTIONS)
       .where('userId', '==', userId)
       .get();
     

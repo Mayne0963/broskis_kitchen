@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyAdminAuth } from '@/lib/auth/adminOnly'
-import { adb } from '@/lib/firebaseAdmin'
+import { db } from '@/lib/firebase/admin'
 import { COLLECTIONS } from '@/lib/firebase/collections'
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,7 +15,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch menu drops data
-    const menuDropsSnapshot = await adb.collection(COLLECTIONS.MENU_DROPS).limit(100).get()
+    const menuDropsSnapshot = await db.collection(COLLECTIONS.MENU_DROPS).limit(100).get()
 
     const menuDrops = menuDropsSnapshot.docs.map(doc => {
       const data = doc.data()

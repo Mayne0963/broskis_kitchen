@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withErrorHandler, requireAuth, requireAdmin } from '@/lib/middleware/error-handler';
 import { logger } from '@/lib/services/logging-service';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 export const GET = withErrorHandler(async (request: NextRequest, context) => {
   // Require admin authentication
   const user = await requireAuth(request);

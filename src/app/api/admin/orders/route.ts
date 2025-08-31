@@ -5,9 +5,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth/adminOnly';
-import { adminCollections } from '@/lib/firebase/admin-collections';
+import { db } from '@/lib/firebase/admin';
 import { Order, OrdersQuery, OrdersResponse } from '@/types/firestore';
+import { COLLECTIONS } from '@/lib/firebase/collections';
 import { Timestamp } from 'firebase-admin/firestore';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -33,7 +37,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Build Firestore query
-    let firestoreQuery = adminCollections.orders.orderBy(query.sort, query.dir);
+    let firestoreQuery = db.collection(COLLECTIONS.ORDERS).orderBy(query.sort, query.dir);
     
     // Apply status filter
     if (query.status) {
@@ -54,7 +58,7 @@ export async function GET(request: NextRequest) {
     // Apply cursor for pagination
     if (query.cursor) {
       try {
-        const cursorDoc = await adminCollections.orders.doc(query.cursor).get();
+        const cursorDoc = await db.collection(COLLECTIONS.ORDERS).doc(query.cursor).get();
         if (cursorDoc.exists) {
           firestoreQuery = firestoreQuery.startAfter(cursorDoc);
         }

@@ -6,9 +6,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth/adminOnly';
-import { adminCollections } from '@/lib/firebase/admin-collections';
+import { db } from '@/lib/firebase/admin';
 import { Coupon, CouponsQuery, CouponsResponse } from '@/types/firestore';
+import { COLLECTIONS } from '@/lib/firebase/collections';
 import { Timestamp } from 'firebase-admin/firestore';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -31,7 +35,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Build Firestore query
-    let firestoreQuery = adminCollections.coupons.orderBy('createdAt', 'desc');
+    let firestoreQuery = db.collection(COLLECTIONS.COUPONS).orderBy('createdAt', 'desc');
     
     // Apply active filter
     if (query.active !== undefined) {
@@ -46,7 +50,7 @@ export async function GET(request: NextRequest) {
     // Apply cursor for pagination
     if (query.cursor) {
       try {
-        const cursorDoc = await adminCollections.coupons.doc(query.cursor).get();
+        const cursorDoc = await db.collection(COLLECTIONS.COUPONS).doc(query.cursor).get();
         if (cursorDoc.exists) {
           firestoreQuery = firestoreQuery.startAfter(cursorDoc);
         }
@@ -168,7 +172,7 @@ export async function POST(request: NextRequest) {
     
     // Check for duplicate codes (unless updating existing coupon)
     if (!body.id) {
-      const existingCoupon = await adminCollections.coupons
+      const existingCoupon = await db.collection(COLLECTIONS.COUPONS)
         .where('code', '==', code)
         .limit(1)
         .get();
