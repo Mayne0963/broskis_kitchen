@@ -127,7 +127,7 @@ export async function verifyRole(requiredRole: UserRole | UserRole[]): Promise<{
     }
 
     // Admin users have all permissions
-    if (user.claims?.admin === true) {
+    if (user.admin === true) {
       return { success: true, user: { ...user, role: 'admin' } }
     }
 

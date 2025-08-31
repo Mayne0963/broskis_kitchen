@@ -55,7 +55,7 @@ export default function RealTimeOrderStatus({ orderId, onOrderUpdate }: RealTime
                 } as Order
                 
                 // Verify user has permission to view this order
-                if (orderData.userId === user.id || claims.admin || claims.role === 'admin') {
+                if (orderData.userId === user.id || user.admin || user.role === 'admin') {
                   setOrder(orderData)
                   setLastUpdate(new Date())
                   onOrderUpdate?.(orderData)
