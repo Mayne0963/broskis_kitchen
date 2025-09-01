@@ -1,7 +1,7 @@
 {
   "version": 2,
   "functions": {
-    "src/app/api/admin/set-claim/route.ts": { "runtime": "nodejs" },
-    "src/app/api/admin/**/route.ts": { "runtime": "nodejs" }
+    "src/app/api/admin/set-claim/route.ts": { "runtime": "nodejs20.x" },
+    "src/app/api/admin/**/route.ts": { "runtime": "nodejs20.x" }
   }
 }
