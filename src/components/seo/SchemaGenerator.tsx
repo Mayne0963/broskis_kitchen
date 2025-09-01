@@ -106,7 +106,7 @@ interface LocalBusinessSchema {
   sameAs: string[]
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://broskiskitchen.com'
+const baseUrl = process.env.BASE_URL || 'https://broskiskitchen.com'
 
 const generateRestaurantSchema = (): RestaurantSchema => ({
   "@context": "https://schema.org",

@@ -21,8 +21,8 @@ const requiredVars = {
   FIREBASE_CLIENT_EMAIL: 'Firebase client email',
   
   // Supabase
-  NEXT_PUBLIC_SUPABASE_URL: 'Supabase project URL',
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: 'Supabase anonymous key',
+  SUPABASE_URL: 'Supabase project URL',
+  SUPABASE_ANON_KEY: 'Supabase anonymous key',
   SUPABASE_SERVICE_ROLE_KEY: 'Supabase service role key',
   
   // Google Services

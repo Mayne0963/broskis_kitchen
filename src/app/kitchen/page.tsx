@@ -8,7 +8,7 @@ import { verifyKitchenAccess } from '@/lib/auth/rbac'
 // Mock function to fetch initial orders for kitchen
 async function getKitchenOrders() {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/orders?status=confirmed,preparing,ready`, {
+    const response = await fetch(`${process.env.BASE_URL || 'http://localhost:3000'}/api/orders?status=confirmed,preparing,ready`, {
       cache: 'no-store'
     })
     

@@ -8,13 +8,13 @@ import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 // Validate Firebase configuration
 const validateFirebaseConfig = () => {
   const requiredEnvVars = [
-    'NEXT_PUBLIC_FIREBASE_API_KEY',
-    'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
-    'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
-    'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET',
-    'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
-    'NEXT_PUBLIC_FIREBASE_APP_ID',
-    'NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY'
+    'FIREBASE_API_KEY',
+    'FIREBASE_AUTH_DOMAIN',
+    'FIREBASE_PROJECT_ID',
+    'FIREBASE_STORAGE_BUCKET',
+    'FIREBASE_MESSAGING_SENDER_ID',
+    'FIREBASE_APP_ID',
+    'RECAPTCHA_V3_SITE_KEY'
   ];
 
   const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
@@ -28,12 +28,12 @@ const validateFirebaseConfig = () => {
 };
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID
 };
 
 // Initialize Firebase - prevent duplicate app error
@@ -49,10 +49,10 @@ try {
     app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
     
     // Initialize App Check for client-side only
-    if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY) {
+    if (typeof window !== 'undefined' && process.env.RECAPTCHA_V3_SITE_KEY) {
       try {
         initializeAppCheck(app, {
-          provider: new ReCaptchaV3Provider(process.env.NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY),
+          provider: new ReCaptchaV3Provider(process.env.RECAPTCHA_V3_SITE_KEY),
           isTokenAutoRefreshEnabled: true,
         });
         console.log('Firebase App Check initialized successfully');
@@ -77,8 +77,8 @@ export const storage =
 export const adminStorage =
   isFirebaseConfigured &&
   app &&
-  process.env.NEXT_PUBLIC_FIREBASE_ADMIN_STORAGE_BUCKET
-    ? getStorage(app, process.env.NEXT_PUBLIC_FIREBASE_ADMIN_STORAGE_BUCKET)
+  process.env.FIREBASE_ADMIN_STORAGE_BUCKET
+    ? getStorage(app, process.env.FIREBASE_ADMIN_STORAGE_BUCKET)
     : storage;
 
 // Export configuration status
@@ -95,7 +95,7 @@ export const getFirebaseStatus = () => {
     configured: isFirebaseConfigured,
     hasDb: db !== null,
     hasAuth: auth !== null,
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'Not configured'
+    projectId: process.env.FIREBASE_PROJECT_ID || 'Not configured'
   };
 };
 

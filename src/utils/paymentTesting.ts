@@ -20,14 +20,14 @@ interface PaymentTestSuite {
 // Test Stripe connection and configuration
 export async function testStripeConnection(): Promise<PaymentTestResult> {
   try {
-    if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+    if (!process.env.STRIPE_PUBLISHABLE_KEY) {
       return {
         success: false,
         error: 'Stripe publishable key is missing from environment variables'
       }
     }
 
-    const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+    const stripe = await loadStripe(process.env.STRIPE_PUBLISHABLE_KEY)
     
     if (!stripe) {
       return {
@@ -40,7 +40,7 @@ export async function testStripeConnection(): Promise<PaymentTestResult> {
       success: true,
       details: {
         stripeVersion: stripe._apiVersion,
-        publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.substring(0, 12) + '...'
+        publishableKey: process.env.STRIPE_PUBLISHABLE_KEY.substring(0, 12) + '...'
       }
     }
   } catch (error) {
@@ -54,7 +54,7 @@ export async function testStripeConnection(): Promise<PaymentTestResult> {
 // Test Apple Pay availability
 export async function testApplePayAvailability(): Promise<PaymentTestResult> {
   try {
-    const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+    const stripe = await loadStripe(process.env.STRIPE_PUBLISHABLE_KEY!)
     
     if (!stripe) {
       return {
@@ -93,7 +93,7 @@ export async function testApplePayAvailability(): Promise<PaymentTestResult> {
 // Test Google Pay availability
 export async function testGooglePayAvailability(): Promise<PaymentTestResult> {
   try {
-    const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+    const stripe = await loadStripe(process.env.STRIPE_PUBLISHABLE_KEY!)
     
     if (!stripe) {
       return {
@@ -131,7 +131,7 @@ export async function testGooglePayAvailability(): Promise<PaymentTestResult> {
 // Test CashApp availability
 export async function testCashAppAvailability(): Promise<PaymentTestResult> {
   try {
-    const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+    const stripe = await loadStripe(process.env.STRIPE_PUBLISHABLE_KEY!)
     
     if (!stripe) {
       return {
@@ -315,7 +315,7 @@ export function validatePaymentEnvironment(): {
   warnings: string[]
 } {
   const required = [
-    'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY',
+    'STRIPE_PUBLISHABLE_KEY',
     'STRIPE_SECRET_KEY',
     'STRIPE_WEBHOOK_SECRET'
   ]
@@ -330,11 +330,11 @@ export function validatePaymentEnvironment(): {
   })
 
   // Check for test vs production keys
-  if (process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.startsWith('pk_test_')) {
+  if (process.env.STRIPE_PUBLISHABLE_KEY?.startsWith('pk_test_')) {
     warnings.push('Using Stripe test keys - remember to switch to production keys for live deployment')
   }
 
-  if (process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.startsWith('pk_test_')) {
+  if (process.env.NODE_ENV === 'production' && process.env.STRIPE_PUBLISHABLE_KEY?.startsWith('pk_test_')) {
     warnings.push('⚠️  CRITICAL: Using test keys in production environment!')
   }
 

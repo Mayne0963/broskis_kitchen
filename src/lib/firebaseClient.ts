@@ -5,10 +5,10 @@ import { getStorage } from 'firebase/storage';
 
 // Validate required environment variables
 const requiredEnvVars = [
-  'NEXT_PUBLIC_FIREBASE_API_KEY',
-  'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN', 
-  'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
-  'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET'
+  'FIREBASE_API_KEY',
+  'FIREBASE_AUTH_DOMAIN', 
+  'FIREBASE_PROJECT_ID',
+  'FIREBASE_STORAGE_BUCKET'
 ];
 
 const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
@@ -18,10 +18,10 @@ if (missingVars.length > 0) {
 }
 
 const c = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!
+  apiKey: process.env.FIREBASE_API_KEY!,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN!,
+  projectId: process.env.FIREBASE_PROJECT_ID!,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET!
 };
 
 let app, auth, db;
@@ -37,9 +37,9 @@ try {
 
 export { app, auth, db };
 const uploadsBucket =
-  process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET_UPLOADS || c.storageBucket;
+  process.env.FIREBASE_STORAGE_BUCKET_UPLOADS || c.storageBucket;
 export const storage = getStorage(app, uploadsBucket);
 export const adminStorage = getStorage(
   app,
-  process.env.NEXT_PUBLIC_FIREBASE_ADMIN_STORAGE_BUCKET || uploadsBucket
+  process.env.FIREBASE_ADMIN_STORAGE_BUCKET || uploadsBucket
 );

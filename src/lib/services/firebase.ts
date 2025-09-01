@@ -5,13 +5,13 @@ import { getStorage, FirebaseStorage } from "firebase/storage"
 import { toast } from 'sonner'
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID,
+  measurementId: process.env.FIREBASE_MEASUREMENT_ID,
 }
 
 // Validate Firebase environment variables at runtime
@@ -26,7 +26,7 @@ const requiredConfigKeys = [
 
 for (const key of requiredConfigKeys) {
   if (!firebaseConfig[key as keyof typeof firebaseConfig]) {
-    const errorMessage = `Missing Firebase environment variable: NEXT_PUBLIC_FIREBASE_${key.toUpperCase()}`
+    const errorMessage = `Missing Firebase environment variable: FIREBASE_${key.toUpperCase()}`
     console.warn(errorMessage)
   }
 }
@@ -66,8 +66,8 @@ try {
   }
   
   storage = getStorage(app)
-    adminStorage = process.env.NEXT_PUBLIC_FIREBASE_ADMIN_STORAGE_BUCKET
-    ? getStorage(app, process.env.NEXT_PUBLIC_FIREBASE_ADMIN_STORAGE_BUCKET)
+    adminStorage = process.env.FIREBASE_ADMIN_STORAGE_BUCKET
+    ? getStorage(app, process.env.FIREBASE_ADMIN_STORAGE_BUCKET)
     : storage
   isFirebaseConfigured = true
 } catch (error: any) {

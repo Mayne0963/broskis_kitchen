@@ -57,7 +57,7 @@ export default function SEOOptimizer({
   canonical
 }: SEOProps) {
   const pathname = usePathname()
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://broskiskitchen.com'
+  const baseUrl = process.env.BASE_URL || 'https://broskiskitchen.com'
   
   const seo = {
     title: title ? `${title} | ${siteName}` : defaultSEO.title,
@@ -176,7 +176,7 @@ export function useSEO(seoData: SEOProps) {
  * Generate sitemap data
  */
 export function generateSitemapData() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://broskiskitchen.com'
+  const baseUrl = process.env.BASE_URL || 'https://broskiskitchen.com'
   
   const pages = [
     { url: '/', priority: 1.0, changefreq: 'daily' },

@@ -45,9 +45,9 @@ const ContactMap: React.FC<ContactMapProps> = ({ locations }) => {
   useEffect(() => {
     // Load Google Maps script
     const loadGoogleMapsScript = () => {
-      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+      const apiKey = process.env.GOOGLE_MAPS_API_KEY
       if (!apiKey) {
-        console.error('Google Maps API key is not configured. Please set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in your environment variables.')
+        console.error('Google Maps API key is not configured. Please set GOOGLE_MAPS_API_KEY in your environment variables.')
         return
       }
       

@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
-  // We'll use a server-only environment variable without the NEXT_PUBLIC_ prefix
+  // We'll use a server-only environment variable without the  prefix
   // This ensures it's never bundled with client code
   const hasApiKey = !!process.env.GOOGLE_MAPS_API_KEY
 

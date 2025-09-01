@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://broskiskitchen.com'),
+  metadataBase: new URL(process.env.SITE_URL || 'https://broskiskitchen.com'),
   alternates: {
     canonical: '/',
   },

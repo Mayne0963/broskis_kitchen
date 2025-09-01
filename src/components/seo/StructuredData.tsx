@@ -11,7 +11,7 @@ export default function StructuredData({ type = 'website', data = {} }: Structur
   const pathname = usePathname()
   
   const getStructuredData = () => {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://broskiskitchen.com'
+    const baseUrl = process.env.SITE_URL || 'https://broskiskitchen.com'
     
     switch (type) {
       case 'restaurant':
@@ -142,7 +142,7 @@ export default function StructuredData({ type = 'website', data = {} }: Structur
 
 // Organization structured data for the company
 export function OrganizationStructuredData() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://broskiskitchen.com'
+  const baseUrl = process.env.SITE_URL || 'https://broskiskitchen.com'
   
   const organizationData = {
     '@context': 'https://schema.org',

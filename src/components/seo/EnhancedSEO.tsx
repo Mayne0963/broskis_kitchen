@@ -69,7 +69,7 @@ export default function EnhancedSEO({
   businessInfo
 }: EnhancedSEOProps) {
   const pathname = usePathname()
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://broskiskitchen.com'
+  const baseUrl = process.env.SITE_URL || 'https://broskiskitchen.com'
   
   const seo = {
     title: title ? `${title} | ${siteName}` : defaultSEO.title,
