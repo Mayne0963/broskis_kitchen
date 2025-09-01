@@ -1,9 +1,9 @@
 import 'server-only';
 import { getApps, getFirestore } from 'firebase-admin/firestore';
-import { getAdminApp } from './firebaseAdmin';
+import { ensureAdmin } from '../firebaseAdmin';
 
 // Initialize the admin app
-getAdminApp();
+ensureAdmin();
 
 // Get the initialized app
 const app = getApps()[0]!;

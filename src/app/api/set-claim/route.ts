@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAuth } from 'firebase-admin/auth';
-import { initAdmin } from '@/lib/firebaseAdmin';
+import { ensureAdmin, adminAuth } from '@/lib/firebaseAdmin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -16,9 +15,8 @@ export async function POST(req: Request) {
       );
     }
     
-    initAdmin();
-    const auth = getAuth();
-    await auth.setCustomUserClaims(uid, { admin: true });
+    ensureAdmin();
+    await adminAuth.setCustomUserClaims(uid, { admin: true });
     
     return NextResponse.json(
       { message: 'Permissions Updated' },

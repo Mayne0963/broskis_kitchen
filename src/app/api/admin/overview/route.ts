@@ -6,6 +6,10 @@ import { COLLECTIONS } from '@/lib/firebase/collections';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+// Environment variable check
+['FIREBASE_ADMIN_PROJECT_ID','FIREBASE_ADMIN_CLIENT_EMAIL','FIREBASE_ADMIN_PRIVATE_KEY']
+  .forEach(k => { if (!process.env[k]) console.warn(`Missing env: ${k}`); });
+
 // Cache configuration
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const overviewCache = new Map<string, { data: any; timestamp: number }>();

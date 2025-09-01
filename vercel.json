@@ -1,14 +1,8 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": "nextjs",
-  "ignoreCommand": "rm -rf .next/cache",
+  "version": 2,
+  "ignoreCommand": "echo no-skip",
   "functions": {
-    "src/app/api/**/*.ts": {
-      "maxDuration": 30
-    },
-    "src/app/api/admin/**/route.ts": {
-      "runtime": "nodejs20.x",
-      "maxDuration": 30
-    }
+    "src/app/api/admin/set-claim/route.ts": { "runtime": "nodejs20.x" },
+    "src/app/api/admin/**/route.ts": { "runtime": "nodejs20.x" }
   }
 }
