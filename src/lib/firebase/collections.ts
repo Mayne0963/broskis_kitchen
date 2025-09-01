@@ -1,13 +1,9 @@
 /**
  * Firestore collections utility
- * Provides collection names and client-side collection references
+ * Provides collection names for both client and server use
  */
 
-import { db } from './client';
-import { collection, CollectionReference } from 'firebase/firestore';
-import { Order, User, RewardTransaction, Coupon, Offer } from '@/types/firestore';
-
-// Collection names
+// Collection names (safe for both client and server)
 export const COLLECTIONS = {
   ORDERS: 'orders',
   USERS: 'users',
@@ -16,12 +12,3 @@ export const COLLECTIONS = {
   OFFERS: 'offers',
   MENU_DROPS: 'menuDrops'
 } as const;
-
-// Client-side collection references (for public reads)
-export const clientCollections = {
-  orders: collection(db, COLLECTIONS.ORDERS) as CollectionReference<Order>,
-  users: collection(db, COLLECTIONS.USERS) as CollectionReference<User>,
-  rewardTransactions: collection(db, COLLECTIONS.REWARD_TRANSACTIONS) as CollectionReference<RewardTransaction>,
-  coupons: collection(db, COLLECTIONS.COUPONS) as CollectionReference<Coupon>,
-  offers: collection(db, COLLECTIONS.OFFERS) as CollectionReference<Offer>
-};

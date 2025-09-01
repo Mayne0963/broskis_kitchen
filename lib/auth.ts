@@ -1,37 +1,28 @@
-import { onAuthStateChanged, onIdTokenChanged, getIdToken, getIdTokenResult } from 'firebase/auth';
-import { auth } from '@/lib/firebaseClient';
+import { auth, db, isFirebaseReady } from '@/lib/firebaseClient';
+import { onAuthStateChanged, User } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
-type Role = 'admin' | 'manager' | 'user' | null;
+export const subscribeToAuth = (callback: (user: User | null, role: string | null) => void) => {
+  // Skip auth subscription during build time or when Firebase is not ready
+  if (!isFirebaseReady()) {
+    // Return a no-op unsubscribe function for build time
+    callback(null, null);
+    return () => {};
+  }
 
-export function subscribeToAuth(onRole: (r: Role) => void) {
-  let forced = false;
-
-  const readClaims = async (force = false) => {
-    const u = auth.currentUser;
-    if (!u) return onRole(null);
-    if (force) await getIdToken(u, true);
-    const res = await getIdTokenResult(u);
-    onRole((res.claims.role as Role) ?? null);
-  };
-
-  const unsub1 = onAuthStateChanged(auth, async (u) => {
-    if (!u) return onRole(null);
-    await readClaims(false);
-  });
-
-  const unsub2 = onIdTokenChanged(auth, async () => {
-    await readClaims(false);
-  });
-
-  setTimeout(async () => {
-    if (!forced && auth.currentUser) {
-      forced = true;
-      await readClaims(true);
+  return onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        const userData = userDoc.data();
+        const role = userData?.role || null;
+        callback(user, role);
+      } catch (error) {
+        console.error('Error fetching user role:', error);
+        callback(user, null);
+      }
+    } else {
+      callback(null, null);
     }
-  }, 1500);
-
-  return () => {
-    unsub1();
-    unsub2();
-  };
-}
+  });
+};

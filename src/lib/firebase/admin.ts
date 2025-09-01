@@ -1,5 +1,6 @@
 import 'server-only';
-import { getApps, getFirestore } from 'firebase-admin/firestore';
+import { getApps } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 import { ensureAdmin } from '../firebaseAdmin';
 
 // Initialize the admin app
