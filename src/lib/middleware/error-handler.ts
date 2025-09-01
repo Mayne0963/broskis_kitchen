@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth, db } from '@/lib/firebaseAdmin';
 
 export interface ApiError extends Error {
   statusCode?: number;
@@ -104,8 +103,22 @@ class ErrorLogger {
         severity: this.getSeverity(error)
       };
 
-      // Log to Firebase
-      await db.collection('error_logs').add(errorLog);
+      // Log to Firebase via API route
+      try {
+        const response = await fetch('/api/error-logs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(errorLog),
+        });
+        
+        if (!response.ok) {
+          throw new Error(`API request failed: ${response.status}`);
+        }
+      } catch (apiError) {
+        console.error('Failed to log error to API:', apiError);
+      }
 
       // Log to console for development
       if (process.env.NODE_ENV === 'development') {
@@ -176,9 +189,21 @@ export function withErrorHandler<T extends any[]>(
       if (authHeader?.startsWith('Bearer ')) {
         try {
           const token = authHeader.split('Bearer ')[1];
-          const decodedToken = await auth.verifyIdToken(token);
-          context.userId = decodedToken.uid;
-          context.userRole = decodedToken.role || 'user';
+          const response = await fetch('/api/error-logs', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token }),
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+              context.userId = data.user.uid;
+              context.userRole = data.user.claims?.role || 'user';
+            }
+          }
         } catch (authError) {
           // Don't fail the request if token verification fails
           // Let the handler decide how to handle authentication
@@ -427,17 +452,37 @@ export async function requireAuth(request: NextRequest): Promise<{
 
   try {
     const token = authHeader.split('Bearer ')[1];
-    const decodedToken = await auth.verifyIdToken(token);
+    const response = await fetch('/api/error-logs', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token }),
+    });
+    
+    if (!response.ok) {
+      throw new AuthenticationError('Invalid authentication token');
+    }
+    
+    const data = await response.json();
+    
+    if (!data.success) {
+      throw new AuthenticationError('Invalid authentication token');
+    }
+    
     return {
-      uid: decodedToken.uid,
-      email: decodedToken.email,
+      uid: data.user.uid,
+      email: data.user.email,
       claims: {
-        admin: decodedToken.admin,
-        role: decodedToken.role,
-        kitchen: decodedToken.kitchen
+        admin: data.user.claims?.admin,
+        role: data.user.claims?.role,
+        kitchen: data.user.claims?.kitchen
       }
     };
   } catch (error) {
+    if (error instanceof AuthenticationError) {
+      throw error;
+    }
     throw new AuthenticationError('Invalid authentication token');
   }
 }

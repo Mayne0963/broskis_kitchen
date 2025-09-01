@@ -3,6 +3,9 @@ import { refundService } from '@/lib/services/refund-service';
 import { auth, adb } from '@/lib/firebaseAdmin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest, { params }: { params: { orderId: string } }) {
   try {
     const orderId = params.orderId;

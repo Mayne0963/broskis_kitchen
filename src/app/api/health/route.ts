@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db, auth } from '@/lib/firebaseAdmin';
 import { logger } from '@/lib/services/logging-service';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 interface HealthCheckResult {
   status: 'healthy' | 'degraded' | 'unhealthy';
   timestamp: string;

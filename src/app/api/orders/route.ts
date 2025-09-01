@@ -3,6 +3,9 @@ import { Order, OrderStatus } from '@/types/order'
 import { adb } from '@/lib/firebaseAdmin'
 import { withErrorHandler } from '@/lib/middleware/error-handler'
 import { logger } from '@/lib/services/logging-service'
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 // Collection name for orders
 const ORDERS_COLLECTION = 'orders'
 

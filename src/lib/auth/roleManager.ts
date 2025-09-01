@@ -1,4 +1,3 @@
-import { adminAuth } from '@/lib/firebaseAdmin'
 import { UserRole } from './rbac'
 
 /**
@@ -6,13 +5,28 @@ import { UserRole } from './rbac'
  */
 export async function setUserRole(uid: string, role: UserRole): Promise<{ success: boolean; error?: string }> {
   try {
-    // Set custom claims
-    await adminAuth.setCustomUserClaims(uid, { role })
+    const response = await fetch('/api/auth/roles', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ uid, role })
+    });
     
-    return { success: true }
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (!data.success) {
+      throw new Error(data.error || 'Failed to set user role');
+    }
+    
+    return { success: true };
   } catch (error) {
-    console.error('Error setting user role:', error)
-    return { success: false, error: 'Failed to set user role' }
+    console.error('Error setting user role:', error);
+    return { success: false, error: 'Failed to set user role' };
   }
 }
 
@@ -21,13 +35,22 @@ export async function setUserRole(uid: string, role: UserRole): Promise<{ succes
  */
 export async function getUserRole(uid: string): Promise<{ success: boolean; role?: UserRole; error?: string }> {
   try {
-    const userRecord = await adminAuth.getUser(uid)
-    const role = userRecord.customClaims?.role as UserRole || 'customer'
+    const response = await fetch(`/api/auth/roles?uid=${encodeURIComponent(uid)}`);
     
-    return { success: true, role }
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (!data.success) {
+      throw new Error(data.error || 'Failed to get user role');
+    }
+    
+    return { success: true, role: data.role };
   } catch (error) {
-    console.error('Error getting user role:', error)
-    return { success: false, error: 'Failed to get user role' }
+    console.error('Error getting user role:', error);
+    return { success: false, error: 'Failed to get user role' };
   }
 }
 
@@ -45,18 +68,35 @@ export async function bulkSetUserRoles(assignments: { uid: string; role: UserRol
   success: boolean;
   results: { uid: string; success: boolean; error?: string }[];
 }> {
-  const results = await Promise.all(
-    assignments.map(async ({ uid, role }) => {
-      const result = await setUserRole(uid, role)
-      return { uid, ...result }
-    })
-  )
-
-  const allSuccessful = results.every(result => result.success)
-  
-  return {
-    success: allSuccessful,
-    results
+  try {
+    const response = await fetch('/api/auth/roles', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ assignments })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    return {
+      success: data.success,
+      results: data.results
+    };
+  } catch (error) {
+    console.error('Error in bulk role assignment:', error);
+    return {
+      success: false,
+      results: assignments.map(({ uid }) => ({
+        uid,
+        success: false,
+        error: 'Failed to process bulk role assignment'
+      }))
+    };
   }
 }
 
@@ -69,19 +109,22 @@ export async function getAllUsersWithRoles(maxResults: number = 1000): Promise<{
   error?: string;
 }> {
   try {
-    const listUsersResult = await adminAuth.listUsers(maxResults)
+    const response = await fetch(`/api/auth/roles?action=list&maxResults=${maxResults}`);
     
-    const users = listUsersResult.users.map(userRecord => ({
-      uid: userRecord.uid,
-      email: userRecord.email || '',
-      role: (userRecord.customClaims?.role as UserRole) || 'customer',
-      emailVerified: userRecord.emailVerified
-    }))
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.status}`);
+    }
     
-    return { success: true, users }
+    const data = await response.json();
+    
+    if (!data.success) {
+      throw new Error(data.error || 'Failed to get users');
+    }
+    
+    return { success: true, users: data.users };
   } catch (error) {
-    console.error('Error getting users with roles:', error)
-    return { success: false, error: 'Failed to get users' }
+    console.error('Error getting users with roles:', error);
+    return { success: false, error: 'Failed to get users' };
   }
 }
 

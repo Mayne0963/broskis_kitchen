@@ -3,6 +3,9 @@ import { otwService } from '@/lib/services/otw-service';
 import { adb } from '@/lib/firebaseAdmin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     const signature = request.headers.get('x-otw-signature');

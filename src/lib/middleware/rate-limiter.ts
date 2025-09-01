@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/firebaseAdmin';
 import { RateLimitError } from './error-handler';
 
 interface RateLimitConfig {
@@ -84,22 +83,21 @@ class MemoryStore {
 
 // Firebase store for persistent rate limiting
 class FirebaseStore {
-  private collectionName = 'rate_limits';
-
   async get(key: string): Promise<RateLimitRecord | null> {
     try {
-      const doc = await db.collection(this.collectionName).doc(key).get();
-      if (!doc.exists) return null;
+      const response = await fetch(`/api/rate-limit?key=${encodeURIComponent(key)}`);
       
-      const data = doc.data() as RateLimitRecord;
-      
-      // Check if record has expired
-      if (Date.now() > data.resetTime) {
-        await doc.ref.delete();
-        return null;
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
       }
       
-      return data;
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to get rate limit record');
+      }
+      
+      return data.record;
     } catch (error) {
       console.error('Error getting rate limit record:', error);
       return null;
@@ -108,52 +106,49 @@ class FirebaseStore {
 
   async set(key: string, record: RateLimitRecord): Promise<void> {
     try {
-      await db.collection(this.collectionName).doc(key).set(record);
+      const response = await fetch('/api/rate-limit', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ key, record }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to set rate limit record');
+      }
     } catch (error) {
       console.error('Error setting rate limit record:', error);
     }
   }
 
   async increment(key: string, windowMs: number): Promise<RateLimitRecord> {
-    const now = Date.now();
-    const docRef = db.collection(this.collectionName).doc(key);
-    
     try {
-      const result = await db.runTransaction(async (transaction) => {
-        const doc = await transaction.get(docRef);
-        
-        if (!doc.exists) {
-          const newRecord: RateLimitRecord = {
-            count: 1,
-            resetTime: now + windowMs,
-            firstRequest: now
-          };
-          transaction.set(docRef, newRecord);
-          return newRecord;
-        }
-        
-        const existing = doc.data() as RateLimitRecord;
-        
-        // Check if window has expired
-        if (now > existing.resetTime) {
-          const newRecord: RateLimitRecord = {
-            count: 1,
-            resetTime: now + windowMs,
-            firstRequest: now
-          };
-          transaction.set(docRef, newRecord);
-          return newRecord;
-        }
-        
-        const updatedRecord: RateLimitRecord = {
-          ...existing,
-          count: existing.count + 1
-        };
-        transaction.update(docRef, { count: updatedRecord.count });
-        return updatedRecord;
+      const response = await fetch('/api/rate-limit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ key, windowMs }),
       });
       
-      return result;
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to increment rate limit');
+      }
+      
+      return data.record;
     } catch (error) {
       console.error('Error incrementing rate limit:', error);
       // Fallback to memory store

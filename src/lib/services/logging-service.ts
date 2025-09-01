@@ -1,4 +1,4 @@
-import { adb } from '@/lib/firebaseAdmin';
+// Removed direct Firebase Admin import - now uses API routes
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 
@@ -158,15 +158,20 @@ class Logger {
     const logsToFlush = [...this.logs];
     this.logs = [];
 
-    // Write to Firebase
+    // Write to Firebase via API route
     if (this.config.enableFirebase) {
       try {
-        const batch = adb.batch();
-        logsToFlush.forEach(log => {
-          const docRef = adb.collection('application_logs').doc();
-          batch.set(docRef, log);
+        const response = await fetch('/api/logs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ logs: logsToFlush }),
         });
-        await batch.commit();
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
       } catch (error) {
         console.error('Failed to write logs to Firebase:', error);
         // Put logs back if write failed
@@ -408,7 +413,7 @@ class Logger {
     };
   }
 
-  // Query logs
+  // Query logs via API route
   async queryLogs(filters: {
     level?: LogLevel;
     source?: string;
@@ -419,45 +424,31 @@ class Logger {
     tags?: string[];
   }): Promise<LogEntry[]> {
     try {
-      let query = db.collection('application_logs') as any;
-
-      if (filters.level) {
-        query = query.where('level', '==', filters.level);
-      }
-      if (filters.source) {
-        query = query.where('source', '==', filters.source);
-      }
-      if (filters.userId) {
-        query = query.where('userId', '==', filters.userId);
-      }
-      if (filters.startTime) {
-        query = query.where('timestamp', '>=', filters.startTime);
-      }
-      if (filters.endTime) {
-        query = query.where('timestamp', '<=', filters.endTime);
-      }
-      if (filters.tags && filters.tags.length > 0) {
-        query = query.where('tags', 'array-contains-any', filters.tags);
-      }
-
-      query = query.orderBy('timestamp', 'desc');
+      const params = new URLSearchParams();
       
-      if (filters.limit) {
-        query = query.limit(filters.limit);
+      if (filters.level) params.append('level', filters.level);
+      if (filters.source) params.append('source', filters.source);
+      if (filters.userId) params.append('userId', filters.userId);
+      if (filters.startTime) params.append('startTime', filters.startTime);
+      if (filters.endTime) params.append('endTime', filters.endTime);
+      if (filters.limit) params.append('limit', filters.limit.toString());
+      if (filters.tags) params.append('tags', filters.tags.join(','));
+      
+      const response = await fetch(`/api/logs?${params.toString()}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-
-      const snapshot = await query.get();
-      return snapshot.docs.map((doc: any) => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      
+      const data = await response.json();
+      return data.logs || [];
     } catch (error) {
       console.error('Error querying logs:', error);
       return [];
     }
   }
 
-  // Get log statistics
+  // Get log statistics via API route
   async getLogStats(timeRange: {
     start: string;
     end: string;
@@ -469,46 +460,21 @@ class Logger {
     topErrors: Array<{ message: string; count: number }>;
   }> {
     try {
-      const logs = await this.queryLogs({
+      const params = new URLSearchParams({
         startTime: timeRange.start,
         endTime: timeRange.end,
-        limit: 10000
+        limit: '10000',
+        statsOnly: 'true'
       });
-
-      const stats = {
-        totalLogs: logs.length,
-        levelDistribution: {} as Record<LogLevel, number>,
-        sourceDistribution: {} as Record<string, number>,
-        errorRate: 0,
-        topErrors: [] as Array<{ message: string; count: number }>
-      };
-
-      const errorMessages = new Map<string, number>();
-      let errorCount = 0;
-
-      logs.forEach(log => {
-        // Level distribution
-        stats.levelDistribution[log.level] = (stats.levelDistribution[log.level] || 0) + 1;
-        
-        // Source distribution
-        stats.sourceDistribution[log.source] = (stats.sourceDistribution[log.source] || 0) + 1;
-        
-        // Error tracking
-        if (log.level === 'error' || log.level === 'fatal') {
-          errorCount++;
-          const count = errorMessages.get(log.message) || 0;
-          errorMessages.set(log.message, count + 1);
-        }
-      });
-
-      stats.errorRate = logs.length > 0 ? (errorCount / logs.length) * 100 : 0;
       
-      stats.topErrors = Array.from(errorMessages.entries())
-        .map(([message, count]) => ({ message, count }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 10);
-
-      return stats;
+      const response = await fetch(`/api/logs?${params.toString()}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return data.stats;
     } catch (error) {
       console.error('Error getting log stats:', error);
       throw error;

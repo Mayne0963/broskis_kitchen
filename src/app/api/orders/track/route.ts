@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { adb } from '@/lib/firebaseAdmin'
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 // In-memory fallback storage
 let orders: any[] = []
 

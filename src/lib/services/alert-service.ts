@@ -1,5 +1,4 @@
 import { logger } from './logging-service';
-import { db } from '@/lib/firebaseAdmin';
 
 interface Alert {
   id?: string;
@@ -300,25 +299,19 @@ class AlertService {
   // Calculate error rate from recent metrics
   private async calculateErrorRate(startTime: number, endTime: number): Promise<number> {
     try {
-      // Query error logs and total requests from the database
-      const errorQuery = db.collection('error_logs')
-        .where('timestamp', '>=', new Date(startTime).toISOString())
-        .where('timestamp', '<=', new Date(endTime).toISOString());
+      const response = await fetch(`/api/alerts?action=error_rate&startTime=${new Date(startTime).toISOString()}&endTime=${new Date(endTime).toISOString()}`);
       
-      const performanceQuery = db.collection('performance_metrics')
-        .where('timestamp', '>=', new Date(startTime).toISOString())
-        .where('timestamp', '<=', new Date(endTime).toISOString());
-
-      const [errorSnapshot, performanceSnapshot] = await Promise.all([
-        errorQuery.get(),
-        performanceQuery.get()
-      ]);
-
-      const errorCount = errorSnapshot.size;
-      const totalRequests = performanceSnapshot.size;
-
-      if (totalRequests === 0) return 0;
-      return (errorCount / totalRequests) * 100;
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to calculate error rate');
+      }
+      
+      return data.errorRate || 0;
     } catch (error) {
       logger.error('Error calculating error rate for alerts', error);
       return 0;
@@ -370,11 +363,28 @@ class AlertService {
       notificationsSent: []
     };
 
-    // Save alert to database
+    // Save alert to database via API
     try {
-      const docRef = await db.collection('alerts').add(alert);
-      alert.id = docRef.id;
-      this.activeAlerts.set(alert.id, alert);
+      const response = await fetch('/api/alerts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(alert)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success && data.alertId) {
+        alert.id = data.alertId;
+        this.activeAlerts.set(alert.id, alert);
+      } else {
+        throw new Error(data.error || 'Failed to create alert');
+      }
     } catch (error) {
       logger.error('Error saving alert to database', error);
     }
@@ -513,13 +523,32 @@ class AlertService {
       alert.metadata = { ...alert.metadata, resolvedBy };
     }
 
-    // Update in database
+    // Update in database via API
     try {
-      await db.collection('alerts').doc(alertId).update({
-        resolved: true,
-        resolvedAt: alert.resolvedAt,
-        metadata: alert.metadata
+      const response = await fetch('/api/alerts', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          alertId,
+          updates: {
+            resolved: true,
+            resolvedAt: alert.resolvedAt,
+            metadata: alert.metadata
+          }
+        })
       });
+      
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to update alert');
+      }
     } catch (error) {
       logger.error('Error updating resolved alert in database', error);
     }

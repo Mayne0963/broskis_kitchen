@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth, db } from '@/lib/firebaseAdmin';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 type DriverStatus = 'available' | 'busy' | 'offline' | 'on_delivery';
 
 // PUT - Update driver status

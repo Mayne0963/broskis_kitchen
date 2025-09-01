@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionCookie } from '@/lib/auth/session';
 import { adb } from '@/lib/firebaseAdmin';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 // Helper to get user ID from session
 const getUserId = async () => {
   const session = await getSessionCookie();
