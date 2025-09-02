@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "ignoreCommand": "echo no-skip",
   "functions": {
     "app/api/**/route.ts": { "runtime": "nodejs20.x" },
     "pages/api/**/*.ts": { "runtime": "nodejs20.x" }
