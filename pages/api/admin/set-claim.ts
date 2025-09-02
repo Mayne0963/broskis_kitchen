@@ -1,3 +1,6 @@
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { adminAuth } from '../../../src/lib/firebaseAdmin';
 
