@@ -1,0 +1,16 @@
+{
+  "projectId": "prj_Y82S3i9Rb6CT0IWpkbGebSfhojVB",
+  "orgId": "team_DCdGkOoKXm35dab7i3a21yL2",
+  "projectName": "v0-broskis",
+  "settings": {
+    "createdAt": 1745278089582,
+    "framework": "nextjs",
+    "devCommand": "npm run dev",
+    "installCommand": "npm install",
+    "buildCommand": "npm run build",
+    "outputDirectory": ".next",
+    "rootDirectory": null,
+    "directoryListing": false,
+    "nodeVersion": "20.x"
+  }
+}
