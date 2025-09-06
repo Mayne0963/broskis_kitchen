@@ -1,8 +1,4 @@
 {
-  "version": 2,
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./",
-  "functions": {
-    "app/api/**/route.ts": { "runtime": "nodejs20.x" },
-    "pages/api/**/*.ts": { "runtime": "nodejs20.x" }
-  }
+  "$schema": 
+  "https://openapi.vercel.sh/vercel.json"
 }
