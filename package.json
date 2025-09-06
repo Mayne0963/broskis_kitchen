@@ -24,7 +24,17 @@
     "deploy-check": "npm run validate-vercel && npm run lint && npm run build-vercel",
     "vercel-postbuild": "echo 'Vercel build completed successfully'",
     "set-admin": "node scripts/setAdminClaim.js amarikelsaw10@gmail.com",
-    "set-admin-mock": "node scripts/setAdminClaim-mock.js amarikelsaw10@gmail.com"
+    "set-admin-mock": "node scripts/setAdminClaim-mock.js amarikelsaw10@gmail.com",
+    "deploy:force": "vercel deploy --prod --force",
+    "deploy:force:preview": "vercel deploy --force",
+    "clear:cache": "node scripts/clear-vercel-cache.js",
+    "clear:nextjs": "rm -rf .next",
+    "clear:vercel": "rm -rf .vercel",
+    "clear:all": "npm run clear:cache && npm run clear:nextjs && npm run clear:vercel",
+    "deploy:fresh": "npm run clear:all && npm install && npm run deploy:force",
+    "force-deploy": "chmod +x scripts/force-deploy.sh && ./scripts/force-deploy.sh",
+    "force-deploy:prod": "chmod +x scripts/force-deploy.sh && ./scripts/force-deploy.sh --env production",
+    "force-deploy:clear": "chmod +x scripts/force-deploy.sh && ./scripts/force-deploy.sh --env production --clear-cache"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
