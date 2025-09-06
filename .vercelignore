@@ -6,6 +6,7 @@ build
 dist
 .trae
 *.log
+.vercel/
 
 # Next.js cache (exclude only cache, not essential build files)
 .next/cache/**
@@ -21,6 +22,7 @@ generate_more_images.sh
 .env.development.local
 .env.test.local
 .env.production.local
+
 
 # IDE and OS files
 .DS_Store
