@@ -1,362 +1,333 @@
-const CACHE_NAME = 'broskis-kitchen-v1';
-const STATIC_CACHE_NAME = 'broskis-kitchen-static-v1';
-const DYNAMIC_CACHE_NAME = 'broskis-kitchen-dynamic-v1';
+// Service Worker for chunk loading error recovery and offline support
 
-// Assets to cache on install
+const CACHE_NAME = 'broski-kitchen-v1'
+const STATIC_CACHE_NAME = 'broski-kitchen-static-v1'
+const DYNAMIC_CACHE_NAME = 'broski-kitchen-dynamic-v1'
+
+// Files to cache immediately
 const STATIC_ASSETS = [
   '/',
-  '/menu',
-  '/locations',
-  '/contact',
-  '/about',
   '/manifest.json',
-  '/offline.html',
-  // Add critical images
-  '/images/logo.svg',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
-];
+  '/favicon.ico',
+  '/offline.html', // Fallback page
+]
 
-// Note: CSS and JS chunks are handled automatically by Next.js
-// and should not be hardcoded as they change with each build
+// Network-first strategy for API calls
+const API_ROUTES = [
+  '/api/',
+  '/auth/',
+]
 
-// API endpoints to cache
-const API_CACHE_PATTERNS = [
-  /^\/api\/menu/,
-  /^\/api\/locations/,
-  /^\/api\/health/
-];
+// Cache-first strategy for static assets
+const STATIC_ROUTES = [
+  '/_next/static/',
+  '/images/',
+  '/icons/',
+  '.js',
+  '.css',
+  '.woff2',
+  '.woff',
+  '.ttf',
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.svg',
+  '.webp',
+]
 
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
-  console.log('Service Worker: Installing...');
+  console.log('Service Worker installing...')
   
   event.waitUntil(
-    caches.open(STATIC_CACHE_NAME)
-      .then((cache) => {
-        console.log('Service Worker: Caching static assets');
-        return cache.addAll(STATIC_ASSETS.map(url => {
-          return new Request(url, { cache: 'reload' });
-        }));
+    Promise.all([
+      caches.open(STATIC_CACHE_NAME).then((cache) => {
+        console.log('Caching static assets')
+        return cache.addAll(STATIC_ASSETS.filter(url => url !== '/offline.html'))
+      }),
+      // Create offline fallback
+      caches.open(DYNAMIC_CACHE_NAME).then((cache) => {
+        return cache.add('/offline.html')
       })
-      .catch((error) => {
-        console.error('Service Worker: Failed to cache static assets', error);
-      })
-  );
-  
-  // Force the waiting service worker to become the active service worker
-  self.skipWaiting();
-});
+    ]).then(() => {
+      console.log('Service Worker installed successfully')
+      // Force activation
+      return self.skipWaiting()
+    })
+  )
+})
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  console.log('Service Worker: Activating...');
+  console.log('Service Worker activating...')
   
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== STATIC_CACHE_NAME && cacheName !== DYNAMIC_CACHE_NAME) {
-            console.log('Service Worker: Deleting old cache', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
+    Promise.all([
+      // Clean up old caches
+      caches.keys().then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => {
+            if (
+              cacheName !== CACHE_NAME &&
+              cacheName !== STATIC_CACHE_NAME &&
+              cacheName !== DYNAMIC_CACHE_NAME
+            ) {
+              console.log('Deleting old cache:', cacheName)
+              return caches.delete(cacheName)
+            }
+          })
+        )
+      }),
+      // Take control of all clients
+      self.clients.claim()
+    ]).then(() => {
+      console.log('Service Worker activated successfully')
     })
-  );
-  
-  // Ensure the service worker takes control immediately
-  self.clients.claim();
-});
+  )
+})
 
-// Fetch event - serve cached content when offline
+// Fetch event - implement caching strategies
 self.addEventListener('fetch', (event) => {
-  const { request } = event;
-  const url = new URL(request.url);
-  
-  // Skip Firestore requests to avoid CORS/service worker conflicts
-  if (url.hostname.endsWith('firestore.googleapis.com')) {
-    return;
-  }
+  const { request } = event
+  const url = new URL(request.url)
   
   // Skip non-GET requests
   if (request.method !== 'GET') {
-    return;
+    return
   }
   
   // Skip chrome-extension and other non-http(s) requests
   if (!url.protocol.startsWith('http')) {
-    return;
+    return
   }
   
-  event.respondWith(
-    handleFetchRequest(request)
-  );
-});
-
-// Handle different types of requests
-async function handleFetchRequest(request) {
-  const url = new URL(request.url);
-  
-  try {
-    // Handle API requests
-    if (url.pathname.startsWith('/api/')) {
-      return await handleApiRequest(request);
-    }
-    
-    // Handle static assets and pages
-    if (isStaticAsset(url.pathname) || isPageRequest(request)) {
-      return await handleStaticRequest(request);
-    }
-    
-    // Handle images and media
-    if (isImageRequest(request)) {
-      return await handleImageRequest(request);
-    }
-    
-    // Default: try network first, then cache
-    return await networkFirst(request);
-    
-  } catch (error) {
-    console.error('Service Worker: Fetch error', error);
-    return await handleOfflineRequest(request);
-  }
-}
-
-// API request handler - network first with cache fallback
-async function handleApiRequest(request) {
-  const url = new URL(request.url);
-  
-  // Check if this API should be cached
-  const shouldCache = API_CACHE_PATTERNS.some(pattern => pattern.test(url.pathname));
-  
-  if (!shouldCache) {
-    return fetch(request);
-  }
-  
-  try {
-    const response = await fetch(request);
-    
-    if (response.ok) {
-      // Cache successful API responses
-      const cache = await caches.open(DYNAMIC_CACHE_NAME);
-      cache.put(request, response.clone());
-    }
-    
-    return response;
-  } catch (error) {
-    // Return cached version if network fails
-    const cachedResponse = await caches.match(request);
-    if (cachedResponse) {
-      return cachedResponse;
-    }
-    throw error;
-  }
-}
-
-// Static request handler - cache first
-async function handleStaticRequest(request) {
-  const cachedResponse = await caches.match(request);
-  
-  if (cachedResponse) {
-    return cachedResponse;
-  }
-  
-  try {
-    const response = await fetch(request);
-    
-    if (response.ok) {
-      const cache = await caches.open(STATIC_CACHE_NAME);
-      cache.put(request, response.clone());
-    }
-    
-    return response;
-  } catch (error) {
-    // Return offline page for navigation requests
-    if (isPageRequest(request)) {
-      const offlineResponse = await caches.match('/offline.html');
-      return offlineResponse || new Response('Offline', { status: 503 });
-    }
-    throw error;
-  }
-}
-
-// Image request handler - cache first with stale-while-revalidate
-async function handleImageRequest(request) {
-  const cache = await caches.open(DYNAMIC_CACHE_NAME);
-  const cachedResponse = await cache.match(request);
-  
-  if (cachedResponse) {
-    // Return cached version immediately
-    fetch(request).then(response => {
-      if (response.ok) {
-        cache.put(request, response.clone());
-      }
-    }).catch(() => {});
-    
-    return cachedResponse;
-  }
-  
-  try {
-    const response = await fetch(request);
-    
-    if (response.ok) {
-      cache.put(request, response.clone());
-    }
-    
-    return response;
-  } catch (error) {
-    // Return placeholder image if available
-    const placeholder = await cache.match('/images/placeholder.svg');
-    return placeholder || new Response('Image not available', { status: 503 });
-  }
-}
-
-// Network first strategy
-async function networkFirst(request) {
-  try {
-    const response = await fetch(request);
-    
-    if (response.ok) {
-      const cache = await caches.open(DYNAMIC_CACHE_NAME);
-      cache.put(request, response.clone());
-    }
-    
-    return response;
-  } catch (error) {
-    const cachedResponse = await caches.match(request);
-    return cachedResponse || new Response('Content not available', { status: 503 });
-  }
-}
-
-// Handle offline requests
-async function handleOfflineRequest(request) {
-  if (isPageRequest(request)) {
-    const offlineResponse = await caches.match('/offline.html');
-    return offlineResponse || new Response('Offline', { status: 503 });
-  }
-  
-  const cachedResponse = await caches.match(request);
-  return cachedResponse || new Response('Content not available', { status: 503 });
-}
-
-// Utility functions
-function isStaticAsset(pathname) {
-  return pathname.startsWith('/_next/') || 
-         pathname.startsWith('/static/') ||
-         pathname.endsWith('.css') ||
-         pathname.endsWith('.js') ||
-         pathname.endsWith('.woff') ||
-         pathname.endsWith('.woff2');
-}
-
-function isPageRequest(request) {
-  return request.mode === 'navigate' || 
-         (request.method === 'GET' && request.headers.get('accept').includes('text/html'));
-}
-
-function isImageRequest(request) {
-  return request.destination === 'image' ||
-         request.url.match(/\.(jpg|jpeg|png|gif|webp|svg|ico)$/i);
-}
-
-// Background sync for offline actions
-self.addEventListener('sync', (event) => {
-  console.log('Service Worker: Background sync', event.tag);
-  
-  if (event.tag === 'background-sync-orders') {
-    event.waitUntil(syncOfflineOrders());
-  }
-});
-
-// Sync offline orders when connection is restored
-async function syncOfflineOrders() {
-  try {
-    // Get offline orders from IndexedDB or localStorage
-    const offlineOrders = await getOfflineOrders();
-    
-    for (const order of offlineOrders) {
-      try {
-        const response = await fetch('/api/orders', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(order)
-        });
-        
-        if (response.ok) {
-          await removeOfflineOrder(order.id);
-          console.log('Service Worker: Synced offline order', order.id);
-        }
-      } catch (error) {
-        console.error('Service Worker: Failed to sync order', order.id, error);
-      }
-    }
-  } catch (error) {
-    console.error('Service Worker: Background sync failed', error);
-  }
-}
-
-// Placeholder functions for offline order management
-async function getOfflineOrders() {
-  // Implementation would use IndexedDB or localStorage
-  return [];
-}
-
-async function removeOfflineOrder(orderId) {
-  // Implementation would remove from IndexedDB or localStorage
-  console.log('Removing offline order:', orderId);
-}
-
-// Push notification handler
-self.addEventListener('push', (event) => {
-  console.log('Service Worker: Push notification received');
-  
-  const options = {
-    body: event.data ? event.data.text() : 'New notification from Broski\'s Kitchen',
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/icon-72x72.png',
-    vibrate: [100, 50, 100],
-    data: {
-      dateOfArrival: Date.now(),
-      primaryKey: 1
-    },
-    actions: [
-      {
-        action: 'explore',
-        title: 'View Menu',
-        icon: '/icons/icon-192x192.png'
-      },
-      {
-        action: 'close',
-        title: 'Close',
-        icon: '/icons/icon-192x192.png'
-      }
-    ]
-  };
-  
-  event.waitUntil(
-    self.registration.showNotification('Broski\'s Kitchen', options)
-  );
-});
-
-// Notification click handler
-self.addEventListener('notificationclick', (event) => {
-  console.log('Service Worker: Notification clicked');
-  
-  event.notification.close();
-  
-  if (event.action === 'explore') {
-    event.waitUntil(
-      clients.openWindow('/menu')
-    );
-  } else if (event.action === 'close') {
-    // Just close the notification
+  // Handle different types of requests
+  if (isAPIRequest(request)) {
+    // Network-first for API calls
+    event.respondWith(networkFirstStrategy(request))
+  } else if (isStaticAsset(request)) {
+    // Cache-first for static assets
+    event.respondWith(cacheFirstStrategy(request))
+  } else if (isNavigationRequest(request)) {
+    // Network-first with offline fallback for navigation
+    event.respondWith(navigationStrategy(request))
   } else {
-    // Default action - open the app
-    event.waitUntil(
-      clients.openWindow('/')
-    );
+    // Default: network-first
+    event.respondWith(networkFirstStrategy(request))
   }
-});
+})
+
+// Strategy: Network-first with cache fallback
+async function networkFirstStrategy(request) {
+  try {
+    const networkResponse = await fetch(request)
+    
+    // Cache successful responses
+    if (networkResponse.ok) {
+      const cache = await caches.open(DYNAMIC_CACHE_NAME)
+      cache.put(request, networkResponse.clone())
+    }
+    
+    return networkResponse
+  } catch (error) {
+    console.log('Network failed, trying cache:', request.url)
+    
+    const cachedResponse = await caches.match(request)
+    if (cachedResponse) {
+      return cachedResponse
+    }
+    
+    // If it's a chunk loading error, try to recover
+    if (isChunkRequest(request)) {
+      return handleChunkLoadError(request)
+    }
+    
+    throw error
+  }
+}
+
+// Strategy: Cache-first with network fallback
+async function cacheFirstStrategy(request) {
+  const cachedResponse = await caches.match(request)
+  
+  if (cachedResponse) {
+    // Update cache in background
+    updateCacheInBackground(request)
+    return cachedResponse
+  }
+  
+  try {
+    const networkResponse = await fetch(request)
+    
+    if (networkResponse.ok) {
+      const cache = await caches.open(STATIC_CACHE_NAME)
+      cache.put(request, networkResponse.clone())
+    }
+    
+    return networkResponse
+  } catch (error) {
+    console.error('Failed to fetch static asset:', request.url, error)
+    throw error
+  }
+}
+
+// Strategy: Navigation with offline fallback
+async function navigationStrategy(request) {
+  try {
+    const networkResponse = await fetch(request)
+    
+    if (networkResponse.ok) {
+      const cache = await caches.open(DYNAMIC_CACHE_NAME)
+      cache.put(request, networkResponse.clone())
+    }
+    
+    return networkResponse
+  } catch (error) {
+    console.log('Navigation failed, trying cache:', request.url)
+    
+    const cachedResponse = await caches.match(request)
+    if (cachedResponse) {
+      return cachedResponse
+    }
+    
+    // Return offline page as fallback
+    const offlineResponse = await caches.match('/offline.html')
+    if (offlineResponse) {
+      return offlineResponse
+    }
+    
+    throw error
+  }
+}
+
+// Handle chunk loading errors specifically
+async function handleChunkLoadError(request) {
+  console.log('Handling chunk load error for:', request.url)
+  
+  // Try to find a cached version
+  const cachedResponse = await caches.match(request)
+  if (cachedResponse) {
+    console.log('Found cached chunk:', request.url)
+    return cachedResponse
+  }
+  
+  // If no cached version, try to fetch with retry
+  for (let i = 0; i < 3; i++) {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)))
+      const response = await fetch(request)
+      
+      if (response.ok) {
+        const cache = await caches.open(STATIC_CACHE_NAME)
+        cache.put(request, response.clone())
+        return response
+      }
+    } catch (error) {
+      console.log(`Chunk retry ${i + 1} failed:`, error)
+    }
+  }
+  
+  // If all retries fail, return a custom error response
+  return new Response(
+    'console.error("Chunk loading failed. Please refresh the page."); window.location.reload();',
+    {
+      status: 200,
+      statusText: 'OK',
+      headers: {
+        'Content-Type': 'application/javascript',
+      },
+    }
+  )
+}
+
+// Update cache in background
+async function updateCacheInBackground(request) {
+  try {
+    const networkResponse = await fetch(request)
+    
+    if (networkResponse.ok) {
+      const cache = await caches.open(STATIC_CACHE_NAME)
+      await cache.put(request, networkResponse)
+    }
+  } catch (error) {
+    // Silently fail background updates
+    console.log('Background cache update failed:', error)
+  }
+}
+
+// Helper functions
+function isAPIRequest(request) {
+  return API_ROUTES.some(route => request.url.includes(route))
+}
+
+function isStaticAsset(request) {
+  return STATIC_ROUTES.some(route => request.url.includes(route))
+}
+
+function isNavigationRequest(request) {
+  return request.mode === 'navigate'
+}
+
+function isChunkRequest(request) {
+  return (
+    request.url.includes('/_next/static/chunks/') ||
+    request.url.includes('.js') ||
+    request.url.includes('.css')
+  )
+}
+
+// Message handling for cache management
+self.addEventListener('message', (event) => {
+  const { type, payload } = event.data
+  
+  switch (type) {
+    case 'CLEAR_CACHE':
+      clearAllCaches().then(() => {
+        event.ports[0].postMessage({ success: true })
+      })
+      break
+      
+    case 'CACHE_URLS':
+      cacheUrls(payload.urls).then(() => {
+        event.ports[0].postMessage({ success: true })
+      })
+      break
+      
+    case 'GET_CACHE_STATUS':
+      getCacheStatus().then((status) => {
+        event.ports[0].postMessage(status)
+      })
+      break
+      
+    default:
+      console.log('Unknown message type:', type)
+  }
+})
+
+// Cache management functions
+async function clearAllCaches() {
+  const cacheNames = await caches.keys()
+  await Promise.all(cacheNames.map(name => caches.delete(name)))
+  console.log('All caches cleared')
+}
+
+async function cacheUrls(urls) {
+  const cache = await caches.open(DYNAMIC_CACHE_NAME)
+  await cache.addAll(urls)
+  console.log('URLs cached:', urls)
+}
+
+async function getCacheStatus() {
+  const cacheNames = await caches.keys()
+  const status = {}
+  
+  for (const name of cacheNames) {
+    const cache = await caches.open(name)
+    const keys = await cache.keys()
+    status[name] = keys.length
+  }
+  
+  return status
+}
+
+console.log('Service Worker loaded successfully')

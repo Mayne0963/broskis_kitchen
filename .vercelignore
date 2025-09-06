@@ -1,24 +1,32 @@
+# Dependencies
 node_modules
+
+# Build artifacts (keep essential ones for Vercel)
 build
 dist
 .trae
-.log
-# Exclude all cache and build artifacts
+*.log
+
+# Next.js cache (exclude only cache, not essential build files)
 .next/cache/**
-.next/standalone/**
-.next/static/chunks/**
 .next/trace
-.next/BUILD_ID
-.next/export-marker.json
-.next/prerender-manifest.json
-.next/routes-manifest.json
-.next/images-manifest.json
-# Exclude documentation files
+
+# Documentation files
 *.md
 docs/
 generate_more_images.sh
-# Exclude development files
+
+# Development environment files
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+
+# IDE and OS files
+.DS_Store
+.vscode/
+.idea/
+
+# Ensure public directory files (including manifest.json) are NOT excluded
+# Public files should be deployed
+!public/**

@@ -12,6 +12,14 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Enhanced Vercel deployment configuration
+  assetPrefix: process.env.NODE_ENV === 'production' ? undefined : undefined,
+  // Enable static optimization
+  output: 'standalone',
+  // Compress output for better performance
+  compress: true,
+  // Enable SWC minification
+  swcMinify: true,
   images: {
     unoptimized: false,
     formats: ['image/webp', 'image/avif'],
@@ -34,6 +42,10 @@ const nextConfig = {
   },
   // Enhanced configuration for Vercel deployment
   trailingSlash: false,
+  // Enable static file serving optimization
+  generateEtags: true,
+  // Optimize for Vercel's edge network
+  poweredByHeader: false,
   // Enhanced webpack configuration to prevent chunk loading errors
   webpack: (config, { dev, isServer }) => {
     // Optimize chunk splitting for better loading reliability
@@ -107,9 +119,49 @@ const nextConfig = {
     },
   },
   
-  // Skip static generation for auth pages
+  // Enhanced build ID generation for cache busting
   async generateBuildId() {
-    return 'build-' + Date.now()
+    // Use environment-specific build ID for better cache management
+    const timestamp = Date.now()
+    const env = process.env.VERCEL_ENV || process.env.NODE_ENV || 'development'
+    return `${env}-${timestamp}`
+  },
+  
+  // Enhanced headers for better caching and security
+  async headers() {
+    return [
+      {
+        source: '/manifest.json',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+          {
+            key: 'Content-Type',
+            value: 'application/manifest+json',
+          },
+        ],
+      },
+      {
+        source: '/_next/static/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/favicon.ico',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400',
+          },
+        ],
+      },
+    ]
   }
 }
 

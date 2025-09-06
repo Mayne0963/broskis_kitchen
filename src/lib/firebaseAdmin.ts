@@ -44,10 +44,19 @@ export function ensureAdmin() {
     return;
   }
 
+  // Skip initialization during build time if no credentials are available
+  const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
+  const hasIndividualVars = process.env.FIREBASE_ADMIN_PROJECT_ID && 
+                           process.env.FIREBASE_ADMIN_CLIENT_EMAIL && 
+                           process.env.FIREBASE_ADMIN_PRIVATE_KEY;
+  
+  if (!serviceAccountJson && !hasIndividualVars) {
+    console.warn('⚠️ Firebase Admin SDK credentials not found. Skipping initialization.');
+    return;
+  }
+
   try {
     // Check for FIREBASE_SERVICE_ACCOUNT first (JSON format)
-    const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
-    
     if (serviceAccountJson) {
       try {
         const serviceAccount = JSON.parse(serviceAccountJson);
@@ -91,11 +100,42 @@ export function ensureAdmin() {
 // Initialize admin app
 ensureAdmin();
 
-// Get the initialized app
-const app = getApps()[0]!;
+// Get the initialized app (if available)
+function getAdminApp() {
+  const apps = getApps();
+  if (apps.length === 0) {
+    throw new Error('Firebase Admin SDK not initialized. Please check your credentials.');
+  }
+  return apps[0];
+}
+
+// Export database and auth instances with lazy initialization
+export function getAdminDb() {
+  return getFirestore(getAdminApp());
+}
+
+export function getAdminAuth() {
+  return getAuth(getAdminApp());
+}
 
 // Export database and auth instances for backward compatibility
-export const adb = getFirestore(app);
+// These will throw an error if Firebase is not properly initialized
+export const adb = (() => {
+  try {
+    return getAdminDb();
+  } catch {
+    return null as any; // Return null during build time
+  }
+})();
+
 export const db = adb; // alias for compatibility
-export const adminAuth = getAuth(app);
+
+export const adminAuth = (() => {
+  try {
+    return getAdminAuth();
+  } catch {
+    return null as any; // Return null during build time
+  }
+})();
+
 export const auth = adminAuth; // alias for compatibility

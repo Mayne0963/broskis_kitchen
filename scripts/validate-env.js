@@ -5,6 +5,13 @@
  * Run this script to validate all required environment variables are set
  */
 
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
 const requiredVars = {
   // Authentication
   NEXTAUTH_SECRET: 'NextAuth secret key (minimum 32 characters)',
@@ -15,10 +22,21 @@ const requiredVars = {
   STRIPE_PUBLISHABLE_KEY: 'Stripe publishable key',
   STRIPE_WEBHOOK_SECRET: 'Stripe webhook secret',
   
-  // Firebase
+  // Firebase Client
+  FIREBASE_API_KEY: 'Firebase API key',
+  FIREBASE_AUTH_DOMAIN: 'Firebase auth domain',
   FIREBASE_PROJECT_ID: 'Firebase project ID',
+  FIREBASE_STORAGE_BUCKET: 'Firebase storage bucket',
+  FIREBASE_MESSAGING_SENDER_ID: 'Firebase messaging sender ID',
+  FIREBASE_APP_ID: 'Firebase app ID',
   FIREBASE_PRIVATE_KEY: 'Firebase private key',
   FIREBASE_CLIENT_EMAIL: 'Firebase client email',
+  
+  // Firebase Admin SDK (optional for build)
+  // FIREBASE_SERVICE_ACCOUNT: 'Firebase service account JSON',
+  
+  // reCAPTCHA
+  RECAPTCHA_V3_SITE_KEY: 'reCAPTCHA v3 site key',
   
   // Supabase
   SUPABASE_URL: 'Supabase project URL',
@@ -44,6 +62,7 @@ const optionalVars = {
   
   // Development
   NODE_ENV: 'Environment (development/production)',
+  FIREBASE_SERVICE_ACCOUNT: 'Firebase service account JSON (optional for development)',
   
   // Monitoring
   SENTRY_DSN: 'Sentry DSN for error tracking'
@@ -131,8 +150,6 @@ function validateEnvironment() {
 
 // Load environment variables from .env files
 try {
-  const fs = require('fs')
-  const path = require('path')
   
   // Simple .env parser
   function loadEnvFile(filePath) {
