@@ -34,7 +34,14 @@
     "deploy:fresh": "npm run clear:all && npm install && npm run deploy:force",
     "force-deploy": "chmod +x scripts/force-deploy.sh && ./scripts/force-deploy.sh",
     "force-deploy:prod": "chmod +x scripts/force-deploy.sh && ./scripts/force-deploy.sh --env production",
-    "force-deploy:clear": "chmod +x scripts/force-deploy.sh && ./scripts/force-deploy.sh --env production --clear-cache"
+    "force-deploy:clear": "chmod +x scripts/force-deploy.sh && ./scripts/force-deploy.sh --env production --clear-cache",
+    "setup:vercel": "node scripts/setup-vercel-env.js",
+    "setup:vercel:interactive": "bash scripts/vercel-env-commands.sh",
+    "validate:env": "node scripts/validate-env.js",
+    "validate:local": "node scripts/setup-vercel-env.js validate",
+    "env:help": "node scripts/setup-vercel-env.js help",
+    "env:setup": "node scripts/setup-vercel-env.js",
+    "env:commands": "bash scripts/vercel-env-commands.sh"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

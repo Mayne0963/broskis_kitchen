@@ -58,7 +58,7 @@ const REQUIRED_ENV_VARS = {
   FIREBASE_ADMIN_PRIVATE_KEY: 'Firebase Admin private key',
   
   // Stripe Payment Processing
-  STRIPE_PUBLISHABLE_KEY: 'Stripe publishable key for client-side',
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: 'Stripe publishable key for client-side',
   STRIPE_SECRET_KEY: 'Stripe secret key for server-side',
   STRIPE_WEBHOOK_SECRET: 'Stripe webhook endpoint secret',
   
@@ -132,7 +132,7 @@ function validateEnvironmentVariables() {
       }
       
       // Check for test keys in production
-      const stripeKey = process.env.STRIPE_PUBLISHABLE_KEY;
+      const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
       if (stripeKey && stripeKey.includes('test')) {
         log('  ❌ Production deployment should not use Stripe test keys', 'red');
         hasErrors = true;
@@ -164,7 +164,7 @@ function validateVariableFormat(varName, value) {
                 !isHttps && process.env.VERCEL_ENV === 'production' ? 'Should use HTTPS in production' : 'OK'
       };
       
-    case 'STRIPE_PUBLISHABLE_KEY':
+    case 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY':
       return {
         isValid: value.startsWith('pk_'),
         message: value.startsWith('pk_') ? 'OK' : 'Must start with "pk_"'

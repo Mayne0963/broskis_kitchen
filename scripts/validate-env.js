@@ -19,8 +19,12 @@ const requiredVars = {
   
   // Stripe Payment
   STRIPE_SECRET_KEY: 'Stripe secret key',
-  STRIPE_PUBLISHABLE_KEY: 'Stripe publishable key',
+  STRIPE_PUBLISHABLE_KEY: 'Stripe publishable key (non-public version)',
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: 'Stripe publishable key (public version)',
   STRIPE_WEBHOOK_SECRET: 'Stripe webhook secret',
+  
+  // Google Services
+  GOOGLE_MAPS_API_KEY: 'Google Maps API key',
   
   // Firebase Client
   FIREBASE_API_KEY: 'Firebase API key',
@@ -29,22 +33,13 @@ const requiredVars = {
   FIREBASE_STORAGE_BUCKET: 'Firebase storage bucket',
   FIREBASE_MESSAGING_SENDER_ID: 'Firebase messaging sender ID',
   FIREBASE_APP_ID: 'Firebase app ID',
-  FIREBASE_PRIVATE_KEY: 'Firebase private key',
-  FIREBASE_CLIENT_EMAIL: 'Firebase client email',
+
   
   // Firebase Admin SDK (optional for build)
   // FIREBASE_SERVICE_ACCOUNT: 'Firebase service account JSON',
   
   // reCAPTCHA
   RECAPTCHA_V3_SITE_KEY: 'reCAPTCHA v3 site key',
-  
-  // Supabase
-  SUPABASE_URL: 'Supabase project URL',
-  SUPABASE_ANON_KEY: 'Supabase anonymous key',
-  SUPABASE_SERVICE_ROLE_KEY: 'Supabase service role key',
-  
-  // Google Services
-  GOOGLE_MAPS_API_KEY: 'Google Maps API key',
   
   // Email
   SENDGRID_API_KEY: 'SendGrid API key for email services',
@@ -63,6 +58,13 @@ const optionalVars = {
   // Development
   NODE_ENV: 'Environment (development/production)',
   FIREBASE_SERVICE_ACCOUNT: 'Firebase service account JSON (optional for development)',
+  
+  // Firebase Admin (optional)
+  FIREBASE_PRIVATE_KEY: 'Firebase private key (optional for some deployments)',
+  FIREBASE_CLIENT_EMAIL: 'Firebase client email (optional for some deployments)',
+  
+  // Additional Google Services (optional)
+  // GOOGLE_MAPS_API_KEY: 'Moved to required variables',
   
   // Monitoring
   SENTRY_DSN: 'Sentry DSN for error tracking'
@@ -133,6 +135,12 @@ function validateEnvironment() {
     console.log('❌ STRIPE_PUBLISHABLE_KEY appears to be a secret key (should start with pk_)')
     hasErrors = true
   }
+  
+  if (process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.startsWith('sk_')) {
+    console.log('❌ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY appears to be a secret key (should start with pk_)')
+    hasErrors = true
+  }
+  
   
   // Summary
   console.log('\n📊 Summary:')

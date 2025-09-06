@@ -14,7 +14,7 @@ import { LoadingOverlay, ErrorState, ProgressIndicator, useLoadingState } from '
 import { toast } from 'sonner'
 
 const stripePromise = loadStripe(
-  process.env.STRIPE_PUBLISHABLE_KEY!
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 )
 
 interface CartItem {

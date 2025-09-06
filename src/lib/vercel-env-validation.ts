@@ -30,7 +30,7 @@ const REQUIRED_VERCEL_ENV_VARS = {
   FIREBASE_ADMIN_PRIVATE_KEY: 'Firebase Admin private key',
   
   // Stripe Payment Processing
-  STRIPE_PUBLISHABLE_KEY: 'Stripe publishable key for client-side',
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: 'Stripe publishable key for client-side',
   STRIPE_SECRET_KEY: 'Stripe secret key for server-side',
   STRIPE_WEBHOOK_SECRET: 'Stripe webhook endpoint secret',
   
@@ -109,9 +109,9 @@ function validateSpecificVariable(
       }
       break;
       
-    case 'STRIPE_PUBLISHABLE_KEY':
+    case 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY':
       if (!value.startsWith('pk_')) {
-        errors.push('STRIPE_PUBLISHABLE_KEY must start with "pk_"');
+        errors.push('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY must start with "pk_"');
       }
       break;
       
@@ -161,7 +161,7 @@ function validateVercelSpecificRules(warnings: string[], errors: string[]): void
       }
       
       // Ensure all keys are production keys
-      const stripeKey = process.env.STRIPE_PUBLISHABLE_KEY;
+      const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
       if (stripeKey && stripeKey.includes('test')) {
         errors.push('Production deployment should not use Stripe test keys');
       }
@@ -253,7 +253,7 @@ export function validateClientEnvironment(): EnvValidationResult {
     'FIREBASE_STORAGE_BUCKET',
     'FIREBASE_MESSAGING_SENDER_ID',
     'FIREBASE_APP_ID',
-    'STRIPE_PUBLISHABLE_KEY',
+    'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY',
     'RECAPTCHA_V3_SITE_KEY'
   ];
   

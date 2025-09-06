@@ -99,7 +99,7 @@ export function validateEnvironmentVariables() {
     'NEXTAUTH_SECRET',
     'NEXTAUTH_URL',
     'STRIPE_SECRET_KEY',
-    'STRIPE_PUBLISHABLE_KEY'
+    'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY'
   ]
   
   const missingVars = requiredVars.filter(varName => !process.env[varName])
