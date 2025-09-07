@@ -8,28 +8,11 @@ import { Providers } from "../lib/context/Providers"
 import { OrderProvider } from "../lib/context/OrderContext"
 import MusicPlayer from "../components/layout/MusicPlayer"
 import ErrorBoundary from "../components/common/ErrorBoundary"
-import ChunkErrorHandler from "../components/common/ChunkErrorHandler"
-import ResourceErrorBoundary from "../components/common/ResourceErrorBoundary"
-import ProductionErrorBoundary from "../components/common/ProductionErrorBoundary"
-import ErrorMonitor from "../components/common/ErrorMonitor"
-import PerformanceMonitor from "../components/common/PerformanceMonitor"
 import CookieConsent from "../components/gdpr/CookieConsent"
-import SEOAudit from "../components/seo/SEOAudit"
-import SchemaGenerator from "../components/seo/SchemaGenerator"
-import { NetworkStatus } from "../components/common/EnhancedLoadingStates"
 import { playfair, montserrat } from "./fonts"
 import StructuredData, { OrganizationStructuredData } from "../components/seo/StructuredData"
 import { SkipNavigation } from "../components/accessibility/AccessibilityEnhancer"
 import ClientProviders from './providers'
-
-// Add environment validation
-import { runClientEnvCheck } from "../lib/env-validation"
-
-// Run environment check early
-if (typeof window !== 'undefined') {
-  console.log('🚀 Broski\'s Kitchen - Starting application...');
-  runClientEnvCheck();
-}
 
 export const metadata: Metadata = {
   title: {
@@ -120,30 +103,20 @@ export default function RootLayout({
         <OrganizationStructuredData />
       </head>
       <body className={`${fontClasses} bg-black text-white min-h-screen flex flex-col antialiased`}>
-        <ProductionErrorBoundary>
-          <ErrorBoundary>
-            <ResourceErrorBoundary>
-              <ChunkErrorHandler />
-              <Providers>
-                <OrderProvider>
-                  <ClientProviders>
-                    <SkipNavigation />
-                    <ConditionalNavbar />
-                    <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
-                    <Footer />
-                    <MusicPlayer />
-                    <CookieConsent />
-                    <SEOAudit />
-                    <SchemaGenerator />
-                    <NetworkStatus />
-                    <ErrorMonitor />
-                    <PerformanceMonitor />
-                  </ClientProviders>
-                </OrderProvider>
-              </Providers>
-            </ResourceErrorBoundary>
-          </ErrorBoundary>
-        </ProductionErrorBoundary>
+        <ErrorBoundary>
+          <Providers>
+            <OrderProvider>
+              <ClientProviders>
+                <SkipNavigation />
+                <ConditionalNavbar />
+                <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
+                <Footer />
+                <MusicPlayer />
+                <CookieConsent />
+              </ClientProviders>
+            </OrderProvider>
+          </Providers>
+        </ErrorBoundary>
       </body>
     </html>
   )
