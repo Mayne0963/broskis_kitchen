@@ -1,0 +1,118 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return request.auth != null &&
+             request.auth.token.admin == true;
+    }
+
+    function isAdminBucket() {
+      return bucket == 'broskis-kitchen-uploads.appspot.com';
+    }
+    
+    function isValidImageType() {
+      return request.resource.contentType.matches('image/.*');
+    }
+    
+    function isValidFileSize(maxSizeInMB) {
+      return request.resource.size < maxSizeInMB * 1024 * 1024;
+    }
+    
+    function isValidImageSize() {
+      return isValidFileSize(10); // 10MB max for images
+    }
+    
+    function isValidDocumentSize() {
+      return isValidFileSize(5); // 5MB max for documents
+    }
+    
+    // Public assets (read-only)
+    match /public/{allPaths=**} {
+      allow read;
+      allow write: if isAdmin();
+    }
+    
+    // Product images (admin only for write)
+    match /products/{productId}/{allPaths=**} {
+      allow read;
+      allow write: if isAdmin() && 
+                      isValidImageType() && 
+                      isValidImageSize();
+    }
+    
+    // Menu item images (admin only for write)
+    match /menu/{menuItemId}/{allPaths=**} {
+      allow read;
+      allow write: if isAdmin() && 
+                      isValidImageType() && 
+                      isValidImageSize();
+    }
+    
+    // Event images (admin only for write)
+    match /events/{eventId}/{allPaths=**} {
+      allow read;
+      allow write: if isAdmin() && 
+                      isValidImageType() && 
+                      isValidImageSize();
+    }
+    
+    // User profile images
+    match /users/{userId}/profile/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) && 
+                      isValidImageType() && 
+                      isValidImageSize();
+    }
+    
+    // User documents (receipts, etc.)
+    match /users/{userId}/documents/{allPaths=**} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId) && 
+                      isValidDocumentSize();
+    }
+    
+    // Order receipts and documents
+    match /orders/{orderId}/documents/{allPaths=**} {
+      allow read: if isAuthenticated() && 
+                     (resource.metadata.userId == request.auth.uid || 
+                      isAdmin());
+      allow write: if isAdmin() && 
+                      isValidDocumentSize();
+    }
+    
+    // Booking documents
+    match /bookings/{bookingId}/documents/{allPaths=**} {
+      allow read: if isAuthenticated() && 
+                     (resource.metadata.userId == request.auth.uid || 
+                      isAdmin());
+      allow write: if isAdmin() && 
+                      isValidDocumentSize();
+    }
+    
+    // Admin uploads
+    match /admin/{allPaths=**} {
+      allow read, write: if isAdmin() && isAdminBucket();
+    }
+    
+    // Temporary uploads (24 hour expiry)
+    match /temp/{userId}/{allPaths=**} {
+      allow read, write: if isOwner(userId) && 
+                            isValidImageSize() && 
+                            request.time < resource.timeCreated + duration.value(1, 'd');
+    }
+    
+    // Default deny all other paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,130 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+             (request.auth.token.admin == true || 
+              request.auth.token.role == 'admin' ||
+              (request.auth.token.roles != null && request.auth.token.roles.admin == true));
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isValidUser() {
+      return isAuthenticated() && request.auth.uid != null;
+    }
+    
+    // Orders collection
+    match /orders/{orderId} {
+      // Users can read their own orders
+      allow read: if isOwner(resource.data.userId);
+      
+      // Users can create orders for themselves
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == request.resource.data.userId &&
+                       request.resource.data.keys().hasAll(['userId', 'status', 'items', 'subtotal', 'tax', 'total', 'createdAt']);
+      
+      // Users can update their own pending orders
+      allow update: if isOwner(resource.data.userId) && 
+                       resource.data.status == 'pending' &&
+                       request.resource.data.userId == resource.data.userId;
+      
+      // Admin can read/write all orders
+      allow read, write: if isAdmin();
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      // Users can read and update their own profile
+      allow read, update: if isOwner(userId);
+      
+      // Users can create their own profile during signup
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == userId &&
+                       request.resource.data.uid == userId;
+      
+      // Admin can read/write all user profiles
+      allow read, write: if isAdmin();
+    }
+    
+    // Reward transactions collection
+    match /rewardTransactions/{transactionId} {
+      // Users can read their own reward transactions
+      allow read: if isAuthenticated() && 
+                     request.auth.uid == resource.data.userId;
+      
+      // Only admin can create/update reward transactions
+      allow write: if isAdmin();
+    }
+    
+    // Coupons collection
+    match /coupons/{couponId} {
+      // All authenticated users can read active coupons
+      allow read: if isAuthenticated() && 
+                     resource.data.isActive == true &&
+                     resource.data.startsAt <= request.time &&
+                     resource.data.endsAt > request.time;
+      
+      // Only admin can create/update/delete coupons
+      allow write: if isAdmin();
+    }
+    
+    // Offers collection
+    match /offers/{offerId} {
+      // All authenticated users can read active offers
+      allow read: if isAuthenticated() && 
+                     resource.data.active == true &&
+                     resource.data.startsAt <= request.time &&
+                     resource.data.endsAt > request.time;
+      
+      // Only admin can create/update/delete offers
+      allow write: if isAdmin();
+    }
+    
+    // Menu items collection (if exists)
+    match /menuItems/{itemId} {
+      // All users can read menu items
+      allow read: if true;
+      
+      // Only admin can modify menu items
+      allow write: if isAdmin();
+    }
+    
+    // Categories collection (if exists)
+    match /categories/{categoryId} {
+      // All users can read categories
+      allow read: if true;
+      
+      // Only admin can modify categories
+      allow write: if isAdmin();
+    }
+    
+    // Analytics collection (if exists)
+    match /analytics/{document=**} {
+      // Only admin can read/write analytics
+      allow read, write: if isAdmin();
+    }
+    
+    // System configuration (if exists)
+    match /config/{configId} {
+      // All users can read public config
+      allow read: if true;
+      
+      // Only admin can modify config
+      allow write: if isAdmin();
+    }
+    
+    // Default deny rule for any other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

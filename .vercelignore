@@ -7,6 +7,7 @@ dist
 .trae
 *.log
 .vercel/
+./vercel/
 
 # Next.js cache (exclude only cache, not essential build files)
 .next/cache/**

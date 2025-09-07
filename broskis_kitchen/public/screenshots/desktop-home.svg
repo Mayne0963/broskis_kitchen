@@ -1,0 +1,12 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="720" fill="#000000"/>
+  <rect x="40" y="40" width="1200" height="640" rx="8" fill="#1a1a1a"/>
+  <rect x="60" y="60" width="1160" height="80" fill="#FFD700"/>
+  <text x="640" y="110" text-anchor="middle" fill="#000000" font-family="Arial, sans-serif" font-size="32" font-weight="bold">Broski's Kitchen</text>
+  <rect x="60" y="160" width="360" height="240" rx="8" fill="#333333"/>
+  <text x="240" y="290" text-anchor="middle" fill="#FFD700" font-family="Arial, sans-serif" font-size="18">Menu</text>
+  <rect x="460" y="160" width="360" height="240" rx="8" fill="#333333"/>
+  <text x="640" y="290" text-anchor="middle" fill="#FFD700" font-family="Arial, sans-serif" font-size="18">Order Online</text>
+  <rect x="860" y="160" width="360" height="240" rx="8" fill="#333333"/>
+  <text x="1040" y="290" text-anchor="middle" fill="#FFD700" font-family="Arial, sans-serif" font-size="18">Locations</text>
+</svg>
