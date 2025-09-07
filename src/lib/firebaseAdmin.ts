@@ -44,19 +44,48 @@ export function ensureAdmin() {
     return;
   }
 
-  // Skip initialization during build time if no credentials are available
+  // Check for different credential sources
+  const serviceAccountBase64 = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
   const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
   const hasIndividualVars = process.env.FIREBASE_ADMIN_PROJECT_ID && 
                            process.env.FIREBASE_ADMIN_CLIENT_EMAIL && 
                            process.env.FIREBASE_ADMIN_PRIVATE_KEY;
   
-  if (!serviceAccountJson && !hasIndividualVars) {
+  if (!serviceAccountBase64 && !serviceAccountJson && !hasIndividualVars) {
     console.warn('⚠️ Firebase Admin SDK credentials not found. Skipping initialization.');
     return;
   }
 
   try {
-    // Check for FIREBASE_SERVICE_ACCOUNT first (JSON format)
+    // Check for FIREBASE_SERVICE_ACCOUNT_BASE64 first (recommended)
+    if (serviceAccountBase64) {
+      try {
+        const serviceAccountJsonString = Buffer.from(serviceAccountBase64, 'base64').toString('utf-8');
+        const serviceAccount = JSON.parse(serviceAccountJsonString);
+        
+        // Validate required fields in service account
+        if (!serviceAccount.private_key || !serviceAccount.client_email || !serviceAccount.project_id) {
+          throw new Error('Service account JSON is missing required fields (private_key, client_email, project_id)');
+        }
+        
+        // Fix private key formatting
+        if (serviceAccount.private_key.includes('\\n')) {
+          serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+        }
+        
+        initializeApp({
+          credential: cert(serviceAccount)
+        });
+        
+        console.log('✅ Firebase Admin SDK initialized successfully with base64 service account');
+        return;
+      } catch (parseError) {
+        console.error('❌ Failed to parse FIREBASE_SERVICE_ACCOUNT_BASE64:', parseError);
+        throw new Error(`Invalid FIREBASE_SERVICE_ACCOUNT_BASE64: ${parseError}`);
+      }
+    }
+    
+    // Fallback to FIREBASE_SERVICE_ACCOUNT (JSON format)
     if (serviceAccountJson) {
       try {
         const serviceAccount = JSON.parse(serviceAccountJson);
