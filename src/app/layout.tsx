@@ -22,6 +22,15 @@ import StructuredData, { OrganizationStructuredData } from "../components/seo/St
 import { SkipNavigation } from "../components/accessibility/AccessibilityEnhancer"
 import ClientProviders from './providers'
 
+// Add environment validation
+import { runClientEnvCheck } from "../lib/env-validation"
+
+// Run environment check early
+if (typeof window !== 'undefined') {
+  console.log('🚀 Broski\'s Kitchen - Starting application...');
+  runClientEnvCheck();
+}
+
 export const metadata: Metadata = {
   title: {
     default: "Broski's Kitchen - Luxury Street Gourmet",
