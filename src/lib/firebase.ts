@@ -134,7 +134,8 @@ export const getFirebaseStatus = () => {
     hasAuth: !!auth,
     hasStorage: !!storage,
     error: firebaseError?.message || null,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    projectId: process.env.FIREBASE_PROJECT_ID || 'Not configured'
   };
 };
 
@@ -144,16 +145,6 @@ export { isFirebaseConfigured };
 // Helper function to check if Firebase is ready
 export const isFirebaseReady = () => {
   return isFirebaseConfigured && db !== null && auth !== null;
-};
-
-// Helper function to get Firebase status for debugging
-export const getFirebaseStatus = () => {
-  return {
-    configured: isFirebaseConfigured,
-    hasDb: db !== null,
-    hasAuth: auth !== null,
-    projectId: process.env.FIREBASE_PROJECT_ID || 'Not configured'
-  };
 };
 
 export default app;
