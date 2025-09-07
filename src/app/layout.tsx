@@ -72,6 +72,31 @@ export const metadata: Metadata = {
   },
 }
 
+// Safe component wrapper that prevents crashes
+function SafeComponent({ children, fallback, name }: { 
+  children: React.ReactNode; 
+  fallback?: React.ReactNode;
+  name?: string;
+}) {
+  try {
+    return <>{children}</>;
+  } catch (error) {
+    console.error(`${name || 'Component'} error:`, error);
+    return <>{fallback || null}</>;
+  }
+}
+
+// Fallback content for critical errors
+const AppFallback = () => (
+  <div className="min-h-screen bg-black text-white flex items-center justify-center">
+    <div className="text-center">
+      <h1 className="text-4xl font-bold mb-4 text-yellow-400">Broski's Kitchen</h1>
+      <p className="text-xl mb-4">Luxury Street Gourmet</p>
+      <p className="text-gray-400">Loading your culinary experience...</p>
+    </div>
+  </div>
+);
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -99,23 +124,47 @@ export default function RootLayout({
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
-        <StructuredData type="website" />
-        <OrganizationStructuredData />
+        <SafeComponent name="StructuredData">
+          <StructuredData type="website" />
+        </SafeComponent>
+        <SafeComponent name="OrganizationStructuredData">
+          <OrganizationStructuredData />
+        </SafeComponent>
       </head>
       <body className={`${fontClasses} bg-black text-white min-h-screen flex flex-col antialiased`}>
-        <ErrorBoundary>
-          <Providers>
-            <OrderProvider>
-              <ClientProviders>
-                <SkipNavigation />
-                <ConditionalNavbar />
-                <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
-                <Footer />
-                <MusicPlayer />
-                <CookieConsent />
-              </ClientProviders>
-            </OrderProvider>
-          </Providers>
+        <ErrorBoundary fallback={<AppFallback />}>
+          <SafeComponent name="Providers" fallback={<AppFallback />}>
+            <Providers>
+              <SafeComponent name="OrderProvider" fallback={<AppFallback />}>
+                <OrderProvider>
+                  <SafeComponent name="ClientProviders" fallback={<AppFallback />}>
+                    <ClientProviders>
+                      <SafeComponent name="SkipNavigation">
+                        <SkipNavigation />
+                      </SafeComponent>
+                      <SafeComponent name="ConditionalNavbar">
+                        <ConditionalNavbar />
+                      </SafeComponent>
+                      <main id="main-content" className="flex-grow" tabIndex={-1}>
+                        <SafeComponent name="MainContent" fallback={<AppFallback />}>
+                          {children}
+                        </SafeComponent>
+                      </main>
+                      <SafeComponent name="Footer">
+                        <Footer />
+                      </SafeComponent>
+                      <SafeComponent name="MusicPlayer">
+                        <MusicPlayer />
+                      </SafeComponent>
+                      <SafeComponent name="CookieConsent">
+                        <CookieConsent />
+                      </SafeComponent>
+                    </ClientProviders>
+                  </SafeComponent>
+                </OrderProvider>
+              </SafeComponent>
+            </Providers>
+          </SafeComponent>
         </ErrorBoundary>
       </body>
     </html>

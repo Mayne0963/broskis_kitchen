@@ -11,43 +11,85 @@ import OptimizedImage, { useImagePreloader } from "../components/performance/Ima
 
 import MobileEnhancer, { useEnhancedResponsive, TouchButton } from "../components/responsive/MobileEnhancer";
 import { ComponentLoader } from "../components/ui/LoadingSpinner";
-// Lazy load non-critical components
 
+// Error boundary component for safe rendering
+function SafePageWrapper({ children }: { children: React.ReactNode }) {
+  const [hasError, setHasError] = useState(false);
 
+  useEffect(() => {
+    const handleError = (error: ErrorEvent) => {
+      console.error('Page error caught:', error);
+      setHasError(true);
+    };
+
+    window.addEventListener('error', handleError);
+    return () => window.removeEventListener('error', handleError);
+  }, []);
+
+  if (hasError) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4">Broski's Kitchen</h1>
+          <p className="text-xl mb-4">Luxury Street Gourmet</p>
+          <p className="text-gray-400">Loading content...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+}
 
 function Page() {
   const [showSaucePopup, setShowSaucePopup] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   
-  // Responsive hooks
-  const { isMobile, isTablet, breakpoint } = useEnhancedResponsive();
+  // Responsive hooks with error handling
+  let isMobile = false;
+  let isTablet = false;
+  let breakpoint = 'desktop';
   
-  // Preload critical images
-  useImagePreloader([
-    '/images/broskis-gold-logo.png',
-    '/images/HomePageHeroImage.png',
-    '/images/otw-logo.svg'
-  ]);
+  try {
+    const responsive = useEnhancedResponsive();
+    isMobile = responsive.isMobile;
+    isTablet = responsive.isTablet;
+    breakpoint = responsive.breakpoint;
+  } catch (error) {
+    console.warn('Responsive hook failed, using defaults:', error);
+  }
+  
+  // Preload critical images with error handling
+  try {
+    useImagePreloader([
+      '/images/broskis-gold-logo.png',
+      '/images/HomePageHeroImage.png',
+      '/images/otw-logo.svg'
+    ]);
+  } catch (error) {
+    console.warn('Image preloader failed:', error);
+  }
 
 
   return (
-    <MobileEnhancer enableSwipeGestures={true} enableTouchOptimizations={true}>
-      <div className="min-h-screen bg-black text-white">
+    <SafePageWrapper>
+      <MobileEnhancer enableSwipeGestures={true} enableTouchOptimizations={true}>
+        <div className="min-h-screen bg-black text-white">
 
-      {/* Hero Section - Fullscreen */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
-        {/* OTW Delivery Button - Top Right Corner */}
-        <div className="absolute top-6 right-6 z-20">
-          <a 
-            href="https://otw-chi.vercel.app" 
-            target="_blank"
-            rel="noopener noreferrer"
-            className="broski-otw-gold-button"
-          >
-            <OptimizedImage 
-              src="/images/otw-logo.svg" 
-              alt="OTW Logo" 
+        {/* Hero Section - Fullscreen */}
+        <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
+          {/* OTW Delivery Button - Top Right Corner */}
+          <div className="absolute top-6 right-6 z-20">
+            <a 
+              href="https://otw-chi.vercel.app" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="broski-otw-gold-button"
+            >
+              <OptimizedImage 
+                src="/images/otw-logo.svg" 
+                alt="OTW Logo" 
               width={36} 
               height={18} 
               className="filter brightness-110"
@@ -475,6 +517,7 @@ function Page() {
       {/* Close the main div */}
     </div>
     </MobileEnhancer>
+    </SafePageWrapper>
   );
 }
 
