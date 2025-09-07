@@ -1,9 +1,0 @@
-<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="192" height="192" rx="32" fill="#000000"/>
-  <circle cx="96" cy="96" r="60" fill="#FFD700"/>
-  <rect x="66" y="76" width="60" height="40" rx="8" fill="#000000"/>
-  <text x="96" y="102" text-anchor="middle" fill="#FFD700" font-family="Arial, sans-serif" font-size="24" font-weight="bold">BK</text>
-  <circle cx="96" cy="140" r="8" fill="#FFD700"/>
-  <circle cx="80" cy="140" r="4" fill="#FFD700"/>
-  <circle cx="112" cy="140" r="4" fill="#FFD700"/>
-</svg>

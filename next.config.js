@@ -18,7 +18,8 @@ const nextConfig = {
   output: 'standalone',
   // Compress output for better performance
   compress: true,
-    // Enhanced image optimization
+  // Enhanced image optimization
+  images: {
     domains: [],
     remotePatterns: [
       {
