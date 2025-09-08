@@ -1,4 +1,2 @@
-'use client';
-
-export { default } from './page-simple';
+export { default } from './page-static';
 
