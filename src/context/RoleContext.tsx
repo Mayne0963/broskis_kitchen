@@ -11,7 +11,12 @@ export const useRole = () => useContext(Ctx);
 export function RoleProvider({ children }: { children: React.ReactNode }) {
   const [role, setRole] = useState<Role>(null);
   
-  useEffect(() => subscribeToAuth(setRole), []);
+  useEffect(() => {
+    const unsubscribe = subscribeToAuth((user, userRole) => {
+      setRole(userRole as Role);
+    });
+    return unsubscribe;
+  }, []);
   
   return <Ctx.Provider value={role}>{children}</Ctx.Provider>;
 }

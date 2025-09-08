@@ -1,2 +1,1 @@
-export { default } from './page-static';
-
+export { default } from './page-simple';
