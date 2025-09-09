@@ -23,27 +23,17 @@ function getFirebaseConfig() {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
   };
 
-  // Check for regular variables (fallback)
-  const serverConfig = {
-    apiKey: process.env.FIREBASE_API_KEY,
-    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.FIREBASE_APP_ID
-  };
-
-  // Use client config if available, otherwise server config, otherwise default
+  // Use client config if available, otherwise default
   const config = {
-    apiKey: clientConfig.apiKey || serverConfig.apiKey || defaultFirebaseConfig.apiKey,
-    authDomain: clientConfig.authDomain || serverConfig.authDomain || defaultFirebaseConfig.authDomain,
-    projectId: clientConfig.projectId || serverConfig.projectId || defaultFirebaseConfig.projectId,
-    storageBucket: clientConfig.storageBucket || serverConfig.storageBucket || defaultFirebaseConfig.storageBucket,
-    messagingSenderId: clientConfig.messagingSenderId || serverConfig.messagingSenderId || defaultFirebaseConfig.messagingSenderId,
-    appId: clientConfig.appId || serverConfig.appId || defaultFirebaseConfig.appId
+    apiKey: clientConfig.apiKey || defaultFirebaseConfig.apiKey,
+    authDomain: clientConfig.authDomain || defaultFirebaseConfig.authDomain,
+    projectId: clientConfig.projectId || defaultFirebaseConfig.projectId,
+    storageBucket: clientConfig.storageBucket || defaultFirebaseConfig.storageBucket,
+    messagingSenderId: clientConfig.messagingSenderId || defaultFirebaseConfig.messagingSenderId,
+    appId: clientConfig.appId || defaultFirebaseConfig.appId
   };
 
-  const isRealConfig = Object.values(clientConfig).some(value => value) || Object.values(serverConfig).some(value => value);
+  const isRealConfig = Object.values(clientConfig).some(value => value);
   
   return { config, isRealConfig };
 }

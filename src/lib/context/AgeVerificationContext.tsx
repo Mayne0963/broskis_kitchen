@@ -31,7 +31,7 @@ interface AgeVerificationProviderProps {
 
 export const AgeVerificationProvider: React.FC<AgeVerificationProviderProps> = ({
   children,
-  expiryDays = Number(process.env.AGE_VERIFICATION_EXPIRY_DAYS || "30"),
+  expiryDays = Number(process.env.NEXT_PUBLIC_AGE_VERIFICATION_EXPIRY_DAYS || "30"),
 }) => {
   const [isVerified, setIsVerified] = useState(false)
   const [isVerifying, setIsVerifying] = useState(false)

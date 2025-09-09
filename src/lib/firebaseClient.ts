@@ -2,6 +2,7 @@ import { initializeApp, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 
 // Validate required environment variables only on client side
 const validateFirebaseConfig = () => {
@@ -47,6 +48,18 @@ try {
       auth = getAuth(app);
       db = getFirestore(app);
       isConfigured = true;
+      
+      // Initialize App Check on client side only
+      if (process.env.NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY) {
+        try {
+          initializeAppCheck(app, {
+            provider: new ReCaptchaV3Provider(process.env.NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY),
+            isTokenAutoRefreshEnabled: true
+          });
+        } catch (appCheckError) {
+          console.warn('App Check initialization failed:', appCheckError);
+        }
+      }
     }
   } else {
     // During build time, create placeholder app to prevent errors
@@ -89,4 +102,9 @@ try {
 // Helper function to check if Firebase is ready for use
 export const isFirebaseReady = () => {
   return typeof window !== 'undefined' && isConfigured && app && auth && db;
+};
+
+// Export singleton Firebase app getter
+export const getFirebaseApp = () => {
+  return app;
 };
