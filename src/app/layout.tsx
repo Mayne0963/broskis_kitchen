@@ -1,18 +1,10 @@
 import type React from "react"
 import type { Metadata } from "next"
-// import "./globals-simple.css"
-// import "./chat-animations.css"
-// import ConditionalNavbar from "../components/layout/ConditionalNavbar"
-// import Footer from "../components/layout/Footer"
-// import { Providers } from "../lib/context/Providers"
-// import { OrderProvider } from "../lib/context/OrderContext"
-// import MusicPlayer from "../components/layout/MusicPlayer"
-// import ErrorBoundary from "../components/common/ErrorBoundary"
-// import CookieConsent from "../components/gdpr/CookieConsent"
-// import { playfair, montserrat } from "./fonts"
-// import StructuredData, { OrganizationStructuredData } from "../components/seo/StructuredData"
-// import { SkipNavigation } from "../components/accessibility/AccessibilityEnhancer"
-// import ClientProviders from './providers'
+import "./globals.css"
+import { Providers } from "../lib/context/Providers"
+import { RoleProvider } from "../context/RoleContext"
+import ClientProviders from './providers'
+import ErrorBoundary from "../components/common/ErrorBoundary"
 
 export const metadata: Metadata = {
   title: {
@@ -85,7 +77,14 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <body style={{ margin: 0, padding: 0, backgroundColor: '#000000', color: '#ffffff' }}>
-        {children}
+        <ErrorBoundary>
+          <Providers>
+            <RoleProvider>
+              {children}
+              <ClientProviders />
+            </RoleProvider>
+          </Providers>
+        </ErrorBoundary>
       </body>
     </html>
   )
