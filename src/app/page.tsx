@@ -48,8 +48,8 @@ function Page() {
             <OptimizedImage 
               src="/images/otw-logo.png" 
               alt="OTW Logo" 
-              width={36} 
-              height={18} 
+              width={72} 
+              height={36} 
               className="filter brightness-110"
               priority
               quality={95}
