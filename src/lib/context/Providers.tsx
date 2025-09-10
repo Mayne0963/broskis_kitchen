@@ -10,6 +10,7 @@ import { AgeVerificationProvider } from "./AgeVerificationContext"
 import { ChatProvider } from "./ChatContext"
 import { MediaPlayerProvider } from "./MediaPlayerContext"
 import { UserProvider } from "./UserContext"
+import { OrderProvider } from "./OrderContext"
 
 interface ProvidersProps {
   children: ReactNode
@@ -19,6 +20,7 @@ export const Providers: React.FC<ProvidersProps> = ({ children }) => {
   return (
     <UserProvider>
     <AuthProvider>
+    <OrderProvider>
     <CartProvider>
     <RewardsProvider>
     <DeliveryProvider>
@@ -32,6 +34,7 @@ export const Providers: React.FC<ProvidersProps> = ({ children }) => {
     </DeliveryProvider>
     </RewardsProvider>
     </CartProvider>
+    </OrderProvider>
     </AuthProvider>
     </UserProvider>
   )

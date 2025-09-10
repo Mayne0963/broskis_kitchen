@@ -8,6 +8,9 @@ import Link from "next/link"
 import { useEffect } from "react"
 import OrderTracking from "../../components/orders/OrderTracking"
 
+// Force dynamic rendering to prevent prerendering issues
+export const dynamic = 'force-dynamic'
+
 export default function OrderHistoryPage() {
   const router = useRouter()
   const { user, isLoading } = useAuth()
