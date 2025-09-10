@@ -17,10 +17,12 @@ import CookieConsent from "../components/gdpr/CookieConsent"
 import SEOAudit from "../components/seo/SEOAudit"
 import SchemaGenerator from "../components/seo/SchemaGenerator"
 import { NetworkStatus } from "../components/common/EnhancedLoadingStates"
+import { Toaster } from "@/components/ui/toaster"
 import { playfair, montserrat } from "./fonts"
 import StructuredData, { OrganizationStructuredData } from "../components/seo/StructuredData"
 import { SkipNavigation } from "../components/accessibility/AccessibilityEnhancer"
-import ClientProviders from './providers'
+import AccessibilityAudit from "../components/accessibility/AccessibilityAudit"
+import PWAManager from "../components/pwa/PWAManager"
 
 export const metadata: Metadata = {
   title: {
@@ -37,7 +39,7 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.SITE_URL || 'https://broskiskitchen.com'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://broskiskitchen.com'),
   alternates: {
     canonical: '/',
   },
@@ -117,19 +119,20 @@ export default function RootLayout({
               <ChunkErrorHandler />
               <Providers>
                 <OrderProvider>
-                  <ClientProviders>
-                    <SkipNavigation />
-                    <ConditionalNavbar />
-                    <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
-                    <Footer />
-                    <MusicPlayer />
-                    <CookieConsent />
-                    <SEOAudit />
-                    <SchemaGenerator />
-                    <NetworkStatus />
-                    <ErrorMonitor />
-                    <PerformanceMonitor />
-                  </ClientProviders>
+                  <SkipNavigation />
+                  <ConditionalNavbar />
+                  <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
+                  <Footer />
+                  <MusicPlayer />
+                  <Toaster />
+                  <CookieConsent />
+                  <SEOAudit />
+                  <SchemaGenerator />
+                  <NetworkStatus />
+                  <ErrorMonitor />
+                  <PerformanceMonitor />
+                  <AccessibilityAudit />
+                  <PWAManager />
                 </OrderProvider>
               </Providers>
             </ResourceErrorBoundary>
