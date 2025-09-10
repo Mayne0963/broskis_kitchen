@@ -46,7 +46,7 @@ function Page() {
             className="broski-otw-gold-button"
           >
             <OptimizedImage 
-              src="/images/otw-logo.svg" 
+              src="/images/otw-logo.png" 
               alt="OTW Logo" 
               width={36} 
               height={18} 
