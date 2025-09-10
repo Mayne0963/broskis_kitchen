@@ -29,7 +29,7 @@ export default function NavBar() {
   const isActive = (href: string) => (pathname === href ? active : "");
 
   return (
-    <nav className="w-full border-b border-zinc-800 bg-black/70 backdrop-blur sticky top-0 z-50">
+    <nav className="w-full border-b border-zinc-800 bg-black/70 backdrop-blur sticky top-0 z-50 border border-emerald-500" data-nav="broski">
       <div className="mx-auto max-w-6xl px-4">
         <div className="flex items-center justify-between py-3">
           <div className="flex items-center gap-3">

@@ -5,6 +5,7 @@ import { Providers } from "../lib/context/Providers"
 import { RoleProvider } from "../context/RoleContext"
 import ClientProviders from './providers'
 import ErrorBoundary from "../components/common/ErrorBoundary"
+import NavBar from "../components/common/NavBar"
 
 export const metadata: Metadata = {
   title: {
@@ -77,14 +78,17 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <body style={{ margin: 0, padding: 0, backgroundColor: '#000000', color: '#ffffff' }}>
-        <ErrorBoundary>
-          <Providers>
-            <RoleProvider>
-              {children}
-              <ClientProviders />
-            </RoleProvider>
-          </Providers>
-        </ErrorBoundary>
+        <NavBar />
+        <main className="pt-16">
+          <ErrorBoundary>
+            <Providers>
+              <RoleProvider>
+                {children}
+                <ClientProviders />
+              </RoleProvider>
+            </Providers>
+          </ErrorBoundary>
+        </main>
       </body>
     </html>
   )
