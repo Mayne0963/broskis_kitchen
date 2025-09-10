@@ -119,7 +119,7 @@ function Page() {
 
           {/* Order Now Button - Rounded Rectangle, Crimson Red */}
           <motion.div 
-            className="mb-16 flex justify-center"
+            className="broski-otw-gold-button mb-16 flex justify-center"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.9, ease: "easeOut" }}
