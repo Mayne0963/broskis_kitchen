@@ -17,13 +17,10 @@ import CookieConsent from "../components/gdpr/CookieConsent"
 import SEOAudit from "../components/seo/SEOAudit"
 import SchemaGenerator from "../components/seo/SchemaGenerator"
 import { NetworkStatus } from "../components/common/EnhancedLoadingStates"
-import { ToastContainer } from "@/components/ui/use-toast"
-import { ToastProvider } from "../components/common/Toast"
 import { playfair, montserrat } from "./fonts"
 import StructuredData, { OrganizationStructuredData } from "../components/seo/StructuredData"
 import { SkipNavigation } from "../components/accessibility/AccessibilityEnhancer"
-import AccessibilityAudit from "../components/accessibility/AccessibilityAudit"
-import PWAManager from "../components/pwa/PWAManager"
+import ClientProviders from './providers'
 
 export const metadata: Metadata = {
   title: {
@@ -40,7 +37,7 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://broskiskitchen.com'),
+  metadataBase: new URL(process.env.SITE_URL || 'https://broskiskitchen.com'),
   alternates: {
     canonical: '/',
   },
@@ -118,26 +115,23 @@ export default function RootLayout({
           <ErrorBoundary>
             <ResourceErrorBoundary>
               <ChunkErrorHandler />
-              <ToastProvider>
-                <Providers>
-                  <OrderProvider>
+              <Providers>
+                <OrderProvider>
+                  <ClientProviders>
                     <SkipNavigation />
                     <ConditionalNavbar />
                     <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
                     <Footer />
                     <MusicPlayer />
-                    <ToastContainer />
                     <CookieConsent />
                     <SEOAudit />
                     <SchemaGenerator />
                     <NetworkStatus />
                     <ErrorMonitor />
                     <PerformanceMonitor />
-                    <AccessibilityAudit />
-                    <PWAManager />
-                  </OrderProvider>
-                </Providers>
-              </ToastProvider>
+                  </ClientProviders>
+                </OrderProvider>
+              </Providers>
             </ResourceErrorBoundary>
           </ErrorBoundary>
         </ProductionErrorBoundary>
