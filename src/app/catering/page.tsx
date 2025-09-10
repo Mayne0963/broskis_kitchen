@@ -1,13 +1,9 @@
-import React from 'react'
-
-const CateringPage = () => {
+export const metadata = { title: "Catering | Broski's Kitchen" };
+export default function Page() {
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">Catering Services</h1>
-      <p>This is a placeholder for the Catering page.</p>
-      <p>More content will be added here soon.</p>
-    </div>
-  )
+    <main className="mx-auto max-w-4xl p-6">
+      <h1 className="text-2xl font-semibold mb-2">Catering</h1>
+      <p className="opacity-80">From small gatherings to big vibes. Catering menu & form coming soon.</p>
+    </main>
+  );
 }
-
-export default CateringPage
