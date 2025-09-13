@@ -27,7 +27,7 @@ function Page() {
   useImagePreloader([
     '/images/broskis-gold-logo.png',
     '/images/HomePageHeroImage.png',
-    '/images/otw-logo.svg'
+    '/brand/otw-logo.png'
   ]);
 
 
@@ -46,10 +46,10 @@ function Page() {
             className="broski-otw-gold-button"
           >
             <OptimizedImage 
-              src="/images/otw-logo.png" 
+              src="/brand/otw-logo.png" 
               alt="OTW Logo" 
-              width={72} 
-              height={36} 
+              width={36} 
+              height={18} 
               className="filter brightness-110"
               priority
               quality={95}
@@ -119,7 +119,7 @@ function Page() {
 
           {/* Order Now Button - Rounded Rectangle, Crimson Red */}
           <motion.div 
-            className="broski-otw-gold-button mb-16 flex justify-center"
+            className="mb-16 flex justify-center"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.9, ease: "easeOut" }}
@@ -128,7 +128,7 @@ function Page() {
               <TouchButton 
                 size={isMobile ? 'lg' : 'md'}
                 variant="primary"
-                className="text-xl font-bold px-8 py-4 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                className="broski-otw-gold-button text-xl"
                 hapticFeedback={true}
               >
                 Order Now
@@ -462,7 +462,7 @@ function Page() {
             Join thousands of satisfied customers who have discovered the perfect blend of luxury and street culture.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in animate-delay-400">
-            <Link href="/menu" className="bg-[var(--color-harvest-gold)] hover:bg-[var(--color-gold-rich)] text-black font-bold py-4 px-10 rounded-lg transform hover:scale-105 transition-all duration-300">
+            <Link href="/menu" className="bg-rose-600 hover:bg-rose-500 text-white font-bold py-4 px-10 rounded-lg transform hover:scale-105 transition-all duration-300">
               Order Now
             </Link>
             <Link href="/rewards" className="border-2 border-[var(--color-harvest-gold)] text-[var(--color-harvest-gold)] hover:bg-[var(--color-harvest-gold)] hover:text-black font-bold py-4 px-10 rounded-lg transform hover:scale-105 transition-all duration-300">

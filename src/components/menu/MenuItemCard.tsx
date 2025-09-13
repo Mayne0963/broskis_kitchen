@@ -43,12 +43,33 @@ const MenuItemCard: React.FC<MenuItemProps> = ({ item, onAddToCart }) => {
     setQuantity(newQuantity)
   }
 
+  // Function to get default options for an item
+  const getDefaultOptions = () => {
+    const defaultOptions: { [categoryId: string]: CustomizationOption[] } = {}
+    
+    customizationOptions.forEach((category) => {
+      if (category.required) {
+        // For required categories, select the first option as default
+        defaultOptions[category.id] = [category.options[0]]
+      }
+      // For optional categories, we don't select any defaults
+    })
+    
+    return defaultOptions
+  }
+
   const handleAddToCart = () => {
     if (hasCustomizationOptions) {
-      setShowCustomizationModal(true)
+      // Use default options when main Add to Cart is clicked
+      const defaultOptions = getDefaultOptions()
+      onAddToCart(quantity, defaultOptions)
     } else {
       onAddToCart(quantity)
     }
+  }
+
+  const handleCustomize = () => {
+    setShowCustomizationModal(true)
   }
 
   const handleCustomizedAddToCart = (
@@ -146,16 +167,16 @@ const MenuItemCard: React.FC<MenuItemProps> = ({ item, onAddToCart }) => {
               </button>
             </div>
 
-            {hasCustomizationOptions ? (
+            <button onClick={handleAddToCart} className="btn-primary flex-1 flex items-center justify-center gap-2">
+              <FaShoppingCart size={14} /> Add to Cart
+            </button>
+            
+            {hasCustomizationOptions && (
               <button
-                onClick={() => setShowCustomizationModal(true)}
-                className="btn-primary flex-1 flex items-center justify-center gap-2"
+                onClick={handleCustomize}
+                className="btn-outline px-3 py-2 flex items-center justify-center gap-2"
               >
                 <FaCog size={14} /> Customize
-              </button>
-            ) : (
-              <button onClick={handleAddToCart} className="btn-primary flex-1 flex items-center justify-center gap-2">
-                <FaShoppingCart size={14} /> Add to Cart
               </button>
             )}
           </div>

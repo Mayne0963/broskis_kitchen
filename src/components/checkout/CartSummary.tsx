@@ -123,10 +123,24 @@ export default function CartSummary({ cartData, checkoutData }: CartSummaryProps
                     <h4 className="text-white font-medium text-sm truncate">{item.name}</h4>
                     {item.customizations && Object.keys(item.customizations).length > 0 && (
                       <div className="mt-1">
-                        {Object.values(item.customizations).flat().map((customization, index) => (
-                          <span key={index} className="text-xs text-gray-400 block">
-                            + {customization.name} {customization.price > 0 && `(+$${customization.price.toFixed(2)})`}
-                          </span>
+                        {Object.entries(item.customizations).map(([categoryId, customizations]) => (
+                          <div key={categoryId}>
+                            {categoryId === 'options' ? (
+                              // Handle simple options
+                              customizations.map((customization, index) => (
+                                <span key={index} className="text-xs text-gray-400 block">
+                                  {customization.name}
+                                </span>
+                              ))
+                            ) : (
+                              // Handle regular customizations
+                              customizations.map((customization, index) => (
+                                <span key={index} className="text-xs text-gray-400 block">
+                                  + {customization.name} {customization.price > 0 && `(+$${customization.price.toFixed(2)})`}
+                                </span>
+                              ))
+                            )}
+                          </div>
                         ))}
                       </div>
                     )}

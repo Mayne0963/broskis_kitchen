@@ -82,6 +82,27 @@ const CartDropdown: React.FC = () => {
                       </div>
                       <div className="flex-grow">
                         <p className="text-white text-sm font-medium">{item.name}</p>
+                        {item.customizations && Object.keys(item.customizations).length > 0 && (
+                          <div className="mt-1">
+                            {Object.entries(item.customizations).map(([categoryId, customizations]) => (
+                              <div key={categoryId}>
+                                {categoryId === 'options' ? (
+                                  customizations.map((customization, index) => (
+                                    <span key={index} className="text-xs text-gray-400 block">
+                                      {customization.name}
+                                    </span>
+                                  ))
+                                ) : (
+                                  customizations.map((customization, index) => (
+                                    <span key={index} className="text-xs text-gray-400 block">
+                                      + {customization.name} {customization.price > 0 && `(+$${customization.price.toFixed(2)})`}
+                                    </span>
+                                  ))
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
                         <div className="flex justify-between items-center mt-1">
                           <div className="quantity-control flex items-center">
                             <button

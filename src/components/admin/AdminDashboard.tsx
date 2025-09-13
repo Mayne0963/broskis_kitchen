@@ -419,28 +419,34 @@ export default function AdminDashboard({ data, refetch, metricsData }: AdminDash
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {data.recentOrders.slice(0, 5).map((order) => (
-                      <div key={order.id} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-black/50 border border-[#B7985A]/10 hover:shadow-md hover:border-[#B7985A]/30 transition-all duration-200">
-                        <div className="space-y-2">
-                          <p className="font-semibold text-white">{order.customerName}</p>
-                          <p className="text-sm text-gray-300">
-                            {order.items.join(', ')}
-                          </p>
-                          <p className="text-xs text-gray-400 flex items-center space-x-1">
-                            <Clock className="h-3 w-3" />
-                            <span>{formatTime(order.orderTime)}</span>
-                          </p>
+                    {data.recentOrders && data.recentOrders.length > 0 ? (
+                      data.recentOrders.slice(0, 5).map((order) => (
+                        <div key={order.id} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-black/50 border border-[#B7985A]/10 hover:shadow-md hover:border-[#B7985A]/30 transition-all duration-200">
+                          <div className="space-y-2">
+                            <p className="font-semibold text-white">{order.customerName}</p>
+                            <p className="text-sm text-gray-300">
+                              {order.items.join(', ')}
+                            </p>
+                            <p className="text-xs text-gray-400 flex items-center space-x-1">
+                              <Clock className="h-3 w-3" />
+                              <span>{formatTime(order.orderTime)}</span>
+                            </p>
+                          </div>
+                          <div className="text-right space-y-2">
+                            <p className="font-bold text-lg text-[#FFD700]">
+                              {formatCurrency(order.total)}
+                            </p>
+                            <Badge className={`${getStatusColor(order.status)} font-medium px-3 py-1`}>
+                              {order.status}
+                            </Badge>
+                          </div>
                         </div>
-                        <div className="text-right space-y-2">
-                          <p className="font-bold text-lg text-[#FFD700]">
-                            {formatCurrency(order.total)}
-                          </p>
-                          <Badge className={`${getStatusColor(order.status)} font-medium px-3 py-1`}>
-                            {order.status}
-                          </Badge>
-                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8 text-gray-400">
+                        <p>No recent orders available</p>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -462,31 +468,37 @@ export default function AdminDashboard({ data, refetch, metricsData }: AdminDash
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {data.menuDrops.slice(0, 3).map((drop) => (
-                      <div key={drop.id} className="p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-black/50 border border-[#B7985A]/10 hover:shadow-md hover:border-[#B7985A]/30 transition-all duration-200">
-                        <div className="flex items-center justify-between mb-3">
-                          <p className="font-semibold text-white">{drop.name}</p>
-                          <Badge className={`${getStatusColor(drop.status)} font-medium px-3 py-1`}>
-                            {drop.status}
-                          </Badge>
+                    {data.menuDrops && data.menuDrops.length > 0 ? (
+                      data.menuDrops.slice(0, 3).map((drop) => (
+                        <div key={drop.id} className="p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-black/50 border border-[#B7985A]/10 hover:shadow-md hover:border-[#B7985A]/30 transition-all duration-200">
+                          <div className="flex items-center justify-between mb-3">
+                            <p className="font-semibold text-white">{drop.name}</p>
+                            <Badge className={`${getStatusColor(drop.status)} font-medium px-3 py-1`}>
+                              {drop.status}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center justify-between text-sm text-gray-300 mb-3">
+                            <span className="font-medium">{drop.soldQuantity}/{drop.totalQuantity} sold</span>
+                            <span className="font-bold text-[#FFD700]">{formatCurrency(drop.revenue)}</span>
+                          </div>
+                          <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+                            <div 
+                              className="bg-gradient-to-r from-[#B7985A] to-[#D2BA6A] h-3 rounded-full transition-all duration-500 ease-out" 
+                              style={{ 
+                                width: `${(drop.soldQuantity / drop.totalQuantity) * 100}%` 
+                              }}
+                            />
+                          </div>
+                          <div className="mt-2 text-xs text-gray-400">
+                            {Math.round((drop.soldQuantity / drop.totalQuantity) * 100)}% completed
+                          </div>
                         </div>
-                        <div className="flex items-center justify-between text-sm text-gray-300 mb-3">
-                          <span className="font-medium">{drop.soldQuantity}/{drop.totalQuantity} sold</span>
-                          <span className="font-bold text-[#FFD700]">{formatCurrency(drop.revenue)}</span>
-                        </div>
-                        <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
-                          <div 
-                            className="bg-gradient-to-r from-[#B7985A] to-[#D2BA6A] h-3 rounded-full transition-all duration-500 ease-out" 
-                            style={{ 
-                              width: `${(drop.soldQuantity / drop.totalQuantity) * 100}%` 
-                            }}
-                          />
-                        </div>
-                        <div className="mt-2 text-xs text-gray-400">
-                          {Math.round((drop.soldQuantity / drop.totalQuantity) * 100)}% completed
-                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8 text-gray-400">
+                        <p>No menu drops available</p>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -541,22 +553,28 @@ export default function AdminDashboard({ data, refetch, metricsData }: AdminDash
                     <span>Top Redemptions</span>
                   </h4>
                   <div className="space-y-3">
-                    {data.rewardsData.topRedemptions.map((redemption, index) => (
-                      <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-black/50 border border-[#B7985A]/10 hover:shadow-md hover:border-[#B7985A]/30 transition-all duration-200">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#B7985A]/20 to-[#D2BA6A]/20 flex items-center justify-center">
-                            <span className="text-sm font-bold text-[#FFD700]">#{index + 1}</span>
+                    {data.rewardsData.topRedemptions && data.rewardsData.topRedemptions.length > 0 ? (
+                      data.rewardsData.topRedemptions.map((redemption, index) => (
+                        <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-black/50 border border-[#B7985A]/10 hover:shadow-md hover:border-[#B7985A]/30 transition-all duration-200">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#B7985A]/20 to-[#D2BA6A]/20 flex items-center justify-center">
+                              <span className="text-sm font-bold text-[#FFD700]">#{index + 1}</span>
+                            </div>
+                            <span className="font-semibold text-white">{redemption.offer}</span>
                           </div>
-                          <span className="font-semibold text-white">{redemption.offer}</span>
+                          <div className="text-right">
+                            <span className="font-bold text-[#FFD700]">{redemption.count} times</span>
+                            <span className="text-sm text-gray-300 ml-2">
+                              ({redemption.points.toLocaleString()} pts)
+                            </span>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <span className="font-bold text-[#FFD700]">{redemption.count} times</span>
-                          <span className="text-sm text-gray-300 ml-2">
-                            ({redemption.points.toLocaleString()} pts)
-                          </span>
-                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8 text-gray-400">
+                        <p>No redemptions available</p>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -581,23 +599,29 @@ export default function AdminDashboard({ data, refetch, metricsData }: AdminDash
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {data.userAnalytics.topCustomers.slice(0, 5).map((customer, index) => (
-                      <div key={customer.id} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-black/50 border border-[#B7985A]/10 hover:shadow-md hover:border-[#B7985A]/30 transition-all duration-200">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#B7985A]/20 to-[#D2BA6A]/20 flex items-center justify-center">
-                            <span className="text-sm font-bold text-[#FFD700]">#{index + 1}</span>
+                    {data.userAnalytics.topCustomers && data.userAnalytics.topCustomers.length > 0 ? (
+                      data.userAnalytics.topCustomers.slice(0, 5).map((customer, index) => (
+                        <div key={customer.id} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-black/50 border border-[#B7985A]/10 hover:shadow-md hover:border-[#B7985A]/30 transition-all duration-200">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#B7985A]/20 to-[#D2BA6A]/20 flex items-center justify-center">
+                              <span className="text-sm font-bold text-[#FFD700]">#{index + 1}</span>
+                            </div>
+                            <div>
+                              <p className="font-semibold text-white">{customer.name}</p>
+                              <p className="text-sm text-gray-300">{customer.email}</p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-semibold text-white">{customer.name}</p>
-                            <p className="text-sm text-gray-300">{customer.email}</p>
+                          <div className="text-right">
+                            <p className="font-bold text-[#FFD700]">{customer.totalOrders} orders</p>
+                            <p className="text-sm text-gray-300">{formatCurrency(customer.totalSpent)}</p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-bold text-[#FFD700]">{customer.totalOrders} orders</p>
-                          <p className="text-sm text-gray-300">{formatCurrency(customer.totalSpent)}</p>
-                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8 text-gray-400">
+                        <p>No customers available</p>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </CardContent>
               </Card>

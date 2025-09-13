@@ -17,7 +17,7 @@ import CookieConsent from "../components/gdpr/CookieConsent"
 import SEOAudit from "../components/seo/SEOAudit"
 import SchemaGenerator from "../components/seo/SchemaGenerator"
 import { NetworkStatus } from "../components/common/EnhancedLoadingStates"
-import { Toaster } from "@/components/ui/toaster"
+
 import { playfair, montserrat } from "./fonts"
 import StructuredData, { OrganizationStructuredData } from "../components/seo/StructuredData"
 import { SkipNavigation } from "../components/accessibility/AccessibilityEnhancer"
@@ -124,7 +124,7 @@ export default function RootLayout({
                   <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
                   <Footer />
                   <MusicPlayer />
-                  <Toaster />
+
                   <CookieConsent />
                   <SEOAudit />
                   <SchemaGenerator />
