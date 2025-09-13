@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { FaFacebook, FaTwitter, FaInstagram, FaYoutube } from "react-icons/fa"
+import RadioPlayer from "../common/RadioPlayer"
 
 const Footer = () => {
   const [currentYear, setCurrentYear] = useState<number | null>(null)
@@ -17,7 +18,7 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-bold text-primary mb-4">Broski&apos;s Kitchen</h3>
             <p className="text-gray-300 mb-4">Luxury Street Gourmet</p>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 mb-4">
               <a
                 href="https://facebook.com"
                 className="text-gray-300 hover:text-primary transition-colors duration-300"
@@ -37,6 +38,7 @@ const Footer = () => {
                 <FaYoutube size={24} />
               </a>
             </div>
+            <RadioPlayer />
           </div>
 
           <div>

@@ -239,14 +239,26 @@ export default function CheckoutClient({
     setCurrentStep(step)
   }
   
+  // read current items from provider or GET /api/cart
+  async function startPayment(currentItems: any[]) {
+    const res = await fetch("/api/checkout/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items: currentItems }),
+    });
+    const j = await res.json();
+    if (j?.url) window.location.href = j.url;
+  }
+
   const handlePlaceOrder = async () => {
     setIsProcessing(true)
     setError(null)
     clearError()
     
     try {
-      setProcessingStep('Creating order...')
-      toast.loading('Processing your order...', { id: 'order-processing' })
+      setProcessingStep('Preparing checkout...')
+      toast.loading('Redirecting to payment...', { id: 'order-processing' })
+      
       // Calculate item prices including customizations
       const calculateItemPrice = (item: CartItem) => {
         let price = item.price
@@ -258,17 +270,22 @@ export default function CheckoutClient({
         return price
       }
       
-      // Create order data with proper item pricing
-      const orderItems = cartData.items.map(item => ({
-        ...item,
-        totalPrice: calculateItemPrice(item) * item.quantity,
-        customizationText: item.customizations 
-          ? Object.values(item.customizations).flat().map(opt => opt.name).join(', ')
-          : ''
+      // Prepare items for Stripe checkout
+      const checkoutItems = cartData.items.map(item => ({
+        name: item.name,
+        price: calculateItemPrice(item),
+        qty: item.quantity
       }))
       
+      // Store order data in localStorage for retrieval after payment
       const orderData = {
-        items: orderItems,
+        items: cartData.items.map(item => ({
+          ...item,
+          totalPrice: calculateItemPrice(item) * item.quantity,
+          customizationText: item.customizations 
+            ? Object.values(item.customizations).flat().map(opt => opt.name).join(', ')
+            : ''
+        })),
         subtotal: cartData.subtotal,
         tax: cartData.tax,
         deliveryFee: cartData.deliveryFee,
@@ -284,146 +301,24 @@ export default function CheckoutClient({
             ? (checkoutData.selectedAddress?.phone || '555-0123')
             : (checkoutData.guestPhone || '555-0123')
         },
-        paymentInfo: {
-          method: checkoutData.paymentType || checkoutData.selectedPayment?.type || 'card',
-          last4: checkoutData.selectedPayment?.last4 || checkoutData.newPayment?.paymentDetails?.last4 || '****',
-          paymentType: checkoutData.paymentType,
-          paymentMethodId: checkoutData.newPayment?.paymentMethodId || checkoutData.selectedPayment?.id
-        },
         specialInstructions: checkoutData.specialInstructions,
         tip: checkoutData.tip,
         rewardsUsed: checkoutData.useRewards,
         rewardsPoints: checkoutData.rewardsPoints,
         userId: isAuthenticated ? userId : null
       }
-
-      // Create order
-      setProcessingStep('Creating order...')
-      const orderResponse = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData)
-      })
-
-      if (!orderResponse.ok) {
-        const errorData = await orderResponse.json().catch(() => ({}))
-        throw new Error(errorData.message || `Order creation failed: ${orderResponse.status}`)
-      }
-
-      const { order } = await orderResponse.json()
       
-      // Store order for guest users
-       if (!isAuthenticated && guestOrderUtils.isClient()) {
-         guestOrderUtils.saveGuestOrder({
-           orderId: order.id,
-           email: checkoutData.guestEmail || 'guest@example.com',
-           phone: checkoutData.guestPhone || '555-0123',
-           total: order.total,
-           status: order.status
-         })
-       }
+      localStorage.setItem('pendingOrder', JSON.stringify(orderData))
       
-      // Create payment intent
-      setProcessingStep('Processing payment...')
-      const paymentResponse = await fetch('/api/stripe/create-payment-intent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: order.total,
-          metadata: {
-            orderId: order.id,
-            orderType: order.orderType
-          }
-        })
-      })
-
-      if (!paymentResponse.ok) {
-        const errorData = await paymentResponse.json().catch(() => ({}))
-        throw new Error(errorData.message || 'Failed to create payment intent')
-      }
-
-      const { paymentIntentId } = await paymentResponse.json()
+      // Call the new checkout session API
+      await startPayment(checkoutItems)
       
-      // Handle different payment types
-      if (checkoutData.newPayment) {
-        // Payment already processed via new payment methods
-        if (checkoutData.newPayment.type === 'digital_wallet') {
-          console.log('Digital wallet payment completed:', checkoutData.newPayment.paymentDetails)
-        } else if (checkoutData.newPayment.type === 'cashapp') {
-          console.log('CashApp payment completed:', checkoutData.newPayment.paymentDetails)
-        } else if (checkoutData.newPayment.type === 'stripe') {
-          // Traditional Stripe payment - confirm if needed
-          if (checkoutData.newPayment.paymentIntentId) {
-            const confirmResponse = await fetch('/api/stripe/confirm-payment', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                paymentIntentId: checkoutData.newPayment.paymentIntentId
-              })
-            })
-
-            if (!confirmResponse.ok) {
-              throw new Error('Failed to confirm payment')
-            }
-          }
-        }
-        
-        // Update order status to confirmed
-        await fetch('/api/orders', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            orderId: order.id,
-            status: 'confirmed',
-            paymentMethod: checkoutData.newPayment.type,
-            paymentDetails: {
-              type: checkoutData.newPayment.type,
-              amount: checkoutData.newPayment.amount,
-              status: checkoutData.newPayment.status
-            }
-          })
-        })
-      } else if (checkoutData.selectedPayment) {
-        // Using existing payment method - would need additional processing
-        console.log('Using existing payment method:', checkoutData.selectedPayment)
-        // For now, simulate successful payment with existing method
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
-        // Update order status to confirmed
-        await fetch('/api/orders', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            orderId: order.id,
-            status: 'confirmed',
-            paymentMethod: 'existing_card',
-            paymentDetails: {
-              type: 'card',
-              last4: checkoutData.selectedPayment.last4,
-              brand: checkoutData.selectedPayment.brand
-            }
-          })
-        })
-      }
-       
-       setProcessingStep('Finalizing order...')
-       setOrderId(order.id)
-       setCurrentStep('confirmation')
-       toast.success('Order placed successfully!', { id: 'order-processing' })
     } catch (error) {
-      console.error('Error placing order:', error)
-      let errorMessage = 'Failed to place order. Please try again.'
+      console.error('Error starting payment:', error)
+      let errorMessage = 'Failed to start payment. Please try again.'
       
       if (error instanceof Error) {
-        if (error.message.includes('payment')) {
-          errorMessage = 'Payment processing failed. Please check your payment method and try again.'
-        } else if (error.message.includes('network') || error.message.includes('fetch')) {
-          errorMessage = 'Network error. Please check your connection and try again.'
-        } else if (error.message.includes('Order creation failed')) {
-          errorMessage = 'Unable to create order. Please verify your information and try again.'
-        } else {
-          errorMessage = error.message
-        }
+        errorMessage = error.message
       }
       
       setError(errorMessage)
