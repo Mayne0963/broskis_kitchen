@@ -1,12 +1,14 @@
 import React from 'react'
 
+export const metadata = {
+  title: "Broski's Kitchen - Catering"
+}
+
 const CateringPage = () => {
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">Catering Services</h1>
-      <p>This is a placeholder for the Catering page.</p>
-      <p>More content will be added here soon.</p>
-    </div>
+    <main className="p-6 text-center text-2xl">
+      This is the Catering page.
+    </main>
   )
 }
 

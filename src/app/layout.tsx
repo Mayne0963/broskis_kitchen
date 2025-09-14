@@ -17,13 +17,13 @@ import CookieConsent from "../components/gdpr/CookieConsent"
 import SEOAudit from "../components/seo/SEOAudit"
 import SchemaGenerator from "../components/seo/SchemaGenerator"
 import { NetworkStatus } from "../components/common/EnhancedLoadingStates"
+import ServiceWorkerCleanup from "../components/common/ServiceWorkerCleanup"
 
 import { playfair, montserrat } from "./fonts"
 import StructuredData, { OrganizationStructuredData } from "../components/seo/StructuredData"
 import { SkipNavigation } from "../components/accessibility/AccessibilityEnhancer"
 import AccessibilityAudit from "../components/accessibility/AccessibilityAudit"
 import PWAManager from "../components/pwa/PWAManager"
-import ServiceWorkerCleanup from "../components/common/ServiceWorkerCleanup"
 
 export const metadata: Metadata = {
   title: {

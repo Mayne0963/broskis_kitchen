@@ -11,10 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/contact',
     '/locations',
     '/catering',
-    '/rewards',
-    '/loyalty',
     '/shop',
-    '/events',
     '/volunteer',
     '/careers',
     '/privacy',
@@ -22,7 +19,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/accessibility',
     '/auth/login',
     '/auth/register',
-    '/track-order',
   ]
   
   const currentDate = new Date()
