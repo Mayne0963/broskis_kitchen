@@ -140,6 +140,14 @@ export default function CartSummary({ cartData, checkoutData }: CartSummaryProps
                                 </span>
                               ))
                             )}
+                            {/* Display simple customization options */}
+                            {customizations
+                              ?.filter(option => option.name.includes(':'))
+                              .map((option, index) => (
+                                <span key={index} className="block text-xs text-gray-500">
+                                  {option.name}
+                                </span>
+                              ))}
                           </div>
                         ))}
                       </div>

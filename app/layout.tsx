@@ -121,7 +121,7 @@ export default function RootLayout({
                 <OrderProvider>
                   <SkipNavigation />
                   <ConditionalNavbar />
-                  <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
+                  <main id="main-content" className="flex-grow pt-16" tabIndex={-1}>{children}</main>
                   <Footer />
                   <MusicPlayer />
 

@@ -34,6 +34,9 @@ const MenuItemCard: React.FC<MenuItemProps> = ({ item, onAddToCart }) => {
   const [quantity, setQuantity] = useState(1)
   const [isExpanded, setIsExpanded] = useState(false)
   const [showCustomizationModal, setShowCustomizationModal] = useState(false)
+  const [size, setSize] = useState('')
+  const [spice, setSpice] = useState('')
+  const [side, setSide] = useState('')
 
   const customizationOptions = getItemCustomizationOptions(item)
   const hasCustomizationOptions = customizationOptions.length > 0
@@ -64,7 +67,25 @@ const MenuItemCard: React.FC<MenuItemProps> = ({ item, onAddToCart }) => {
       const defaultOptions = getDefaultOptions()
       onAddToCart(quantity, defaultOptions)
     } else {
-      onAddToCart(quantity)
+      // Create options object for simple customizations
+      const options: { [key: string]: any } = {}
+      if (size) options.size = size
+      if (spice) options.spice = spice
+      if (side) options.side = side
+      
+      // Convert simple options to customization format if any exist
+      if (Object.keys(options).length > 0) {
+        const simpleCustomizations = {
+          options: Object.entries(options).map(([key, value]) => ({
+            id: `${key}-${value}`,
+            name: `${key}: ${value}`,
+            price: 0
+          }))
+        }
+        onAddToCart(quantity, simpleCustomizations)
+      } else {
+        onAddToCart(quantity)
+      }
     }
   }
 
@@ -146,6 +167,62 @@ const MenuItemCard: React.FC<MenuItemProps> = ({ item, onAddToCart }) => {
               )}
               {item.dietary.dairyFree && (
                 <span className="text-xs bg-[#333333] text-white px-2 py-1 rounded">Dairy Free</span>
+              )}
+            </div>
+          )}
+
+          {/* Simple Customization Controls */}
+          {!hasCustomizationOptions && (
+            <div className="mb-4">
+              {/* Size Selection */}
+              {(item.category === 'drinks' || item.category === 'sides' || item.category === 'desserts') && (
+                <>
+                  <label className="block text-sm mb-1 text-white">Size</label>
+                  <select 
+                    className="mb-2 bg-zinc-900 border border-zinc-700 rounded p-2 w-full text-white" 
+                    value={size}
+                    onChange={(e) => setSize(e.target.value)}
+                  >
+                    <option value="">Choose</option>
+                    <option value="Regular">Regular</option>
+                    <option value="Large">Large</option>
+                  </select>
+                </>
+              )}
+              
+              {/* Spice Level */}
+              {(item.category === 'wings' || item.category === 'tacos' || item.category === 'burgers') && (
+                <>
+                  <label className="block text-sm mb-1 text-white">Spice</label>
+                  <select 
+                    className="mb-2 bg-zinc-900 border border-zinc-700 rounded p-2 w-full text-white" 
+                    value={spice}
+                    onChange={(e) => setSpice(e.target.value)}
+                  >
+                    <option value="">Choose</option>
+                    <option value="Mild">Mild</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hot">Hot</option>
+                    <option value="Extra Hot">Extra Hot</option>
+                  </select>
+                </>
+              )}
+              
+              {/* Side Selection */}
+              {(item.category === 'sandwiches' || item.category === 'burgers') && (
+                <>
+                  <label className="block text-sm mb-1 text-white">Side</label>
+                  <select 
+                    className="mb-2 bg-zinc-900 border border-zinc-700 rounded p-2 w-full text-white" 
+                    value={side}
+                    onChange={(e) => setSide(e.target.value)}
+                  >
+                    <option value="">Choose</option>
+                    <option value="Fries">Fries</option>
+                    <option value="Salad">Side Salad</option>
+                    <option value="Chips">Chips</option>
+                  </select>
+                </>
               )}
             </div>
           )}
