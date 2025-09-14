@@ -23,6 +23,7 @@ import StructuredData, { OrganizationStructuredData } from "../components/seo/St
 import { SkipNavigation } from "../components/accessibility/AccessibilityEnhancer"
 import AccessibilityAudit from "../components/accessibility/AccessibilityAudit"
 import PWAManager from "../components/pwa/PWAManager"
+import ServiceWorkerCleanup from "../components/common/ServiceWorkerCleanup"
 
 export const metadata: Metadata = {
   title: {
@@ -113,6 +114,7 @@ export default function RootLayout({
         <OrganizationStructuredData />
       </head>
       <body className={`${fontClasses} bg-black text-white min-h-screen flex flex-col antialiased`}>
+        <ServiceWorkerCleanup />
         <ProductionErrorBoundary>
           <ErrorBoundary>
             <ResourceErrorBoundary>
