@@ -5,20 +5,18 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
 
   async function startPayment() {
+    setLoading(true);
     try {
-      setLoading(true);
-      // TODO: replace with your real cart items
+      // TODO: replace with real cart
       const items = [{ name: "Order", price: 12.99, qty: 1 }];
-      const res = await fetch("/api/checkout/session", {
+      const r = await fetch("/api/checkout/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ items }),
       });
-      const j = await res.json();
+      const j = await r.json();
       if (j?.url) window.location.href = j.url;
-      else alert("Could not start checkout");
-    } catch (e) {
-      alert("Checkout error");
+      else alert("Checkout failed");
     } finally {
       setLoading(false);
     }
