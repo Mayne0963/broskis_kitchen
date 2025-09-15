@@ -34,13 +34,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "empty_cart" }, { status: 400 });
   }
 
+  // Calculate subtotal and tax
+  const TAX_RATE = 0.0825; // 8.25% sales tax
+  const subtotal = clean.reduce((sum, item) => sum + (item.amount * item.qty), 0);
+  const taxAmount = Math.round(subtotal * TAX_RATE);
+
   const successUrl = `${baseUrl()}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = `${baseUrl()}/checkout/cancel`;
 
-  const session = await stripe.checkout.sessions.create({
-    mode: "payment",
-    payment_method_types: ["card"],
-    line_items: clean.map(li => ({
+  // Create line items array with products and tax
+  const lineItems = [
+    ...clean.map(li => ({
       price_data: {
         currency: "usd",
         product_data: { name: li.name },
@@ -49,11 +53,36 @@ export async function POST(req: Request) {
       quantity: li.qty,
       adjustable_quantity: { enabled: true, minimum: 1, maximum: 99 },
     })),
+    // Add tax as a separate line item
+    {
+      price_data: {
+        currency: "usd",
+        product_data: { 
+          name: `Sales Tax (${(TAX_RATE * 100).toFixed(2)}%)`,
+          description: "State and local taxes"
+        },
+        unit_amount: taxAmount,
+      },
+      quantity: 1,
+    }
+  ];
+
+  const session = await stripe.checkout.sessions.create({
+    mode: "payment",
+    payment_method_types: ["card"],
+    line_items: lineItems,
     success_url: successUrl,
     cancel_url: cancelUrl,
   });
 
-  return NextResponse.json({ url: session.url, mode: "stripe", itemsSent: clean.length });
+  return NextResponse.json({ 
+    url: session.url, 
+    mode: "stripe", 
+    itemsSent: clean.length,
+    subtotal: subtotal / 100,
+    tax: taxAmount / 100,
+    total: (subtotal + taxAmount) / 100
+  });
 }
 
 export async function GET() {
