@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useCart } from "../../lib/context/CartContext"
@@ -10,13 +10,50 @@ import { useAuth } from "../../lib/context/AuthContext"
 import { OrderItem } from "../../types/order"
 import { FaShoppingCart, FaTrash, FaPlus, FaMinus, FaArrowLeft, FaCreditCard, FaCog, FaLock, FaUserPlus } from "react-icons/fa"
 
+function normalizePrice(p: unknown): number {
+  const n = typeof p === "string" ? parseFloat((p as string).replace(/[^0-9.]/g, "")) : Number(p);
+  return isFinite(n) ? n : 0;
+}
+
 export default function CartPage() {
   const { items, removeItem, updateQuantity, subtotal, tax, total, clearCart } = useCart()
   const { user } = useAuth()
   const [promoCode, setPromoCode] = useState("")
   const [promoError, setPromoError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
   const isAuthenticated = !!user
+
+  const payloadItems = useMemo(() => {
+    return (items || []).map((it: any) => ({
+      name: String(it?.name ?? it?.title ?? "Item"),
+      price: normalizePrice(it?.price ?? it?.unitPrice ?? it?.amount),
+      qty: Math.max(1, Number(it?.qty ?? it?.quantity ?? 1)),
+    })).filter(x => x.qty > 0 && x.price >= 0);
+  }, [items]);
+
+  async function proceedToCheckout() {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/checkout/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: payloadItems }),
+      });
+      const j = await res.json();
+      if (res.ok && j?.url) {
+        window.location.href = j.url;
+      } else {
+        console.error("Checkout error:", j);
+        alert(j?.error || "Unable to start checkout");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Network error starting checkout");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const handleQuantityChange = (id: string, currentQuantity: number, change: number) => {
     const newQuantity = currentQuantity + change
@@ -245,9 +282,13 @@ export default function CartPage() {
                 </div>
               </div>
 
-              <Link href="/checkout" className="btn-primary w-full flex items-center justify-center gap-2">
-                <FaCreditCard /> Proceed to Checkout
-              </Link>
+              <button
+                onClick={proceedToCheckout}
+                disabled={loading || payloadItems.length === 0}
+                className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-60"
+              >
+                <FaCreditCard /> {loading ? "Starting…" : "Proceed to Checkout"}
+              </button>
 
               <p className="text-xs text-gray-500 mt-4 text-center">Taxes and shipping calculated at checkout</p>
             </div>
