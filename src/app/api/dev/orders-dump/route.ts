@@ -1,39 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase/firebaseAdmin';
+import { getAdminDb } from '@/lib/firebaseAdmin';
+import { COLLECTIONS } from '@/lib/firebase/collections';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    // Get the last order from the orders collection
-    const ordersRef = adminDb.collection('orders');
-    const snapshot = await ordersRef
-      .orderBy('created_at', 'desc')
-      .limit(1)
-      .get();
-
-    if (snapshot.empty) {
-      return NextResponse.json({ message: 'No orders found' }, { status: 404 });
-    }
-
-    const lastOrder = snapshot.docs[0];
-    const orderData = lastOrder.data();
-
-    // Return essential order info
-    const orderInfo = {
-      id: lastOrder.id,
-      amount_total: orderData.amount_total,
-      items_length: orderData.items?.length || 0,
-      created_at: orderData.created_at,
-      status: orderData.status,
-      stripe_session_id: orderData.stripe_session_id
-    };
-
-    return NextResponse.json(orderInfo);
+    // Test admin SDK access
+    const db = getAdminDb();
+    
+    // Try to list collections first
+    const collections = await db.listCollections();
+    const collectionNames = collections.map(col => col.id);
+    
+    // Try to get orders collection info
+    const ordersRef = db.collection(COLLECTIONS.ORDERS);
+    const querySnapshot = await ordersRef.limit(5).get();
+    
+    const orders = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      data: doc.data()
+    }));
+    
+    return NextResponse.json({
+      collections: collectionNames,
+      orders_count: querySnapshot.size,
+      orders: orders
+    });
   } catch (error) {
     console.error('Error fetching orders:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch orders' },
+      { error: 'Failed to fetch orders', details: error.message },
       { status: 500 }
     );
+  }
+}
