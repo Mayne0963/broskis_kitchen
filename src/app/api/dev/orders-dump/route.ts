@@ -1,29 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { adminDb } from '@/lib/firebase/firebaseAdmin';
 
-export async function GET() {
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+export async function GET(request: NextRequest) {
   try {
-    const ordersRef = collection(db, 'orders');
-    const q = query(ordersRef, orderBy('created_at', 'desc'), limit(1));
-    const querySnapshot = await getDocs(q);
-    
-    if (querySnapshot.empty) {
-      return NextResponse.json({ message: 'No orders found' });
+    // Get the last order from the orders collection
+    const ordersRef = adminDb.collection('orders');
+    const snapshot = await ordersRef
+      .orderBy('created_at', 'desc')
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) {
+      return NextResponse.json({ message: 'No orders found' }, { status: 404 });
     }
-    
-    const lastOrder = querySnapshot.docs[0];
+
+    const lastOrder = snapshot.docs[0];
     const orderData = lastOrder.data();
-    
-    return NextResponse.json({
+
+    // Return essential order info
+    const orderInfo = {
       id: lastOrder.id,
       amount_total: orderData.amount_total,
       items_length: orderData.items?.length || 0,
       created_at: orderData.created_at,
-      status: orderData.status
-    });
+      status: orderData.status,
+      stripe_session_id: orderData.stripe_session_id
+    };
+
+    return NextResponse.json(orderInfo);
   } catch (error) {
     console.error('Error fetching orders:', error);
-    return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 });
-  }
-}
+    return NextResponse.json(
+      { error: 'Failed to fetch orders' },
+      { status: 500 }
+    );

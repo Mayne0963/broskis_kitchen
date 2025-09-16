@@ -31,43 +31,17 @@ export async function POST(req: NextRequest) {
       const session = event.data.object as Stripe.Checkout.Session;
       
       try {
-        // For test events, use mock data since session doesn't exist in Stripe
-        console.log('Processing checkout.session.completed event:', session.id);
-        
+        // Retrieve full session with line items
         let fullSession: Stripe.Checkout.Session;
-        let isTestEvent = false;
-        
         try {
           fullSession = await stripe.checkout.sessions.retrieve(session.id, {
             expand: ['line_items.data.price.product']
           });
-        } catch (error: any) {
-          if (error.code === 'resource_missing') {
-            // This is a test event, create mock session data
-            console.log('Test event detected, using mock data');
-            isTestEvent = true;
-            fullSession = {
-              ...session,
-              line_items: {
-                data: [
-                  {
-                    description: 'Test Item 1',
-                    quantity: 2,
-                    price: { unit_amount: 1299, product: 'test_product_1' }
-                  },
-                  {
-                    description: 'Test Item 2', 
-                    quantity: 1,
-                    price: { unit_amount: 899, product: 'test_product_2' }
-                  }
-                ]
-              },
-              amount_total: 3497, // 1299*2 + 899
-              currency: 'usd'
-            } as any;
-          } else {
-            throw error; // Re-throw if it's not a missing resource error
-          }
+        } catch (expandError) {
+          // Fallback if product expand fails
+          fullSession = await stripe.checkout.sessions.retrieve(session.id, {
+            expand: ['line_items']
+          });
         }
 
         // Build order object
