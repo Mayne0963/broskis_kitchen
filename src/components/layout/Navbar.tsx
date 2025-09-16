@@ -167,11 +167,11 @@ const Navbar: React.FC = () => {
               </AccessibleMenuItem>
               {!loading && claims?.admin && (
                 <AccessibleMenuItem
-                  href="/admin"
+                  href="/login"
                   onClick={() => setUserDropdownOpen(false)}
                   className="text-red-600 font-medium"
                 >
-                  Admin Dashboard
+                  Admin
                 </AccessibleMenuItem>
               )}
               <AccessibleMenuItem
@@ -301,11 +301,11 @@ const Navbar: React.FC = () => {
               </Link>
               {!loading && claims?.admin && (
                 <Link
-                  href="/admin"
+                  href="/login"
                   className="block py-2 hover:text-gold-foil transition-colors duration-300 text-red-600 font-medium"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Admin Dashboard
+                  Admin
                 </Link>
               )}
               <button
