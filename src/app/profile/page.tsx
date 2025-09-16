@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/lib/context/AuthContext";
+import SessionGate from "@/components/auth/SessionGate";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -89,38 +90,40 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black to-[#1A1A1A] text-white py-12 px-4">
-      <div className="max-w-md mx-auto bg-[#1A1A1A] p-8 rounded-lg shadow-md border border-[var(--color-harvest-gold)]">
-        <h1 className="text-3xl font-bold mb-6 text-center text-[var(--color-harvest-gold)]">User Profile</h1>
-        <div className="flex flex-col items-center mb-6">
-          <div className="relative">
-            <Avatar className="w-24 h-24">
-              <AvatarImage src={avatarUrl} alt="Profile picture" />
-              <AvatarFallback>{user.displayName?.[0] || "U"}</AvatarFallback>
-            </Avatar>
-            <Label htmlFor="avatar-upload" className="absolute bottom-0 right-0 bg-[var(--color-harvest-gold)] p-2 rounded-full cursor-pointer">
-              <Camera className="w-4 h-4 text-black" />
-              <Input id="avatar-upload" type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} disabled={uploading} />
-            </Label>
+    <SessionGate>
+      <div className="min-h-screen bg-gradient-to-b from-black to-[#1A1A1A] text-white py-12 px-4">
+        <div className="max-w-md mx-auto bg-[#1A1A1A] p-8 rounded-lg shadow-md border border-[var(--color-harvest-gold)]">
+          <h1 className="text-3xl font-bold mb-6 text-center text-[var(--color-harvest-gold)]">User Profile</h1>
+          <div className="flex flex-col items-center mb-6">
+            <div className="relative">
+              <Avatar className="w-24 h-24">
+                <AvatarImage src={avatarUrl} alt="Profile picture" />
+                <AvatarFallback>{user.displayName?.[0] || "U"}</AvatarFallback>
+              </Avatar>
+              <Label htmlFor="avatar-upload" className="absolute bottom-0 right-0 bg-[var(--color-harvest-gold)] p-2 rounded-full cursor-pointer">
+                <Camera className="w-4 h-4 text-black" />
+                <Input id="avatar-upload" type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} disabled={uploading} />
+              </Label>
+            </div>
+            {uploading && <p className="mt-2 text-sm">Uploading...</p>}
           </div>
-          {uploading && <p className="mt-2 text-sm">Uploading...</p>}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div>
+              <Label htmlFor="displayName">Name</Label>
+              <Input id="displayName" {...register("displayName")} className="bg-[#2A2A2A] border-[var(--color-harvest-gold)]" />
+              {errors.displayName && <p className="text-[var(--color-harvest-gold)] text-sm">{errors.displayName.message}</p>}
+            </div>
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" type="email" {...register("email")} className="bg-[#2A2A2A] border-[var(--color-harvest-gold)]" disabled />
+              {errors.email && <p className="text-[var(--color-harvest-gold)] text-sm">{errors.email.message}</p>}
+            </div>
+            <Button type="submit" className="w-full bg-[var(--color-harvest-gold)] text-black">Update Profile</Button>
+          </form>
+          <Button onClick={logout} variant="destructive" className="w-full mt-4">Logout</Button>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <Label htmlFor="displayName">Name</Label>
-            <Input id="displayName" {...register("displayName")} className="bg-[#2A2A2A] border-[var(--color-harvest-gold)]" />
-            {errors.displayName && <p className="text-[var(--color-harvest-gold)] text-sm">{errors.displayName.message}</p>}
-          </div>
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" {...register("email")} className="bg-[#2A2A2A] border-[var(--color-harvest-gold)]" disabled />
-            {errors.email && <p className="text-[var(--color-harvest-gold)] text-sm">{errors.email.message}</p>}
-          </div>
-          <Button type="submit" className="w-full bg-[var(--color-harvest-gold)] text-black">Update Profile</Button>
-        </form>
-        <Button onClick={logout} variant="destructive" className="w-full mt-4">Logout</Button>
       </div>
-    </div>
+    </SessionGate>
   );
 }
 
