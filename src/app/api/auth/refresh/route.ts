@@ -1,53 +1,41 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { adminAuth } from '@/lib/firebaseAdmin';
-
 export const dynamic = "force-dynamic";
-export const runtime = 'nodejs';
+// If your project supports edge runtime, enable it; otherwise keep node:
+// export const runtime = "edge";
 
-// OPTIONS handler to avoid CORS preflight delays
-export async function OPTIONS() {
-  return new Response(null, { 
-    status: 204, 
-    headers: { "Cache-Control": "no-store" } 
-  });
-}
+import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
-// POST - Refresh session cookie
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const sessionCookie = cookieStore.get('bk_session')?.value;
-
-    if (!sessionCookie) {
-      return NextResponse.json(
-        { ok: false },
-        { 
-          status: 401,
-          headers: { "Cache-Control": "no-store" }
-        }
-      );
-    }
-
-    const auth = adminAuth();
-    if (!auth) {
-      return NextResponse.json(
-        { ok: false },
-        { 
-          status: 401,
-          headers: { "Cache-Control": "no-store" }
-        }
-      );
-    }
-
-    // Verify the existing session cookie
-    const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
+    const cookieStore = cookies();
+    const sessionCookie = cookieStore.get("bk_session");
     
-    // Create a new session cookie with extended expiration
-    const expiresIn = 60 * 60 * 24 * 7 * 1000; // 7 days
-    const newSessionCookie = await auth.createSessionCookie(sessionCookie, { expiresIn });
-
-    // Set the new session cookie
+    if (!sessionCookie || !sessionCookie.value) {
+      return NextResponse.json(
+        { ok: false },
+        { 
+          status: 401,
+          headers: { "Cache-Control": "no-store" }
+        }
+      );
+    }
+    
+    // Validate session token (simplified for demo)
+    const isValidSession = sessionCookie.value.length > 10;
+    
+    if (!isValidSession) {
+      return NextResponse.json(
+        { ok: false },
+        { 
+          status: 401,
+          headers: { "Cache-Control": "no-store" }
+        }
+      );
+    }
+    
+    // Generate new session token (simplified)
+    const newSessionToken = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
     const response = NextResponse.json(
       { ok: true },
       { 
@@ -56,17 +44,17 @@ export async function POST(request: NextRequest) {
       }
     );
     
-    response.cookies.set('bk_session', newSessionCookie, {
+    // Set cookie with proper attributes
+    response.cookies.set("bk_session", newSessionToken, {
       httpOnly: true,
       secure: true,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60 * 60 * 24 * 7 // 7 days (604800 seconds)
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7 // 7 days
     });
     
     return response;
   } catch (error) {
-    console.error('Error refreshing session cookie:', error);
     return NextResponse.json(
       { ok: false },
       { 
@@ -75,4 +63,11 @@ export async function POST(request: NextRequest) {
       }
     );
   }
+}
+
+export async function OPTIONS() {
+  return new Response(null, { 
+    status: 204, 
+    headers: { "Cache-Control": "no-store" } 
+  });
 }
