@@ -1,81 +1,177 @@
-// Client component: Customer Login (email/password)
-"use client";
-import React, { useState } from "react";
-import Link from "next/link";
+'use client'
 
-export default function CustomerLoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Eye, EyeOff, AlertCircle } from 'lucide-react'
+import { useAuth } from '@/lib/context/AuthContext'
+import AuthLayout from '@/components/auth/AuthLayout'
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton'
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
+const loginSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(1, 'Password is required')
+})
+
+type LoginFormValues = z.infer<typeof loginSchema>
+
+export default function LoginPage() {
+  const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const { login } = useAuth()
+  const router = useRouter()
+
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: ''
+    }
+  })
+
+  const onSubmit = async (values: LoginFormValues) => {
+    setIsLoading(true)
+    
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data?.message || `Login failed (${res.status})`);
+      const success = await login(values.email, values.password)
+      if (success) {
+        router.push('/dashboard')
       }
-      // success: redirect to previous page or profile
-      const next = typeof window !== "undefined" && sessionStorage.getItem("afterLogin") || "/profile";
-      window.location.assign(next);
-    } catch (err:any) {
-      setError(err.message || "Login failed");
+    } catch (error) {
+      console.error('Login error:', error)
+      form.setError('root', {
+        message: 'Invalid email or password. Please try again.'
+      })
     } finally {
-      setLoading(false);
+      setIsLoading(false)
     }
   }
 
   return (
-    <main className="mx-auto max-w-md px-4 py-16">
-      <h1 className="text-2xl font-semibold mb-6">Sign in to your account</h1>
-      <form onSubmit={onSubmit} className="space-y-4">
-        <label className="block">
-          <span className="mb-1 block text-sm">Email</span>
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e)=>setEmail(e.target.value)}
-            className="w-full rounded-md border border-zinc-700 bg-black/30 px-3 py-2 outline-none"
-            placeholder="you@example.com"
-          />
-        </label>
-        <label className="block">
-          <span className="mb-1 block text-sm">Password</span>
-          <input
-            type="password"
-            required
-            value={password}
-            onChange={(e)=>setPassword(e.target.value)}
-            className="w-full rounded-md border border-zinc-700 bg-black/30 px-3 py-2 outline-none"
-            placeholder="••••••••"
-          />
-        </label>
-        {error && <p className="text-sm text-red-400">{error}</p>}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-md bg-yellow-500 px-4 py-2 font-medium text-black hover:bg-yellow-400 disabled:opacity-50"
-        >
-          {loading ? "Signing in…" : "Sign in"}
-        </button>
-      </form>
-      <p className="mt-4 text-sm text-zinc-400">
-        Don't have an account?{" "}
-        <Link href="/auth/register" className="text-yellow-400 hover:underline">
-          Sign up
-        </Link>
-      </p>
-    </main>
-  );
-}
+    <AuthLayout title="Welcome Back" subtitle="Sign in to your Broski's Kitchen account">
+      <Card className="w-full max-w-md">
+        
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {form.formState.errors.root && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
+                </Alert>
+              )}
 
-export const dynamic = "force-dynamic";
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="email"
+                        placeholder="you@broski.com"
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          {...field}
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder="Enter your password"
+                          className="pr-10"
+                          disabled={isLoading}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                          disabled={isLoading}
+                        >
+                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex items-center justify-between">
+                <div className="text-sm">
+                  <Link 
+                    href="/auth/forgot-password" 
+                    className="text-[var(--color-harvest-gold)] hover:underline"
+                  >
+                    Forgot your password?
+                  </Link>
+                </div>
+              </div>
+
+              <Button 
+                type="submit" 
+                className="w-full bg-[var(--color-harvest-gold)] hover:bg-[var(--color-harvest-gold)]/90 text-[var(--color-rich-black)] font-medium"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <div className="w-4 h-4 mr-2 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    Signing In...
+                  </>
+                ) : (
+                  'Sign In'
+                )}
+              </Button>
+            </form>
+          </Form>
+
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+              </div>
+            </div>
+            
+            <div className="mt-6">
+              <GoogleSignInButton text="Sign in with Google" />
+            </div>
+          </div>
+
+          <div className="mt-6 text-center text-sm text-gray-600">
+            Don't have an account?{' '}
+            <Link 
+              href="/auth/signup" 
+              className="text-[var(--color-harvest-gold)] hover:underline font-medium"
+            >
+              Sign up
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+    </AuthLayout>
+  )
+}
