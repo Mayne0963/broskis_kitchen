@@ -9,9 +9,12 @@ dist
 .vercel/
 ./vercel/
 
-# Next.js cache (exclude only cache, not essential build files)
+# Next.js cache (exclude all cache files)
+.next/cache
 .next/cache/**
 .next/trace
+.next/standalone
+.next/static/chunks/webpack*
 
 # Documentation files
 *.md
