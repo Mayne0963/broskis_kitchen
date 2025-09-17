@@ -292,7 +292,7 @@ const Navbar: React.FC = () => {
           {user ? (
             <div className="pt-4 border-t border-[#FFD700] mt-2 space-y-2">
               <Link
-                href="/sign-in"
+                href="/auth/login"
                 className="block py-2 hover:text-gold-foil transition-colors duration-300"
                 onClick={() => setMobileMenuOpen(false)}
               >
