@@ -15,7 +15,7 @@ export async function POST() {
     if (sessionCookie) {
       try {
         // Verify and revoke the session
-    const auth = adminAuth()
+    const auth = adminAuth
     if (!auth) {
       return NextResponse.json(
         { error: 'Firebase Admin not initialized' },

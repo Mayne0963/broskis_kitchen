@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Verify the ID token
-  const auth = adminAuth();
+  const auth = adminAuth;
   try {
     const decodedToken = await auth.verifyIdToken(idToken);
 

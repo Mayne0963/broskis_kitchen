@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const auth = adminAuth();
+    const auth = adminAuth;
     if (!auth) {
       return NextResponse.json(
         { success: false, error: 'Firebase Admin not initialized' },
@@ -62,7 +62,7 @@ export async function GET() {
       );
     }
 
-    const auth = adminAuth();
+    const auth = adminAuth;
     if (!auth) {
       return NextResponse.json(
         { success: false, error: 'Firebase Admin not initialized' },

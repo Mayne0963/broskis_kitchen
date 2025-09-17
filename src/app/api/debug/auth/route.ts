@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     console.log('=== AUTH DEBUG START ===')
     
     // Check if Firebase Admin is properly initialized
-    const auth = adminAuth()
+    const auth = adminAuth
     console.log('Firebase Admin Auth initialized:', !!auth)
     
     // Check session cookie
