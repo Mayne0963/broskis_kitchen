@@ -81,80 +81,12 @@ const POINTS_TRANSACTIONS_COLLECTION = COLLECTIONS.REWARD_TRANSACTIONS
 const REWARD_OFFERS_COLLECTION = 'rewardOffers'
 const USER_REDEMPTIONS_COLLECTION = 'userRedemptions'
 
-// Mock data fallback
-const mockUserRewards = {
-  'mock-user-id': {
-    id: 'mock-user-id',
-    userId: 'mock-user-id',
-    points: 1250,
-    tier: 'Gold',
-    nextTier: 'Platinum',
-    pointsToNextTier: 750,
-    totalSpent: 485.50,
-    ordersCount: 23,
-    lifetimePoints: 2100,
-    redeemedPoints: 850,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  }
-}
-
-const mockOffers: RewardOffer[] = [
-  {
-    id: '1',
-    title: 'Free Appetizer',
-    description: 'Get any appetizer on the house',
-    pointsCost: 500,
-    type: 'food',
-    category: 'appetizer',
-    validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-    isActive: true,
-    maxRedemptions: 100,
-    currentRedemptions: 23,
-    terms: 'Valid for dine-in and takeout. Cannot be combined with other offers.',
-    image: 'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=delicious%20appetizer%20platter%20with%20wings%20and%20dips&image_size=square',
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: '2',
-    title: '20% Off Next Order',
-    description: 'Save 20% on your entire next order',
-    pointsCost: 750,
-    type: 'discount',
-    category: 'percentage',
-    validUntil: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000),
-    isActive: true,
-    maxRedemptions: 50,
-    currentRedemptions: 12,
-    terms: 'Valid for orders over $25. Cannot be combined with other discounts.',
-    image: 'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=discount%20coupon%20with%2020%20percent%20off%20text&image_size=square',
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: '3',
-    title: 'Free Delivery',
-    description: 'Get free delivery on your next order',
-    pointsCost: 300,
-    type: 'service',
-    category: 'delivery',
-    validUntil: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
-    isActive: true,
-    maxRedemptions: 200,
-    currentRedemptions: 87,
-    terms: 'Valid for delivery orders only. Minimum order value $15.',
-    image: 'https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=delivery%20truck%20with%20free%20delivery%20text&image_size=square',
-    createdAt: new Date(),
-    updatedAt: new Date()
-  }
-]
+// Removed mock data - service now requires proper Firebase configuration
 
 // User Rewards Functions
 export async function getUserRewards(userId: string): Promise<UserRewards | null> {
   if (!isFirebaseConfigured()) {
-    console.warn('Firebase not configured, using mock data')
-    return mockUserRewards[userId as keyof typeof mockUserRewards] || null
+    throw new Error('Firebase not configured - rewards service unavailable')
   }
 
   try {
@@ -182,14 +114,13 @@ export async function getUserRewards(userId: string): Promise<UserRewards | null
     return null
   } catch (error) {
     console.error('Error fetching user rewards:', error)
-    return mockUserRewards[userId as keyof typeof mockUserRewards] || null
+    return null
   }
 }
 
 export async function createUserRewards(userId: string): Promise<UserRewards> {
   if (!isFirebaseConfigured()) {
-    console.warn('Firebase not configured, using mock data')
-    return mockUserRewards['mock-user-id']
+    throw new Error('Firebase not configured - rewards service unavailable')
   }
 
   try {
@@ -218,7 +149,7 @@ export async function createUserRewards(userId: string): Promise<UserRewards> {
     }
   } catch (error) {
     console.error('Error creating user rewards:', error)
-    return mockUserRewards['mock-user-id']
+    throw error
   }
 }
 
@@ -313,8 +244,7 @@ export async function getUserPointsHistory(userId: string, limitCount: number = 
 // Reward Offers Functions
 export async function getAllRewardOffers(): Promise<RewardOffer[]> {
   if (!isFirebaseConfigured()) {
-    console.warn('Firebase not configured, using mock data')
-    return mockOffers
+    throw new Error('Firebase not configured')
   }
 
   try {
@@ -350,19 +280,13 @@ export async function getAllRewardOffers(): Promise<RewardOffer[]> {
     return offers
   } catch (error) {
     console.error('Error fetching reward offers:', error)
-    return mockOffers
+    return []
   }
 }
 
 export async function createRewardOffer(offer: Omit<RewardOffer, 'id' | 'createdAt' | 'updatedAt'>): Promise<RewardOffer | null> {
   if (!isFirebaseConfigured()) {
-    console.warn('Firebase not configured, using mock data')
-    return {
-      id: `mock-${Date.now()}`,
-      ...offer,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }
+    throw new Error('Firebase not configured')
   }
 
   try {
@@ -390,11 +314,7 @@ export async function createRewardOffer(offer: Omit<RewardOffer, 'id' | 'created
 // User Redemptions Functions
 export async function createUserRedemption(redemption: Omit<UserRedemption, 'id'>): Promise<UserRedemption | null> {
   if (!isFirebaseConfigured()) {
-    console.warn('Firebase not configured, using mock data')
-    return {
-      id: `mock-${Date.now()}`,
-      ...redemption
-    }
+    throw new Error('Firebase not configured')
   }
 
   try {
@@ -419,8 +339,7 @@ export async function createUserRedemption(redemption: Omit<UserRedemption, 'id'
 
 export async function getUserRedemptions(userId: string): Promise<UserRedemption[]> {
   if (!isFirebaseConfigured()) {
-    console.warn('Firebase not configured, using mock data')
-    return []
+    throw new Error('Firebase not configured')
   }
 
   try {
@@ -466,18 +385,7 @@ export async function getRewardsAnalytics(): Promise<{
   topRedemptions: Array<{ offer: string; count: number; points: number }>
 }> {
   if (!isFirebaseConfigured()) {
-    console.warn('Firebase not configured, using mock data')
-    return {
-      totalPointsIssued: 125000,
-      totalPointsRedeemed: 45000,
-      activeOffers: 8,
-      totalRedemptions: 342,
-      topRedemptions: [
-        { offer: 'Free Appetizer', count: 89, points: 500 },
-        { offer: 'Free Delivery', count: 156, points: 300 },
-        { offer: '20% Off Next Order', count: 67, points: 750 }
-      ]
-    }
+    throw new Error('Firebase not configured')
   }
 
   try {
@@ -510,11 +418,7 @@ export async function getRewardsAnalytics(): Promise<{
     const totalRedemptions = redemptionsSnapshot.size
 
     // Get top redemptions (simplified - would need aggregation in real implementation)
-    const topRedemptions = [
-      { offer: 'Free Appetizer', count: 89, points: 500 },
-      { offer: 'Free Delivery', count: 156, points: 300 },
-      { offer: '20% Off Next Order', count: 67, points: 750 }
-    ]
+    const topRedemptions: Array<{ offer: string; count: number; points: number }> = []
 
     return {
       totalPointsIssued,

@@ -1,6 +1,9 @@
 "use client"
 import { useState } from "react"
 import type { Metadata } from "next"
+
+// Note: Metadata export for client components is handled by layout.tsx
+// This page uses the template from root layout: "%s | Broski's Kitchen"
 import Link from "next/link"
 import {
   FaMapMarkerAlt,

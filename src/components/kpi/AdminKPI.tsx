@@ -1,125 +1,72 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import useSWR from 'swr';
 import { Card, CardContent } from '@/components/ui/card';
 import { BarChart3, DollarSign, Users } from 'lucide-react';
 
+const fetcher = (url: string) => fetch(url, { credentials: 'include' }).then(r => r.json());
+
 export default function AdminKPI() {
-  const [metrics, setMetrics] = useState({
-    totalOrders: 0,
-    totalRevenue: 0,
-    activeUsers: 0
-  });
-  const [loading, setLoading] = useState(true);
+  const { data, error, isLoading } = useSWR('/api/orders?kpi=1', fetcher);
+  
+  const kpi = data?.kpi ?? { totalOrders: 0, revenueCents: 0, activeUsers: 0 };
+  const revenue = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD'
+  }).format((kpi.revenueCents || 0) / 100);
 
-  useEffect(() => {
-    const fetchAdminMetrics = async () => {
-      try {
-        // TODO: Replace with actual API call to fetch admin metrics
-        // const response = await fetch('/api/admin/metrics');
-        // const data = await response.json();
-        // setMetrics(data);
-        
-        // Mock data for now - global totals
-        setMetrics({
-          totalOrders: 24,
-          totalRevenue: 1234,
-          activeUsers: 156
-        });
-      } catch (error) {
-        console.error('Error fetching admin metrics:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAdminMetrics();
-  }, []);
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
-  };
-
-  if (loading) {
+  if (error) {
     return (
-      <>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Orders</p>
-                <div className="w-16 h-6 bg-gray-200 animate-pulse rounded"></div>
-              </div>
-              <BarChart3 className="h-8 w-8 text-blue-600" />
+            <div className="text-center text-red-600">
+              <p>Error loading admin metrics</p>
+              <p className="text-sm">{error.message || 'Access denied'}</p>
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-                <div className="w-20 h-6 bg-gray-200 animate-pulse rounded"></div>
-              </div>
-              <DollarSign className="h-8 w-8 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Active Users</p>
-                <div className="w-16 h-6 bg-gray-200 animate-pulse rounded"></div>
-              </div>
-              <Users className="h-8 w-8 text-purple-600" />
-            </div>
-          </CardContent>
-        </Card>
-      </>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <KpiCard label="Total Orders" value="Loading..." icon={BarChart3} />
+        <KpiCard label="Revenue" value="Loading..." icon={DollarSign} />
+        <KpiCard label="Active Users" value="Loading..." icon={Users} />
+      </div>
     );
   }
 
   return (
-    <>
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Orders</p>
-              <p className="text-2xl font-bold text-gray-900">{metrics.totalOrders}</p>
-            </div>
-            <BarChart3 className="h-8 w-8 text-blue-600" />
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <KpiCard label="Total Orders" value={kpi.totalOrders ?? 0} icon={BarChart3} />
+      <KpiCard label="Revenue" value={revenue} icon={DollarSign} />
+      <KpiCard label="Active Users" value={kpi.activeUsers ?? 0} icon={Users} />
+    </div>
+  );
+}
+
+interface KpiCardProps {
+  label: string;
+  value: string | number;
+  icon: React.ComponentType<{ className?: string }>;
+}
+
+function KpiCard({ label, value, icon: Icon }: KpiCardProps) {
+  return (
+    <Card>
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-gray-600">{label}</p>
+            <p className="text-2xl font-bold text-gray-900">{value}</p>
           </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(metrics.totalRevenue)}</p>
-            </div>
-            <DollarSign className="h-8 w-8 text-green-600" />
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Active Users</p>
-              <p className="text-2xl font-bold text-gray-900">{metrics.activeUsers}</p>
-            </div>
-            <Users className="h-8 w-8 text-purple-600" />
-          </div>
-        </CardContent>
-      </Card>
-    </>
+          <Icon className="h-8 w-8 text-blue-600" />
+        </div>
+      </CardContent>
+    </Card>
   );
 }

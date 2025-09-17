@@ -1,5 +1,8 @@
 "use client"
 
+// Note: Metadata export for client components is handled by layout.tsx
+// This page uses the template from root layout: "%s | Broski's Kitchen"
+
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { useCart } from "../../lib/context/CartContext"

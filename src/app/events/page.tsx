@@ -1,6 +1,13 @@
+// Metadata is handled by the root layout.tsx using the default template
+// This page uses the "Events & Experiences" template
+
 "use client"
 
 import { useState, useEffect } from "react"
+import type { Metadata } from "next"
+
+// Note: Metadata export not needed as this is a client component
+// Metadata is handled by the layout.tsx file
 import Image from "next/image"
 import { FaSearch, FaCalendarAlt, FaFilter, FaMapMarkerAlt, FaClock, FaTicketAlt } from "react-icons/fa"
 import EventCard from "../../components/events/EventCard"

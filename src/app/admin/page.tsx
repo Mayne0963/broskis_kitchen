@@ -2,6 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { onAuthStateChanged, getIdTokenResult } from 'firebase/auth';
+import { auth } from '@/lib/services/firebase';
+import AdminKPI from '@/components/kpi/AdminKPI';
+import type { User as FirebaseUser } from 'firebase/auth';
 
 // Force dynamic rendering to ensure middleware runs
 export const dynamic = 'force-dynamic';
@@ -28,11 +32,37 @@ interface Order {
 export default function AdminPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<FirebaseUser | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const tokenResult = await getIdTokenResult(user);
+          const userIsAdmin = tokenResult.claims?.role === 'admin' || tokenResult.claims?.admin === true;
+          setUser(user);
+          setIsAdmin(userIsAdmin);
+          
+          if (userIsAdmin) {
+            fetchOrders();
+          } else {
+            router.push('/dashboard');
+          }
+        } catch (error) {
+          console.error('Error checking admin status:', error);
+          router.push('/login');
+        }
+      } else {
+        router.push('/login');
+      }
+      setAuthLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [router]);
 
   const fetchOrders = async () => {
     try {
@@ -89,6 +119,34 @@ export default function AdminPage() {
     }
   };
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Verifying admin access...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">Access Denied</h1>
+          <p className="text-gray-600 mb-4">You need admin privileges to access this page.</p>
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+          >
+            Go to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -105,24 +163,10 @@ export default function AdminPage() {
           </button>
         </div>
         
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold text-gray-900">Total Orders</h3>
-            <p className="text-3xl font-bold text-blue-600">156</p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold text-gray-900">Revenue</h3>
-            <p className="text-3xl font-bold text-green-600">$12,450</p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold text-gray-900">Products</h3>
-            <p className="text-3xl font-bold text-purple-600">89</p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold text-gray-900">Customers</h3>
-            <p className="text-3xl font-bold text-orange-600">234</p>
-          </div>
+        {/* Admin KPIs */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Key Performance Indicators</h2>
+          <AdminKPI />
         </div>
 
         {/* Orders Table */}

@@ -109,6 +109,12 @@ const Navbar: React.FC = () => {
           <Link href="/locations" className={`nav-link ${pathname === "/locations" ? "nav-link-active" : ""}`}>
             Locations
           </Link>
+          <Link href="/events" className={`nav-link ${pathname === "/events" ? "nav-link-active" : ""}`}>
+            Events
+          </Link>
+          <Link href="/music" className={`nav-link ${pathname === "/music" ? "nav-link-active" : ""}`}>
+            Music
+          </Link>
           <Link href="/rewards" className={`nav-link ${pathname === "/rewards" ? "nav-link-active" : ""}`}>
             Rewards
           </Link>

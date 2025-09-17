@@ -50,66 +50,27 @@ export interface UserActivity {
   retentionRate: number
 }
 
-// Mock data fallback
-const mockUserAnalytics: UserAnalytics = {
-  totalUsers: 892,
-  activeUsers: 234,
-  newUsersToday: 12,
-  newUsersThisWeek: 67,
-  newUsersThisMonth: 189,
-  userGrowthRate: 15.2,
-  averageOrdersPerUser: 3.4,
-  topCustomers: [
-    {
-      id: '1',
-      name: 'John Smith',
-      email: 'j.smith@broskis.com',
-      totalOrders: 24,
-      totalSpent: 1250.00,
-      lastOrderDate: new Date('2024-01-15')
-    },
-    {
-      id: '2',
-      name: 'Sarah Johnson',
-      email: 's.johnson@broskis.com',
-      totalOrders: 18,
-      totalSpent: 980.50,
-      lastOrderDate: new Date('2024-01-14')
-    },
-    {
-      id: '3',
-      name: 'Mike Davis',
-      email: 'm.davis@broskis.com',
-      totalOrders: 15,
-      totalSpent: 875.25,
-      lastOrderDate: new Date('2024-01-13')
-    }
-  ],
-  usersByLocation: [
-    { city: 'New York', state: 'NY', count: 156 },
-    { city: 'Los Angeles', state: 'CA', count: 134 },
-    { city: 'Chicago', state: 'IL', count: 98 },
-    { city: 'Houston', state: 'TX', count: 87 },
-    { city: 'Phoenix', state: 'AZ', count: 65 }
-  ],
-  userRegistrationTrend: [
-    { date: '2024-01-08', count: 8 },
-    { date: '2024-01-09', count: 12 },
-    { date: '2024-01-10', count: 15 },
-    { date: '2024-01-11', count: 9 },
-    { date: '2024-01-12', count: 18 },
-    { date: '2024-01-13', count: 14 },
-    { date: '2024-01-14', count: 11 }
-  ]
+// Empty fallback data - no mock numbers
+const emptyUserAnalytics: UserAnalytics = {
+  totalUsers: 0,
+  activeUsers: 0,
+  newUsersToday: 0,
+  newUsersThisWeek: 0,
+  newUsersThisMonth: 0,
+  userGrowthRate: 0,
+  averageOrdersPerUser: 0,
+  topCustomers: [],
+  usersByLocation: [],
+  userRegistrationTrend: []
 }
 
-const mockUserActivity: UserActivity = {
-  dailyActiveUsers: 234,
-  weeklyActiveUsers: 567,
-  monthlyActiveUsers: 892,
-  averageSessionDuration: 8.5,
-  bounceRate: 0.32,
-  retentionRate: 0.68
+const emptyUserActivity: UserActivity = {
+  dailyActiveUsers: 0,
+  weeklyActiveUsers: 0,
+  monthlyActiveUsers: 0,
+  averageSessionDuration: 0,
+  bounceRate: 0,
+  retentionRate: 0
 }
 
 /**
@@ -117,7 +78,7 @@ const mockUserActivity: UserActivity = {
  */
 export const getUserAnalytics = async (): Promise<UserAnalytics> => {
   if (!isFirebaseConfigured || !db) {
-    return mockUserAnalytics
+    return emptyUserAnalytics
   }
 
   try {
@@ -211,8 +172,8 @@ export const getUserAnalytics = async (): Promise<UserAnalytics> => {
     // Get user registration trend (last 7 days)
     const userRegistrationTrend = await getUserRegistrationTrend()
 
-    // Get users by location (mock for now as location data might not be available)
-    const usersByLocation = mockUserAnalytics.usersByLocation
+    // Get users by location (empty for now as location data might not be available)
+    const usersByLocation: Array<{city: string; state: string; count: number}> = []
 
     return {
       totalUsers,
@@ -228,7 +189,7 @@ export const getUserAnalytics = async (): Promise<UserAnalytics> => {
     }
   } catch (error) {
     console.error('Error fetching user analytics:', error)
-    return mockUserAnalytics
+    return emptyUserAnalytics
   }
 }
 
@@ -237,7 +198,7 @@ export const getUserAnalytics = async (): Promise<UserAnalytics> => {
  */
 export const getUserActivity = async (): Promise<UserActivity> => {
   if (!isFirebaseConfigured || !db) {
-    return mockUserActivity
+    return emptyUserActivity
   }
 
   try {
@@ -316,13 +277,13 @@ export const getUserActivity = async (): Promise<UserActivity> => {
       dailyActiveUsers,
       weeklyActiveUsers,
       monthlyActiveUsers,
-      averageSessionDuration: mockUserActivity.averageSessionDuration, // Would need session tracking
-      bounceRate: mockUserActivity.bounceRate, // Would need session tracking
+      averageSessionDuration: 0, // Would need session tracking
+      bounceRate: 0, // Would need session tracking
       retentionRate
     }
   } catch (error) {
     console.error('Error fetching user activity:', error)
-    return mockUserActivity
+    return emptyUserActivity
   }
 }
 
@@ -374,7 +335,7 @@ const getTopCustomers = async (
     return topCustomers
   } catch (error) {
     console.error('Error getting top customers:', error)
-    return mockUserAnalytics.topCustomers
+    return []
   }
 }
 
@@ -407,7 +368,7 @@ const getUserRegistrationTrend = async () => {
     return trend
   } catch (error) {
     console.error('Error getting user registration trend:', error)
-    return mockUserAnalytics.userRegistrationTrend
+    return []
   }
 }
 
@@ -416,7 +377,7 @@ const getUserRegistrationTrend = async () => {
  */
 export const getTotalUserCount = async (): Promise<number> => {
   if (!isFirebaseConfigured || !db) {
-    return mockUserAnalytics.totalUsers
+    return 0
   }
 
   try {
@@ -424,7 +385,7 @@ export const getTotalUserCount = async (): Promise<number> => {
     return usersSnapshot.size
   } catch (error) {
     console.error('Error fetching user count:', error)
-    return mockUserAnalytics.totalUsers
+    return 0
   }
 }
 
@@ -433,7 +394,7 @@ export const getTotalUserCount = async (): Promise<number> => {
  */
 export const getActiveUserCount = async (): Promise<number> => {
   if (!isFirebaseConfigured || !db) {
-    return mockUserAnalytics.activeUsers
+    return 0
   }
 
   try {
@@ -456,6 +417,6 @@ export const getActiveUserCount = async (): Promise<number> => {
     return activeUserIds.size
   } catch (error) {
     console.error('Error fetching active user count:', error)
-    return mockUserAnalytics.activeUsers
+    return 0
   }
 }

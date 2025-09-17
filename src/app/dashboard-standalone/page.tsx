@@ -6,6 +6,7 @@ import { auth } from '@/lib/services/firebase';
 import { User, Shield, LogOut, Home, BarChart3, Users, DollarSign, Mail } from 'lucide-react';
 import Link from 'next/link';
 import type { User as FirebaseUser } from 'firebase/auth';
+import AdminKPI from '@/components/kpi/AdminKPI';
 
 interface AuthState {
   user: FirebaseUser | null;
@@ -232,56 +233,49 @@ export default function StandaloneDashboard() {
             </div>
           </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Total Orders</p>
-                    <p className="text-2xl font-bold text-gray-900">24</p>
-                  </div>
-                  <BarChart3 className="h-8 w-8 text-blue-600" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Revenue</p>
-                    <p className="text-2xl font-bold text-gray-900">$1,234</p>
-                  </div>
-                  <DollarSign className="h-8 w-8 text-green-600" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Active Users</p>
-                    <p className="text-2xl font-bold text-gray-900">156</p>
-                  </div>
-                  <Users className="h-8 w-8 text-purple-600" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Role</p>
-                    <p className="text-2xl font-bold text-gray-900 capitalize">{userRole}</p>
-                  </div>
-                  <User className="h-8 w-8 text-orange-600" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          {/* Stats Grid - Only show for admins */}
+           {authState.claims?.role === 'admin' && (
+             <div className="mb-8">
+               <h2 className="text-xl font-semibold text-gray-900 mb-4">Admin KPIs</h2>
+               <AdminKPI />
+               
+               {/* Role card for admin */}
+               <div className="mt-6">
+                 <Card>
+                   <CardContent className="p-6">
+                     <div className="flex items-center justify-between">
+                       <div>
+                         <p className="text-sm font-medium text-gray-600">Role</p>
+                         <p className="text-2xl font-bold text-gray-900 capitalize">{userRole}</p>
+                       </div>
+                       <UserIcon className="h-8 w-8 text-orange-600" />
+                     </div>
+                   </CardContent>
+                 </Card>
+               </div>
+             </div>
+           )}
+          
+          {/* User-specific stats for non-admins */}
+          {authState.claims?.role !== 'admin' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">My Orders</h3>
+                <p className="text-3xl font-bold text-blue-600">-</p>
+                <p className="text-sm text-gray-500">View your order history</p>
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">My Spending</h3>
+                <p className="text-3xl font-bold text-green-600">-</p>
+                <p className="text-sm text-gray-500">Your total spending</p>
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Account Status</h3>
+                <p className="text-3xl font-bold text-purple-600">Active</p>
+                <p className="text-sm text-gray-500">Account is in good standing</p>
+              </div>
+            </div>
+          )}
 
           {/* Authentication Info */}
           <Card className="mb-8">

@@ -32,124 +32,69 @@ export interface MenuDrop {
 
 const MENU_DROPS_COLLECTION = 'menuDrops'
 
-// Mock data fallback
-const mockMenuDrops: MenuDrop[] = [
-  {
-    id: '1',
-    name: 'Truffle Mac & Cheese Drop',
-    description: 'Limited edition truffle-infused mac & cheese with aged gruyere',
-    image: '/images/truffle-fries.jpg',
-    price: 18.99,
-    availableQuantity: 25,
-    totalQuantity: 50,
-    status: 'active',
-    createdAt: new Date(),
-    endsAt: new Date(Date.now() + 2 * 60 * 60 * 1000),
-    createdBy: 'admin',
-    revenue: 474.75,
-    soldQuantity: 25
-  },
-  {
-    id: '2',
-    name: 'Wagyu Slider Trio',
-    description: 'Three premium wagyu sliders with house-made sauces',
-    image: '/images/wagyu-sandwich.jpg',
-    price: 24.99,
-    availableQuantity: 12,
-    totalQuantity: 30,
-    status: 'active',
-    createdAt: new Date(),
-    endsAt: new Date(Date.now() + 4 * 60 * 60 * 1000),
-    createdBy: 'admin',
-    revenue: 449.82,
-    soldQuantity: 18
-  },
-  {
-    id: '3',
-    name: 'Infused Brownie Bites',
-    description: 'Premium cannabis-infused chocolate brownies (21+ only)',
-    image: '/images/infused-brownie.jpg',
-    price: 15.99,
-    availableQuantity: 0,
-    totalQuantity: 20,
-    status: 'scheduled',
-    createdAt: new Date(),
-    scheduledFor: new Date(Date.now() + 24 * 60 * 60 * 1000),
-    createdBy: 'admin',
-    revenue: 0,
-    soldQuantity: 0
-  }
-]
+
 
 /**
  * Create a new menu drop
  */
 export const createMenuDrop = async (dropData: Omit<MenuDrop, 'id' | 'createdAt' | 'updatedAt'>): Promise<MenuDrop> => {
+  if (!isFirebaseConfigured || !db) {
+    throw new Error('Firebase not configured')
+  }
+
   try {
-    if (isFirebaseConfigured && db) {
-      const docRef = await addDoc(collection(db, MENU_DROPS_COLLECTION), {
-        ...dropData,
-        createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now()
-      })
-      
-      return {
-        ...dropData,
-        id: docRef.id,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }
+    const docRef = await addDoc(collection(db, MENU_DROPS_COLLECTION), {
+      ...dropData,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now()
+    })
+    
+    return {
+      ...dropData,
+      id: docRef.id,
+      createdAt: new Date(),
+      updatedAt: new Date()
     }
   } catch (error) {
-    console.warn('Failed to create menu drop in Firebase:', error)
+    console.error('Failed to create menu drop in Firebase:', error)
+    throw error
   }
-  
-  // Fallback to mock data
-  const newDrop: MenuDrop = {
-    ...dropData,
-    id: Date.now().toString(),
-    createdAt: new Date(),
-    updatedAt: new Date()
-  }
-  
-  mockMenuDrops.push(newDrop)
-  return newDrop
 }
 
 /**
  * Get all menu drops
  */
 export const getAllMenuDrops = async (): Promise<MenuDrop[]> => {
-  try {
-    if (isFirebaseConfigured && db) {
-      const q = query(
-        collection(db, MENU_DROPS_COLLECTION),
-        orderBy('createdAt', 'desc')
-      )
-      
-      const querySnapshot = await getDocs(q)
-      const menuDrops: MenuDrop[] = []
-      
-      querySnapshot.forEach((doc) => {
-        const data = doc.data()
-        menuDrops.push({
-          id: doc.id,
-          ...data,
-          createdAt: data.createdAt.toDate(),
-          updatedAt: data.updatedAt?.toDate(),
-          endsAt: data.endsAt?.toDate(),
-          scheduledFor: data.scheduledFor?.toDate()
-        } as MenuDrop)
-      })
-      
-      return menuDrops
-    }
-  } catch (error) {
-    console.warn('Failed to get menu drops from Firebase:', error)
+  if (!isFirebaseConfigured || !db) {
+    throw new Error('Firebase not configured')
   }
-  
-  // Fallback to mock data
-  return mockMenuDrops
+
+  try {
+    const q = query(
+      collection(db, MENU_DROPS_COLLECTION),
+      orderBy('createdAt', 'desc')
+    )
+    
+    const querySnapshot = await getDocs(q)
+    const menuDrops: MenuDrop[] = []
+    
+    querySnapshot.forEach((doc) => {
+      const data = doc.data()
+      menuDrops.push({
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt.toDate(),
+        updatedAt: data.updatedAt?.toDate(),
+        endsAt: data.endsAt?.toDate(),
+        scheduledFor: data.scheduledFor?.toDate()
+      } as MenuDrop)
+    })
+    
+    return menuDrops
+  } catch (error) {
+    console.error('Failed to get menu drops from Firebase:', error)
+    return []
+  }
 }
 
 /**
@@ -176,90 +121,76 @@ export const getMenuDropsByStatus = async (status: string): Promise<MenuDrop[]> 
  * Get menu drop by ID
  */
 export const getMenuDropById = async (dropId: string): Promise<MenuDrop | null> => {
-  try {
-    if (isFirebaseConfigured && db) {
-      const q = query(
-        collection(db, MENU_DROPS_COLLECTION),
-        where('__name__', '==', dropId)
-      )
-      
-      const querySnapshot = await getDocs(q)
-      
-      if (!querySnapshot.empty) {
-        const doc = querySnapshot.docs[0]
-        const data = doc.data()
-        return {
-          id: doc.id,
-          ...data,
-          createdAt: data.createdAt.toDate(),
-          updatedAt: data.updatedAt?.toDate(),
-          endsAt: data.endsAt?.toDate(),
-          scheduledFor: data.scheduledFor?.toDate()
-        } as MenuDrop
-      }
-    }
-  } catch (error) {
-    console.warn('Failed to get menu drop from Firebase:', error)
+  if (!isFirebaseConfigured || !db) {
+    throw new Error('Firebase not configured')
   }
-  
-  // Fallback to mock data
-  return mockMenuDrops.find(drop => drop.id === dropId) || null
+
+  try {
+    const q = query(
+      collection(db, MENU_DROPS_COLLECTION),
+      where('__name__', '==', dropId)
+    )
+    
+    const querySnapshot = await getDocs(q)
+    
+    if (!querySnapshot.empty) {
+      const doc = querySnapshot.docs[0]
+      const data = doc.data()
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt.toDate(),
+        updatedAt: data.updatedAt?.toDate(),
+        endsAt: data.endsAt?.toDate(),
+        scheduledFor: data.scheduledFor?.toDate()
+      } as MenuDrop
+    }
+    
+    return null
+  } catch (error) {
+    console.error('Failed to get menu drop from Firebase:', error)
+    return null
+  }
 }
 
 /**
  * Update menu drop
  */
 export const updateMenuDrop = async (dropId: string, updateData: Partial<MenuDrop>): Promise<MenuDrop | null> => {
+  if (!isFirebaseConfigured || !db) {
+    throw new Error('Firebase not configured')
+  }
+
   try {
-    if (isFirebaseConfigured && db) {
-      const docRef = doc(db, MENU_DROPS_COLLECTION, dropId)
-      await updateDoc(docRef, {
-        ...updateData,
-        updatedAt: Timestamp.now()
-      })
-      
-      return await getMenuDropById(dropId)
-    }
-  } catch (error) {
-    console.warn('Failed to update menu drop in Firebase:', error)
-  }
-  
-  // Fallback to mock data
-  const dropIndex = mockMenuDrops.findIndex(drop => drop.id === dropId)
-  if (dropIndex !== -1) {
-    mockMenuDrops[dropIndex] = {
-      ...mockMenuDrops[dropIndex],
+    const docRef = doc(db, MENU_DROPS_COLLECTION, dropId)
+    await updateDoc(docRef, {
       ...updateData,
-      updatedAt: new Date()
-    }
-    return mockMenuDrops[dropIndex]
+      updatedAt: Timestamp.now()
+    })
+    
+    return await getMenuDropById(dropId)
+  } catch (error) {
+    console.error('Failed to update menu drop in Firebase:', error)
+    return null
   }
-  
-  return null
 }
 
 /**
  * Delete menu drop
  */
 export const deleteMenuDrop = async (dropId: string): Promise<boolean> => {
+  if (!isFirebaseConfigured || !db) {
+    throw new Error('Firebase not configured')
+  }
+
   try {
-    if (isFirebaseConfigured && db) {
-      const docRef = doc(db, MENU_DROPS_COLLECTION, dropId)
-      await deleteDoc(docRef)
-      return true
-    }
-  } catch (error) {
-    console.warn('Failed to delete menu drop from Firebase:', error)
-  }
-  
-  // Fallback to mock data
-  const dropIndex = mockMenuDrops.findIndex(drop => drop.id === dropId)
-  if (dropIndex !== -1) {
-    mockMenuDrops.splice(dropIndex, 1)
+    const docRef = doc(db, MENU_DROPS_COLLECTION, dropId)
+    await deleteDoc(docRef)
     return true
+  } catch (error) {
+    console.error('Failed to delete menu drop from Firebase:', error)
+    return false
   }
-  
-  return false
 }
 
 /**

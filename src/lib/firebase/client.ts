@@ -1,15 +1,7 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 
-// Default Firebase configuration - prevents initialization errors
-const defaultFirebaseConfig = {
-  apiKey: "demo-api-key",
-  authDomain: "demo-project.firebaseapp.com",
-  projectId: "demo-project",
-  storageBucket: "demo-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:demo"
-};
+
 
 // Try to get Firebase configuration from environment variables
 function getFirebaseConfig() {
@@ -23,19 +15,23 @@ function getFirebaseConfig() {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
   };
 
-  // Use client config if available, otherwise default
+  // Check if all required config values are present
+  const isRealConfig = Object.values(clientConfig).every(value => value && value.trim() !== '');
+  
+  if (!isRealConfig) {
+    throw new Error('Firebase configuration missing - please set NEXT_PUBLIC_FIREBASE_* environment variables');
+  }
+
   const config = {
-    apiKey: clientConfig.apiKey || defaultFirebaseConfig.apiKey,
-    authDomain: clientConfig.authDomain || defaultFirebaseConfig.authDomain,
-    projectId: clientConfig.projectId || defaultFirebaseConfig.projectId,
-    storageBucket: clientConfig.storageBucket || defaultFirebaseConfig.storageBucket,
-    messagingSenderId: clientConfig.messagingSenderId || defaultFirebaseConfig.messagingSenderId,
-    appId: clientConfig.appId || defaultFirebaseConfig.appId
+    apiKey: clientConfig.apiKey!,
+    authDomain: clientConfig.authDomain!,
+    projectId: clientConfig.projectId!,
+    storageBucket: clientConfig.storageBucket!,
+    messagingSenderId: clientConfig.messagingSenderId!,
+    appId: clientConfig.appId!
   };
 
-  const isRealConfig = Object.values(clientConfig).some(value => value);
-  
-  return { config, isRealConfig };
+  return { config, isRealConfig: true };
 }
 
 let firebaseClientApp = null;
@@ -43,22 +39,16 @@ let db = null;
 let isFirebaseEnabled = false;
 
 try {
-  const { config, isRealConfig } = getFirebaseConfig();
+  const { config } = getFirebaseConfig();
   
-  // Always initialize Firebase to prevent app crashes
+  // Initialize Firebase with real configuration
   firebaseClientApp = getApps().length ? getApp() : initializeApp(config);
-  
-  if (isRealConfig) {
-    db = getFirestore(firebaseClientApp);
-    isFirebaseEnabled = true;
-    console.log('✅ Firebase client initialized with real configuration');
-  } else {
-    // Use demo mode - Firebase initialized but features disabled
-    console.log('⚠️ Firebase running in demo mode - features disabled');
-    console.log('To enable Firebase features, add NEXT_PUBLIC_FIREBASE_* environment variables');
-  }
+  db = getFirestore(firebaseClientApp);
+  isFirebaseEnabled = true;
+  console.log('✅ Firebase client initialized successfully');
 } catch (error) {
-  console.warn('⚠️ Firebase initialization failed, using fallback mode:', error);
+  console.warn('⚠️ Firebase initialization failed:', error.message);
+  console.warn('Please ensure all NEXT_PUBLIC_FIREBASE_* environment variables are set');
   firebaseClientApp = null;
   db = null;
   isFirebaseEnabled = false;

@@ -1,6 +1,13 @@
+// Metadata is handled by the root layout.tsx using the default template
+// This page uses the "Broski's Music" template
+
 "use client"
 
 import React from "react"
+import type { Metadata } from "next"
+
+// Note: Metadata export not needed as this is a client component
+// Metadata is handled by the layout.tsx file
 import MUSICPLERAY from "../../components/common/MUSICPLERAY"
 
 const MusicPage = () => {

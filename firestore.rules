@@ -14,6 +14,15 @@ service cloud.firestore {
               (request.auth.token.roles != null && request.auth.token.roles.admin == true));
     }
     
+    function isAdminOrManager() {
+      return isAuthenticated() && 
+             (request.auth.token.role == 'admin' || 
+              request.auth.token.role == 'manager' ||
+              request.auth.token.admin == true ||
+              (request.auth.token.roles != null && 
+               (request.auth.token.roles.admin == true || request.auth.token.roles.manager == true)));
+    }
+    
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
@@ -107,9 +116,59 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
-    // Analytics collection (if exists)
+    // Loyalty collection - user-specific loyalty data
+    match /loyalty/{userId} {
+      // Users can read their own loyalty data
+      allow read: if isOwner(userId);
+      
+      // Only admin/manager can read all loyalty data and write
+      allow read, write: if isAdminOrManager();
+    }
+    
+    // Points transactions collection
+    match /pointsTransactions/{transactionId} {
+      // Users can read their own points transactions
+      allow read: if isAuthenticated() && 
+                     request.auth.uid == resource.data.userId;
+      
+      // Only admin/manager can read all transactions and write
+      allow read, write: if isAdminOrManager();
+    }
+    
+    // User redemptions collection
+    match /userRedemptions/{redemptionId} {
+      // Users can read their own redemptions
+      allow read: if isAuthenticated() && 
+                     request.auth.uid == resource.data.userId;
+      
+      // Only admin/manager can read all redemptions and write
+      allow read, write: if isAdminOrManager();
+    }
+    
+    // Menu drops collection
+    match /menuDrops/{dropId} {
+      // All authenticated users can read active menu drops
+      allow read: if isAuthenticated();
+      
+      // Only admin/manager can write menu drops
+      allow write: if isAdminOrManager();
+    }
+    
+    // Analytics collection - admin only for global metrics
     match /analytics/{document=**} {
-      // Only admin can read/write analytics
+      // Only admin can read/write analytics - NO customer access to global data
+      allow read, write: if isAdmin();
+    }
+    
+    // Global metrics/aggregations - admin only
+    match /metrics/{document=**} {
+      // Only admin can read/write global metrics - prevents customers from seeing totals
+      allow read, write: if isAdmin();
+    }
+    
+    // KPI data - admin only
+    match /kpis/{document=**} {
+      // Only admin can read/write KPI data - prevents customers from seeing global totals
       allow read, write: if isAdmin();
     }
     

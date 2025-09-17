@@ -235,76 +235,43 @@ export const useAdminData = () => {
   // Set up real-time listeners for all data
   useEffect(() => {
     if (!isFirebaseConfigured || !db) {
-      // Use mock data if Firebase is not configured
+      // Use empty data if Firebase is not configured
       setData({
         stats: {
-          totalOrders: 1247,
-          totalRevenue: 45678.90,
-          activeMenuDrops: 3,
-          totalUsers: 892,
-          activeUsers: 234,
-          newUsersToday: 12,
-          newUsersThisWeek: 67,
-          newUsersThisMonth: 189,
-          userGrowthRate: 15.2,
-          rewardsRedeemed: 156,
-          averageOrderValue: 36.65,
-          averageOrdersPerUser: 3.4,
-          retentionRate: 0.68
+          totalOrders: 0,
+          totalRevenue: 0,
+          activeMenuDrops: 0,
+          totalUsers: 0,
+          activeUsers: 0,
+          newUsersToday: 0,
+          newUsersThisWeek: 0,
+          newUsersThisMonth: 0,
+          userGrowthRate: 0,
+          rewardsRedeemed: 0,
+          averageOrderValue: 0,
+          averageOrdersPerUser: 0,
+          retentionRate: 0
         },
         recentOrders: [],
         menuDrops: [],
         rewardsData: {
-          totalPointsIssued: 125000,
-          totalPointsRedeemed: 87500,
-          activeOffers: 5,
-          totalRedemptions: 234,
-          topRedemptions: [
-            { offer: 'Free Appetizer', count: 45, points: 22500 },
-            { offer: 'Free Delivery', count: 67, points: 20100 },
-            { offer: '20% Off Next Order', count: 28, points: 21000 }
-          ]
+          totalPointsIssued: 0,
+          totalPointsRedeemed: 0,
+          activeOffers: 0,
+          totalRedemptions: 0,
+          topRedemptions: []
         },
         userAnalytics: {
-          topCustomers: [
-            {
-              id: '1',
-              name: 'John Smith',
-              email: 'j.smith@broskis.com',
-              totalOrders: 24,
-              totalSpent: 1250.0,
-              lastOrderDate: new Date('2024-01-15')
-            },
-            {
-              id: '2',
-              name: 'Sarah Johnson',
-              email: 's.johnson@broskis.com',
-              totalOrders: 18,
-              totalSpent: 980.5,
-              lastOrderDate: new Date('2024-01-14')
-            }
-          ],
-          usersByLocation: [
-            { city: 'New York', state: 'NY', count: 156 },
-            { city: 'Los Angeles', state: 'CA', count: 134 },
-            { city: 'Chicago', state: 'IL', count: 98 }
-          ],
-          userRegistrationTrend: [
-            { date: '2024-01-08', count: 8 },
-            { date: '2024-01-09', count: 12 },
-            { date: '2024-01-10', count: 15 },
-            { date: '2024-01-11', count: 9 },
-            { date: '2024-01-12', count: 18 },
-            { date: '2024-01-13', count: 14 },
-            { date: '2024-01-14', count: 11 }
-          ]
+          topCustomers: [],
+          usersByLocation: [],
+          userRegistrationTrend: []
         },
         userActivity: {
-          dailyActiveUsers: 234,
-          weeklyActiveUsers: 567,
-          monthlyActiveUsers: 892,
-          averageSessionDuration: 8.5,
-          bounceRate: 0.32
+          dailyActiveUsers: 0,
+          weeklyActiveUsers: 0,
+          monthlyActiveUsers: 0,
+          averageSessionDuration: 0,
+          bounceRate: 0
         }
       })
       setLoading(false)
