@@ -9,7 +9,7 @@ export interface SessionUser {
   permissions?: string[]
 }
 
-// Full session verification for API routes (Node.js Runtime)
+// Full session verification for server-side (Node.js Runtime)
 export async function getSessionCookie(): Promise<SessionUser | null> {
   try {
     const cookieStore = await cookies()
@@ -20,32 +20,30 @@ export async function getSessionCookie(): Promise<SessionUser | null> {
       return null
     }
 
-    // Use API route for session verification
-    console.log('Verifying session cookie via API...');
-    const response = await fetch('/api/auth/session', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ sessionCookie }),
-    });
-
-    if (!response.ok) {
-      console.error('Session verification failed:', response.status);
-      return null;
-    }
-
-    const data = await response.json();
+    // Direct Firebase Admin verification (no HTTP calls)
+    console.log('Verifying session cookie directly...');
+    const { adminAuth } = await import('@/lib/firebaseAdmin');
     
-    if (!data.success) {
-      console.error('Session verification unsuccessful:', data.error);
+    if (!adminAuth) {
+      console.error('Firebase Admin not initialized');
       return null;
     }
 
-    console.log('Verification successful:', !!data.user);
-    console.log('Custom claims role:', data.user.role);
+    const decodedClaims = await adminAuth.verifySessionCookie(sessionCookie, true);
+    
+    const user: SessionUser = {
+      uid: decodedClaims.uid,
+      email: decodedClaims.email || '',
+      emailVerified: decodedClaims.email_verified || false,
+      name: decodedClaims.name || decodedClaims.email?.split('@')[0],
+      role: decodedClaims.role || 'customer',
+      permissions: decodedClaims.permissions || []
+    };
 
-    return data.user;
+    console.log('Verification successful:', !!user);
+    console.log('Custom claims role:', user.role);
+
+    return user;
   } catch (error) {
     console.error('Error verifying session cookie:', error)
     return null

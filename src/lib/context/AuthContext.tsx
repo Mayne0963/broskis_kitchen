@@ -18,7 +18,7 @@ import { doc, setDoc, getDoc, updateDoc, Timestamp } from "firebase/firestore"
 import { toast } from "sonner"
 import type { User, AuthContextType } from "@/types"
 import type { Claims } from "@/types/auth"
-import { useConditionalSessionRefresh } from "../session/exp"
+import { performBackgroundRefresh } from "../session/exp"
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
@@ -40,8 +40,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
 
-  // Enable conditional background session refresh
-  useConditionalSessionRefresh()
+
 
   useEffect(() => {
     if (!auth) {

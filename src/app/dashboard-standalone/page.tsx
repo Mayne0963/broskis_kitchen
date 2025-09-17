@@ -70,7 +70,7 @@ const CardContent = ({ children, className = '', ...props }: any) => (
   </div>
 );
 
-export default function DashboardPage() {
+export default function StandaloneDashboard() {
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
     loading: true,
