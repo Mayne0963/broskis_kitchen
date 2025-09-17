@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, Shield, LogOut } from 'lucide-react';
+import { User, Shield, LogOut, Zap } from 'lucide-react';
+import QuickActions from '@/components/dashboard/QuickActions';
 
 // Simple auth state management without complex context
 interface AuthState {
@@ -156,21 +157,13 @@ export default function SimpleDashboardGate() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>
-                Common tasks and shortcuts
-              </CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5" />
+                Quick Actions
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <Button variant="outline" className="w-full justify-start">
-                View Profile
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                Account Settings
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                Help & Support
-              </Button>
+            <CardContent>
+              <QuickActions />
             </CardContent>
           </Card>
 
