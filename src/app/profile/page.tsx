@@ -28,18 +28,13 @@ type ProfileForm = z.infer<typeof profileSchema>;
 export default function ProfilePage() {
   const router = useRouter();
   const { user, logout, isLoading, isAdmin } = useAuth();
-
-  if (!isLoading && !user) {
-    router.push("/auth/login");
-    return null;
-  }
-  const [avatarUrl, setAvatarUrl] = useState(user?.photoURL?.toString() || "");
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [uploading, setUploading] = useState(false);
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      displayName: user?.displayName || "",
-      email: user?.email || "",
+      displayName: "",
+      email: "",
     },
   });
 
@@ -85,10 +80,6 @@ export default function ProfilePage() {
     }
   };
 
-  if (!user) {
-    return <div className="text-center py-8 text-[var(--color-harvest-gold)]">Please log in to view your profile.</div>;
-  }
-
   return (
     <SessionGate>
       <div className="min-h-screen bg-gradient-to-b from-black to-[#1A1A1A] text-white py-12 px-4">
@@ -98,7 +89,7 @@ export default function ProfilePage() {
             <div className="relative">
               <Avatar className="w-24 h-24">
                 <AvatarImage src={avatarUrl} alt="Profile picture" />
-                <AvatarFallback>{user.displayName?.[0] || "U"}</AvatarFallback>
+                <AvatarFallback>{user?.displayName?.[0] || user?.email?.[0] || "U"}</AvatarFallback>
               </Avatar>
               <Label htmlFor="avatar-upload" className="absolute bottom-0 right-0 bg-[var(--color-harvest-gold)] p-2 rounded-full cursor-pointer">
                 <Camera className="w-4 h-4 text-black" />

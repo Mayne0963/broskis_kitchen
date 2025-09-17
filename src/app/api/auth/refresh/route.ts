@@ -4,23 +4,30 @@ export const runtime = "edge";
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-// Concurrency guard: coalesce overlapping refresh requests
-const inFlightRequests = new Map<string, Promise<Response>>();
-
-// Helper to decode JWT payload (base64url decode)
-function decodeJWTPayload(token: string): any {
+// Helper function to decode JWT payload
+function decodeJWTPayload(token: string) {
   try {
     const parts = token.split('.');
-    if (parts.length !== 3) return null;
+    if (parts.length !== 3) {
+      return null;
+    }
     
-    // Base64url decode
-    const payload = parts[1];
-    const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
-    return JSON.parse(decoded);
-  } catch {
+    // Decode base64url payload with proper padding
+    let base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    while (base64.length % 4) {
+      base64 += '=';
+    }
+    
+    const payload = JSON.parse(atob(base64));
+    return payload;
+  } catch (error) {
+    console.log('[decodeJWTPayload] Error decoding token:', error);
     return null;
   }
 }
+
+// Concurrency guard: coalesce overlapping refresh requests
+const inFlightRequests = new Map<string, Promise<Response>>();
 
 export async function POST(request: NextRequest) {
   const t0 = Date.now();
@@ -28,7 +35,7 @@ export async function POST(request: NextRequest) {
   
   try {
     const cookieStore = cookies();
-    const sessionCookie = cookieStore.get("bk_session");
+    const sessionCookie = cookieStore.get("session");
     checkpoints.parseCookies = Date.now() - t0;
     
     if (!sessionCookie || !sessionCookie.value) {
@@ -74,12 +81,26 @@ export async function POST(request: NextRequest) {
           }
         }
         
-        // Validate session token (simplified for demo)
-        const isValidSession = sessionCookie.value.length > 10;
+        // Validate session token structure and content
+        const tokenPayload = decodeJWTPayload(sessionCookie.value);
         checkpoints.validation = Date.now() - t0;
         
-        if (!isValidSession) {
-          console.log(`[refresh] ms=${Date.now() - t0}, detail=${JSON.stringify(checkpoints)} (invalid session)`);
+        if (!tokenPayload || !tokenPayload.uid || !tokenPayload.exp) {
+          console.log(`[refresh] ms=${Date.now() - t0}, detail=${JSON.stringify(checkpoints)} (invalid session structure)`);
+          return new Response(JSON.stringify({ ok: false }), {
+            status: 401,
+            headers: {
+              "Cache-Control": "no-store, no-cache, must-revalidate",
+              "Vary": "Cookie",
+              "Content-Type": "application/json"
+            }
+          });
+        }
+        
+        // Check if token is expired
+        const now = Date.now();
+        if (tokenPayload.exp * 1000 < now) {
+          console.log(`[refresh] ms=${Date.now() - t0}, detail=${JSON.stringify(checkpoints)} (expired session)`);
           return new Response(JSON.stringify({ ok: false }), {
             status: 401,
             headers: {
@@ -90,14 +111,27 @@ export async function POST(request: NextRequest) {
           });
         }
     
-        // Generate new session token (simplified)
+        // Generate new session token using existing payload data
         const refreshStart = Date.now();
-        const newSessionToken = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const newPayload = {
+          uid: tokenPayload.uid,
+          role: tokenPayload.role || 'customer',
+          exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 7), // 7 days
+          iat: Math.floor(Date.now() / 1000)
+        };
+        
+        // Create a simple JWT-like token (for demo purposes)
+        const header = btoa(JSON.stringify({
+            alg: 'HS256',
+            typ: 'JWT'
+        }));
+        const encodedPayload = btoa(JSON.stringify(newPayload)).replace(/=/g, '');
+        const newSessionToken = `${header}.${encodedPayload}.signature`;
         checkpoints.refreshCall = Date.now() - refreshStart;
         
         const setCookieStart = Date.now();
         const maxAge = 60 * 60 * 24 * 7; // 7 days
-        const cookieValue = `bk_session=${newSessionToken}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${maxAge}`;
+        const cookieValue = `session=${newSessionToken}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${maxAge}`;
         checkpoints.setCookie = Date.now() - setCookieStart;
         
         const totalMs = Date.now() - t0;
