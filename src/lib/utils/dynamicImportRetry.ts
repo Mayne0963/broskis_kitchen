@@ -129,7 +129,12 @@ export function setupChunkErrorHandler(): void {
           console.log('Multiple chunk errors detected - auto-reloading in 3 seconds...');
           reloadTimeout = setTimeout(() => {
             console.log('Auto-reloading page to recover from chunk errors');
-            window.location.reload();
+            if (process.env.DISABLE_FORCED_REFRESH !== "true") {
+              window.location.reload();
+            } else {
+              // Silent recovery - navigate to same page
+              window.location.href = window.location.href;
+            }
           }, 3000);
         }
       }

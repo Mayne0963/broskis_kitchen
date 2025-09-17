@@ -126,7 +126,12 @@ class ProductionErrorBoundary extends Component<Props, State> {
               <Button 
                 onClick={() => {
                   console.log('🔄 Reloading page...');
-                  window.location.reload();
+                  if (process.env.DISABLE_FORCED_REFRESH !== "true") {
+                    window.location.reload();
+                  } else {
+                    // Silent recovery - navigate to same page
+                    window.location.href = window.location.href;
+                  }
                 }}
                 className="bg-[#FFD700] hover:bg-[#E6C200] text-black font-bold"
               >

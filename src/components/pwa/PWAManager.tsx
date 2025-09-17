@@ -153,7 +153,12 @@ export default function PWAManager() {
           registration.update()
         })
       })
-      window.location.reload()
+      if (process.env.DISABLE_FORCED_REFRESH !== "true") {
+        window.location.reload()
+      } else {
+        // Silent update - navigate to same page
+        window.location.href = window.location.href
+      }
     }
   }
 

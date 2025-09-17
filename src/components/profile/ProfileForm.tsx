@@ -52,9 +52,14 @@ export default function ProfileForm({ user }: ProfileFormProps) {
         throw new Error('Failed to update profile')
       }
 
-      // Refresh the page to show updated data
-      router.refresh()
+      // Soft revalidation - update local state without page reload
+      // The updated data will be reflected through the auth context or parent component
       alert('Profile updated successfully!')
+      
+      // Optionally trigger a soft revalidation of user data
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('profile-updated', { detail: data }))
+      }
     } catch (error) {
       console.error('Error updating profile:', error)
       alert('Failed to update profile. Please try again.')

@@ -29,11 +29,17 @@ export default function ErrorFallback({
 
   const handleRetry = () => {
     if (resetError) {
-      resetError()
+      resetError();
     } else {
-      window.location.reload()
+      // Soft refresh instead of forced reload
+      if (process.env.DISABLE_FORCED_REFRESH !== "true") {
+        window.location.reload();
+      } else {
+        // Silent retry - just reset the error state
+        window.location.href = window.location.href;
+      }
     }
-  }
+  };
 
   const handleGoHome = () => {
     router.push('/')

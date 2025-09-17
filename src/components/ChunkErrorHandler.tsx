@@ -78,7 +78,14 @@ export const retryDynamicImport = async <T>(
           duration: 5000,
           action: {
             label: 'Refresh',
-            onClick: () => window.location.reload(),
+            onClick: () => {
+            if (process.env.DISABLE_FORCED_REFRESH !== "true") {
+              window.location.reload();
+            } else {
+              // Silent retry - navigate to same page
+              window.location.href = window.location.href;
+            }
+          },
           },
         })
       }
@@ -115,10 +122,20 @@ const handleGlobalChunkError = (event: ErrorEvent | PromiseRejectionEvent) => {
               caches.keys().then(names => {
                 names.forEach(name => caches.delete(name))
               }).finally(() => {
-                window.location.reload()
+                if (process.env.DISABLE_FORCED_REFRESH !== "true") {
+                  window.location.reload();
+                } else {
+                  // Silent recovery - navigate to same page
+                  window.location.href = window.location.href;
+                }
               })
             } else {
-              window.location.reload()
+              if (process.env.DISABLE_FORCED_REFRESH !== "true") {
+                window.location.reload();
+              } else {
+                // Silent recovery - navigate to same page
+                window.location.href = window.location.href;
+              }
             }
           },
         },
@@ -149,7 +166,14 @@ const registerServiceWorker = async () => {
                 duration: 10000,
                 action: {
                   label: 'Update',
-                  onClick: () => window.location.reload(),
+                  onClick: () => {
+                    if (process.env.DISABLE_FORCED_REFRESH !== "true") {
+                      window.location.reload();
+                    } else {
+                      // Silent update - navigate to same page
+                      window.location.href = window.location.href;
+                    }
+                  },
                 },
               })
             }
@@ -207,7 +231,12 @@ export const useChunkErrorRecovery = () => {
     }
     
     // Reload the page
-    window.location.reload()
+    if (process.env.DISABLE_FORCED_REFRESH !== "true") {
+      window.location.reload();
+    } else {
+      // Silent recovery - navigate to same page
+      window.location.href = window.location.href;
+    }
   }
   
   return { recoverFromChunkError }

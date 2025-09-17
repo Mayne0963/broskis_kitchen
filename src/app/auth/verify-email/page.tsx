@@ -41,8 +41,27 @@ export default function VerifyEmailPage() {
     }
   }
 
-  const handleCheckVerification = () => {
-    router.refresh()
+  const handleCheckVerification = async () => {
+    // Soft revalidation - check verification status without full page reload
+    try {
+      const response = await fetch('/api/auth/verify-status', {
+        method: 'GET',
+        credentials: 'include'
+      })
+      
+      if (response.ok) {
+        const { isVerified } = await response.json()
+        if (isVerified) {
+          toast.success('Email verified successfully!')
+          router.push('/dashboard')
+        } else {
+          toast.info('Email not yet verified. Please check your email.')
+        }
+      }
+    } catch (error) {
+      console.error('Error checking verification:', error)
+      toast.error('Failed to check verification status')
+    }
   }
 
   useEffect(() => {
