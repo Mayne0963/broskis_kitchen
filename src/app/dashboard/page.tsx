@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { onAuthStateChanged, getIdTokenResult, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '@/lib/services/firebase';
-import { User, Shield, LogOut, Home, BarChart3, Users, DollarSign, Mail } from 'lucide-react';
+import { User, Shield, LogOut, Home, Mail } from 'lucide-react';
 import Link from 'next/link';
 import type { User as FirebaseUser } from 'firebase/auth';
+import Dashboard from '@/components/dashboard/Dashboard';
 
 interface AuthState {
   user: FirebaseUser | null;
@@ -232,143 +233,40 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Total Orders</p>
-                    <p className="text-2xl font-bold text-gray-900">24</p>
-                  </div>
-                  <BarChart3 className="h-8 w-8 text-blue-600" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Revenue</p>
-                    <p className="text-2xl font-bold text-gray-900">$1,234</p>
-                  </div>
-                  <DollarSign className="h-8 w-8 text-green-600" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Active Users</p>
-                    <p className="text-2xl font-bold text-gray-900">156</p>
-                  </div>
-                  <Users className="h-8 w-8 text-purple-600" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Role</p>
-                    <p className="text-2xl font-bold text-gray-900 capitalize">{userRole}</p>
-                  </div>
-                  <User className="h-8 w-8 text-orange-600" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Authentication Info */}
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Authentication Status</CardTitle>
-              <CardDescription>
-                Current session and implementation details
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium text-gray-600">Status:</span>
-                    <span className="text-sm text-green-600 font-medium">✅ Authenticated</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium text-gray-600">Method:</span>
-                    <span className="text-sm text-gray-900">Firebase Auth</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium text-gray-600">Implementation:</span>
-                    <span className="text-sm text-gray-900">Client-side Gate</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium text-gray-600">Redirect Loops:</span>
-                    <span className="text-sm text-green-600 font-medium">None</span>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium text-gray-600">User ID:</span>
-                    <span className="text-sm text-gray-900 truncate">{authState.user?.uid}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium text-gray-600">Email:</span>
-                    <span className="text-sm text-gray-900">{authState.user?.email}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium text-gray-600">Role:</span>
-                    <span className="text-sm text-gray-900 capitalize">{userRole}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium text-gray-600">Admin:</span>
-                    <span className={`text-sm font-medium ${isAdmin ? 'text-red-600' : 'text-gray-600'}`}>
-                      {isAdmin ? 'Yes' : 'No'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Quick Actions */}
-          <div>
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                <CardContent className="p-4">
-                  <div className="flex items-center space-x-3">
-                    <User className="h-5 w-5 text-blue-600" />
-                    <span className="font-medium">View Profile</span>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                <CardContent className="p-4">
-                  <div className="flex items-center space-x-3">
-                    <BarChart3 className="h-5 w-5 text-green-600" />
-                    <span className="font-medium">View Orders</span>
-                  </div>
-                </CardContent>
-              </Card>
-
+          {/* Welcome Section */}
+          <div className="bg-white rounded-lg shadow p-6 mb-6">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              Welcome back, {authState.user?.displayName || 'User'}!
+            </h1>
+            <p className="text-gray-600">
+              Here's what's happening with your account today.
+            </p>
+            <div className="mt-4 flex items-center space-x-4">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                ✅ No Redirect Loops!
+              </span>
               {isAdmin && (
-                <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                  <CardContent className="p-4">
-                    <div className="flex items-center space-x-3">
-                      <Shield className="h-5 w-5 text-red-600" />
-                      <span className="font-medium">Admin Panel</span>
-                    </div>
-                  </CardContent>
-                </Card>
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  <Shield className="w-3 h-3 mr-1" />
+                  Admin
+                </span>
               )}
             </div>
           </div>
+
+          <Dashboard 
+            session={{
+              user: {
+                id: authState.user?.uid,
+                uid: authState.user?.uid,
+                email: authState.user?.email,
+                displayName: authState.user?.displayName,
+                role: isAdmin ? 'admin' : 'customer'
+              }
+            }}
+            userId={authState.user?.uid}
+            role={isAdmin ? 'admin' : 'customer'}
+          />
         </div>
       </div>
     </div>
