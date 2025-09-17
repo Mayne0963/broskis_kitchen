@@ -44,7 +44,7 @@ export function middleware(request: NextRequest) {
     const sessionCookie = request.cookies.get('session')?.value
     if (!sessionCookie) {
       console.log('[MIDDLEWARE] No session cookie found for profile route')
-      const loginUrl = new URL('/login', request.url)
+      const loginUrl = new URL('/auth/login', request.url)
       loginUrl.searchParams.set('from', pathname)
       return NextResponse.redirect(loginUrl, 302)
     }
@@ -54,7 +54,7 @@ export function middleware(request: NextRequest) {
       const parts = sessionCookie.split('.')
       if (parts.length !== 3) {
         console.log('[MIDDLEWARE] Invalid session token format for profile route')
-        const loginUrl = new URL('/login', request.url)
+        const loginUrl = new URL('/auth/login', request.url)
         loginUrl.searchParams.set('from', pathname)
         return NextResponse.redirect(loginUrl, 302)
       }
@@ -69,7 +69,7 @@ export function middleware(request: NextRequest) {
       // Check if token is expired
       if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
         console.log('[MIDDLEWARE] Expired session token for profile route')
-        const loginUrl = new URL('/login', request.url)
+        const loginUrl = new URL('/auth/login', request.url)
         loginUrl.searchParams.set('from', pathname)
         return NextResponse.redirect(loginUrl, 302)
       }
@@ -77,7 +77,7 @@ export function middleware(request: NextRequest) {
       // Check if required fields are present
       if (!payload.uid || !payload.role) {
         console.log('[MIDDLEWARE] Invalid session payload for profile route')
-        const loginUrl = new URL('/login', request.url)
+        const loginUrl = new URL('/auth/login', request.url)
         loginUrl.searchParams.set('from', pathname)
         return NextResponse.redirect(loginUrl, 302)
       }
@@ -101,7 +101,7 @@ export function middleware(request: NextRequest) {
       const sessionCookie = request.cookies.get('session')?.value
       if (!sessionCookie) {
         console.log('[MIDDLEWARE] No session cookie found for admin route:', pathname)
-        const loginUrl = new URL('/login', request.url)
+        const loginUrl = new URL('/auth/login', request.url)
         loginUrl.searchParams.set('from', pathname)
         return NextResponse.redirect(loginUrl, 302)
       }
@@ -128,7 +128,7 @@ export function middleware(request: NextRequest) {
           
           if (userRole !== 'admin') {
             console.log('[MIDDLEWARE] Non-admin user attempting admin access:', { role: userRole, path: pathname })
-            const loginUrl = new URL('/login', request.url)
+            const loginUrl = new URL('/auth/login', request.url)
             loginUrl.searchParams.set('from', pathname)
             loginUrl.searchParams.set('error', 'admin_required')
             return NextResponse.redirect(loginUrl, 302)
@@ -137,13 +137,13 @@ export function middleware(request: NextRequest) {
           console.log('[MIDDLEWARE] Admin access granted:', { role: userRole, path: pathname })
         } else {
           console.log('[MIDDLEWARE] Invalid session token format for admin route:', pathname)
-          const loginUrl = new URL('/login', request.url)
+          const loginUrl = new URL('/auth/login', request.url)
           loginUrl.searchParams.set('from', pathname)
           return NextResponse.redirect(loginUrl, 302)
         }
       } catch (error) {
         console.log('[MIDDLEWARE] Error validating admin session:', error)
-        const loginUrl = new URL('/login', request.url)
+        const loginUrl = new URL('/auth/login', request.url)
         loginUrl.searchParams.set('from', pathname)
         return NextResponse.redirect(loginUrl, 302)
       }

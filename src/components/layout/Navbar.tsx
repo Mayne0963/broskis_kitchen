@@ -50,11 +50,7 @@ const Navbar: React.FC = () => {
     }
   }, [])
 
-  // Early session refresh trigger
-  useEffect(() => {
-    fetch("/api/auth/refresh", { method: "POST", keepalive: true, headers: { "x-prewarm": "1" } })
-      .catch(() => void 0);
-  }, []);
+
 
   // Handle scroll behavior
   useEffect(() => {
