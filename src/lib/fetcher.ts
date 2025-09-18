@@ -1,0 +1,1 @@
+export const fetchJson = (url: string) => fetch(url, { credentials: "include", cache: "no-store" }).then(r => r.json());

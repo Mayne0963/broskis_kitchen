@@ -1,44 +1,19 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import useSWR from "swr";
 import { Card, CardContent } from '@/components/ui/card';
 import { ShoppingCart } from 'lucide-react';
+import { fetchJson } from "@/lib/fetcher";
 
 interface MyOrdersKPIProps {
   userId?: string;
 }
 
 export default function MyOrdersKPI({ userId }: MyOrdersKPIProps) {
-  const [orderCount, setOrderCount] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading } = useSWR("/api/my-orders", fetchJson);
+  const count = data?.orders?.length ?? 0;
 
-  useEffect(() => {
-    const fetchUserOrders = async () => {
-      if (!userId) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        // TODO: Replace with actual API call to fetch user's orders
-        // const response = await fetch(`/api/user/orders?userId=${userId}`);
-        // const data = await response.json();
-        // setOrderCount(data.count);
-        
-        // Mock data for now - only user's orders
-        setOrderCount(3);
-      } catch (error) {
-        console.error('Error fetching user orders:', error);
-        setOrderCount(0);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserOrders();
-  }, [userId]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <Card>
         <CardContent className="p-6">
@@ -60,7 +35,7 @@ export default function MyOrdersKPI({ userId }: MyOrdersKPIProps) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-gray-600">My Orders</p>
-            <p className="text-2xl font-bold text-gray-900">{orderCount}</p>
+            <p className="text-2xl font-bold text-gray-900">{count}</p>
           </div>
           <ShoppingCart className="h-8 w-8 text-blue-600" />
         </div>
