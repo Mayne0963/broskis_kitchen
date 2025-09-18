@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   try {
     const cookieStore = await cookies();
-    const sessionCookie = cookieStore.get('session')?.value;
+    const sessionCookie = cookieStore.get('__session')?.value;
 
     if (!sessionCookie) {
       return NextResponse.json(

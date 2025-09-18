@@ -129,11 +129,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const idToken = await getIdToken(userCredential.user, true)
       
       // Create session cookie
-      const response = await fetch('/api/auth/session-login', {
+      const response = await fetch('/api/session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ idToken }),
       })
 
@@ -291,9 +292,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return
     }
     try {
+      // Clear session cookie first
+      await fetch('/api/session', { 
+        method: 'DELETE',
+        credentials: 'include'
+      })
       await signOut(auth)
-      // Clear session cookie
-      await fetch('/api/auth/session-logout', { method: 'POST' })
       toast.success("You have been successfully logged out.")
       return
     } catch (error: unknown) {
@@ -345,11 +349,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           // Force token refresh before getting ID token
           const idToken = await getIdToken(user, true);
           
-          const response = await fetch('/api/auth/session-login', {
+          const response = await fetch('/api/session', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify({ idToken }),
           });
   

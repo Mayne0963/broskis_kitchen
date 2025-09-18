@@ -21,7 +21,7 @@ async function extractIdToken(request: NextRequest): Promise<string | null> {
 
   // Try session cookie
   const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get('session');
+  const sessionCookie = cookieStore.get('__session');
   if (sessionCookie) {
     return sessionCookie.value;
   }

@@ -10,7 +10,7 @@ interface MyOrdersKPIProps {
 }
 
 export default function MyOrdersKPI({ userId }: MyOrdersKPIProps) {
-  const { data, isLoading } = useSWR("/api/my-orders", fetchJson);
+  const { data, error, isLoading } = useSWR("/api/my-orders", fetchJson);
   const count = data?.orders?.length ?? 0;
 
   if (isLoading) {
@@ -21,6 +21,24 @@ export default function MyOrdersKPI({ userId }: MyOrdersKPIProps) {
             <div>
               <p className="text-sm font-medium text-gray-600">My Orders</p>
               <div className="w-16 h-6 bg-gray-200 animate-pulse rounded"></div>
+            </div>
+            <ShoppingCart className="h-8 w-8 text-blue-600" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Handle 401 or other errors
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">My Orders</p>
+              <p className="text-2xl font-bold text-gray-900">0</p>
+              <p className="text-xs text-gray-500">Sign in to see your data</p>
             </div>
             <ShoppingCart className="h-8 w-8 text-blue-600" />
           </div>

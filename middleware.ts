@@ -41,7 +41,7 @@ export function middleware(request: NextRequest) {
   
   // Profile route protection (requires any valid session)
   if (pathname === '/profile') {
-    const sessionCookie = request.cookies.get('session')?.value
+    const sessionCookie = request.cookies.get('__session')?.value
     if (!sessionCookie) {
       console.log('[MIDDLEWARE] No session cookie found for profile route')
       const loginUrl = new URL('/auth/login', request.url)
@@ -98,7 +98,7 @@ export function middleware(request: NextRequest) {
       // Continue without auth check
     } else {
       // Check for session cookie and validate admin role
-      const sessionCookie = request.cookies.get('session')?.value
+      const sessionCookie = request.cookies.get('__session')?.value
       if (!sessionCookie) {
         console.log('[MIDDLEWARE] No session cookie found for admin route:', pathname)
         const loginUrl = new URL('/auth/login', request.url)

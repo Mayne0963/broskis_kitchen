@@ -9,6 +9,7 @@ import {
   User 
 } from "firebase/auth";
 import { auth } from "../firebase";
+import { establishSessionCookie, clearSessionCookie } from "@/lib/sessionClient";
 
 // Create context
 interface AuthContextType {
@@ -38,17 +39,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     setLoading(true);
     await signInWithEmailAndPassword(auth, email, password);
+    await establishSessionCookie();
     setLoading(false);
   };
 
   const signup = async (email: string, password: string) => {
     setLoading(true);
     await createUserWithEmailAndPassword(auth, email, password);
+    await establishSessionCookie();
     setLoading(false);
   };
 
   const logout = async () => {
     setLoading(true);
+    await clearSessionCookie();
     await signOut(auth);
     setLoading(false);
   };

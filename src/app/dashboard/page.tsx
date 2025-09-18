@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { onAuthStateChanged, getIdTokenResult, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '@/lib/services/firebase';
+import { establishSessionCookie, clearSessionCookie } from '@/lib/sessionClient';
 import { User, Shield, LogOut, Home, Mail } from 'lucide-react';
 import Link from 'next/link';
 import type { User as FirebaseUser } from 'firebase/auth';
@@ -115,6 +116,7 @@ export default function DashboardPage() {
 
   const handleSignOut = async () => {
     try {
+      await clearSessionCookie();
       await auth.signOut();
     } catch (error) {
       console.error('Error signing out:', error);
@@ -125,6 +127,7 @@ export default function DashboardPage() {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
+      await establishSessionCookie();
     } catch (error) {
       console.error('Error signing in with Google:', error);
     }
@@ -184,9 +187,7 @@ export default function DashboardPage() {
                   Admin
                 </span>
               )}
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                ✅ No Redirect Loops!
-              </span>
+
             </div>
             <div className="flex items-center space-x-4">
               <div className="text-sm text-gray-600">
@@ -210,28 +211,7 @@ export default function DashboardPage() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          {/* Success Message */}
-          <div className="mb-8 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <Shield className="h-5 w-5 text-green-400" />
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-green-800">
-                  Client-Side Gate Implementation Successful!
-                </h3>
-                <div className="mt-2 text-sm text-green-700">
-                  <ul className="list-disc list-inside space-y-1">
-                    <li>✅ No redirect loops detected</li>
-                    <li>✅ Inline authentication for logged-out users</li>
-                    <li>✅ Direct dashboard access for authenticated users</li>
-                    <li>✅ Firebase Authentication integration working</li>
-                    <li>✅ Role-based access control implemented</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
+
 
           {/* Welcome Section */}
           <div className="bg-white rounded-lg shadow p-6 mb-6">
@@ -242,9 +222,7 @@ export default function DashboardPage() {
               Here's what's happening with your account today.
             </p>
             <div className="mt-4 flex items-center space-x-4">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                ✅ No Redirect Loops!
-              </span>
+
               {isAdmin && (
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                   <Shield className="w-3 h-3 mr-1" />

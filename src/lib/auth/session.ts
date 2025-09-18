@@ -13,7 +13,7 @@ export interface SessionUser {
 export async function getSessionCookie(): Promise<SessionUser | null> {
   try {
     const cookieStore = await cookies()
-    const sessionCookie = cookieStore.get('session')?.value
+    const sessionCookie = cookieStore.get('__session')?.value
     console.log('Session cookie value:', sessionCookie ? 'exists' : 'missing');
 
     if (!sessionCookie) {

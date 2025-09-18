@@ -166,7 +166,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies()
-    const sessionCookie = cookieStore.get('session')
+    const sessionCookie = cookieStore.get('__session')
     
     if (!sessionCookie) {
       return NextResponse.json(
@@ -271,7 +271,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const cookieStore = await cookies()
-    const sessionCookie = cookieStore.get('session')
+    const sessionCookie = cookieStore.get('__session')
     
     if (!sessionCookie) {
       return NextResponse.json(
