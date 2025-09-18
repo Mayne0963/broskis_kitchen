@@ -95,6 +95,9 @@ const nextConfig = {
     
     return config;
   },
+  // External packages for server components
+  serverExternalPackages: ['firebase-admin'],
+  
   // Experimental settings to improve build stability
   experimental: {
     optimizePackageImports: ['lucide-react', 'sonner'],
