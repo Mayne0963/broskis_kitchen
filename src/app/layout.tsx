@@ -5,7 +5,6 @@ import "./chat-animations.css"
 import ConditionalNavbar from "../components/layout/ConditionalNavbar"
 import Footer from "../components/layout/Footer"
 import { Providers } from "../lib/context/Providers"
-import { OrderProvider } from "../lib/context/OrderContext"
 import MusicPlayer from "../components/layout/MusicPlayer"
 import ErrorBoundary from "../components/common/ErrorBoundary"
 import ChunkErrorHandler from "../components/common/ChunkErrorHandler"
@@ -120,22 +119,20 @@ export default function RootLayout({
             <ResourceErrorBoundary>
               <ChunkErrorHandler />
               <Providers>
-                <OrderProvider>
-                  <SkipNavigation />
-                  <ConditionalNavbar />
-                  <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
-                  <Footer />
-                  <MusicPlayer />
+                <SkipNavigation />
+                <ConditionalNavbar />
+                <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
+                <Footer />
+                <MusicPlayer />
 
-                  <CookieConsent />
-                  <SEOAudit />
-                  <SchemaGenerator />
-                  <NetworkStatus />
-                  <ErrorMonitor />
-                  <PerformanceMonitor />
-                  <AccessibilityAudit />
-                  <PWAManager />
-                </OrderProvider>
+                <CookieConsent />
+                <SEOAudit />
+                <SchemaGenerator />
+                <NetworkStatus />
+                <ErrorMonitor />
+                <PerformanceMonitor />
+                <AccessibilityAudit />
+                <PWAManager />
               </Providers>
             </ResourceErrorBoundary>
           </ErrorBoundary>
