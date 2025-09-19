@@ -1,8 +1,9 @@
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import { NextRequest, NextResponse } from 'next/server';
 import { adb } from '@/lib/firebaseAdmin';
-
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 

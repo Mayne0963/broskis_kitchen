@@ -1,3 +1,7 @@
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 /**
  * Quota-friendly metrics service with caching and rate limiting
  * Prevents Firestore quota exhaustion through efficient data fetching

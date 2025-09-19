@@ -1,11 +1,12 @@
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionCookie } from '@/lib/auth/session';
 import Stripe from 'stripe';
 import { adb } from '@/lib/firebaseAdmin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
-
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 let stripe: Stripe | null = null;
 if (process.env.STRIPE_SECRET_KEY) {

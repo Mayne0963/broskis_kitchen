@@ -1,9 +1,12 @@
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth } from '@/lib/firebaseAdmin';
 import { UserRole } from '@/lib/auth/rbac';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
+
 
 // POST - Set user role
 export async function POST(request: NextRequest) {

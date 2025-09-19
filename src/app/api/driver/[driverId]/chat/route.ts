@@ -1,9 +1,10 @@
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import { NextRequest, NextResponse } from 'next/server';
 import { auth, adb } from '@/lib/firebaseAdmin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
-
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 interface ChatMessage {
   id?: string;

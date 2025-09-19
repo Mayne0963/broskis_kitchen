@@ -1,9 +1,10 @@
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import { NextRequest, NextResponse } from 'next/server';
 import { auth, db } from '@/lib/firebaseAdmin';
 import webpush from 'web-push';
-
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 interface NotificationPayload {
   title: string;

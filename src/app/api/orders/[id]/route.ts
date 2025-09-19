@@ -1,11 +1,12 @@
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/lib/firebaseAdmin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
 import { Order } from '@/types/firestore';
 import { Timestamp, FieldValue } from 'firebase-admin/firestore';
-
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 const ALLOWED_STATUSES: Order['status'][] = ['pending', 'confirmed', 'preparing', 'ready', 'delivered', 'cancelled'];
 

@@ -1,8 +1,9 @@
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/firebaseAdmin';
-
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 interface RateLimitRecord {
   count: number;

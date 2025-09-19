@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
-import { getServerUser } from "@/lib/authServer";
-import { adminDb } from "@/lib/firebaseAdmin";
-
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+
+import { NextResponse } from "next/server";
+import { getServerUser } from "@/lib/authServer";
+import { adminDb } from "@/lib/firebaseAdmin";
 
 export async function GET() {
   const user = await getServerUser();
