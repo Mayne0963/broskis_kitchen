@@ -2,14 +2,13 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 import { getServerUser } from "@/lib/authServer";
-import { getUserTotals } from "@/lib/server/getUserTotals";
+import { getUserTotals } from "@/lib/server/orderTotals";
 import KpiCard from "@/components/kpi/KpiCard";
 import QuickActions from "@/components/QuickActions";
 import { LuxeCard, LuxeCardHeader, LuxeCardTitle, LuxeCardContent } from "@/components/luxe/LuxeCard";
 
 export default async function DashboardPage() {
   const user = await getServerUser();
-
   if (!user) {
     return (
       <div className="min-h-screen bg-black text-white">
@@ -33,7 +32,7 @@ export default async function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <KpiCard title="My Orders" value={totals.ordersCount} format="number" subtitle="Lifetime" />
           <KpiCard title="My Spending" value={totals.totalUSD} format="currency" currency="USD" subtitle="Lifetime total" />
-          <KpiCard title="Loyalty Points" value={totals.points} format="number" subtitle="1 pt / $1 spent" />
+          <KpiCard title="Loyalty Points" value={totals.points} format="number" subtitle="1 pt per $1" />
         </div>
 
         <QuickActions />

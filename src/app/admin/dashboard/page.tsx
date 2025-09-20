@@ -1,18 +1,20 @@
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-import { getAdminKpis } from "@/lib/server/getAdminKpis";
 import KpiCard from "@/components/kpi/KpiCard";
+import { getAdminKpis30d } from "@/lib/server/orderTotals";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default async function AdminDashboardPage() {
-  const k = await getAdminKpis();
+  const k = await getAdminKpis30d();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-white">
+      <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <KpiCard title="Orders (30d)" value={k.orders30Count} format="number" subtitle="Last 30 days" />
+        <KpiCard title="Orders (30d)" value={k.orders30} format="number" subtitle="Last 30 days" />
         <KpiCard title="Revenue (30d)" value={k.revenue30USD} format="currency" currency="USD" subtitle="Last 30 days" />
         <KpiCard title="Active Users (30d)" value={k.activeUsers30} format="number" subtitle="Placed an order" />
       </div>
@@ -31,17 +33,16 @@ export default async function AdminDashboardPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {k.recent.length === 0 ? (
-                  <TableRow><TableCell colSpan={4} className="text-white/60">No orders in last 30 days.</TableCell></TableRow>
-                ) : (
-                  k.recent.map(r => (
-                    <TableRow key={r.id} className="hover:bg-white/5">
-                      <TableCell>{r.id}</TableCell>
-                      <TableCell>{r.date}</TableCell>
-                      <TableCell>{r.total}</TableCell>
-                      <TableCell className="capitalize">{r.status}</TableCell>
-                    </TableRow>
-                  ))
+                {k.recent.map(r => (
+                  <TableRow key={r.id} className="hover:bg-white/5">
+                    <TableCell>{r.id}</TableCell>
+                    <TableCell>{r.date}</TableCell>
+                    <TableCell>{r.total}</TableCell>
+                    <TableCell className="capitalize">{r.status}</TableCell>
+                  </TableRow>
+                ))}
+                {k.recent.length === 0 && (
+                  <TableRow><TableCell colSpan={4} className="text-white/60">No orders yet.</TableCell></TableRow>
                 )}
               </TableBody>
             </Table>
