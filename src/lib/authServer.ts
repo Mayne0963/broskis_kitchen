@@ -2,7 +2,7 @@ import { cookies, headers } from "next/headers";
 import { adminAuth } from "./firebaseAdmin";
 
 export async function getServerUser() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionCookie = cookieStore.get("__session")?.value || cookieStore.get("session")?.value;
   if (!sessionCookie) return null;
 

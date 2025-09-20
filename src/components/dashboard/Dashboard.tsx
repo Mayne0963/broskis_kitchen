@@ -2,9 +2,6 @@
 
 import { isAdmin } from '@/lib/rbac';
 import AdminKPI from '@/components/kpi/AdminKPI';
-import MyOrdersKPI from '@/components/kpi/MyOrdersKPI';
-import MySpendKPI from '@/components/kpi/MySpendKPI';
-import LoyaltyKPI from '@/components/kpi/LoyaltyKPI';
 import QuickActions from '@/components/dashboard/QuickActions';
 
 type Props = { 
@@ -27,12 +24,7 @@ export default function Dashboard({ session, userId, role }: Props) {
         </section>
       )}
       
-      {/* Customer widgets */}
-      <section aria-label="customer-kpis" className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <MyOrdersKPI userId={currentUserId} />
-        <MySpendKPI userId={currentUserId} />
-        <LoyaltyKPI userId={currentUserId} />
-      </section>
+      {/* Customer KPIs now handled server-side in dashboard page */}
       
       {/* Authentication Status panel REMOVED completely */}
       
