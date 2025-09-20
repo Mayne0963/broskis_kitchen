@@ -20,7 +20,7 @@ export const Providers: React.FC<ProvidersProps> = ({ children }) => {
   return (
     <UserProvider>
     <AuthProvider>
-    <OrderProvider>
+    <OrderProvider autoLoad={false}>
     <CartProvider>
     <RewardsProvider>
     <DeliveryProvider>

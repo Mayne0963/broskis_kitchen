@@ -2,7 +2,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 import { getServerUser } from "@/lib/authServer";
-import { getUserSpend } from "@/lib/server/getUserSpend";
+import { getUserTotals } from "@/lib/server/getUserTotals";
 import KpiCard from "@/components/kpi/KpiCard";
 import QuickActions from "@/components/QuickActions";
 import { LuxeCard, LuxeCardHeader, LuxeCardTitle, LuxeCardContent } from "@/components/luxe/LuxeCard";
@@ -23,7 +23,7 @@ export default async function DashboardPage() {
     );
   }
 
-  const totals = await getUserSpend(user.uid);
+  const totals = await getUserTotals(user.uid);
 
   return (
     <div className="min-h-screen bg-black text-white">

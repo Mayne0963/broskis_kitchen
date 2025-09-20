@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useAuth } from "../../lib/context/AuthContext"
-import { useOrder } from "../../lib/context/OrderContext"
+import { useOrders, OrderProvider } from "../../lib/context/OrderContext"
 import { FaArrowLeft, FaShoppingBag, FaHistory } from "react-icons/fa"
 import Link from "next/link"
 import { useEffect } from "react"
@@ -11,10 +11,10 @@ import OrderTracking from "../../components/orders/OrderTracking"
 // Force dynamic rendering to prevent prerendering issues
 export const dynamic = 'force-dynamic'
 
-export default function OrderHistoryPage() {
+function OrderHistoryPageContent() {
   const router = useRouter()
   const { user, isLoading } = useAuth()
-  const { orders, getUserOrders, isLoading: ordersLoading } = useOrder()
+  const { orders, loading: ordersLoading, refresh } = useOrders()
 
   // Redirect to login if not authenticated
   if (!isLoading && !user) {
@@ -25,9 +25,9 @@ export default function OrderHistoryPage() {
   // Fetch user orders on component mount
   useEffect(() => {
     if (user) {
-      getUserOrders(user.uid)
+      refresh()
     }
-  }, [user, getUserOrders])
+  }, [user, refresh])
 
   if (isLoading) {
     return (
@@ -62,5 +62,13 @@ export default function OrderHistoryPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function OrderHistoryPage() {
+  return (
+    <OrderProvider autoLoad={true}>
+      <OrderHistoryPageContent />
+    </OrderProvider>
   )
 }
