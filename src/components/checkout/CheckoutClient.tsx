@@ -12,6 +12,7 @@ import OrderConfirmation from './OrderConfirmation'
 import { guestOrderUtils } from '@/utils/guestOrderTracking'
 import { LoadingOverlay, ErrorState, ProgressIndicator, useLoadingState } from '../common/EnhancedLoadingStates'
 import { toast } from 'sonner'
+import { safeFetch } from '@/lib/utils/safeFetch'
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -241,7 +242,7 @@ export default function CheckoutClient({
   
   // read current items from provider or GET /api/cart
   async function startPayment(currentItems: any[]) {
-    const res = await fetch("/api/checkout/session", {
+    const res = await safeFetch("/api/checkout/session", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ items: currentItems }),

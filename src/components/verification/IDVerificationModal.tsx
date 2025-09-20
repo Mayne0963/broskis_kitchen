@@ -6,6 +6,7 @@ import { useState, useRef, useEffect } from "react"
 import { FaTimes, FaIdCard, FaCamera, FaCheck, FaExclamationTriangle } from "react-icons/fa"
 import { useAgeVerification } from "../../lib/context/AgeVerificationContext"
 import { auth } from "../../lib/services/firebase"
+import { safeFetch } from "@/lib/utils/safeFetch"
 
 interface IDVerificationModalProps {
   onClose: () => void
@@ -93,7 +94,7 @@ const IDVerificationModal: React.FC<IDVerificationModalProps> = ({ onClose, onSu
 
     try {
       // Call our API to verify the ID
-      const response = await fetch("/api/verify-id", {
+      const response = await safeFetch("/api/verify-id", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -27,6 +27,7 @@ import { collection, query, orderBy, onSnapshot, doc, updateDoc, Timestamp } fro
 import { COLLECTIONS } from '@/lib/firebase/collections'
 import OrderStatusUpdate from '@/components/orders/OrderStatusUpdate'
 import { STATUS_INFO, getStatusColorClass } from '@/lib/utils/orderStatusValidation'
+import { safeFetch } from '@/lib/utils/safeFetch'
 
 interface OrdersTabProps {
   initialOrders?: Order[]
@@ -171,7 +172,7 @@ export default function OrdersTab({ initialOrders = [] }: OrdersTabProps) {
 
   const refreshOrders = async () => {
     try {
-      const response = await fetch('/api/orders')
+      const response = await safeFetch('/api/orders')
       if (response.ok) {
         const data = await response.json()
         setOrders(data.orders || [])

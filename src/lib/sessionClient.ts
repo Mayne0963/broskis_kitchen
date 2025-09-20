@@ -1,6 +1,7 @@
 "use client";
 
 import { getAuth } from "firebase/auth";
+import { safeFetch } from "@/lib/utils/safeFetch";
 
 export async function establishSessionCookie() {
   const auth = getAuth();
@@ -8,7 +9,7 @@ export async function establishSessionCookie() {
   if (!user) return false;
 
   const idToken = await user.getIdToken(/* forceRefresh */ true);
-  const res = await fetch("/api/session", {
+  const res = await safeFetch("/api/session", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -18,7 +19,7 @@ export async function establishSessionCookie() {
 }
 
 export async function clearSessionCookie() {
-  await fetch("/api/session", {
+  await safeFetch("/api/session", {
     method: "DELETE",
     credentials: "include"
   });

@@ -23,6 +23,7 @@ import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, Timestam
 import { COLLECTIONS } from '@/lib/firebase/collections'
 import OrderStatusUpdate from '@/components/orders/OrderStatusUpdate'
 import { STATUS_INFO, getStatusColorClass } from '@/lib/utils/orderStatusValidation'
+import { safeFetch } from '@/lib/utils/safeFetch'
 
 interface KitchenDisplayProps {
   initialOrders?: Order[]
@@ -181,7 +182,7 @@ export default function KitchenDisplay({ initialOrders = [] }: KitchenDisplayPro
   const refreshOrders = async () => {
     setIsLoading(true)
     try {
-      const response = await fetch('/api/orders')
+      const response = await safeFetch('/api/orders')
       if (response.ok) {
         const data = await response.json()
         setOrders(data.orders || [])

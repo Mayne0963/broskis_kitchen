@@ -1,4 +1,5 @@
 import { logger } from './logging-service';
+import { safeFetch } from '../utils/safeFetch';
 
 interface Alert {
   id?: string;
@@ -473,7 +474,7 @@ class AlertService {
   // Send webhook notification
   private async sendWebhookNotification(alert: Alert, webhook: { url: string; headers?: Record<string, string> }) {
     try {
-      const response = await fetch(webhook.url, {
+      const response = await safeFetch(webhook.url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -525,7 +526,7 @@ class AlertService {
 
     // Update in database via API
     try {
-      const response = await fetch('/api/alerts', {
+      const response = await safeFetch('/api/alerts', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

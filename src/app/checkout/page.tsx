@@ -1,6 +1,7 @@
 "use client";
 import { useState, useMemo } from "react";
 import { useCart } from "../../lib/context/CartContext";
+import { safeFetch } from "@/lib/utils/safeFetch";
 
 type OutItem = { name: string; price: number; qty: number };
 
@@ -24,7 +25,7 @@ export default function CheckoutPage() {
   async function startPayment() {
     setLoading(true);
     try {
-      const res = await fetch("/api/checkout/session", {
+      const res = await safeFetch("/api/checkout/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ items: payloadItems }),

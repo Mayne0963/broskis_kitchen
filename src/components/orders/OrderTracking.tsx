@@ -45,6 +45,7 @@ import { toast } from 'sonner'
 import { pushNotificationService } from '@/lib/services/push-notification-service'
 import { getOTWOrderStatus } from '@/lib/services/otw-integration'
 import OTWTracker from './OTWTracker'
+import { safeFetch } from '@/lib/utils/safeFetch'
 
 interface OrderTrackingProps {
   userId: string
@@ -279,7 +280,7 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
   const fetchOrdersFromAPI = useCallback(async () => {
     try {
       setIsLoading(true)
-      const response = await fetch(`/api/orders?userId=${userId}`)
+      const response = await safeFetch(`/api/orders?userId=${userId}`)
       if (response.ok) {
         const data = await response.json()
         if (data.orders) {
@@ -1194,7 +1195,7 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
         clearError()
         setIsRefreshing(true)
         
-        const response = await fetch(`/api/orders?userId=${userId}`)
+        const response = await safeFetch(`/api/orders?userId=${userId}`)
         if (!response.ok) {
           throw new Error(`Failed to fetch orders: ${response.status}`)
         }

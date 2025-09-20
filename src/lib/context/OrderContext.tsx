@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import { toast } from 'sonner'
 import { Order, OrderStatus, OrderContextType } from '@/types/order'
+import { safeFetch } from '@/lib/utils/safeFetch'
 import { 
   saveOrder, 
   getOrderById, 
@@ -46,7 +47,7 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
       }
       
       // Use API endpoint for creating orders
-      const response = await fetch('/api/orders', {
+      const response = await safeFetch('/api/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -152,7 +153,7 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
       const targetUserId = userId || user?.id
       if (!targetUserId) return []
       
-      const response = await fetch(`/api/orders?userId=${targetUserId}`, {
+      const response = await safeFetch(`/api/orders?userId=${targetUserId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

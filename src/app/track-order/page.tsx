@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Search, Package, Clock, CheckCircle, Truck } from 'lucide-react'
 import { guestOrderUtils } from '@/utils/guestOrderTracking'
+import { safeFetch } from '@/lib/utils/safeFetch'
 
 interface Order {
   id: string
@@ -49,7 +50,7 @@ export default function TrackOrderPage() {
         const guestOrder = guestOrderUtils.getGuestOrder(orderId)
         if (guestOrder && guestOrder.email.toLowerCase() === email.toLowerCase()) {
           // Fetch full order details from API
-          const response = await fetch(`/api/orders/${orderId}`)
+          const response = await safeFetch(`/api/orders/${orderId}`)
           if (response.ok) {
             const { order: fullOrder } = await response.json()
             setOrder(fullOrder)
@@ -60,7 +61,7 @@ export default function TrackOrderPage() {
       }
 
       // Fallback to API search
-      const response = await fetch('/api/orders/track', {
+      const response = await safeFetch('/api/orders/track', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderId, email })

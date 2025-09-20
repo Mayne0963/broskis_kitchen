@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { Clock, CheckCircle, Truck, ChefHat, Package, AlertCircle } from 'lucide-react'
 import { Order, OrderStatus } from '@/types/order'
+import { safeFetch } from '@/lib/utils/safeFetch'
 import { db, isFirebaseConfigured } from '@/lib/services/firebase'
 import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore'
 import { COLLECTIONS } from '@/lib/firebase/collections'
@@ -90,7 +91,7 @@ export default function RealTimeOrderStatus({ orderId, onOrderUpdate }: RealTime
 
     const pollOrderStatus = async () => {
       try {
-        const response = await fetch(`/api/orders?orderId=${orderId}`)
+        const response = await safeFetch(`/api/orders?orderId=${orderId}`)
         if (response.ok) {
           const data = await response.json()
           if (data.orders && data.orders.length > 0) {

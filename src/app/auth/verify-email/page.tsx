@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Mail, CheckCircle, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/lib/context/AuthContext'
 import { toast, Toaster } from 'sonner'
+import { safeFetch } from '@/lib/utils/safeFetch'
 
 export const dynamic = 'force-dynamic'
 
@@ -44,7 +45,7 @@ export default function VerifyEmailPage() {
   const handleCheckVerification = async () => {
     // Soft revalidation - check verification status without full page reload
     try {
-      const response = await fetch('/api/auth/verify-status', {
+      const response = await safeFetch('/api/auth/verify-status', {
         method: 'GET',
         credentials: 'include'
       })

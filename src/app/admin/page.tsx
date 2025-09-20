@@ -6,6 +6,7 @@ import { onAuthStateChanged, getIdTokenResult } from 'firebase/auth';
 import { auth } from '@/lib/services/firebase';
 import AdminKPI from '@/components/kpi/AdminKPI';
 import type { User as FirebaseUser } from 'firebase/auth';
+import { safeFetch } from '@/lib/utils/safeFetch';
 
 // Force dynamic rendering to ensure middleware runs
 export const dynamic = 'force-dynamic';
@@ -66,7 +67,7 @@ export default function AdminPage() {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch('/api/orders');
+      const response = await safeFetch('/api/orders');
       const data = await response.json();
       if (data.ok) {
         setOrders(data.orders);
@@ -82,7 +83,7 @@ export default function AdminPage() {
 
   const updateOrderStatus = async (orderId: string, newStatus: Order['status']) => {
     try {
-      const response = await fetch(`/api/orders/${orderId}`, {
+      const response = await safeFetch(`/api/orders/${orderId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +111,7 @@ export default function AdminPage() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', {
+      await safeFetch('/api/auth/logout', {
         method: 'POST',
       });
       router.push('/login');

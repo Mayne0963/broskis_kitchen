@@ -9,6 +9,7 @@ import { useCart } from "../../lib/context/CartContext"
 import { useAuth } from "../../lib/context/AuthContext"
 import { OrderItem } from "../../types/order"
 import { FaShoppingCart, FaTrash, FaPlus, FaMinus, FaArrowLeft, FaCreditCard, FaCog, FaLock, FaUserPlus } from "react-icons/fa"
+import { safeFetch } from "../../lib/utils/safeFetch"
 
 function normalizePrice(p: unknown): number {
   const n = typeof p === "string" ? parseFloat((p as string).replace(/[^0-9.]/g, "")) : Number(p);
@@ -35,7 +36,7 @@ export default function CartPage() {
   async function proceedToCheckout() {
     try {
       setLoading(true);
-      const res = await fetch("/api/checkout/session", {
+      const res = await safeFetch("/api/checkout/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ items: payloadItems }),

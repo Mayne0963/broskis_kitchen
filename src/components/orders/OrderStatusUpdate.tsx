@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { OrderStatus, Order } from '@/types/order'
+import { safeFetch } from '@/lib/utils/safeFetch'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -101,7 +102,7 @@ export default function OrderStatusUpdate({
     setIsUpdating(true)
 
     try {
-      const response = await fetch(`/api/orders/${order.id}/status`, {
+      const response = await safeFetch(`/api/orders/${order.id}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

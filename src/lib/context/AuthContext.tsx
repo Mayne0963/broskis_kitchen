@@ -19,6 +19,7 @@ import { toast } from "sonner"
 import type { User, AuthContextType } from "@/types"
 import type { Claims } from "@/types/auth"
 import { performBackgroundRefresh } from "../session/exp"
+import { safeFetch } from "../utils/safeFetch"
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
@@ -129,7 +130,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const idToken = await getIdToken(userCredential.user, true)
       
       // Create session cookie
-      const response = await fetch('/api/session', {
+      const response = await safeFetch('/api/session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -293,7 +294,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
     try {
       // Clear session cookie first
-      await fetch('/api/session', { 
+      await safeFetch('/api/session', { 
         method: 'DELETE',
         credentials: 'include'
       })
@@ -349,7 +350,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           // Force token refresh before getting ID token
           const idToken = await getIdToken(user, true);
           
-          const response = await fetch('/api/session', {
+          const response = await safeFetch('/api/session', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

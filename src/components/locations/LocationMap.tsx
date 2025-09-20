@@ -4,6 +4,7 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import type { Location } from "@/types/location"
 import { FaMapMarkerAlt, FaDirections, FaPhone, FaInfoCircle } from "react-icons/fa"
+import { safeFetch } from "@/lib/utils/safeFetch"
 
 interface LocationMapProps {
   locations: Location[]
@@ -21,7 +22,7 @@ const LocationMap: React.FC<LocationMapProps> = ({ locations, selectedLocation, 
     const checkMapAvailability = async () => {
       try {
         // Check if maps are available without exposing API key
-        const response = await fetch("/api/maps")
+        const response = await safeFetch("/api/maps")
         
         if (!response.ok) {
           console.error(`Maps API check failed: HTTP ${response.status}`)

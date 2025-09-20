@@ -4,11 +4,12 @@ import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import KitchenDisplay from '@/components/kitchen/KitchenDisplay'
 import { verifyKitchenAccess } from '@/lib/auth/rbac'
+import { safeFetch } from '@/lib/utils/safeFetch'
 
 // Mock function to fetch initial orders for kitchen
 async function getKitchenOrders() {
   try {
-    const response = await fetch(`${process.env.BASE_URL || 'http://localhost:3000'}/api/orders?status=confirmed,preparing,ready`, {
+    const response = await safeFetch(`${process.env.BASE_URL || 'http://localhost:3000'}/api/orders?status=confirmed,preparing,ready`, {
       cache: 'no-store'
     })
     

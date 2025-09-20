@@ -3,6 +3,7 @@
 import type React from "react"
 import { createContext, useState, useContext, useEffect, type ReactNode } from "react"
 import type { ChatContextType, ChatMessage } from "@/types"
+import { safeFetch } from "../utils/safeFetch"
 
 // Create the context with a default undefined value
 const ChatContext = createContext<ChatContextType | undefined>(undefined)
@@ -59,7 +60,7 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/chat', {
+      const response = await safeFetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
