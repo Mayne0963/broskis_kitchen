@@ -1,5 +1,5 @@
 import "server-only";
-import admin from "firebase-admin";
+import * as admin from "firebase-admin";
 
 const app =
   admin.apps.length > 0
