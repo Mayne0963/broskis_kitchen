@@ -1,31 +1,69 @@
+export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
 import KpiCard from "@/components/kpi/KpiCard";
+import { adminDb } from "@/lib/firebaseAdmin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-export default async function AdminDashboardPage() {
-  // Placeholder values; backend can hydrate later.
-  const kpis = [
-    { label: "Total Orders", value: "1,204" },
-    { label: "Revenue (30d)", value: "$42,910" },
-    { label: "Active Users", value: "356" },
-  ];
+function toDateStr(d: Date) {
+  return d.toISOString().slice(0,10);
+}
 
-  const recent = [
-    { id: "ORD-1001", date: "2025-09-18", total: "$62.40", status: "paid" },
-    { id: "ORD-1000", date: "2025-09-18", total: "$24.10", status: "paid" },
-  ];
+export default async function AdminDashboardPage() {
+  const now = new Date();
+  const d30 = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+  // --- Metrics (server-direct) ---
+  // Revenue + orders last 30d
+  const orders30Snap = await adminDb
+    .collection("orders")
+    .where("createdAt", ">=", d30)
+    .get();
+
+  let revenue30 = 0;
+  const activeUserSet = new Set<string>();
+  const recentForTable: { id: string; date: string; total: string; status: string }[] = [];
+
+  orders30Snap.forEach(doc => {
+    const o: any = doc.data();
+    const cents = Number(o.totalCents || 0);
+    revenue30 += cents;
+    if (o.userId) activeUserSet.add(String(o.userId));
+    // collect a few recents for table
+    recentForTable.push({
+      id: doc.id,
+      date: toDateStr(o.createdAt?.toDate?.() || new Date()),
+      total: new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100),
+      status: o.status || "paid",
+    });
+  });
+
+  // sort recents by date desc & trim to 10 rows
+  recentForTable.sort((a, b) => (a.date < b.date ? 1 : -1));
+  const recent = recentForTable.slice(0, 10);
+
+  // Total orders (lifetime) — lightweight count
+  const totalOrdersSnap = await adminDb.collection("orders").limit(1).get();
+  // If counting exactly is heavy, show orders30Snap.size with subtitle "last 30 days".
+  // Here we'll show 30d orders count as primary.
+  const orders30Count = orders30Snap.size;
+
+  const revenue30USD = revenue30 / 100;
+  const activeUsers30 = activeUserSet.size;
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {kpis.map(k => <KpiCard key={k.label} label={k.label} value={k.value} />)}
+        <KpiCard title="Orders (30d)" value={orders30Count} format="number" subtitle="Last 30 days" />
+        <KpiCard title="Revenue (30d)" value={revenue30USD} format="currency" currency="USD" subtitle="Last 30 days" />
+        <KpiCard title="Active Users (30d)" value={activeUsers30} format="number" subtitle="Placed an order in 30d" />
       </div>
 
-      <Card className="bk-card">
+      <Card className="rounded-2xl border-[#FFD700] bg-[#0b0b0b] text-white">
         <CardHeader><CardTitle>Recent Orders</CardTitle></CardHeader>
         <CardContent>
-          <div className="overflow-x-auto rounded-xl border border-[rgba(255,255,255,0.08)]">
+          <div className="overflow-x-auto rounded-xl border border-[rgba(255,255,255,0.12)]">
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
@@ -45,7 +83,9 @@ export default async function AdminDashboardPage() {
                   </TableRow>
                 ))}
                 {recent.length === 0 && (
-                  <TableRow><TableCell colSpan={4} className="text-white/60">No data yet.</TableCell></TableRow>
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-white/60">No orders in the last 30 days.</TableCell>
+                  </TableRow>
                 )}
               </TableBody>
             </Table>
