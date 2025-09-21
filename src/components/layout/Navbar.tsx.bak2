@@ -165,7 +165,7 @@ const Navbar: React.FC = () => {
               </AccessibleMenuItem>
               {user?.role === 'admin' && (
                 <AccessibleMenuItem 
-                  href="/admin"
+                  href="/admin/dashboard"
                   onClick={() => setUserDropdownOpen(false)}
                   className="text-red-600 font-medium"
                 >
@@ -187,7 +187,7 @@ const Navbar: React.FC = () => {
             </Link>
               {user?.role === 'admin' && (
                 <Link
-                  href="/admin"
+                  href="/admin/dashboard"
                   className="block py-2 hover:text-gold-foil transition-colors duration-300 text-red-600 font-medium"
                   onClick={() => setMobileMenuOpen(false)}
                 >
@@ -308,7 +308,7 @@ const Navbar: React.FC = () => {
               </Link>
               {user?.role === 'admin' && (
                 <Link
-                  href="/admin"
+                  href="/admin/dashboard"
                   className="block py-2 hover:text-gold-foil transition-colors duration-300 text-red-600 font-medium"
                   onClick={() => setMobileMenuOpen(false)}
                 >

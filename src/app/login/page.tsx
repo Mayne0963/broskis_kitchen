@@ -27,7 +27,7 @@ function LoginForm() {
 
       if (response.ok) {
         const data = await response.json()
-        router.push(data.redirect || '/admin')
+        router.push(data.redirect || '/admin/dashboard')
       } else {
         setError('Invalid access code')
       }
