@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth, db } from '@/lib/firebaseAdmin';
+import { auth, adminDb } from '@/lib/firebaseAdmin';
 
 type DriverStatus = 'available' | 'busy' | 'offline' | 'on_delivery';
 
@@ -51,7 +51,7 @@ export async function PUT(
     }
 
     // Get current driver data
-    const driverDoc = await db.collection('drivers').doc(driverId).get();
+    const driverDoc = await adminDb.collection('drivers').doc(driverId).get();
     if (!driverDoc.exists) {
       return NextResponse.json(
         { error: 'Driver not found' },
@@ -107,10 +107,10 @@ export async function PUT(
       updateData.lastDeliveryCompleted = new Date().toISOString();
     }
 
-    await db.collection('drivers').doc(driverId).update(updateData);
+    await adminDb.collection('drivers').doc(driverId).update(updateData);
 
     // Log status change
-    await db.collection('driver_status_history').add({
+    await adminDb.collection('driver_status_history').add({
       driverId,
       previousStatus: currentStatus,
       newStatus: status,
@@ -187,7 +187,7 @@ export async function GET(
     const endDate = searchParams.get('endDate');
 
     // Build query
-    let query = db.collection('driver_status_history')
+    let query = adminDb.collection('driver_status_history')
       .where('driverId', '==', driverId)
       .orderBy('timestamp', 'desc')
       .limit(limit);
@@ -207,7 +207,7 @@ export async function GET(
     }));
 
     // Get current status
-    const driverDoc = await db.collection('drivers').doc(driverId).get();
+    const driverDoc = await adminDb.collection('drivers').doc(driverId).get();
     const currentStatus = driverDoc.exists ? driverDoc.data()?.status : null;
 
     // Calculate status duration statistics
@@ -243,7 +243,7 @@ async function handleDriverOfflineAlert(driverId: string, deliveryId: string | n
     if (!deliveryId) return;
 
     // Create alert for support team
-    await db.collection('support_alerts').add({
+    await adminDb.collection('support_alerts').add({
       type: 'driver_offline_during_delivery',
       severity: 'high',
       driverId,
@@ -255,10 +255,10 @@ async function handleDriverOfflineAlert(driverId: string, deliveryId: string | n
     });
 
     // Update delivery status
-    await db.collection('deliveries').doc(deliveryId).update({
+    await adminDb.collection('deliveries').doc(deliveryId).update({
       status: 'driver_unavailable',
       lastUpdate: new Date().toISOString(),
-      alerts: db.FieldValue.arrayUnion({
+      alerts: adminDb.FieldValue.arrayUnion({
         type: 'driver_offline',
         timestamp: new Date().toISOString(),
         message: 'Driver went offline during delivery'
@@ -277,7 +277,7 @@ async function updateDriverMetrics(driverId: string, previousStatus: string, new
     const today = new Date().toISOString().split('T')[0];
     const metricsDocId = `${driverId}_${today}`;
     
-    const metricsRef = db.collection('driver_daily_metrics').doc(metricsDocId);
+    const metricsRef = adminDb.collection('driver_daily_metrics').doc(metricsDocId);
     const metricsDoc = await metricsRef.get();
     
     const currentMetrics = metricsDoc.exists ? metricsDoc.data() : {

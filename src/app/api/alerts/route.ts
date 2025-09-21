@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/firebaseAdmin';
+import { adminDb } from '@/lib/firebaseAdmin';
 
 interface Alert {
   id?: string;
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
   try {
     const alert: Omit<Alert, 'id'> = await request.json();
     
-    const docRef = await db.collection('alerts').add(alert);
+    const docRef = await adminDb.collection('alerts').add(alert);
     
     return NextResponse.json({ 
       success: true, 
@@ -43,7 +43,7 @@ export async function PUT(request: NextRequest) {
   try {
     const { alertId, updates } = await request.json();
     
-    await db.collection('alerts').doc(alertId).update(updates);
+    await adminDb.collection('alerts').doc(alertId).update(updates);
     
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -73,11 +73,11 @@ export async function GET(request: NextRequest) {
       }
       
       // Query error logs and total requests from the database
-      const errorQuery = db.collection('error_logs')
+      const errorQuery = adminDb.collection('error_logs')
         .where('timestamp', '>=', startTime)
         .where('timestamp', '<=', endTime);
       
-      const performanceQuery = db.collection('performance_metrics')
+      const performanceQuery = adminDb.collection('performance_metrics')
         .where('timestamp', '>=', startTime)
         .where('timestamp', '<=', endTime);
 
@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Default: return active alerts
-    const alertsSnapshot = await db.collection('alerts')
+    const alertsSnapshot = await adminDb.collection('alerts')
       .where('resolved', '==', false)
       .orderBy('timestamp', 'desc')
       .get();

@@ -3,12 +3,13 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextResponse } from "next/server";
-import { adminAuth } from "@/lib/firebaseAdmin";
+import { adminAuth, ensureAdmin } from "@/lib/firebaseAdmin";
 
 const COOKIE_NAME = "__session"; // standard on Vercel/Edge-friendly name
 
 export async function POST(req: Request) {
   try {
+    await ensureAdmin(req);
     const { idToken } = await req.json();
     if (!idToken) return NextResponse.json({ error: "missing token" }, { status: 400 });
 
@@ -28,12 +29,17 @@ export async function POST(req: Request) {
   }
 }
 
-export async function DELETE() {
-  // Clear cookie
-  const res = NextResponse.json({ ok: true });
-  res.headers.append(
-    "Set-Cookie",
-    `${COOKIE_NAME}=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0`
-  );
-  return res;
+export async function DELETE(req: Request) {
+  try {
+    await ensureAdmin(req);
+    // Clear cookie
+    const res = NextResponse.json({ ok: true });
+    res.headers.append(
+      "Set-Cookie",
+      `${COOKIE_NAME}=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0`
+    );
+    return res;
+  } catch (e) {
+    return NextResponse.json({ error: "unable to delete session" }, { status: 401 });
+  }
 }

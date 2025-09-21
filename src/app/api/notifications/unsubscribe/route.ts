@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth, db } from '@/lib/firebaseAdmin';
+import { adminDb, auth } from '@/lib/firebaseAdmin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
 
 interface UnsubscribeRequest {
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     const subscriptionId = Buffer.from(body.endpoint).toString('base64url');
     
     // Check if subscription exists and belongs to the user
-    const subscriptionDoc = await db.collection('push_subscriptions').doc(subscriptionId).get();
+    const subscriptionDoc = await adminDb.collection('push_subscriptions').doc(subscriptionId).get();
     
     if (!subscriptionDoc.exists) {
       return NextResponse.json(
@@ -66,13 +66,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Mark subscription as inactive instead of deleting
-    await db.collection('push_subscriptions').doc(subscriptionId).update({
+    await adminDb.collection('push_subscriptions').doc(subscriptionId).update({
       isActive: false,
       unsubscribedAt: new Date().toISOString()
     });
 
     // Check if user has any other active subscriptions
-    const activeSubscriptionsSnapshot = await db
+    const activeSubscriptionsSnapshot = await adminDb
       .collection('push_subscriptions')
       .where('userId', '==', userId)
       .where('isActive', '==', true)
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
 
     // If no active subscriptions, update user preferences
     if (activeSubscriptionsSnapshot.empty) {
-      await db.collection(COLLECTIONS.USERS).doc(userId).update({
+      await adminDb.collection(COLLECTIONS.USERS).doc(userId).update({
         'notificationPreferences.pushNotifications': false,
         'notificationPreferences.lastUnsubscribed': new Date().toISOString()
       });
@@ -138,7 +138,7 @@ export async function GET(request: NextRequest) {
     const subscriptionId = Buffer.from(endpoint).toString('base64url');
     
     // Get subscription status
-    const subscriptionDoc = await db.collection('push_subscriptions').doc(subscriptionId).get();
+    const subscriptionDoc = await adminDb.collection('push_subscriptions').doc(subscriptionId).get();
     
     if (!subscriptionDoc.exists) {
       return NextResponse.json({

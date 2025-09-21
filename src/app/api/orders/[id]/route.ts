@@ -3,10 +3,9 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminDb } from '@/lib/firebaseAdmin';
+import { ensureAdmin, adminDb, Timestamp, FieldValue } from '@/lib/firebaseAdmin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
 import { Order } from '@/types/firestore';
-import { Timestamp, FieldValue } from 'firebase-admin/firestore';
 
 const ALLOWED_STATUSES: Order['status'][] = ['pending', 'confirmed', 'preparing', 'ready', 'delivered', 'cancelled'];
 
@@ -16,7 +15,7 @@ export async function GET(
 ) {
   try {
     const { id } = params;
-    const db = getAdminDb();
+    const db = adminDb;
     
     const doc = await db.collection(COLLECTIONS.ORDERS).doc(id).get();
     
@@ -59,6 +58,9 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Verify admin authentication for order updates
+    const user = await ensureAdmin(request);
+    
     const { id } = params;
     const body = await request.json();
     const { status } = body;
@@ -75,7 +77,7 @@ export async function PATCH(
       );
     }
     
-    const db = getAdminDb();
+    const db = adminDb;
     const docRef = db.collection(COLLECTIONS.ORDERS).doc(id);
     
     // Check if order exists

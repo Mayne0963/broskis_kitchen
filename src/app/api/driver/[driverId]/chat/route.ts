@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth, adb } from '@/lib/firebaseAdmin';
+import { auth, adminDb } from '@/lib/firebaseAdmin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
 
 interface ChatMessage {
@@ -69,7 +69,7 @@ export async function POST(
     }
 
     // Get delivery to verify access
-    const deliveryDoc = await adb.collection('deliveries').doc(deliveryId).get();
+    const deliveryDoc = await adminDb.collection('deliveries').doc(deliveryId).get();
     if (!deliveryDoc.exists) {
       return NextResponse.json(
         { error: 'Delivery not found' },
@@ -131,11 +131,11 @@ export async function POST(
     }
 
     // Save message to database
-    const messageRef = await adb.collection('delivery_chat_messages').add(chatMessage);
+    const messageRef = await adminDb.collection('delivery_chat_messages').add(chatMessage);
     const messageId = messageRef.id;
 
     // Update delivery with last message info
-    await adb.collection('deliveries').doc(deliveryId).update({
+    await adminDb.collection('deliveries').doc(deliveryId).update({
       lastChatMessage: {
         messageId,
         senderId,

@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/firebaseAdmin';
+import { adminDb } from '@/lib/firebaseAdmin';
 
 interface RateLimitRecord {
   count: number;
@@ -25,9 +25,9 @@ export async function POST(request: NextRequest) {
     }
 
     const now = Date.now();
-    const docRef = db.collection('rate_limits').doc(key);
+    const docRef = adminDb.collection('rate_limits').doc(key);
     
-    const result = await db.runTransaction(async (transaction) => {
+    const result = await adminDb.runTransaction(async (transaction) => {
       const doc = await transaction.get(docRef);
       
       if (!doc.exists) {
@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const doc = await db.collection('rate_limits').doc(key).get();
+    const doc = await adminDb.collection('rate_limits').doc(key).get();
     
     if (!doc.exists) {
       return NextResponse.json({
@@ -131,7 +131,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    await db.collection('rate_limits').doc(key).set(record);
+    await adminDb.collection('rate_limits').doc(key).set(record);
     
     return NextResponse.json({
       success: true

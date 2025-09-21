@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth, db } from '@/lib/firebaseAdmin';
+import { auth, adminDb } from '@/lib/firebaseAdmin';
 import webpush from 'web-push';
 
 interface NotificationPayload {
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user's active push subscriptions
-    let subscriptionsQuery = db
+    let subscriptionsQuery = adminDb
       .collection('push_subscriptions')
       .where('userId', '==', body.userId)
       .where('isActive', '==', true);
@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
     const failureCount = results.filter(r => !r.success).length;
 
     // Log notification activity
-    await db.collection('notification_logs').add({
+    await adminDb.collection('notification_logs').add({
       type: 'push_notification',
       userId: body.userId,
       sentBy: requestingUserId,

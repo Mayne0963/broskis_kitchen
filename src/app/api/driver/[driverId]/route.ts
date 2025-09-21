@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth, db } from '@/lib/firebaseAdmin';
+import { adminDb, ensureAdmin } from '@/lib/firebaseAdmin';
 
 interface DriverInfo {
   id: string;
@@ -34,33 +34,14 @@ export async function GET(
   { params }: { params: { driverId: string } }
 ) {
   try {
-    // Verify authentication
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'Missing or invalid authorization header' },
-        { status: 401 }
-      );
-    }
-
-    const token = authHeader.split('Bearer ')[1];
-    const decodedToken = await auth.verifyIdToken(token);
-    const requestingUserId = decodedToken.uid;
+    // Verify admin authentication
+    await ensureAdmin(request);
     const { driverId } = params;
 
-    // Check if user is admin or the driver themselves
-    const isAdmin = decodedToken.admin === true;
-    const isDriver = decodedToken.role === 'driver' && requestingUserId === driverId;
-    
-    if (!isAdmin && !isDriver) {
-      return NextResponse.json(
-        { error: 'Access denied' },
-        { status: 403 }
-      );
-    }
+    // Admin access verified by ensureAdmin
 
     // Get driver information
-    const driverDoc = await db.collection('drivers').doc(driverId).get();
+    const driverDoc = await adminDb.collection('drivers').doc(driverId).get();
     
     if (!driverDoc.exists) {
       return NextResponse.json(
@@ -71,11 +52,7 @@ export async function GET(
 
     const driverData = driverDoc.data() as DriverInfo;
     
-    // Remove sensitive information if not admin or the driver themselves
-    if (!isAdmin && !isDriver) {
-      delete driverData.phone;
-      delete driverData.email;
-    }
+    // Admin has full access to driver data
 
     return NextResponse.json(driverData);
 
@@ -102,30 +79,9 @@ export async function PUT(
   { params }: { params: { driverId: string } }
 ) {
   try {
-    // Verify authentication
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'Missing or invalid authorization header' },
-        { status: 401 }
-      );
-    }
-
-    const token = authHeader.split('Bearer ')[1];
-    const decodedToken = await auth.verifyIdToken(token);
-    const requestingUserId = decodedToken.uid;
+    // Verify admin authentication
+    await ensureAdmin(request);
     const { driverId } = params;
-
-    // Check if user is admin or the driver themselves
-    const isAdmin = decodedToken.admin === true;
-    const isDriver = decodedToken.role === 'driver' && requestingUserId === driverId;
-    
-    if (!isAdmin && !isDriver) {
-      return NextResponse.json(
-        { error: 'Access denied' },
-        { status: 403 }
-      );
-    }
 
     const body = await request.json();
     const allowedFields = ['name', 'phone', 'email', 'vehicle'];
@@ -142,13 +98,13 @@ export async function PUT(
     updateData.updatedAt = new Date().toISOString();
 
     // Update driver document
-    await db.collection('drivers').doc(driverId).update(updateData);
+    await adminDb.collection('drivers').doc(driverId).update(updateData);
 
     // Log the update
-    await db.collection('driver_activity_logs').add({
+    await adminDb.collection('driver_activity_logs').add({
       driverId,
       action: 'profile_updated',
-      updatedBy: requestingUserId,
+      updatedBy: 'admin',
       changes: updateData,
       timestamp: new Date().toISOString()
     });

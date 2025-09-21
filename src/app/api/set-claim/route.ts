@@ -16,7 +16,7 @@ export async function POST(req: Request) {
       );
     }
     
-    ensureAdmin();
+    await ensureAdmin(req);
     await adminAuth.setCustomUserClaims(uid, { admin: true });
     
     return NextResponse.json(

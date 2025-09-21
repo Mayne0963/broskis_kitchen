@@ -8,7 +8,7 @@ export const revalidate = 0;
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { adminAuth } from '@/lib/firebaseAdmin';
+import { adminAuth, ensureAdmin } from '@/lib/firebaseAdmin';
 
 // Inline verifyIdToken function to avoid duplicate admin config
 async function verifyIdToken(idToken: string, checkRevoked: boolean = true) {
@@ -56,29 +56,7 @@ async function extractIdToken(request: NextRequest): Promise<string | null> {
  */
 export async function requireAdmin(request: NextRequest) {
   try {
-    const idToken = await extractIdToken(request);
-    
-    if (!idToken) {
-      return NextResponse.json(
-        { error: 'Unauthorized - No authentication token provided' },
-        { status: 401 }
-      );
-    }
-
-    // Verify the ID token
-    const decodedToken = await verifyIdToken(idToken);
-    
-    // Check for admin role
-    const isAdmin = decodedToken.role === 'admin';
-    
-    if (!isAdmin) {
-      return NextResponse.json(
-        { error: 'Forbidden - Admin access required' },
-        { status: 403 }
-      );
-    }
-
-    return decodedToken;
+    return await ensureAdmin(request);
   } catch (error) {
     // If error is already a NextResponse, throw it
     if (error instanceof NextResponse) {

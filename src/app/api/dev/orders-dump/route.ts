@@ -3,13 +3,13 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminDb } from '@/lib/firebaseAdmin';
+import { adminDb } from '@/lib/firebaseAdmin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
 
 export async function GET() {
   try {
     // Test admin SDK access
-    const db = getAdminDb();
+    const db = adminDb;
     
     // Try to list collections first
     const collections = await db.listCollections();

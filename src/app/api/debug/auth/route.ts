@@ -5,10 +5,11 @@ export const revalidate = 0;
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionCookie } from '@/lib/auth/session'
 import { verifyAdminAccess } from '@/lib/auth/rbac'
-import { adminAuth } from '@/lib/firebaseAdmin'
+import { adminAuth, ensureAdmin } from '@/lib/firebaseAdmin'
 
 export async function GET(request: NextRequest) {
   try {
+    await ensureAdmin(request);
     console.log('=== AUTH DEBUG START ===')
     
     // Check if Firebase Admin is properly initialized

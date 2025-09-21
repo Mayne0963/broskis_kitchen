@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server'
-import { adb } from '@/lib/firebaseAdmin'
+import { adminDb } from '@/lib/firebaseAdmin'
 
 // In-memory fallback storage
 let orders: any[] = []
@@ -24,9 +24,9 @@ export async function POST(request: NextRequest) {
     let foundOrder = null
 
     // Try Firebase Admin SDK first
-    if (adb) {
+    if (adminDb) {
       try {
-        const querySnapshot = await adb.collection(ORDERS_COLLECTION)
+        const querySnapshot = await adminDb.collection(ORDERS_COLLECTION)
           .where('id', '==', orderId)
           .get()
         

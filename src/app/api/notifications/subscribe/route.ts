@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth, db } from '@/lib/firebaseAdmin';
+import { auth, adminDb } from '@/lib/firebaseAdmin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
 
 interface SubscriptionRequest {
@@ -69,10 +69,10 @@ export async function POST(request: NextRequest) {
     // Use endpoint as document ID to prevent duplicates
     const subscriptionId = Buffer.from(body.subscription.endpoint).toString('base64url');
     
-    await db.collection('push_subscriptions').doc(subscriptionId).set(subscriptionData);
+    await adminDb.collection('push_subscriptions').doc(subscriptionId).set(subscriptionData);
 
     // Update user's notification preferences
-    await db.collection(COLLECTIONS.USERS).doc(userId).update({
+    await adminDb.collection(COLLECTIONS.USERS).doc(userId).update({
       'notificationPreferences.pushNotifications': true,
       'notificationPreferences.lastSubscribed': new Date().toISOString()
     });
@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
     const userId = decodedToken.uid;
 
     // Get user's active subscriptions
-    const subscriptionsSnapshot = await db
+    const subscriptionsSnapshot = await adminDb
       .collection('push_subscriptions')
       .where('userId', '==', userId)
       .where('isActive', '==', true)

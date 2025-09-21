@@ -3,12 +3,13 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { adminAuth } from '@/lib/firebaseAdmin';
+import { adminAuth, ensureAdmin } from '@/lib/firebaseAdmin';
 import { cookies } from 'next/headers';
 
 // POST - Verify session cookie
 export async function POST(request: NextRequest) {
   try {
+    await ensureAdmin(request);
     const { sessionCookie } = await request.json();
 
     if (!sessionCookie) {
@@ -51,8 +52,9 @@ export async function POST(request: NextRequest) {
 }
 
 // GET - Get current session from cookies
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    await ensureAdmin(request);
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get('__session')?.value;
 

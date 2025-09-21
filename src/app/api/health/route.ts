@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { db, auth } from '@/lib/firebaseAdmin';
+import { adminDb, auth } from '@/lib/firebaseAdmin';
 import { logger } from '@/lib/services/logging-service';
 
 interface HealthCheckResult {
@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
     const dbCheckStart = Date.now();
     try {
       // Simple database connectivity test
-      await db.collection('health_check').limit(1).get();
+      await adminDb.collection('health_check').limit(1).get();
       const dbDuration = Date.now() - dbCheckStart;
       
       healthCheck.services.database = {

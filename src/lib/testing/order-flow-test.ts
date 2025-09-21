@@ -2,7 +2,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-import { db } from '@/lib/firebaseAdmin';
+import { adminDb } from '@/lib/firebaseAdmin';
 import { logger } from '@/lib/services/logging-service';
 import { saveOrder, getOrderById, updateOrderStatus, trackOrder, cancelOrder } from '@/lib/services/orderService';
 import { NotificationService } from '@/lib/services/notification-service';
@@ -159,7 +159,7 @@ class OrderFlowTestSuite {
   }
 
   private async createTestUser(user: TestUser): Promise<void> {
-    await db.collection(COLLECTIONS.USERS).doc(user.id).set({
+    await adminDb.collection(COLLECTIONS.USERS).doc(user.id).set({
       email: user.email,
       phone: user.phone,
       name: user.name,
@@ -169,13 +169,13 @@ class OrderFlowTestSuite {
     });
 
     this.cleanup.push(async () => {
-      await db.collection(COLLECTIONS.USERS).doc(user.id).delete();
+      await adminDb.collection(COLLECTIONS.USERS).doc(user.id).delete();
     });
   }
 
   private async createTestRestaurant(): Promise<string> {
     const restaurantId = 'test_restaurant_1';
-    await db.collection('restaurants').doc(restaurantId).set({
+    await adminDb.collection('restaurants').doc(restaurantId).set({
       name: 'Test Restaurant',
       address: {
         street: '789 Restaurant St',

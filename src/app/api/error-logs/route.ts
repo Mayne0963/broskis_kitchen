@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth, db } from '@/lib/firebaseAdmin';
+import { adminDb, ensureAdmin } from '@/lib/firebaseAdmin';
 
 // POST - Log error to Firebase
 // PUT - Verify authentication token
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Log to Firebase
-    const docRef = await db.collection('error_logs').add(errorLog);
+    const docRef = await adminDb.collection('error_logs').add(errorLog);
     
     return NextResponse.json({
       success: true,
@@ -42,28 +42,11 @@ export async function POST(request: NextRequest) {
 // PUT - Verify authentication token
 export async function PUT(request: NextRequest) {
   try {
-    const { token } = await request.json();
-    
-    if (!token) {
-      return NextResponse.json(
-        { success: false, error: 'Missing token' },
-        { status: 400 }
-      );
-    }
-
-    const decodedToken = await auth.verifyIdToken(token);
+    await ensureAdmin(request);
     
     return NextResponse.json({
       success: true,
-      user: {
-        uid: decodedToken.uid,
-        email: decodedToken.email,
-        claims: {
-          admin: decodedToken.admin,
-          role: decodedToken.role,
-          kitchen: decodedToken.kitchen
-        }
-      }
+      message: 'Admin access verified'
     });
   } catch (error) {
     console.error('Error verifying token:', error);

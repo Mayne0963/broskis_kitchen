@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth, db } from '@/lib/firebaseAdmin';
+import { auth, adminDb } from '@/lib/firebaseAdmin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
 
 // PUT - Update driver location
@@ -72,24 +72,24 @@ export async function PUT(
     };
 
     // Update driver location
-    await db.collection('drivers').doc(driverId).update({
+    await adminDb.collection('drivers').doc(driverId).update({
       location: locationUpdate,
       lastLocationUpdate: new Date().toISOString()
     });
 
     // Store location history for tracking
-    await db.collection('driver_location_history').add({
+    await adminDb.collection('driver_location_history').add({
       driverId,
       location: locationUpdate,
       timestamp: new Date().toISOString()
     });
 
     // If driver is on delivery, update delivery tracking
-    const driverDoc = await db.collection('drivers').doc(driverId).get();
+    const driverDoc = await adminDb.collection('drivers').doc(driverId).get();
     const driverData = driverDoc.data();
     
     if (driverData?.status === 'on_delivery' && driverData?.currentDeliveryId) {
-      await db.collection('delivery_tracking').doc(driverData.currentDeliveryId).update({
+      await adminDb.collection('delivery_tracking').doc(driverData.currentDeliveryId).update({
         driverLocation: locationUpdate,
         lastUpdate: new Date().toISOString()
       });
@@ -151,7 +151,7 @@ export async function GET(
       const deliveryId = searchParams.get('deliveryId');
       
       if (deliveryId) {
-        const deliveryDoc = await db.collection('deliveries').doc(deliveryId).get();
+        const deliveryDoc = await adminDb.collection('deliveries').doc(deliveryId).get();
         const deliveryData = deliveryDoc.data();
         
         if (!deliveryData || deliveryData.customerId !== requestingUserId || deliveryData.driverId !== driverId) {
@@ -174,7 +174,7 @@ export async function GET(
     const endTime = searchParams.get('endTime');
 
     // Build query
-    let query = db.collection('driver_location_history')
+    let query = adminDb.collection('driver_location_history')
       .where('driverId', '==', driverId)
       .orderBy('timestamp', 'desc')
       .limit(limit);
@@ -194,7 +194,7 @@ export async function GET(
     }));
 
     // Get current location from driver document
-    const driverDoc = await db.collection('drivers').doc(driverId).get();
+    const driverDoc = await adminDb.collection('drivers').doc(driverId).get();
     const currentLocation = driverDoc.exists ? driverDoc.data()?.location : null;
 
     return NextResponse.json({
@@ -224,7 +224,7 @@ export async function GET(
 async function notifyCustomerLocationUpdate(deliveryId: string, location: any) {
   try {
     // Get delivery information
-    const deliveryDoc = await db.collection('deliveries').doc(deliveryId).get();
+    const deliveryDoc = await adminDb.collection('deliveries').doc(deliveryId).get();
     if (!deliveryDoc.exists) return;
     
     const deliveryData = deliveryDoc.data();
@@ -233,7 +233,7 @@ async function notifyCustomerLocationUpdate(deliveryId: string, location: any) {
     if (!customerId) return;
 
     // Check if customer wants location updates
-    const userDoc = await db.collection(COLLECTIONS.USERS).doc(customerId).get();
+    const userDoc = await adminDb.collection(COLLECTIONS.USERS).doc(customerId).get();
     const userData = userDoc.data();
     const wantsLocationUpdates = userData?.notificationPreferences?.push?.orderUpdates !== false;
     

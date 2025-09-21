@@ -5,11 +5,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdmin } from '@/lib/auth/adminOnly';
-import { db } from '@/lib/firebase/admin';
+import { ensureAdmin, adminDb, Timestamp } from '@/lib/firebaseAdmin';
 import { Coupon, CouponsQuery, CouponsResponse } from '@/types/firestore';
 import { COLLECTIONS } from '@/lib/firebase/collections';
-import { Timestamp } from 'firebase-admin/firestore';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -17,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     // Verify admin authentication
-    await requireAdmin(request);
+    const user = await ensureAdmin(request);
     
     const { searchParams } = new URL(request.url);
     
@@ -35,7 +33,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Build Firestore query
-    let firestoreQuery = db.collection(COLLECTIONS.COUPONS).orderBy('createdAt', 'desc');
+    let firestoreQuery = adminDb.collection(COLLECTIONS.COUPONS).orderBy('createdAt', 'desc');
     
     // Apply active filter
     if (query.active !== undefined) {
@@ -50,7 +48,7 @@ export async function GET(request: NextRequest) {
     // Apply cursor for pagination
     if (query.cursor) {
       try {
-        const cursorDoc = await db.collection(COLLECTIONS.COUPONS).doc(query.cursor).get();
+        const cursorDoc = await adminDb.collection(COLLECTIONS.COUPONS).doc(query.cursor).get();
         if (cursorDoc.exists) {
           firestoreQuery = firestoreQuery.startAfter(cursorDoc);
         }
@@ -117,7 +115,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Verify admin authentication
-    await requireAdmin(request);
+    const user = await ensureAdmin(request);
     
     const body = await request.json();
     
@@ -172,7 +170,7 @@ export async function POST(request: NextRequest) {
     
     // Check for duplicate codes (unless updating existing coupon)
     if (!body.id) {
-      const existingCoupon = await db.collection(COLLECTIONS.COUPONS)
+      const existingCoupon = await adminDb.collection(COLLECTIONS.COUPONS)
         .where('code', '==', code)
         .limit(1)
         .get();
@@ -218,16 +216,16 @@ export async function POST(request: NextRequest) {
     if (body.id) {
       // Update existing coupon
       couponId = body.id;
-      await adminCollections.coupons.doc(couponId).update(couponData);
+      await adminDb.collection(COLLECTIONS.COUPONS).doc(couponId).update(couponData);
     } else {
       // Create new coupon
       couponData.createdAt = now;
-      const docRef = await adminCollections.coupons.add(couponData);
+      const docRef = await adminDb.collection(COLLECTIONS.COUPONS).add(couponData);
       couponId = docRef.id;
     }
     
     // Fetch and return the created/updated coupon
-    const couponDoc = await adminCollections.coupons.doc(couponId).get();
+    const couponDoc = await adminDb.collection(COLLECTIONS.COUPONS).doc(couponId).get();
     const coupon = {
       id: couponDoc.id,
       ...couponDoc.data()

@@ -4,13 +4,14 @@ export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { adminAuth } from '@/lib/firebaseAdmin'
+import { adminAuth, ensureAdmin } from '@/lib/firebaseAdmin'
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   if (process.env.NEXT_PHASE === 'phase-production-build') {
     return NextResponse.json({});
   }
   try {
+    await ensureAdmin(request);
     const cookieStore = await cookies()
     const sessionCookie = cookieStore.get('__session')?.value
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/lib/auth/adminOnly';
+import { ensureAdmin } from '@/lib/firebaseAdmin';
 import { getOrderMetrics, getUserMetrics, checkRateLimit } from '@/lib/services/quota-friendly-metrics';
 
 export const runtime = 'nodejs';
@@ -7,10 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   // Check admin authentication
-  const adminCheck = await verifyAdminAuth(request);
-  if (adminCheck instanceof Response) {
-    return adminCheck;
-  }
+  const user = await ensureAdmin(request);
   
   // Rate limiting check
   const clientId = request.headers.get('x-forwarded-for') || 'unknown';

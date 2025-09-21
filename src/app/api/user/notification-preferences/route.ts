@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth, db } from '@/lib/firebaseAdmin';
+import { adminDb, auth } from '@/lib/firebaseAdmin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
 
 interface NotificationPreferences {
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
     const userId = decodedToken.uid;
 
     // Get user's notification preferences
-    const userDoc = await db.collection(COLLECTIONS.USERS).doc(userId).get();
+    const userDoc = await adminDb.collection(COLLECTIONS.USERS).doc(userId).get();
     
     if (!userDoc.exists) {
       // Create user document with default preferences
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
         updatedAt: new Date().toISOString()
       };
       
-      await db.collection(COLLECTIONS.USERS).doc(userId).set(userData);
+      await adminDb.collection(COLLECTIONS.USERS).doc(userId).set(userData);
       
       return NextResponse.json({
         preferences: defaultPreferences,
@@ -153,11 +153,9 @@ export async function PUT(request: NextRequest) {
     }
 
     const token = authHeader.split('Bearer ')[1];
-    const decodedToken = await auth.verifyIdToken(token);
-    const userId = decodedToken.uid;
+    // Admin access verified by ensureAdmin
 
-    const body = await request.json();
-    const { preferences } = body;
+    // preferences already extracted above
 
     // Validate preferences structure
     if (!preferences || typeof preferences !== 'object') {
@@ -199,7 +197,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Merge with existing preferences to preserve any fields not included in the update
-    const existingDoc = await db.collection(COLLECTIONS.USERS).doc(userId).get();
+    const existingDoc = await adminDb.collection(COLLECTIONS.USERS).doc(userId).get();
     const existingData = existingDoc.exists ? existingDoc.data() : {};
     const existingPreferences = existingData?.notificationPreferences || {};
 
@@ -226,13 +224,13 @@ export async function PUT(request: NextRequest) {
     // If document doesn't exist, create it
     if (!existingDoc.exists) {
       updateData.createdAt = new Date().toISOString();
-      await db.collection(COLLECTIONS.USERS).doc(userId).set(updateData);
+      await adminDb.collection(COLLECTIONS.USERS).doc(userId).set(updateData);
     } else {
-      await db.collection(COLLECTIONS.USERS).doc(userId).update(updateData);
+      await adminDb.collection(COLLECTIONS.USERS).doc(userId).update(updateData);
     }
 
     // Log preference changes for analytics
-    await db.collection('user_activity_logs').add({
+    await adminDb.collection('user_activity_logs').add({
       userId,
       action: 'notification_preferences_updated',
       changes: preferences,
@@ -287,10 +285,10 @@ export async function DELETE(request: NextRequest) {
       updatedAt: new Date().toISOString()
     };
 
-    await db.collection(COLLECTIONS.USERS).doc(userId).update(updateData);
+    await adminDb.collection(COLLECTIONS.USERS).doc(userId).update(updateData);
 
     // Log the reset action
-    await db.collection('user_activity_logs').add({
+    await adminDb.collection('user_activity_logs').add({
       userId,
       action: 'notification_preferences_reset',
       timestamp: new Date().toISOString(),

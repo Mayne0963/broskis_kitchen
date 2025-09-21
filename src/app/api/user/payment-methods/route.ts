@@ -5,7 +5,7 @@ export const revalidate = 0;
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionCookie } from '@/lib/auth/session';
 import Stripe from 'stripe';
-import { adb } from '@/lib/firebaseAdmin';
+import { adminDb } from '@/lib/firebaseAdmin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
 
 let stripe: Stripe | null = null;
@@ -22,7 +22,7 @@ async function getStripeCustomerId(userId: string) {
   if (!stripe) {
     throw new Error('Stripe not configured');
   }
-  const userRef = adb.collection(COLLECTIONS.USERS).doc(userId);
+  const userRef = adminDb.collection(COLLECTIONS.USERS).doc(userId);
   const userSnap = await userRef.get();
   let customerId = userSnap.data()?.stripeCustomerId;
 

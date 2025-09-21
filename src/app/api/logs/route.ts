@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { adb } from '@/lib/firebaseAdmin';
+import { adminDb } from '@/lib/firebaseAdmin';
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 
@@ -36,9 +36,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Write logs to Firebase in batch
-    const batch = adb.batch();
+    const batch = adminDb.batch();
     logs.forEach((log: LogEntry) => {
-      const docRef = adb.collection('application_logs').doc();
+      const docRef = adminDb.collection('application_logs').doc();
       batch.set(docRef, log);
     });
     
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
     const tags = searchParams.get('tags')?.split(',');
     const statsOnly = searchParams.get('statsOnly') === 'true';
 
-    let query = adb.collection('application_logs') as any;
+    let query = adminDb.collection('application_logs') as any;
 
     // Apply filters
     if (level) {

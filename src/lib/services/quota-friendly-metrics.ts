@@ -7,7 +7,7 @@ export const revalidate = 0;
  * Prevents Firestore quota exhaustion through efficient data fetching
  */
 
-import { adb } from '@/lib/firebaseAdmin';
+import { adminDb } from '@/lib/firebaseAdmin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
 
 // Cache configuration
@@ -103,7 +103,7 @@ export async function getOrderMetrics(options: MetricsOptions = {}): Promise<any
   }
   
   try {
-    const ordersRef = adb.collection(COLLECTIONS.ORDERS);
+    const ordersRef = adminDb.collection(COLLECTIONS.ORDERS);
     const timeRangeData = getTimeRange(timeRange);
     
     let queries: Promise<any>[] = [];
@@ -193,7 +193,7 @@ export async function getUserMetrics(options: MetricsOptions = {}): Promise<any>
   }
   
   try {
-    const usersRef = adb.collection(COLLECTIONS.USERS);
+    const usersRef = adminDb.collection(COLLECTIONS.USERS);
     const timeRangeData = getTimeRange(timeRange);
     
     let userQuery;

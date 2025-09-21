@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { adminAuth } from '@/lib/firebaseAdmin';
+import { adminAuth, ensureAdmin } from '@/lib/firebaseAdmin';
 import { UserRole } from '@/lib/auth/rbac';
 
 
@@ -11,6 +11,7 @@ import { UserRole } from '@/lib/auth/rbac';
 // POST - Set user role
 export async function POST(request: NextRequest) {
   try {
+    await ensureAdmin(request);
     const { uid, role } = await request.json();
     
     if (!uid || !role) {
@@ -36,6 +37,7 @@ export async function POST(request: NextRequest) {
 // GET - Get user role or list all users with roles
 export async function GET(request: NextRequest) {
   try {
+    await ensureAdmin(request);
     const { searchParams } = new URL(request.url);
     const uid = searchParams.get('uid');
     const action = searchParams.get('action');
@@ -77,6 +79,7 @@ export async function GET(request: NextRequest) {
 // PUT - Bulk role assignment
 export async function PUT(request: NextRequest) {
   try {
+    await ensureAdmin(request);
     const { assignments } = await request.json();
     
     if (!Array.isArray(assignments)) {

@@ -4,9 +4,8 @@ export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { getAdminDb } from '@/lib/firebaseAdmin';
+import { adminDb, Timestamp } from '@/lib/firebaseAdmin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
-import { Timestamp } from 'firebase-admin/firestore';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-02-24.acacia',
@@ -70,8 +69,7 @@ export async function POST(req: NextRequest) {
         };
 
         // Write to Firestore using detected collection name
-        const db = getAdminDb();
-        await db.collection(COLLECTIONS.ORDERS).doc(fullSession.id).set(order);
+        await adminDb.collection(COLLECTIONS.ORDERS).doc(fullSession.id).set(order);
 
         console.log(`Order ${fullSession.id} written to Firestore`);
       } catch (error) {

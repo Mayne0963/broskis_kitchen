@@ -3,44 +3,19 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminDb, adminAuth } from '@/lib/firebaseAdmin';
+import { ensureAdmin, adminDb, Timestamp } from '@/lib/firebaseAdmin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
 import { Order } from '@/types/firestore';
-import { Timestamp } from 'firebase-admin/firestore';
 import { isAdmin } from '@/lib/rbac';
 import { cookies } from 'next/headers';
 
-/**
- * Extracts ID token from request headers or cookies
- */
-async function extractIdToken(request: NextRequest): Promise<string | null> {
-  // Try Authorization header first
-  const authHeader = request.headers.get('authorization');
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    return authHeader.replace('Bearer ', '');
-  }
 
-  // Try session cookie
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get('__session');
-  if (sessionCookie) {
-    return sessionCookie.value;
-  }
-
-  // Try __session cookie (Firebase hosting)
-  const firebaseSession = cookieStore.get('__session');
-  if (firebaseSession) {
-    return firebaseSession.value;
-  }
-
-  return null;
-}
 
 /**
  * Aggregates global KPI data for admin users
  */
 async function aggregateGlobalKPIs() {
-  const db = getAdminDb();
+  const db = adminDb;
   
   try {
     // Get total orders count
@@ -89,101 +64,53 @@ async function aggregateGlobalKPIs() {
 
 export async function GET(request: NextRequest) {
   try {
-    // Extract and verify authentication token
-    const idToken = await extractIdToken(request);
-    
-    if (!idToken) {
-      return NextResponse.json(
-        { error: 'unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    // Verify the ID token
-    const decodedToken = await adminAuth.verifyIdToken(idToken);
-    const userId = decodedToken.uid;
-    const userRole = decodedToken.role || 'customer';
-    
     // Parse query parameters
     const { searchParams } = new URL(request.url);
     const mine = searchParams.get('mine') === '1';
     const wantKpi = searchParams.get('kpi') === '1';
     
-    const db = getAdminDb();
+    // For admin-only operations (KPI or all orders), verify admin authentication
+    if (wantKpi || !mine) {
+      const user = await ensureAdmin(request);
+      const userId = user.uid;
+      const userRole = user.role || 'admin';
     
-    // Handle KPI request (admin only)
-    if (wantKpi) {
-      if (!isAdmin(userRole)) {
-        return NextResponse.json(
-          { error: 'forbidden' },
-          { status: 403 }
-        );
+      const db = adminDb;
+    
+      // Handle KPI request (admin only)
+      if (wantKpi) {
+        const kpi = await aggregateGlobalKPIs();
+        return NextResponse.json({ kpi });
       }
-      
-      const kpi = await aggregateGlobalKPIs();
-      return NextResponse.json({ kpi });
-    }
     
-    // Handle user's own orders
-    if (mine) {
-      const ordersSnapshot = await db
+      // Admin can see all orders (limited to 100)
+      const allOrdersSnapshot = await db
         .collection(COLLECTIONS.ORDERS)
-        .where('userId', '==', userId)
         .orderBy('createdAt', 'desc')
-        .limit(50)
+        .limit(100)
         .get();
-      
-      const orders = ordersSnapshot.docs.map(doc => {
+    
+      const orders = allOrdersSnapshot.docs.map(doc => {
         const data = doc.data();
-        const createdAt = data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(data.createdAt);
-        const total = data.total || 0;
-        
         return {
           id: doc.id,
-          date: createdAt.toISOString().slice(0, 10),
-          items: data.items?.map((item: any) => ({
-            name: item.name,
-            qty: item.qty
-          })) || [],
-          total,
-          totalFormatted: new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD'
-          }).format(total / 100),
-          status: data.status || 'processing'
+          ...data,
+          // Convert Firestore Timestamps to ISO strings
+          createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate().toISOString() : data.createdAt,
+          updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate().toISOString() : data.updatedAt
         };
       });
-      
+    
       return NextResponse.json({ orders });
     }
     
-    // Default behavior: only allow admins to see all orders
-    if (!isAdmin(userRole)) {
-      return NextResponse.json(
-        { error: 'forbidden' },
-        { status: 403 }
-      );
-    }
-    
-    // Admin can see all orders (limited to 100)
-    const allOrdersSnapshot = await db
-      .collection(COLLECTIONS.ORDERS)
-      .orderBy('createdAt', 'desc')
-      .limit(100)
-      .get();
-    
-    const orders = allOrdersSnapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        ...data,
-        // Convert Firestore Timestamps to ISO strings
-        createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate().toISOString() : data.createdAt,
-        updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate().toISOString() : data.updatedAt
-      };
-    });
-    
-    return NextResponse.json({ orders });
+    // Handle user's own orders (no admin check needed)
+    // TODO: For user's own orders, we should implement proper user authentication
+    // For now, this endpoint requires admin access for all operations
+    return NextResponse.json(
+      { error: 'User order access not implemented with new auth system' },
+      { status: 501 }
+    );
     
   } catch (error) {
     console.error('Orders API error:', error);

@@ -4,7 +4,7 @@ export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionCookie } from '@/lib/auth/session';
-import { adb } from '@/lib/firebaseAdmin';
+import { adminDb } from '@/lib/firebaseAdmin';
 
 // Helper to get user ID from session
 const getUserId = async () => {
@@ -17,7 +17,7 @@ const getUserId = async () => {
 export async function GET() {
   try {
     const userId = await getUserId();
-    const addressesRef = adb.collection(`users/${userId}/addresses`);
+    const addressesRef = adminDb.collection(`users/${userId}/addresses`);
     const snapshot = await addressesRef.get();
     const addresses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     return NextResponse.json(addresses);
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
   try {
     const userId = await getUserId();
     const addressData = await request.json();
-    const addressesRef = adb.collection(`users/${userId}/addresses`);
+    const addressesRef = adminDb.collection(`users/${userId}/addresses`);
     const docRef = await addressesRef.add(addressData);
     return NextResponse.json({ id: docRef.id, ...addressData });
   } catch (error: any) {
@@ -44,7 +44,7 @@ export async function PUT(request: NextRequest) {
   try {
     const userId = await getUserId();
     const { id, ...updateData } = await request.json();
-    const addressRef = adb.collection(`users/${userId}/addresses`).doc(id);
+    const addressRef = adminDb.collection(`users/${userId}/addresses`).doc(id);
     await addressRef.update(updateData);
     return NextResponse.json({ id, ...updateData });
   } catch (error: any) {
@@ -57,7 +57,7 @@ export async function DELETE(request: NextRequest) {
   try {
     const userId = await getUserId();
     const { id } = await request.json();
-    const addressRef = adb.collection(`users/${userId}/addresses`).doc(id);
+    const addressRef = adminDb.collection(`users/${userId}/addresses`).doc(id);
     await addressRef.delete();
     return NextResponse.json({ success: true });
   } catch (error: any) {
