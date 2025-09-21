@@ -50,12 +50,13 @@ const auth = getAuth(app);
  */
 export async function ensureAdmin(req: NextRequest) {
   // 1) Try Firebase session cookie
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionCookie = cookieStore.get('__session')?.value || cookieStore.get('session')?.value;
 
   // 2) Try Authorization: Bearer <idToken>
   let idToken: string | undefined;
-  const authHeader = headers().get('authorization') || req.headers.get('authorization');
+  const headerStore = await headers();
+  const authHeader = headerStore.get('authorization') || req.headers.get('authorization');
   if (authHeader?.toLowerCase().startsWith('bearer ')) {
     idToken = authHeader.slice(7).trim();
   }
