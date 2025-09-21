@@ -9,7 +9,7 @@ function LoginForm() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const from = searchParams.get('from') || '/admin'
+  const from = searchParams?.get('from') || '/admin/dashboard'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
