@@ -1,0 +1,21 @@
+{
+  "status": "pending",
+  "userEmail": "test@example.com",
+  "userName": "Test User",
+  "totalCents": 1299,
+  "items": [
+    {
+      "name": "Test Burger",
+      "qty": 1,
+      "priceCents": 1299,
+      "options": ["Medium", "No Pickles"]
+    }
+  ],
+  "address": {
+    "street": "123 Test St",
+    "city": "Test City",
+    "state": "CA",
+    "zip": "12345"
+  },
+  "createdAt": "2024-01-15T10:30:00.000Z"
+}

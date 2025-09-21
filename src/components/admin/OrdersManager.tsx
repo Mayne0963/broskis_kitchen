@@ -1,6 +1,7 @@
 'use client';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import OrdersTable, { AdminOrder } from './OrdersTable';
+import OrdersKanban from '@/components/admin/OrdersKanban';
 
 const STAGES = [
   { key: 'active', label: 'Active' },
@@ -18,6 +19,7 @@ function isActiveStatus(s: string) {
 }
 
 export default function OrdersManager() {
+  const [view, setView] = useState<'list'|'kanban'>('list');
   const [stage, setStage] = useState<(typeof STAGES)[number]['key']>('active');
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
@@ -86,6 +88,12 @@ export default function OrdersManager() {
           >
             Apply
           </button>
+          <button
+            onClick={() => setView(v => v === 'list' ? 'kanban' : 'list')}
+            className="rounded-lg bg-zinc-900/50 px-3 py-2 text-sm text-zinc-200 ring-1 ring-white/10"
+          >
+            {view === 'list' ? 'Kanban View' : 'List View'}
+          </button>
         </div>
       </div>
 
@@ -94,7 +102,7 @@ export default function OrdersManager() {
         {loading && <span className="text-xs text-zinc-400">Loading…</span>}
       </div>
 
-      <OrdersTable orders={orders} />
+      {view === 'list' ? <OrdersTable orders={orders}/> : <OrdersKanban orders={orders} onMoved={() => {}} />}
 
       <div className="flex items-center justify-end gap-2">
         <button
