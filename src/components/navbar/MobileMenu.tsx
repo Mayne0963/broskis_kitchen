@@ -4,6 +4,8 @@ import React, { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { X } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/dom/lockBodyScroll'
 
 interface MobileMenuProps {
   open: boolean
@@ -16,9 +18,13 @@ export default function MobileMenu({ open, onOpenChange, items }: MobileMenuProp
 
   // Body scroll lock
   useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : ''
+    if (open) {
+      lockBodyScroll()
+    } else {
+      unlockBodyScroll()
+    }
     return () => {
-      document.body.style.overflow = ''
+      unlockBodyScroll()
     }
   }, [open])
 
@@ -60,41 +66,56 @@ export default function MobileMenu({ open, onOpenChange, items }: MobileMenuProp
   if (!open) return null
 
   return createPortal(
-    <div 
-      className="fixed inset-0 z-[100] flex flex-col bg-black/95 text-white"
-      onClick={handleBackdropClick}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="mobile-menu-title"
+    <div
+      className={cn(
+        'fixed inset-0 z-[100] transition-opacity duration-300',
+        open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+      )}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between p-6 border-b border-white/10" onClick={(e) => e.stopPropagation()}>
-        <div id="mobile-menu-title" className="text-xl font-bold text-white">
-          Broski's Kitchen
+      {/* Backdrop */}
+      <button
+        className="absolute inset-0 bg-black/60"
+        onClick={() => onOpenChange(false)}
+        aria-label="Close menu"
+      />
+      
+      {/* Panel */}
+      <div
+        className={cn(
+          'fixed inset-y-0 right-0 w-full sm:w-[420px]',
+          'bg-black text-white shadow-2xl ring-1 ring-white/10',
+          'transform transition-transform duration-300 ease-in-out',
+          'h-100dvh max-h-100dvh overflow-hidden',
+          open ? 'translate-x-0' : 'translate-x-full'
+        )}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-white/10">
+          <h2 className="text-lg font-semibold">Menu</h2>
+          <button
+            ref={closeButtonRef}
+            onClick={() => onOpenChange(false)}
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+            aria-label="Close menu"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
-        <button
-          ref={closeButtonRef}
-          onClick={() => onOpenChange(false)}
-          className="p-2 rounded-lg hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
-          aria-label="Close menu"
-        >
-          <X className="w-6 h-6" />
-        </button>
-      </div>
-
-      {/* Scrollable Navigation Links */}
-      <div className="flex-1 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }} onClick={(e) => e.stopPropagation()}>
-        <nav className="py-4">
-          {items.map((item, index) => (
-            <Link
-              key={index}
-              href={item.href}
-              onClick={handleLinkClick}
-              className="block px-6 py-4 text-lg font-medium active:opacity-80 hover:bg-white/5 transition-colors focus:outline-none focus:bg-white/10"
-            >
-              {item.label}
-            </Link>
-          ))}
+        
+        {/* Navigation */}
+        <nav className="mobile-scroll overflow-y-auto h-full p-6">
+          <div className="space-y-4">
+            {items.map((item, index) => (
+              <Link
+                key={index}
+                href={item.href}
+                className="block py-3 px-4 text-white hover:bg-white/10 rounded-lg transition-colors"
+                onClick={handleLinkClick}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
         </nav>
       </div>
     </div>,

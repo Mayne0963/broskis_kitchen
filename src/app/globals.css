@@ -1269,3 +1269,19 @@ main {
     padding: 2rem 0;
   }
 }
+
+/* Allow momentum scrolling on iOS inside panels */
+.mobile-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Dynamic viewport height fix for iOS Safari */
+.h-100dvh { height: 100dvh; }
+.min-h-100dvh { min-height: 100dvh; }
+.max-h-100dvh { max-height: 100dvh; }
+
+/* Debug CSS for visualizing fixed overlays */
+.debug-fixed *[style*="position: fixed"], .debug-fixed .fixed {
+  outline: 1px solid red !important;
+}
