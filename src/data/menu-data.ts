@@ -10,6 +10,7 @@ export const categories = [
   { id: "desserts", name: "Desserts" },
   { id: "drinks", name: "Drinks" },
   { id: "infused", name: "Infused" },
+  { id: "test", name: "Test" },
 ]
 
 // Infused menu offerings currently feature a few specialty items
@@ -391,6 +392,17 @@ export const menuItems = [
     image: '/images/menu-items/BroskisTea.png',
     category: 'drinks',
     dietary: { dairyFree: false, glutenFree: false, vegetarian: false, vegan: false },
+  },
+  // Test Item for Order Flow Testing
+  {
+    id: 'test-item-5c',
+    name: 'Test Item (5¢)',
+    description: 'This is a fake product for internal order flow testing only.',
+    price: 0.05,
+    image: '/images/test-item.svg',
+    category: 'test',
+    dietary: { dairyFree: true, glutenFree: true, vegetarian: true, vegan: true },
+    isTestItem: true,
   },
 ] 
 

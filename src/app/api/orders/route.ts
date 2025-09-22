@@ -68,6 +68,12 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const mine = searchParams.get('mine') === '1';
     const wantKpi = searchParams.get('kpi') === '1';
+    const includeTestParam = searchParams.get('includeTest');
+    
+    // Determine includeTest default based on environment
+    const includeTest = includeTestParam !== null 
+      ? includeTestParam === 'true' 
+      : process.env.NODE_ENV === 'development';
     
     // For admin-only operations (KPI or all orders), verify admin authentication
     if (wantKpi || !mine) {
@@ -84,11 +90,17 @@ export async function GET(request: NextRequest) {
       }
     
       // Admin can see all orders (limited to 100)
-      const allOrdersSnapshot = await db
+      let ordersQuery = db
         .collection(COLLECTIONS.ORDERS)
         .orderBy('createdAt', 'desc')
-        .limit(100)
-        .get();
+        .limit(100);
+      
+      // Filter out test orders if includeTest is false
+      if (!includeTest) {
+        ordersQuery = ordersQuery.where('isTest', '!=', true);
+      }
+      
+      const allOrdersSnapshot = await ordersQuery.get();
     
       const orders = allOrdersSnapshot.docs.map(doc => {
         const data = doc.data();
@@ -97,7 +109,10 @@ export async function GET(request: NextRequest) {
           ...data,
           // Convert Firestore Timestamps to ISO strings
           createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate().toISOString() : data.createdAt,
-          updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate().toISOString() : data.updatedAt
+          updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate().toISOString() : data.updatedAt,
+          // Ensure test order fields are included
+          isTest: data.isTest || false,
+          tags: data.tags || []
         };
       });
     

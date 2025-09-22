@@ -187,7 +187,7 @@ export default function MobileMenu({ open, onOpenChange, items }: MobileMenuProp
               </Link>
               {isAdmin && (
                 <Link 
-                  href="/admin/dashboard" 
+                  href="/admin/dsahboard" 
                   onClick={closeMenu} 
                   data-testid="mobile-menu-cta"
                   className="btn btn-warning w-full"

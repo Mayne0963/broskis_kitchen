@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { adminDb, Timestamp } from '@/lib/firebaseAdmin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
+import { isTestOrder, markAsTestOrder } from '@/lib/orders/isTestOrder';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-02-24.acacia',
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Build order object
-        const order = {
+        const orderDraft = {
           id: fullSession.id,
           payment_intent: fullSession.payment_intent,
           amount_total: fullSession.amount_total,
@@ -65,8 +66,12 @@ export async function POST(req: NextRequest) {
             productId: typeof item.price?.product === 'object' ? item.price.product.id : item.price?.product || undefined
           })) || [],
           mode: fullSession.mode,
-          status: 'paid' as const
+          status: 'paid' as const,
+          metadata: fullSession.metadata || {}
         };
+
+        // Check if this is a test order and mark it accordingly
+        const order = isTestOrder(orderDraft) ? markAsTestOrder(orderDraft) : orderDraft;
 
         // Write to Firestore using detected collection name
         await adminDb.collection(COLLECTIONS.ORDERS).doc(fullSession.id).set(order);

@@ -63,6 +63,12 @@ interface OrderCardProps {
 }
 
 const OrderCard: React.FC<OrderCardProps> = ({ order, index }) => {
+  const hasTestItem = order.items.some(item => 
+    item.id === 'test-item-5c' || item.name?.includes('Test Item')
+  );
+  const isProduction = process.env.NODE_ENV === 'production';
+  const showTestWarning = hasTestItem && isProduction;
+  
   return (
     <Draggable draggableId={order.id} index={index}>
       {(provided, snapshot) => (
@@ -71,9 +77,10 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, index }) => {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           className={`
-            rounded-xl bg-zinc-900/60 ring-1 ring-white/10 p-4 mb-3 cursor-grab
+            rounded-xl ring-1 ring-white/10 p-4 mb-3 cursor-grab
             hover:bg-zinc-900/80 transition-all duration-200
             ${snapshot.isDragging ? 'shadow-2xl ring-2 ring-blue-500/50 rotate-2 scale-105' : ''}
+            ${showTestWarning ? 'bg-red-900/40 ring-red-500/50' : 'bg-zinc-900/60'}
           `}
         >
           <div className="space-y-3">
@@ -82,7 +89,18 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, index }) => {
               <h3 className="font-semibold text-zinc-100 text-sm truncate">
                 #{order.id.slice(-8)}
               </h3>
-              <StatusPill status={order.status} />
+              <div className="flex items-center gap-2">
+                {hasTestItem && (
+                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                    showTestWarning 
+                      ? 'bg-red-100 text-red-800 border border-red-200' 
+                      : 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+                  }`}>
+                    {showTestWarning ? '⚠️ TEST' : 'TEST'}
+                  </span>
+                )}
+                <StatusPill status={order.status} />
+              </div>
             </div>
 
             {/* Customer Info */}

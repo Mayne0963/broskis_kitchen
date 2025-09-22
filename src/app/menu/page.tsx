@@ -1,5 +1,6 @@
 "use client"
-import { useState, useEffect } from "react"
+
+import { useState, useEffect, useMemo } from "react"
 import type { Metadata } from "next"
 
 // Note: Metadata export for client components is handled by layout.tsx
@@ -11,7 +12,8 @@ import { FaSearch, FaFilter, FaStar, FaFire, FaLeaf } from "react-icons/fa"
 import AgeVerificationModal from "../../components/modals/AgeVerificationModal"
 import MenuItemCard from "../../components/menu/MenuItemCard"
 import CategoryFilter from "../../components/menu/CategoryFilter"
-import { menuItems, categories } from "../../data/menu-data"
+import { categories } from "../../data/menu-data"
+import { getVisibleMenuItems, shouldShowTestItems } from "../../utils/menuUtils"
 import type { CustomizationOption } from "../../types"
 import { GridSkeleton, EmptyState, SearchLoading } from "../../components/common/LoadingStates"
 import { LoadingOverlay, useLoadingState } from "../../components/common/EnhancedLoadingStates"
@@ -22,7 +24,15 @@ export default function MenuPage() {
   const [showAgeModal, setShowAgeModal] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
-  const [filteredItems, setFilteredItems] = useState(menuItems)
+  
+  // Get visible menu items based on environment and query params
+  const visibleMenuItems = useMemo(() => {
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search)
+      return getVisibleMenuItems(searchParams)
+    }
+    return getVisibleMenuItems()
+  }, [])
   
   // Hero Image Section
   const heroSection = (
@@ -65,46 +75,49 @@ export default function MenuPage() {
     return () => clearTimeout(timer)
   }, [])
 
-  // Filter menu items based on selected category, search query, and filters
-  useEffect(() => {
-    const filterItems = () => {
-      let filtered = [...menuItems]
-
+  // Filter items based on search, category, price, and dietary preferences
+  const filteredItems = useMemo(() => {
+    return visibleMenuItems.filter((item) => {
       // Filter by category
-      if (selectedCategory !== "all") {
-        filtered = filtered.filter((item) => item.category === selectedCategory)
+      if (selectedCategory !== "all" && item.category !== selectedCategory) {
+        return false
       }
 
       // Filter by search query
       if (searchQuery) {
         const query = searchQuery.toLowerCase()
-        filtered = filtered.filter(
-          (item) => item.name.toLowerCase().includes(query) || item.description.toLowerCase().includes(query),
-        )
+        const matchesSearch = 
+          item.name.toLowerCase().includes(query) ||
+          item.description.toLowerCase().includes(query) ||
+          item.category.toLowerCase().includes(query)
+        if (!matchesSearch) return false
       }
 
       // Filter by price range
-      filtered = filtered.filter((item) => item.price >= priceRange[0] && item.price <= priceRange[1])
+      const price = typeof item.price === 'string' 
+        ? Number.parseFloat(item.price.replace("$", ""))
+        : item.price
+      if (price < priceRange[0] || price > priceRange[1]) {
+        return false
+      }
 
       // Filter by dietary preferences
-      if (dietaryFilters.vegetarian) {
-        filtered = filtered.filter((item) => item.dietary?.vegetarian)
+      if (dietaryFilters.vegetarian && !item.dietary?.vegetarian) {
+        return false
       }
-      if (dietaryFilters.vegan) {
-        filtered = filtered.filter((item) => item.dietary?.vegan)
+      if (dietaryFilters.vegan && !item.dietary?.vegan) {
+        return false
       }
-      if (dietaryFilters.glutenFree) {
-        filtered = filtered.filter((item) => item.dietary?.glutenFree)
+      if (dietaryFilters.glutenFree && !item.dietary?.glutenFree) {
+        return false
       }
-      if (dietaryFilters.dairyFree) {
-        filtered = filtered.filter((item) => item.dietary?.dairyFree)
+      if (dietaryFilters.dairyFree && !item.dietary?.dairyFree) {
+        return false
       }
 
-      setFilteredItems(filtered)
-    }
-
-    filterItems()
-  }, [selectedCategory, searchQuery, priceRange, dietaryFilters, menuItems])
+      return true
+    })
+  }, [visibleMenuItems, searchQuery, selectedCategory, priceRange, dietaryFilters])
 
   // Handle adding item to cart
   const handleAddToCart = (
@@ -309,9 +322,10 @@ export default function MenuPage() {
             
             {!isInitialLoading && !isSearching && (
               <>
-                {filteredItems.length > 0 ? (
+                {/* Regular Menu Items */}
+                {filteredItems.filter(item => !item.isTestItem).length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {filteredItems.map((item) => (
+                    {filteredItems.filter(item => !item.isTestItem).map((item) => (
                       <MenuItemCard
                         key={item.id}
                         item={item}
@@ -320,28 +334,58 @@ export default function MenuPage() {
                     ))}
                   </div>
                 ) : (
-                  <EmptyState
-                    title="No items found"
-                    description="No menu items match your current filters. Try adjusting your search criteria."
-                    action={
-                      <button
-                        className="btn-primary"
-                        onClick={() => {
-                          setSelectedCategory("all")
-                          setSearchQuery("")
-                          setPriceRange([0, 50])
-                          setDietaryFilters({
-                            vegetarian: false,
-                            vegan: false,
-                            glutenFree: false,
-                            dairyFree: false,
-                          })
-                        }}
-                      >
-                        Reset Filters
-                      </button>
-                    }
-                  />
+                  !filteredItems.some(item => item.isTestItem) && (
+                    <EmptyState
+                      title="No items found"
+                      description="No menu items match your current filters. Try adjusting your search criteria."
+                      action={
+                        <button
+                          className="btn-primary"
+                          onClick={() => {
+                            setSelectedCategory("all")
+                            setSearchQuery("")
+                            setPriceRange([0, 50])
+                            setDietaryFilters({
+                              vegetarian: false,
+                              vegan: false,
+                              glutenFree: false,
+                              dairyFree: false,
+                            })
+                          }}
+                        >
+                          Reset Filters
+                        </button>
+                      }
+                    />
+                  )
+                )}
+
+                {/* Test Items Section */}
+                {filteredItems.some(item => item.isTestItem) && (
+                  <div className="mt-16">
+                    <div className="flex items-center gap-3 mb-8">
+                      <h2 className="text-2xl font-bold">Test Products</h2>
+                      <div className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                        TEST
+                      </div>
+                      <div className="text-sm text-gray-400">
+                        (Internal Testing Only)
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                      {filteredItems.filter(item => item.isTestItem).map((item) => (
+                        <div key={item.id} className="relative">
+                          <div className="absolute -top-2 -right-2 z-10 bg-red-600 text-white px-2 py-1 rounded-full text-xs font-bold">
+                            TEST
+                          </div>
+                          <MenuItemCard
+                            item={item}
+                            onAddToCart={(quantity, customizations) => handleAddToCart(item, quantity, customizations)}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </>
             )}

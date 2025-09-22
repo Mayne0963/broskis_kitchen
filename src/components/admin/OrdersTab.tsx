@@ -18,7 +18,9 @@ import {
   AlertCircle,
   Package,
   ChefHat,
-  MapPin
+  MapPin,
+  ToggleLeft,
+  ToggleRight
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Order, OrderStatus } from '@/types/order'
@@ -28,6 +30,7 @@ import { COLLECTIONS } from '@/lib/firebase/collections'
 import OrderStatusUpdate from '@/components/orders/OrderStatusUpdate'
 import { STATUS_INFO, getStatusColorClass } from '@/lib/utils/orderStatusValidation'
 import { safeFetch } from '@/lib/utils/safeFetch'
+import { isTestOrder } from '@/lib/orders/isTestOrder'
 
 interface OrdersTabProps {
   initialOrders?: Order[]
@@ -89,6 +92,7 @@ export default function OrdersTab({ initialOrders = [] }: OrdersTabProps) {
   const [isUpdating, setIsUpdating] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [includeTest, setIncludeTest] = useState(process.env.NODE_ENV === 'development')
 
   // Set up real-time Firebase listener
   useEffect(() => {
@@ -129,7 +133,7 @@ export default function OrdersTab({ initialOrders = [] }: OrdersTabProps) {
     return () => unsubscribe()
   }, [initialOrders])
 
-  // Filter orders based on search, status, order type, and date
+  // Filter orders based on search, status, order type, date, and test status
   const filteredOrders = orders.filter(order => {
     const matchesSearch = 
       order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -138,6 +142,10 @@ export default function OrdersTab({ initialOrders = [] }: OrdersTabProps) {
     
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter
     const matchesOrderType = orderTypeFilter === 'all' || order.orderType === orderTypeFilter
+    
+    // Test order filtering
+    const orderIsTest = isTestOrder(order)
+    const matchesTestFilter = includeTest || !orderIsTest
     
     // Date filtering
     let matchesDate = true
@@ -161,7 +169,7 @@ export default function OrdersTab({ initialOrders = [] }: OrdersTabProps) {
       }
     }
     
-    return matchesSearch && matchesStatus && matchesOrderType && matchesDate
+    return matchesSearch && matchesStatus && matchesOrderType && matchesDate && matchesTestFilter
   })
 
   const handleStatusUpdate = async (orderId: string, newStatus: OrderStatus) => {
@@ -172,7 +180,7 @@ export default function OrdersTab({ initialOrders = [] }: OrdersTabProps) {
 
   const refreshOrders = async () => {
     try {
-      const response = await safeFetch('/api/orders')
+      const response = await safeFetch(`/api/orders?includeTest=${includeTest}`)
       if (response.ok) {
         const data = await response.json()
         setOrders(data.orders || [])
@@ -296,6 +304,20 @@ const canAdvanceStatus = (status: OrderStatus) => {
             </SelectContent>
           </Select>
           
+          {/* Test Orders Toggle */}
+          <Button
+            variant={includeTest ? "default" : "outline"}
+            size="sm"
+            onClick={() => setIncludeTest(!includeTest)}
+            className={includeTest 
+              ? "bg-gradient-to-r from-[#B7985A] to-[#D2BA6A] text-black border-0 shadow-lg shadow-[#B7985A]/30" 
+              : "bg-gray-700/50 border-[#B7985A]/30 text-gray-300 hover:bg-[#B7985A]/20 hover:text-white hover:border-[#FFD700]/50"
+            }
+          >
+            {includeTest ? <ToggleRight className="h-4 w-4 mr-2" /> : <ToggleLeft className="h-4 w-4 mr-2" />}
+            Show test orders
+          </Button>
+          
           {/* Clear Filters Button */}
           {(searchTerm || statusFilter !== 'all' || orderTypeFilter !== 'all' || dateFilter !== 'all') && (
             <Button
@@ -354,7 +376,9 @@ const canAdvanceStatus = (status: OrderStatus) => {
             const StatusIcon = getStatusIcon(order.status)
             
             return (
-              <Card key={order.id} className="bg-gradient-to-br from-gray-900 to-black border-[#B7985A]/30 hover:border-[#FFD700]/50 transition-all duration-300 hover:shadow-lg hover:shadow-[#FFD700]/10">
+              <Card key={order.id} className={`bg-gradient-to-br from-gray-900 to-black border-[#B7985A]/30 hover:border-[#FFD700]/50 transition-all duration-300 hover:shadow-lg hover:shadow-[#FFD700]/10 ${
+                  isTestOrder(order) ? 'ring-1 ring-red-500/40 hover:ring-red-500/60' : ''
+                }`}>
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
@@ -364,6 +388,11 @@ const canAdvanceStatus = (status: OrderStatus) => {
                           <StatusIcon className="h-3 w-3 mr-1" />
                           {getStatusDisplayName(order.status)}
                         </Badge>
+                        {isTestOrder(order) && (
+                          <span className="bg-red-600/80 text-white text-[10px] px-2 py-0.5 rounded font-medium">
+                            TEST ORDER
+                          </span>
+                        )}
                         {order.orderType === 'delivery' && (
                           <Badge variant="outline" className="text-xs bg-[#B7985A]/20 text-[#FFD700] border-[#B7985A]/30">
                             <Truck className="h-3 w-3 mr-1" />
@@ -485,6 +514,20 @@ const canAdvanceStatus = (status: OrderStatus) => {
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Test Order Banner */}
+              {isTestOrder(selectedOrder) && (
+                <div className="bg-red-600/20 border border-red-500/50 rounded-lg p-4 mb-6">
+                  <div className="flex items-center gap-3">
+                    <AlertCircle className="h-5 w-5 text-red-400" />
+                    <div>
+                      <h3 className="text-red-400 font-semibold text-sm">TEST ORDER</h3>
+                      <p className="text-red-300/80 text-xs mt-1">
+                        Contains internal test product(s) and is excluded from live metrics.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <h4 className="font-medium mb-3 text-white">Customer Information</h4>

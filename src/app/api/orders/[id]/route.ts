@@ -32,7 +32,10 @@ export async function GET(
       ...data,
       // Convert Firestore Timestamps to ISO strings
       createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate().toISOString() : data.createdAt,
-      updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate().toISOString() : data.updatedAt
+      updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate().toISOString() : data.updatedAt,
+      // Ensure test order fields are included
+      isTest: data.isTest || false,
+      tags: data.tags || []
     };
     
     return NextResponse.json({
@@ -103,7 +106,10 @@ export async function PATCH(
       ...data,
       // Convert Firestore Timestamps to ISO strings
       createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate().toISOString() : data.createdAt,
-      updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate().toISOString() : data.updatedAt
+      updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate().toISOString() : data.updatedAt,
+      // Ensure test order fields are included
+      isTest: data.isTest || false,
+      tags: data.tags || []
     };
     
     return NextResponse.json({

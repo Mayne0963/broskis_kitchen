@@ -68,6 +68,13 @@ export interface Order {
   // Add payment status
   paymentStatus?: 'pending' | 'processing' | 'succeeded' | 'failed' | 'canceled'
   stripePaymentIntentId?: string
+  // Test order marking fields
+  isTest?: boolean
+  tags?: string[]
+  metadata?: {
+    isTest?: boolean
+    [key: string]: any
+  }
 }
 
 export type OrderStatus = 

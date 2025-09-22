@@ -39,6 +39,13 @@ export interface Order {
     type: 'card' | 'cash' | 'digital';
     last4?: string;
   };
+  // Test order marking fields
+  isTest?: boolean;
+  tags?: string[];
+  metadata?: {
+    isTest?: boolean;
+    [key: string]: any;
+  };
 }
 
 // User related types

@@ -48,7 +48,8 @@
     "validate:local": "node scripts/setup-vercel-env.js validate",
     "env:help": "node scripts/setup-vercel-env.js help",
     "env:setup": "node scripts/setup-vercel-env.js",
-    "env:commands": "bash scripts/vercel-env-commands.sh"
+    "env:commands": "bash scripts/vercel-env-commands.sh",
+    "backfill-test-orders": "tsx scripts/backfill-test-orders.ts"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
@@ -135,6 +136,7 @@
     "eslint": "^9.17.0",
     "eslint-config-next": "15.1.3",
     "jsdom": "^27.0.0",
+    "tsx": "^4.19.2",
     "vitest": "^3.2.4"
   }
 }
