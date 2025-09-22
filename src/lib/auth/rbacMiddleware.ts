@@ -23,7 +23,7 @@ export const ROLE_ROUTES = {
   ],
   admin: [
     '/admin',
-    '/admin/dsahboard',
+    '/admin/dashboard',
     '/admin/orders',
     '/admin/analytics',
     '/admin/users',

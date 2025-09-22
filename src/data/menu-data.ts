@@ -396,9 +396,9 @@ export const menuItems = [
   // Test Item for Order Flow Testing
   {
     id: 'test-item-5c',
-    name: 'Test Item (5¢)',
+    name: 'Test Item ($0.50)',
     description: 'This is a fake product for internal order flow testing only.',
-    price: 0.05,
+    price: 0.50,
     image: '/images/test-item.svg',
     category: 'test',
     dietary: { dairyFree: true, glutenFree: true, vegetarian: true, vegan: true },

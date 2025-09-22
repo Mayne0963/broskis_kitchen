@@ -29,6 +29,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Stripe minimum charge validation
+    const MIN_USD_CENTS = 50;
+    const amountInCents = Math.round(amount * 100);
+    if (currency === 'usd' && amountInCents < MIN_USD_CENTS) {
+      return NextResponse.json(
+        { error: 'Minimum charge is $0.50 USD. Please add more items.' },
+        { status: 400 }
+      );
+    }
+
     // Prepare payment intent options
     const paymentIntentOptions: Stripe.PaymentIntentCreateParams = {
       amount: Math.round(amount * 100), // Convert to cents

@@ -40,10 +40,11 @@ export function isTestOrder(order: OrderLike): boolean {
   // Method 4: Check metadata.isTest
   const byMeta = !!order.metadata?.isTest;
 
-  // Method 5: Very safe fallback - totalCents <= 5 AND currency === 'USD'
+  // Method 5: Very safe fallback - totalCents <= 50 AND currency === 'USD'
   // Handle different total field names (totalCents, total, amount_total)
+  // Updated to account for 50¢ test item price
   const totalAmount = order.totalCents || order.total || order.amount_total || 0;
-  const byAmount = Number(totalAmount) <= 5 && order.currency === 'USD';
+  const byAmount = Number(totalAmount) <= 50 && order.currency === 'USD';
 
   return Boolean(byItem || byTag || byFlag || byMeta || byAmount);
 }

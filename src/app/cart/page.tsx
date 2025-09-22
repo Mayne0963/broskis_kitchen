@@ -25,6 +25,11 @@ export default function CartPage() {
 
   const isAuthenticated = !!user
 
+  // Stripe minimum charge validation
+  const MIN_USD_CENTS = 50;
+  const totalCents = Math.round(total * 100);
+  const isUnderMinimum = totalCents < MIN_USD_CENTS;
+
   const payloadItems = useMemo(() => {
     return (items || []).map((it: any) => ({
       name: String(it?.name ?? it?.title ?? "Item"),
@@ -34,6 +39,12 @@ export default function CartPage() {
   }, [items]);
 
   async function proceedToCheckout() {
+    // Check minimum charge before proceeding
+    if (isUnderMinimum) {
+      alert("Stripe requires a minimum charge of $0.50.");
+      return;
+    }
+
     try {
       setLoading(true);
       const res = await safeFetch("/api/checkout/session", {
@@ -46,7 +57,12 @@ export default function CartPage() {
         window.location.href = j.url;
       } else {
         console.error("Checkout error:", j);
-        alert(j?.error || "Unable to start checkout");
+        // Handle specific minimum charge error from server
+        if (j?.error?.includes("Minimum charge is $0.50")) {
+          alert("Stripe requires a minimum charge of $0.50. Please add more items.");
+        } else {
+          alert(j?.error || "Unable to start checkout");
+        }
       }
     } catch (e) {
       console.error(e);
@@ -283,9 +299,17 @@ export default function CartPage() {
                 </div>
               </div>
 
+              {isUnderMinimum && (
+                <div className="mb-4 p-3 bg-yellow-900/20 border border-yellow-600 rounded-lg">
+                  <p className="text-yellow-400 text-sm text-center">
+                    Stripe requires a minimum charge of $0.50.
+                  </p>
+                </div>
+              )}
+
               <button
                 onClick={proceedToCheckout}
-                disabled={loading || payloadItems.length === 0}
+                disabled={loading || payloadItems.length === 0 || isUnderMinimum}
                 className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-60"
               >
                 <FaCreditCard /> {loading ? "Starting…" : "Proceed to Checkout"}

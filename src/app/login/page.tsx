@@ -9,7 +9,7 @@ function LoginForm() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const from = searchParams?.get('from') || '/admin/dsahboard'
+  const from = searchParams?.get('from') || '/admin/dashboard'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,7 +27,7 @@ function LoginForm() {
 
       if (response.ok) {
         const data = await response.json()
-        router.push(data.redirect || '/admin/dsahboard')
+        router.push(data.redirect || '/admin/dashboard')
       } else {
         setError('Invalid access code')
       }

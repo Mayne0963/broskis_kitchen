@@ -38,6 +38,16 @@ export async function POST(req: Request) {
   const TAX_RATE = 0.0825; // 8.25% sales tax
   const subtotal = clean.reduce((sum, item) => sum + (item.amount * item.qty), 0);
   const taxAmount = Math.round(subtotal * TAX_RATE);
+  const totalCents = subtotal + taxAmount;
+
+  // Stripe minimum charge validation
+  const MIN_USD_CENTS = 50;
+  if (totalCents < MIN_USD_CENTS) {
+    return NextResponse.json(
+      { error: 'Minimum charge is $0.50 USD. Please add more items.' },
+      { status: 400 }
+    );
+  }
 
   const successUrl = `${baseUrl()}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = `${baseUrl()}/checkout/cancel`;
