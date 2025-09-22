@@ -18,6 +18,7 @@ import {
   AccessibleButton 
 } from "../accessibility/AccessibilityEnhancer"
 import MobileMenu from "../navbar/MobileMenu"
+import { NAV_ITEMS, visibleNav } from "../../config/nav"
 
 const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -91,6 +92,7 @@ const Navbar: React.FC = () => {
 
         <button
            type="button"
+           data-testid="mobile-menu-toggle"
            aria-label="Open menu"
            onClick={() => setMobileMenuOpen(true)}
            className="md:hidden inline-flex items-center justify-center rounded-lg px-3 py-2 ring-1 ring-white/20 bg-zinc-900/60 text-white"
@@ -99,33 +101,16 @@ const Navbar: React.FC = () => {
          </button>
 
         <div className="hidden md:flex items-center space-x-6">
-          <Link href="/menu" className={`nav-link ${pathname === "/menu" ? "nav-link-active" : ""}`}>
-            Menu
-          </Link>
-          <Link href="/infused-menu" className={`nav-link ${pathname === "/infused-menu" ? "nav-link-active" : ""}`}>
-            Infused Menu - Coming Soon
-          </Link>
-          <Link href="/locations" className={`nav-link ${pathname === "/locations" ? "nav-link-active" : ""}`}>
-            Locations
-          </Link>
-          <Link href="/events" className={`nav-link ${pathname === "/events" ? "nav-link-active" : ""}`}>
-            Events
-          </Link>
-          <Link href="/music" className={`nav-link ${pathname === "/music" ? "nav-link-active" : ""}`}>
-            Music
-          </Link>
-          <Link href="/rewards" className={`nav-link ${pathname === "/rewards" ? "nav-link-active" : ""}`}>
-            Rewards
-          </Link>
-          <Link href="/shop" className={`nav-link ${pathname === "/shop" ? "nav-link-active" : ""}`}>
-            Shop
-          </Link>
-          <Link href="/catering" className={`nav-link ${pathname === "/catering" ? "nav-link-active" : ""}`}>
-            Catering
-          </Link>
-          <Link href="/contact" className={`nav-link ${pathname === "/contact" ? "nav-link-active" : ""}`}>
-            Contact
-          </Link>
+          {visibleNav(NAV_ITEMS, { isMobile: false, isAuthed: !!user, isAdmin: !!claims?.admin }).map((item) => (
+            <Link 
+              key={item.href}
+              href={item.href} 
+              className={`nav-link ${pathname === item.href ? "nav-link-active" : ""}`}
+              {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+            >
+              {item.label}
+            </Link>
+          ))}
           <a 
             href="https://otw-chi.vercel.app" 
             className="broski-otw-gold-button"
@@ -201,17 +186,7 @@ const Navbar: React.FC = () => {
       <MobileMenu 
         open={mobileMenuOpen} 
         onOpenChange={setMobileMenuOpen} 
-        items={[
-          { href: "/menu", label: "Menu" },
-          { href: "/infused-menu", label: "Infused Menu" },
-          { href: "/locations", label: "Locations" },
-          { href: "/events", label: "Events" },
-          { href: "/music", label: "Music" },
-          { href: "/rewards", label: "Rewards" },
-          { href: "/shop", label: "Shop" },
-          { href: "/catering", label: "Catering" },
-          { href: "/contact", label: "Contact" },
-        ]}
+        items={visibleNav(NAV_ITEMS, { isMobile: true, isAuthed: !!user, isAdmin: !!claims?.admin })}
       />
       </nav>
       <EmailVerificationBanner className="fixed top-20 left-0 right-0 z-40 mx-4" />

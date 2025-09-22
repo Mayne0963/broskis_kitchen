@@ -1,0 +1,882 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - link "Skip to main content" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - link "Skip to navigation" [ref=e4] [cursor=pointer]:
+      - /url: "#navigation"
+  - navigation "Main navigation" [ref=e5]:
+    - generic [ref=e6]:
+      - link "Broski's Kitchen" [ref=e7] [cursor=pointer]:
+        - /url: /
+      - button "Open menu" [ref=e8] [cursor=pointer]:
+        - img [ref=e9] [cursor=pointer]
+  - main [ref=e12]:
+    - generic [ref=e13]:
+      - generic [ref=e14]:
+        - img "Broski's Kitchen Menu" [ref=e16]
+        - generic [ref=e18]:
+          - heading "Our Menu" [level=1] [ref=e19]
+          - paragraph [ref=e20]: Discover our luxury street gourmet dishes, crafted with premium ingredients and innovative techniques.
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - textbox "Search menu..." [ref=e25]
+          - img [ref=e26]
+        - generic [ref=e29]:
+          - button "All" [ref=e30] [cursor=pointer]
+          - button "Breakfast" [ref=e31] [cursor=pointer]
+          - button "Burgers" [ref=e32] [cursor=pointer]
+          - button "Wings" [ref=e33] [cursor=pointer]
+          - button "Tacos" [ref=e34] [cursor=pointer]
+          - button "Sandwiches" [ref=e35] [cursor=pointer]
+          - button "Sides" [ref=e36] [cursor=pointer]
+          - button "Desserts" [ref=e37] [cursor=pointer]
+          - button "Drinks" [ref=e38] [cursor=pointer]
+          - button "Infused" [ref=e39] [cursor=pointer]
+        - button "Show Filters" [ref=e40] [cursor=pointer]:
+          - img [ref=e41] [cursor=pointer]
+          - text: Show Filters
+      - generic [ref=e46]:
+        - generic [ref=e47]:
+          - generic [ref=e48]:
+            - img "Broskis Pearl Sugar Waffles" [ref=e50]
+            - generic [ref=e52]: breakfast
+          - generic [ref=e53]:
+            - generic [ref=e54]:
+              - heading "Broskis Pearl Sugar Waffles" [level=3] [ref=e55]
+              - generic [ref=e56]: $12.99
+            - paragraph [ref=e57]: Crisp golden waffles served with powdered sugar, warm maple syrup and whipped butter on the side.
+            - generic [ref=e59]: Vegetarian
+            - generic [ref=e60]:
+              - generic [ref=e61]:
+                - button [ref=e62] [cursor=pointer]:
+                  - img [ref=e63] [cursor=pointer]
+                - generic [ref=e65]: "1"
+                - button [ref=e66] [cursor=pointer]:
+                  - img [ref=e67] [cursor=pointer]
+              - button "Add to Cart" [ref=e69] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e70] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e71]:
+          - generic [ref=e72]:
+            - img "Sweet Potato Pancakes" [ref=e74]
+            - generic [ref=e76]: breakfast
+          - generic [ref=e77]:
+            - generic [ref=e78]:
+              - heading "Sweet Potato Pancakes" [level=3] [ref=e79]
+              - generic [ref=e80]: $12.99
+            - paragraph [ref=e81]: Fluffy pancakes made with mashed sweet potatoes and warm spices.
+            - generic [ref=e83]: Vegetarian
+            - generic [ref=e84]:
+              - generic [ref=e85]:
+                - button [ref=e86] [cursor=pointer]:
+                  - img [ref=e87] [cursor=pointer]
+                - generic [ref=e89]: "1"
+                - button [ref=e90] [cursor=pointer]:
+                  - img [ref=e91] [cursor=pointer]
+              - button "Add to Cart" [ref=e93] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e94] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e95]:
+          - generic [ref=e96]:
+            - img "Veggie Burger Deluxe" [ref=e98]
+            - generic [ref=e100]: burgers
+          - generic [ref=e101]:
+            - generic [ref=e102]:
+              - heading "Veggie Burger Deluxe" [level=3] [ref=e103]
+              - generic [ref=e104]: $12.99
+            - paragraph [ref=e105]: Plant-based patty topped with vegan cheese and crisp pickles on a soft brioche bun.
+            - generic [ref=e106]:
+              - generic [ref=e107]: Vegetarian
+              - generic [ref=e108]: Vegan
+              - generic [ref=e109]: Dairy Free
+            - generic [ref=e110]:
+              - generic [ref=e111]:
+                - button [ref=e112] [cursor=pointer]:
+                  - img [ref=e113] [cursor=pointer]
+                - generic [ref=e115]: "1"
+                - button [ref=e116] [cursor=pointer]:
+                  - img [ref=e117] [cursor=pointer]
+              - button "Add to Cart" [ref=e119] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e120] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e121]:
+          - generic [ref=e122]:
+            - img "Broskis Veggie Sliders" [ref=e124]
+            - generic [ref=e126]: burgers
+          - generic [ref=e127]:
+            - generic [ref=e128]:
+              - heading "Broskis Veggie Sliders" [level=3] [ref=e129]
+              - generic [ref=e130]: $13.99
+            - paragraph [ref=e131]: Three mini plant-based sliders stacked with melted American cheese on toasted brioche buns.
+            - generic [ref=e132]:
+              - generic [ref=e133]: Vegetarian
+              - generic [ref=e134]: Vegan
+              - generic [ref=e135]: Dairy Free
+            - generic [ref=e136]:
+              - generic [ref=e137]:
+                - button [ref=e138] [cursor=pointer]:
+                  - img [ref=e139] [cursor=pointer]
+                - generic [ref=e141]: "1"
+                - button [ref=e142] [cursor=pointer]:
+                  - img [ref=e143] [cursor=pointer]
+              - button "Add to Cart" [ref=e145] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e146] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e147]:
+          - generic [ref=e148]:
+            - img "Double Stack Veggie Burger" [ref=e150]
+            - generic [ref=e152]: burgers
+          - generic [ref=e153]:
+            - generic [ref=e154]:
+              - heading "Double Stack Veggie Burger" [level=3] [ref=e155]
+              - generic [ref=e156]: $12.99
+            - paragraph [ref=e157]: Two plant-based patties layered with melted American cheese and our signature special sauce.
+            - generic [ref=e158]:
+              - generic [ref=e159]: Vegetarian
+              - generic [ref=e160]: Vegan
+              - generic [ref=e161]: Dairy Free
+            - generic [ref=e162]:
+              - generic [ref=e163]:
+                - button [ref=e164] [cursor=pointer]:
+                  - img [ref=e165] [cursor=pointer]
+                - generic [ref=e167]: "1"
+                - button [ref=e168] [cursor=pointer]:
+                  - img [ref=e169] [cursor=pointer]
+              - button "Add to Cart" [ref=e171] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e172] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e173]:
+          - generic [ref=e174]:
+            - img "Boosie Gold Wings" [ref=e176]
+            - generic [ref=e178]: wings
+          - generic [ref=e179]:
+            - generic [ref=e180]:
+              - heading "Boosie Gold Wings" [level=3] [ref=e181]
+              - generic [ref=e182]: $12.99
+            - paragraph [ref=e183]: Crispy fried wings coated in our signature honey-gold sauce with a sprinkle of sesame seeds.
+            - generic [ref=e184]:
+              - generic [ref=e185]:
+                - button [ref=e186] [cursor=pointer]:
+                  - img [ref=e187] [cursor=pointer]
+                - generic [ref=e189]: "1"
+                - button [ref=e190] [cursor=pointer]:
+                  - img [ref=e191] [cursor=pointer]
+              - button "Add to Cart" [ref=e193] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e194] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e195]:
+          - generic [ref=e196]:
+            - img "Smoked Fried Wings" [ref=e198]
+            - generic [ref=e200]: wings
+          - generic [ref=e201]:
+            - generic [ref=e202]:
+              - heading "Smoked Fried Wings" [level=3] [ref=e203]
+              - generic [ref=e204]: $12.99
+            - paragraph [ref=e205]: Crispy wings drenched in our fiery house-made red hot sauce.
+            - generic [ref=e206]:
+              - generic [ref=e207]:
+                - button [ref=e208] [cursor=pointer]:
+                  - img [ref=e209] [cursor=pointer]
+                - generic [ref=e211]: "1"
+                - button [ref=e212] [cursor=pointer]:
+                  - img [ref=e213] [cursor=pointer]
+              - button "Add to Cart" [ref=e215] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e216] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e217]:
+          - generic [ref=e218]:
+            - img "Sexyy Red Wings" [ref=e220]
+            - generic [ref=e222]: wings
+          - generic [ref=e223]:
+            - generic [ref=e224]:
+              - heading "Sexyy Red Wings" [level=3] [ref=e225]
+              - generic [ref=e226]: $12.99
+            - paragraph [ref=e227]: Spicy wings coated in our signature bright red hot sauce.
+            - generic [ref=e228]:
+              - generic [ref=e229]:
+                - button [ref=e230] [cursor=pointer]:
+                  - img [ref=e231] [cursor=pointer]
+                - generic [ref=e233]: "1"
+                - button [ref=e234] [cursor=pointer]:
+                  - img [ref=e235] [cursor=pointer]
+              - button "Add to Cart" [ref=e237] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e238] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e239]:
+          - generic [ref=e240]:
+            - img "Birria Tacos" [ref=e242]
+            - generic [ref=e244]: tacos
+          - generic [ref=e245]:
+            - generic [ref=e246]:
+              - heading "Birria Tacos" [level=3] [ref=e247]
+              - generic [ref=e248]: $12.99
+            - paragraph [ref=e249]: Slow-braised beef tucked in soft tortillas with melted cheese and a side of savory consommé.
+            - generic [ref=e250]:
+              - generic [ref=e251]:
+                - button [ref=e252] [cursor=pointer]:
+                  - img [ref=e253] [cursor=pointer]
+                - generic [ref=e255]: "1"
+                - button [ref=e256] [cursor=pointer]:
+                  - img [ref=e257] [cursor=pointer]
+              - button "Add to Cart" [ref=e259] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e260] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e261]:
+          - generic [ref=e262]:
+            - img "Broskis Dog" [ref=e264]
+            - generic [ref=e266]: sandwiches
+          - generic [ref=e267]:
+            - generic [ref=e268]:
+              - heading "Broskis Dog" [level=3] [ref=e269]
+              - generic [ref=e270]: $12.99
+            - paragraph [ref=e271]: Grilled all-beef hot dog piled high with onions, relish and classic yellow mustard.
+            - generic [ref=e272]:
+              - generic [ref=e273]:
+                - button [ref=e274] [cursor=pointer]:
+                  - img [ref=e275] [cursor=pointer]
+                - generic [ref=e277]: "1"
+                - button [ref=e278] [cursor=pointer]:
+                  - img [ref=e279] [cursor=pointer]
+              - button "Add to Cart" [ref=e281] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e282] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e283]:
+          - generic [ref=e284]:
+            - img "Wild Caught Cod Sandwich" [ref=e286]
+            - generic [ref=e288]: sandwiches
+          - generic [ref=e289]:
+            - generic [ref=e290]:
+              - heading "Wild Caught Cod Sandwich" [level=3] [ref=e291]
+              - generic [ref=e292]: $12.99
+            - paragraph [ref=e293]: Crispy fried chicken breast with tangy pickles and our signature sauce on a toasted bun.
+            - generic [ref=e294]:
+              - generic [ref=e295]:
+                - button [ref=e296] [cursor=pointer]:
+                  - img [ref=e297] [cursor=pointer]
+                - generic [ref=e299]: "1"
+                - button [ref=e300] [cursor=pointer]:
+                  - img [ref=e301] [cursor=pointer]
+              - button "Add to Cart" [ref=e303] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e304] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e305]:
+          - generic [ref=e306]:
+            - img "Rib Plate" [ref=e308]
+            - generic [ref=e310]: sandwiches
+          - generic [ref=e311]:
+            - generic [ref=e312]:
+              - heading "Rib Plate" [level=3] [ref=e313]
+              - generic [ref=e314]: $12.99
+            - paragraph [ref=e315]: Slow-cooked pork ribs glazed in smoky barbecue sauce.
+            - generic [ref=e316]:
+              - generic [ref=e317]:
+                - button [ref=e318] [cursor=pointer]:
+                  - img [ref=e319] [cursor=pointer]
+                - generic [ref=e321]: "1"
+                - button [ref=e322] [cursor=pointer]:
+                  - img [ref=e323] [cursor=pointer]
+              - button "Add to Cart" [ref=e325] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e326] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e327]:
+          - generic [ref=e328]:
+            - img "Salmon Plate" [ref=e330]
+            - generic [ref=e332]: sandwiches
+          - generic [ref=e333]:
+            - generic [ref=e334]:
+              - heading "Salmon Plate" [level=3] [ref=e335]
+              - generic [ref=e336]: $12.99
+            - paragraph [ref=e337]: Grilled salmon fillet finished with a bright lemon-herb marinade.
+            - generic [ref=e338]:
+              - generic [ref=e339]:
+                - button [ref=e340] [cursor=pointer]:
+                  - img [ref=e341] [cursor=pointer]
+                - generic [ref=e343]: "1"
+                - button [ref=e344] [cursor=pointer]:
+                  - img [ref=e345] [cursor=pointer]
+              - button "Add to Cart" [ref=e347] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e348] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e349]:
+          - generic [ref=e350]:
+            - img "Meatloaf Plate" [ref=e352]
+            - generic [ref=e354]: sandwiches
+          - generic [ref=e355]:
+            - generic [ref=e356]:
+              - heading "Meatloaf Plate" [level=3] [ref=e357]
+              - generic [ref=e358]: $14.99
+            - paragraph [ref=e359]: Home-style meatloaf topped with rich brown gravy and served with mashed potatoes.
+            - generic [ref=e360]:
+              - generic [ref=e361]:
+                - button [ref=e362] [cursor=pointer]:
+                  - img [ref=e363] [cursor=pointer]
+                - generic [ref=e365]: "1"
+                - button [ref=e366] [cursor=pointer]:
+                  - img [ref=e367] [cursor=pointer]
+              - button "Add to Cart" [ref=e369] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e370] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e371]:
+          - generic [ref=e372]:
+            - img "Steam Fried Cabbage" [ref=e374]
+            - generic [ref=e376]: sides
+          - generic [ref=e377]:
+            - generic [ref=e378]:
+              - heading "Steam Fried Cabbage" [level=3] [ref=e379]
+              - generic [ref=e380]: $12.99
+            - paragraph [ref=e381]: Seasoned cabbage sautéed with onions until tender and packed with flavor.
+            - generic [ref=e382]:
+              - generic [ref=e383]:
+                - button [ref=e384] [cursor=pointer]:
+                  - img [ref=e385] [cursor=pointer]
+                - generic [ref=e387]: "1"
+                - button [ref=e388] [cursor=pointer]:
+                  - img [ref=e389] [cursor=pointer]
+              - button "Add to Cart" [ref=e391] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e392] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e393]:
+          - generic [ref=e394]:
+            - img "Smoked Corn On The Cob" [ref=e396]
+            - generic [ref=e398]: sides
+          - generic [ref=e399]:
+            - generic [ref=e400]:
+              - heading "Smoked Corn On The Cob" [level=3] [ref=e401]
+              - generic [ref=e402]: $12.99
+            - paragraph [ref=e403]: Sweet corn brushed with garlic butter then grilled to smoky perfection.
+            - generic [ref=e404]:
+              - generic [ref=e405]:
+                - button [ref=e406] [cursor=pointer]:
+                  - img [ref=e407] [cursor=pointer]
+                - generic [ref=e409]: "1"
+                - button [ref=e410] [cursor=pointer]:
+                  - img [ref=e411] [cursor=pointer]
+              - button "Add to Cart" [ref=e413] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e414] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e415]:
+          - generic [ref=e416]:
+            - img "Boosie Powder Tenders" [ref=e418]
+            - generic [ref=e420]: sides
+          - generic [ref=e421]:
+            - generic [ref=e422]:
+              - heading "Boosie Powder Tenders" [level=3] [ref=e423]
+              - generic [ref=e424]: $12.99
+            - paragraph [ref=e425]: Crispy chicken tenders tossed in a zesty lemon pepper seasoning.
+            - generic [ref=e426]:
+              - generic [ref=e427]:
+                - button [ref=e428] [cursor=pointer]:
+                  - img [ref=e429] [cursor=pointer]
+                - generic [ref=e431]: "1"
+                - button [ref=e432] [cursor=pointer]:
+                  - img [ref=e433] [cursor=pointer]
+              - button "Add to Cart" [ref=e435] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e436] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e437]:
+          - generic [ref=e438]:
+            - img "Mac N Cheese" [ref=e440]
+            - generic [ref=e442]: sides
+          - generic [ref=e443]:
+            - generic [ref=e444]:
+              - heading "Mac N Cheese" [level=3] [ref=e445]
+              - generic [ref=e446]: $12.99
+            - paragraph [ref=e447]: Classic elbow macaroni baked in a creamy cheddar cheese sauce.
+            - generic [ref=e448]:
+              - generic [ref=e449]:
+                - button [ref=e450] [cursor=pointer]:
+                  - img [ref=e451] [cursor=pointer]
+                - generic [ref=e453]: "1"
+                - button [ref=e454] [cursor=pointer]:
+                  - img [ref=e455] [cursor=pointer]
+              - button "Add to Cart" [ref=e457] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e458] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e459]:
+          - generic [ref=e460]:
+            - img "Nachos" [ref=e462]
+            - generic [ref=e464]: sides
+          - generic [ref=e465]:
+            - generic [ref=e466]:
+              - heading "Nachos" [level=3] [ref=e467]
+              - generic [ref=e468]: $12.99
+            - paragraph [ref=e469]: House tortilla chips smothered in queso, jalapeños and fresh pico de gallo.
+            - generic [ref=e470]:
+              - generic [ref=e471]:
+                - button [ref=e472] [cursor=pointer]:
+                  - img [ref=e473] [cursor=pointer]
+                - generic [ref=e475]: "1"
+                - button [ref=e476] [cursor=pointer]:
+                  - img [ref=e477] [cursor=pointer]
+              - button "Add to Cart" [ref=e479] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e480] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e481]:
+          - generic [ref=e482]:
+            - img "Salmon Bites" [ref=e484]
+            - generic [ref=e486]: sides
+          - generic [ref=e487]:
+            - generic [ref=e488]:
+              - heading "Salmon Bites" [level=3] [ref=e489]
+              - generic [ref=e490]: $12.99
+            - paragraph [ref=e491]: Bite-size salmon pieces fried crisp and served with tangy dipping sauce.
+            - generic [ref=e492]:
+              - generic [ref=e493]:
+                - button [ref=e494] [cursor=pointer]:
+                  - img [ref=e495] [cursor=pointer]
+                - generic [ref=e497]: "1"
+                - button [ref=e498] [cursor=pointer]:
+                  - img [ref=e499] [cursor=pointer]
+              - button "Add to Cart" [ref=e501] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e502] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e503]:
+          - generic [ref=e504]:
+            - img "Shrimp N Grits" [ref=e506]
+            - generic [ref=e508]: sides
+          - generic [ref=e509]:
+            - generic [ref=e510]:
+              - heading "Shrimp N Grits" [level=3] [ref=e511]
+              - generic [ref=e512]: $12.99
+            - paragraph [ref=e513]: Creamy cheddar grits topped with seasoned shrimp and scallions.
+            - generic [ref=e514]:
+              - generic [ref=e515]:
+                - button [ref=e516] [cursor=pointer]:
+                  - img [ref=e517] [cursor=pointer]
+                - generic [ref=e519]: "1"
+                - button [ref=e520] [cursor=pointer]:
+                  - img [ref=e521] [cursor=pointer]
+              - button "Add to Cart" [ref=e523] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e524] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e525]:
+          - generic [ref=e526]:
+            - img "Sweet Potatoes" [ref=e528]
+            - generic [ref=e530]: sides
+          - generic [ref=e531]:
+            - generic [ref=e532]:
+              - heading "Sweet Potatoes" [level=3] [ref=e533]
+              - generic [ref=e534]: $12.99
+            - paragraph [ref=e535]: Roasted sweet potato wedges tossed with brown sugar and butter.
+            - generic [ref=e536]:
+              - generic [ref=e537]:
+                - button [ref=e538] [cursor=pointer]:
+                  - img [ref=e539] [cursor=pointer]
+                - generic [ref=e541]: "1"
+                - button [ref=e542] [cursor=pointer]:
+                  - img [ref=e543] [cursor=pointer]
+              - button "Add to Cart" [ref=e545] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e546] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e547]:
+          - generic [ref=e548]:
+            - img "Broskis House Salad" [ref=e550]
+            - generic [ref=e552]: sides
+          - generic [ref=e553]:
+            - generic [ref=e554]:
+              - heading "Broskis House Salad" [level=3] [ref=e555]
+              - generic [ref=e556]: $9.99
+            - paragraph [ref=e557]: Fresh mixed greens topped with cherry tomatoes, cucumber, red onions and your choice of dressing.
+            - generic [ref=e558]:
+              - generic [ref=e559]: Vegetarian
+              - generic [ref=e560]: Vegan
+              - generic [ref=e561]: Gluten Free
+              - generic [ref=e562]: Dairy Free
+            - generic [ref=e563]:
+              - generic [ref=e564]:
+                - button [ref=e565] [cursor=pointer]:
+                  - img [ref=e566] [cursor=pointer]
+                - generic [ref=e568]: "1"
+                - button [ref=e569] [cursor=pointer]:
+                  - img [ref=e570] [cursor=pointer]
+              - button "Add to Cart" [ref=e572] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e573] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e574]:
+          - generic [ref=e575]:
+            - img "Fettuccine Alfredo" [ref=e577]
+            - generic [ref=e579]: sides
+          - generic [ref=e580]:
+            - generic [ref=e581]:
+              - heading "Fettuccine Alfredo" [level=3] [ref=e582]
+              - generic [ref=e583]: $13.99
+            - paragraph [ref=e584]: Fettuccine pasta tossed in a rich and creamy parmesan alfredo sauce.
+            - generic [ref=e586]: Vegetarian
+            - generic [ref=e587]:
+              - generic [ref=e588]:
+                - button [ref=e589] [cursor=pointer]:
+                  - img [ref=e590] [cursor=pointer]
+                - generic [ref=e592]: "1"
+                - button [ref=e593] [cursor=pointer]:
+                  - img [ref=e594] [cursor=pointer]
+              - button "Add to Cart" [ref=e596] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e597] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e598]:
+          - generic [ref=e599]:
+            - img "Broskis Cake" [ref=e601]
+            - generic [ref=e603]: desserts
+          - generic [ref=e604]:
+            - generic [ref=e605]:
+              - heading "Broskis Cake" [level=3] [ref=e606]
+              - generic [ref=e607]: $12.99
+            - paragraph [ref=e608]: A sinfully delicious warm chocolate cake with an irresistibly gooey molten center, drizzled with luxurious dark chocolate ganache and dusted with gold-flecked powdered sugar. So good it will make your knees weak.
+            - button "Read more" [ref=e609] [cursor=pointer]
+            - generic [ref=e610]:
+              - generic [ref=e611]:
+                - button [ref=e612] [cursor=pointer]:
+                  - img [ref=e613] [cursor=pointer]
+                - generic [ref=e615]: "1"
+                - button [ref=e616] [cursor=pointer]:
+                  - img [ref=e617] [cursor=pointer]
+              - button "Add to Cart" [ref=e619] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e620] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e621]:
+          - generic [ref=e622]:
+            - img "Cheesecake Bites" [ref=e624]
+            - generic [ref=e626]: desserts
+          - generic [ref=e627]:
+            - generic [ref=e628]:
+              - heading "Cheesecake Bites" [level=3] [ref=e629]
+              - generic [ref=e630]: $12.99
+            - paragraph [ref=e631]: Bite-size pieces of creamy cheesecake rolled in sweet graham cracker crumbs.
+            - generic [ref=e632]:
+              - generic [ref=e633]:
+                - button [ref=e634] [cursor=pointer]:
+                  - img [ref=e635] [cursor=pointer]
+                - generic [ref=e637]: "1"
+                - button [ref=e638] [cursor=pointer]:
+                  - img [ref=e639] [cursor=pointer]
+              - button "Add to Cart" [ref=e641] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e642] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e643]:
+          - generic [ref=e644]:
+            - img "Cheesecake Cones" [ref=e646]
+            - generic [ref=e648]: desserts
+          - generic [ref=e649]:
+            - generic [ref=e650]:
+              - heading "Cheesecake Cones" [level=3] [ref=e651]
+              - generic [ref=e652]: $12.99
+            - paragraph [ref=e653]: Crispy waffle cones overflowing with smooth cheesecake filling and fresh fruit.
+            - generic [ref=e654]:
+              - generic [ref=e655]:
+                - button [ref=e656] [cursor=pointer]:
+                  - img [ref=e657] [cursor=pointer]
+                - generic [ref=e659]: "1"
+                - button [ref=e660] [cursor=pointer]:
+                  - img [ref=e661] [cursor=pointer]
+              - button "Add to Cart" [ref=e663] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e664] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e665]:
+          - generic [ref=e666]:
+            - img "Broskis Chocolate Chip Cookies" [ref=e668]
+            - generic [ref=e670]: desserts
+          - generic [ref=e671]:
+            - generic [ref=e672]:
+              - heading "Broskis Chocolate Chip Cookies" [level=3] [ref=e673]
+              - generic [ref=e674]: $12.99
+            - paragraph [ref=e675]: Chewy double-chocolate cookies loaded with dark chocolate chunks.
+            - generic [ref=e676]:
+              - generic [ref=e677]:
+                - button [ref=e678] [cursor=pointer]:
+                  - img [ref=e679] [cursor=pointer]
+                - generic [ref=e681]: "1"
+                - button [ref=e682] [cursor=pointer]:
+                  - img [ref=e683] [cursor=pointer]
+              - button "Add to Cart" [ref=e685] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e686] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e687]:
+          - generic [ref=e688]:
+            - img "Boosie Punch" [ref=e690]
+            - generic [ref=e692]: drinks
+          - generic [ref=e693]:
+            - generic [ref=e694]:
+              - heading "Boosie Punch" [level=3] [ref=e695]
+              - generic [ref=e696]: $12.99
+            - paragraph [ref=e697]: Refreshing tropical fruit punch with bright citrus flavors and a signature kick.
+            - generic [ref=e698]:
+              - generic [ref=e699]:
+                - button [ref=e700] [cursor=pointer]:
+                  - img [ref=e701] [cursor=pointer]
+                - generic [ref=e703]: "1"
+                - button [ref=e704] [cursor=pointer]:
+                  - img [ref=e705] [cursor=pointer]
+              - button "Add to Cart" [ref=e707] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e708] [cursor=pointer]:
+                - img
+                - text: Customize
+        - generic [ref=e709]:
+          - generic [ref=e710]:
+            - img "Broskis Sweet Tea" [ref=e712]
+            - generic [ref=e714]: drinks
+          - generic [ref=e715]:
+            - generic [ref=e716]:
+              - heading "Broskis Sweet Tea" [level=3] [ref=e717]
+              - generic [ref=e718]: $12.99
+            - paragraph [ref=e719]: Classic Southern sweet tea brewed fresh each day and served over ice.
+            - generic [ref=e720]:
+              - generic [ref=e721]:
+                - button [ref=e722] [cursor=pointer]:
+                  - img [ref=e723] [cursor=pointer]
+                - generic [ref=e725]: "1"
+                - button [ref=e726] [cursor=pointer]:
+                  - img [ref=e727] [cursor=pointer]
+              - button "Add to Cart" [ref=e729] [cursor=pointer]:
+                - img
+                - text: Add to Cart
+              - button "Customize" [ref=e730] [cursor=pointer]:
+                - img
+                - text: Customize
+      - generic [ref=e732]:
+        - heading "Menu Legend" [level=2] [ref=e733]
+        - generic [ref=e734]:
+          - generic [ref=e735]:
+            - img [ref=e737]
+            - generic [ref=e739]: Popular Item
+          - generic [ref=e740]:
+            - img [ref=e742]
+            - generic [ref=e744]: New Item
+          - generic [ref=e745]:
+            - img [ref=e747]
+            - generic [ref=e749]: Infused Item (21+ Only)
+  - contentinfo [ref=e750]:
+    - generic [ref=e751]:
+      - generic [ref=e752]:
+        - generic [ref=e753]:
+          - heading "Broski's Kitchen" [level=3] [ref=e754]
+          - paragraph [ref=e755]: Luxury Street Gourmet
+          - generic [ref=e756]:
+            - link [ref=e757] [cursor=pointer]:
+              - /url: https://facebook.com
+              - img [ref=e758] [cursor=pointer]
+            - link [ref=e760] [cursor=pointer]:
+              - /url: https://twitter.com
+              - img [ref=e761] [cursor=pointer]
+            - link [ref=e763] [cursor=pointer]:
+              - /url: https://instagram.com
+              - img [ref=e764] [cursor=pointer]
+            - link [ref=e766] [cursor=pointer]:
+              - /url: https://youtube.com
+              - img [ref=e767] [cursor=pointer]
+          - button "Play Radio" [ref=e770] [cursor=pointer]
+        - generic [ref=e771]:
+          - heading "Quick Links" [level=3] [ref=e772]
+          - list [ref=e773]:
+            - listitem [ref=e774]:
+              - link "Menu" [ref=e775] [cursor=pointer]:
+                - /url: /menu
+            - listitem [ref=e776]:
+              - link "Locations" [ref=e777] [cursor=pointer]:
+                - /url: /locations
+            - listitem [ref=e778]:
+              - link "Events" [ref=e779] [cursor=pointer]:
+                - /url: /events
+            - listitem [ref=e780]:
+              - link "Rewards" [ref=e781] [cursor=pointer]:
+                - /url: /rewards
+            - listitem [ref=e782]:
+              - link "Shop" [ref=e783] [cursor=pointer]:
+                - /url: /shop
+        - generic [ref=e784]:
+          - heading "Information" [level=3] [ref=e785]
+          - list [ref=e786]:
+            - listitem [ref=e787]:
+              - link "About Us" [ref=e788] [cursor=pointer]:
+                - /url: /about
+            - listitem [ref=e789]:
+              - link "Contact" [ref=e790] [cursor=pointer]:
+                - /url: /contact
+            - listitem [ref=e791]:
+              - link "Gift Cards" [ref=e792] [cursor=pointer]:
+                - /url: /gift-cards
+            - listitem [ref=e793]:
+              - link "Catering" [ref=e794] [cursor=pointer]:
+                - /url: /catering
+            - listitem [ref=e795]:
+              - link "Volunteer" [ref=e796] [cursor=pointer]:
+                - /url: /volunteer
+        - generic [ref=e797]:
+          - heading "Legal" [level=3] [ref=e798]
+          - list [ref=e799]:
+            - listitem [ref=e800]:
+              - link "Terms & Conditions" [ref=e801] [cursor=pointer]:
+                - /url: /terms
+            - listitem [ref=e802]:
+              - link "Privacy Policy" [ref=e803] [cursor=pointer]:
+                - /url: /privacy
+            - listitem [ref=e804]:
+              - link "Accessibility" [ref=e805] [cursor=pointer]:
+                - /url: /accessibility
+      - paragraph [ref=e807]: © 2025 Broski's Kitchen. All rights reserved.
+  - generic [ref=e811]:
+    - img [ref=e813]
+    - generic [ref=e820]:
+      - heading "We use cookies to enhance your experience" [level=3] [ref=e821]
+      - paragraph [ref=e822]: We use essential cookies to make our site work. We'd also like to set optional cookies to help us improve our website and analyze how it's used. We won't set optional cookies unless you enable them.
+      - generic [ref=e823]:
+        - generic [ref=e824]:
+          - img [ref=e825]
+          - text: Essential cookies always active
+        - generic [ref=e827]:
+          - img [ref=e828]
+          - text: Analytics optional
+        - generic [ref=e833]:
+          - img [ref=e834]
+          - text: Marketing optional
+      - generic [ref=e838]:
+        - button "Accept All" [ref=e839] [cursor=pointer]
+        - button "Reject Optional" [ref=e840] [cursor=pointer]
+        - button "Customize" [ref=e841] [cursor=pointer]:
+          - img [ref=e842] [cursor=pointer]
+          - text: Customize
+        - link "Privacy Policy" [ref=e845] [cursor=pointer]:
+          - /url: /privacy
+    - button [ref=e846] [cursor=pointer]:
+      - img [ref=e847] [cursor=pointer]
+  - button "SEO Audit (100/100)" [ref=e851] [cursor=pointer]
+  - 'button "Accessibility audit: 65 errors, 1 warnings. Show details" [ref=e853] [cursor=pointer]':
+    - generic [ref=e854] [cursor=pointer]:
+      - generic [ref=e855] [cursor=pointer]: A11y
+      - generic [ref=e856] [cursor=pointer]:
+        - generic [ref=e857] [cursor=pointer]: "65"
+        - generic [ref=e858] [cursor=pointer]: "1"
+  - button "Open Next.js Dev Tools" [ref=e864] [cursor=pointer]:
+    - img [ref=e865] [cursor=pointer]
+  - alert [ref=e869]
+  - generic [ref=e870]:
+    - button "Close menu overlay" [ref=e871] [cursor=pointer]
+    - dialog "Menu" [ref=e872]:
+      - generic [ref=e873]:
+        - heading "Menu" [level=2] [ref=e874]
+        - button "Close menu" [ref=e875] [cursor=pointer]:
+          - img [ref=e876] [cursor=pointer]
+      - navigation [active] [ref=e878]:
+        - list [ref=e879]:
+          - listitem [ref=e880]:
+            - link "Menu" [ref=e881] [cursor=pointer]:
+              - /url: /menu
+          - listitem [ref=e882]:
+            - link "Infused Menu - Coming Soon" [ref=e883] [cursor=pointer]:
+              - /url: /infused-menu
+          - listitem [ref=e884]:
+            - link "Locations" [ref=e885] [cursor=pointer]:
+              - /url: /locations
+          - listitem [ref=e886]:
+            - link "Events" [ref=e887] [cursor=pointer]:
+              - /url: /events
+          - listitem [ref=e888]:
+            - link "Music" [ref=e889] [cursor=pointer]:
+              - /url: /music
+          - listitem [ref=e890]:
+            - link "Rewards" [ref=e891] [cursor=pointer]:
+              - /url: /rewards
+          - listitem [ref=e892]:
+            - link "Shop" [ref=e893] [cursor=pointer]:
+              - /url: /shop
+          - listitem [ref=e894]:
+            - link "Catering" [ref=e895] [cursor=pointer]:
+              - /url: /catering
+          - listitem [ref=e896]:
+            - link "Contact" [ref=e897] [cursor=pointer]:
+              - /url: /contact
+      - generic [ref=e898]:
+        - link "Sign In / Join" [ref=e899] [cursor=pointer]:
+          - /url: /auth/login
+        - link "Cart0" [ref=e900] [cursor=pointer]:
+          - /url: /cart
+          - generic [ref=e901] [cursor=pointer]: Cart
+          - generic [ref=e902] [cursor=pointer]: "0"
+```
