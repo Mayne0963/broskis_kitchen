@@ -42,9 +42,9 @@ const CartDropdown: React.FC = () => {
         className="relative p-2 text-white hover:text-gold-foil transition-colors"
         aria-label="Shopping cart"
       >
-        <FaShoppingBag className="text-xl" />
+        <FaShoppingBag style={{fontSize: 'var(--text-xl)'}} />
         {itemCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-gold-foil text-black text-xs w-5 h-5 flex items-center justify-center rounded-full font-bold">
+          <span className="absolute -top-1 -right-1 bg-gold-foil text-black w-5 h-5 flex items-center justify-center rounded-full font-bold" style={{fontSize: 'var(--text-sm)'}}>
             {itemCount}
           </span>
         )}
@@ -59,7 +59,7 @@ const CartDropdown: React.FC = () => {
           <div className="p-4">
             {items.length === 0 ? (
               <div className="text-center py-8">
-                <FaShoppingBag className="text-4xl mx-auto mb-3 text-gray-600" />
+                <FaShoppingBag className="mx-auto mb-3 text-gray-600" style={{fontSize: 'var(--text-4xl)'}} />
                 <p className="text-gray-400">Your cart is empty</p>
                 <p className="text-xs text-gray-500 mt-1">Add some delicious items to get started</p>
               </div>
@@ -81,20 +81,20 @@ const CartDropdown: React.FC = () => {
                         )}
                       </div>
                       <div className="flex-grow">
-                        <p className="text-white text-sm font-medium">{item.name}</p>
+                        <p className="text-white font-medium" style={{fontSize: 'var(--text-sm)'}}>{item.name}</p>
                         {item.customizations && Object.keys(item.customizations).length > 0 && (
                           <div className="mt-1">
                             {Object.entries(item.customizations).map(([categoryId, customizations]) => (
                               <div key={categoryId}>
                                 {categoryId === 'options' ? (
                                   customizations.map((customization, index) => (
-                                    <span key={index} className="text-xs text-gray-400 block">
+                                    <span key={index} className="text-gray-400 block" style={{fontSize: 'var(--text-sm)'}}>
                                       {customization.name}
                                     </span>
                                   ))
                                 ) : (
                                   customizations.map((customization, index) => (
-                                    <span key={index} className="text-xs text-gray-400 block">
+                                    <span key={index} className="text-gray-400 block" style={{fontSize: 'var(--text-sm)'}}>
                                       + {customization.name} {customization.price > 0 && `(+$${customization.price.toFixed(2)})`}
                                     </span>
                                   ))
@@ -111,7 +111,7 @@ const CartDropdown: React.FC = () => {
                             >
                               <FaMinus size={8} />
                             </button>
-                            <span className="mx-2 text-xs text-gray-400">{item.quantity}</span>
+                            <span className="mx-2 text-gray-400" style={{fontSize: 'var(--text-sm)'}}>{item.quantity}</span>
                             <button
                               className="quantity-button bg-[#222222] hover:bg-[#333333] w-5 h-5 flex items-center justify-center rounded"
                               onClick={() => handleQuantityChange(item.id, item.quantity, 1)}
@@ -119,7 +119,7 @@ const CartDropdown: React.FC = () => {
                               <FaPlus size={8} />
                             </button>
                           </div>
-                          <span className="text-xs text-gold-foil font-bold">${item.price.toFixed(2)}</span>
+                          <span className="text-gold-foil font-bold" style={{fontSize: 'var(--text-sm)'}}>${item.price.toFixed(2)}</span>
                           <button
                             onClick={() => removeItem(item.id)}
                             className="text-[var(--color-harvest-gold)] hover:text-[var(--color-harvest-gold)] transition-colors"

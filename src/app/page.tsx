@@ -55,10 +55,10 @@ function Page() {
             <span className="text-base font-extrabold tracking-wide">OTW DELIVERY</span>
           </a>
         </div>
-        <div className="relative z-10 text-center px-4 sm:px-6 lg:px-6 max-w-6xl mx-auto flex flex-col items-center justify-start pt-8 w-full">
+        <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto flex flex-col items-center justify-start pt-4 sm:pt-6 lg:pt-8 w-full">
           {/* Content after hero */}
           <motion.div 
-            className="mb-8 flex justify-center"
+            className="mb-6 sm:mb-8 flex justify-center"
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: "easeOut" }}
@@ -68,9 +68,9 @@ function Page() {
               alt="Broski's Kitchen Official Gold Logo"
               width={400}
               height={200}
-              className="mx-auto drop-shadow-2xl max-w-full h-auto"
+              className="mx-auto drop-shadow-2xl max-w-full h-auto w-auto max-h-32 sm:max-h-40 md:max-h-48 lg:max-h-56"
               priority
-              sizes="(max-width: 768px) 300px, 400px"
+              sizes="(max-width: 480px) 240px, (max-width: 768px) 320px, (max-width: 1024px) 360px, 400px"
               style={{ display: 'block' }}
               quality={90}
             />
@@ -78,25 +78,25 @@ function Page() {
 
           {/* Tagline/Header Stack */}
           <motion.div 
-            className="mb-8 space-y-4"
+            className="mb-6 sm:mb-8 space-y-3 sm:space-y-4"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
           >
             {/* HOME OF THE AWARD-WINNING - Gold, Serif, ALL CAPS */}
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-[var(--color-harvest-gold)] uppercase tracking-wide leading-tight" style={{ fontFamily: 'var(--font-playfair), serif', color: '#FFD700' }}>
+            <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-serif font-bold text-[var(--color-harvest-gold)] uppercase tracking-wide leading-tight px-2" style={{ fontFamily: 'var(--font-playfair), serif', color: '#FFD700', fontSize: 'clamp(1.125rem, 4vw, 2.5rem)' }}>
               HOME OF THE AWARD-WINNING
             </h1>
              
             {/* BOOSIE WINGS - Larger, Gold, Bold Serif, ALL CAPS */}
-            <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-[var(--color-harvest-gold)] uppercase tracking-tight leading-none" style={{ fontFamily: 'var(--font-playfair), serif', color: '#FFD700' }}>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif font-bold text-[var(--color-harvest-gold)] uppercase tracking-tight leading-none px-2" style={{ fontFamily: 'var(--font-playfair), serif', color: '#FFD700', fontSize: 'clamp(2rem, 8vw, 4.5rem)' }}>
               BOOSIE WINGS
             </h2>
              
             {/* CAUSE IT'S BADAZZ - Red, All Caps, smaller */}
             <motion.p 
-              className="text-xl md:text-2xl lg:text-3xl font-bold text-[var(--color-burgundy)] uppercase tracking-wide"
-              style={{ color: '#B22222' }}
+              className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-[var(--color-burgundy)] uppercase tracking-wide px-2"
+              style={{ color: '#B22222', fontSize: 'clamp(1rem, 3vw, 1.875rem)' }}
               animate={{ 
                 textShadow: [
                   "0 0 5px #B22222, 0 0 10px #B22222, 0 0 15px #B22222",
@@ -117,16 +117,16 @@ function Page() {
 
           {/* Order Now Button - Rounded Rectangle, Crimson Red */}
           <motion.div 
-            className="mb-16 flex justify-center"
+            className="mb-8 sm:mb-12 lg:mb-16 flex justify-center px-4"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.9, ease: "easeOut" }}
           >
-            <Link href="/menu" aria-label="Order Now Button for Boosie Wings">
+            <Link href="/menu" aria-label="Order Now Button for Boosie Wings" className="w-full max-w-xs sm:w-auto">
               <TouchButton 
                 size={isMobile ? 'lg' : 'md'}
                 variant="primary"
-                className="broski-otw-gold-button text-xl"
+                className="broski-otw-gold-button text-lg sm:text-xl w-full sm:w-auto min-h-[48px] px-8 sm:px-12"
                 hapticFeedback={true}
               >
                 Order Now
@@ -160,7 +160,7 @@ function Page() {
 
       {/* Navigation Bar - Below Hero Section */}
       <nav className="bg-black border-b-2 border-[#FFD700] py-4">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 max-w-6xl">
           <div className="flex justify-center items-center space-x-8 overflow-x-auto">
             <Link href="/menu" className="text-white hover:text-[#FFD700] hover:border-b-2 hover:border-[#FFD700] transition-all duration-300 font-medium whitespace-nowrap px-2 py-1">
               Menu
@@ -190,12 +190,13 @@ function Page() {
       </nav>
 
       {/* Welcome Block - Below Hero */}
-      <section className="py-20 bg-black relative overflow-hidden">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+      <section className="section-padding bg-black relative overflow-hidden">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
+          <div className="text-center mb-12 sm:mb-16">
             {/* Header: WELCOME TO BROSKI'S KITCHEN - Gold, Serif, ALL CAPS, centered */}
             <motion.h2 
-             className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-[#FFD700] uppercase text-center mb-8"
+             className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-serif font-bold text-[#FFD700] uppercase text-center mb-6 sm:mb-8 px-2"
+             style={{ fontSize: 'clamp(1.5rem, 5vw, 3.75rem)' }}
              initial={{ opacity: 0, y: 30 }}
              whileInView={{ opacity: 1, y: 0 }}
              transition={{ duration: 0.8 }}
@@ -206,8 +207,8 @@ function Page() {
             
             {/* Subtext: White text with max width readability */}
             <motion.p 
-              className="text-xl text-white max-w-2xl mx-auto leading-relaxed mb-8" 
-              style={{ maxWidth: '65ch' }}
+              className="text-base sm:text-lg lg:text-xl text-white max-w-2xl mx-auto leading-relaxed mb-6 sm:mb-8 px-4" 
+              style={{ maxWidth: '65ch', fontSize: 'clamp(1rem, 2.5vw, 1.25rem)' }}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
@@ -218,6 +219,7 @@ function Page() {
             
             {/* CTA Button: Explore Our Menu - Crimson red with white text */}
             <motion.div
+              className="px-4"
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
@@ -225,7 +227,7 @@ function Page() {
             >
               <Link 
                 href="/menu" 
-                className="inline-block bg-[#FFD700] hover:bg-[#E6C200] text-black font-bold py-4 px-12 text-xl rounded-lg shadow-2xl transform hover:scale-105 hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] transition-all duration-300 border-2 border-[#FFD700] hover:border-[#E6C200]"
+                className="inline-block bg-[#FFD700] hover:bg-[#E6C200] text-black font-bold py-3 sm:py-4 px-8 sm:px-12 text-lg sm:text-xl rounded-lg shadow-2xl transform hover:scale-105 hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] transition-all duration-300 border-2 border-[#FFD700] hover:border-[#E6C200] min-h-[48px] w-full max-w-xs sm:w-auto"
                 aria-label="Explore Our Menu Button"
               >
                 Explore Our Menu
@@ -236,9 +238,9 @@ function Page() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-[#0A0A0A] relative overflow-hidden">
+      <section className="section-padding bg-[#0A0A0A] relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#FFD700]/5 via-transparent to-black/10 opacity-50"></div>
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 relative z-10 max-w-6xl">
           <h2 className="heading-lg mb-12 text-center">
             Experience <span className="graffiti-text elegant-glow">Broski&apos;s</span>
           </h2>
@@ -247,39 +249,39 @@ function Page() {
               <div className="bg-[#FFD700] bg-opacity-20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-opacity-40 transition-all duration-300 group-hover:scale-110">
                 <FaUtensils className="text-[#FFD700] text-2xl group-hover:text-3xl transition-all duration-300" />
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold mb-2 text-white group-hover:text-[#FFD700] transition-colors duration-300">Gourmet Menu</h3>
-              <p className="text-[#FFD700] group-hover:text-white transition-colors duration-300">Explore our luxury street food with both regular and infused options.</p>
+              <h3 className="font-semibold mb-2 text-white group-hover:text-[#FFD700] transition-colors duration-300" style={{fontSize: 'var(--text-xl)'}}>Gourmet Menu</h3>
+              <p className="text-[#FFD700] group-hover:text-white transition-colors duration-300" style={{fontSize: 'var(--text-base)'}}>Explore our luxury street food with both regular and infused options.</p>
             </div>
             <div className="feature-card animate-fade-in animate-delay-100 group">
               <div className="bg-[#FFD700] bg-opacity-20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-opacity-40 transition-all duration-300 group-hover:scale-110">
                 <FaMapMarkerAlt className="text-[#FFD700] text-2xl group-hover:text-3xl transition-all duration-300" />
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold mb-2 text-white group-hover:text-[#FFD700] transition-colors duration-300">Multiple Locations</h3>
-              <p className="text-[#FFD700] group-hover:text-white transition-colors duration-300">Visit us at our convenient locations throughout the city.</p>
+              <h3 className="font-semibold mb-2 text-white group-hover:text-[#FFD700] transition-colors duration-300" style={{fontSize: 'var(--text-xl)'}}>Multiple Locations</h3>
+              <p className="text-[#FFD700] group-hover:text-white transition-colors duration-300" style={{fontSize: 'var(--text-base)'}}>Visit us at our convenient locations throughout the city.</p>
             </div>
             <div className="feature-card animate-fade-in animate-delay-200 group">
               <div className="bg-[#FFD700] bg-opacity-20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-opacity-40 transition-all duration-300 group-hover:scale-110">
                 <FaCalendarAlt className="text-[#FFD700] text-2xl group-hover:text-3xl transition-all duration-300" />
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold mb-2 text-white group-hover:text-[#FFD700] transition-colors duration-300">Special Events</h3>
-              <p className="text-[#FFD700] group-hover:text-white transition-colors duration-300">Join our exclusive tasting events and culinary experiences.</p>
+              <h3 className="font-semibold mb-2 text-white group-hover:text-[#FFD700] transition-colors duration-300" style={{fontSize: 'var(--text-xl)'}}>Special Events</h3>
+              <p className="text-[#FFD700] group-hover:text-white transition-colors duration-300" style={{fontSize: 'var(--text-base)'}}>Join our exclusive tasting events and culinary experiences.</p>
             </div>
             <div className="feature-card animate-fade-in animate-delay-300 group">
               <div className="bg-[#FFD700] bg-opacity-20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-opacity-40 transition-all duration-300 group-hover:scale-110">
                 <FaGift className="text-[#FFD700] text-2xl group-hover:text-3xl transition-all duration-300" />
               </div>
-              <h3 className="text-xl md:text-2xl font-semibold mb-2 text-white group-hover:text-[#FFD700] transition-colors duration-300">Rewards Program</h3>
-              <p className="text-[#FFD700] group-hover:text-white transition-colors duration-300">Earn points with every purchase and unlock exclusive perks.</p>
+              <h3 className="font-semibold mb-2 text-white group-hover:text-[#FFD700] transition-colors duration-300" style={{fontSize: 'var(--text-xl)'}}>Rewards Program</h3>
+              <p className="text-[#FFD700] group-hover:text-white transition-colors duration-300" style={{fontSize: 'var(--text-base)'}}>Earn points with every purchase and unlock exclusive perks.</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Specialty Section */}
-      <section className="py-20 bg-[#0A0A0A] overflow-hidden relative">
+      <section className="section-padding bg-[#0A0A0A] overflow-hidden relative">
         <div className="absolute inset-0 bg-gradient-to-t from-[#FFD700]/5 via-transparent to-transparent opacity-70"></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center text-white">
+        <div className="container mx-auto px-4 relative z-10 max-w-7xl">
+          <h2 className="font-bold mb-12 text-center text-white" style={{fontSize: 'var(--text-4xl)'}}>
             <span className="text-[#FFD700]">Specialty</span>
             <div className="w-24 h-1 bg-gradient-to-r from-[#FFD700] to-[#FFD700]/30 mx-auto mt-4 rounded-full"></div>
           </h2>
@@ -290,10 +292,10 @@ function Page() {
                 <div className="relative h-48 mb-4">
                   <OptimizedImage src="/images/1000009121.png" alt="Boosie Sweet Heat Sauce" fill className="object-cover rounded-lg" quality={85} />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Boosie Sweet Heat Sauce</h3>
-                <p className="text-[#FFD700] mb-4">Smooth, saucy, and slightly savage. Our signature sweet heat sauce that brings the perfect balance of flavor and fire.</p>
+                <h3 className="font-bold text-white mb-2" style={{fontSize: 'var(--text-xl)'}}>Boosie Sweet Heat Sauce</h3>
+                <p className="text-[#FFD700] mb-4" style={{fontSize: 'var(--text-sm)'}}>Smooth, saucy, and slightly savage. Our signature sweet heat sauce that brings the perfect balance of flavor and fire.</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-[#FFD700] font-bold text-xl">$12</span>
+                  <span className="text-[#FFD700] font-bold" style={{fontSize: 'var(--text-xl)'}}>$12</span>
                   <Link href="/menu" className="bg-[#FFD700] hover:bg-[#E6C200] text-black font-bold py-2 px-4 rounded transition-colors duration-300">
                     View Details
                   </Link>
@@ -303,10 +305,10 @@ function Page() {
                 <div className="relative h-48 mb-4">
                   <OptimizedImage src="/images/menu-items/BoosieGoldWings.png" alt="Boosie Gold Wings" fill className="object-cover rounded-lg" quality={85} />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Boosie Gold Wings</h3>
-                <p className="text-[#FFD700] mb-4">Crispy fried wings coated in our signature honey-gold sauce with a sprinkle of sesame seeds.</p>
+                <h3 className="font-bold text-white mb-2" style={{fontSize: 'var(--text-xl)'}}>Boosie Gold Wings</h3>
+                <p className="text-[#FFD700] mb-4" style={{fontSize: 'var(--text-sm)'}}>Crispy fried wings coated in our signature honey-gold sauce with a sprinkle of sesame seeds.</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-[#FFD700] font-bold text-xl">$12</span>
+                  <span className="text-[#FFD700] font-bold" style={{fontSize: 'var(--text-xl)'}}>$12</span>
                   <Link href="/menu" className="bg-[#FFD700] hover:bg-[#E6C200] text-black font-bold py-2 px-4 rounded transition-colors duration-300">
                     View Details
                   </Link>
@@ -316,10 +318,10 @@ function Page() {
                 <div className="relative h-48 mb-4">
                   <OptimizedImage src="/images/menu-items/SexyyRedWings.png" alt="Sexyy Red Wings" fill className="object-cover rounded-lg" quality={85} />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Boosie Red Wings</h3>
-                <p className="text-[#FFD700] mb-4">Crispy wings drenched in our fiery house-made red hot sauce.</p>
+                <h3 className="font-bold text-white mb-2" style={{fontSize: 'var(--text-xl)'}}>Boosie Red Wings</h3>
+                <p className="text-[#FFD700] mb-4" style={{fontSize: 'var(--text-sm)'}}>Crispy wings drenched in our fiery house-made red hot sauce.</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-[#FFD700] font-bold text-xl">$12</span>
+                  <span className="text-[#FFD700] font-bold" style={{fontSize: 'var(--text-xl)'}}>$12</span>
                   <Link href="/menu" className="bg-[#FFD700] hover:bg-[#E6C200] text-black font-bold py-2 px-4 rounded transition-colors duration-300">
                     View Details
                   </Link>
@@ -329,10 +331,10 @@ function Page() {
                 <div className="relative h-48 mb-4">
                   <OptimizedImage src="/images/1000009265.png" alt="Lotus Cheesecake" fill className="object-cover rounded-lg" quality={85} />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Lotus Cheesecake</h3>
-                <p className="text-[#FFD700] mb-4">Decadent golden brown cheesecake infused with Lotus cookie crumbles, crafted with premium ingredients.</p>
+                <h3 className="font-bold text-white mb-2" style={{fontSize: 'var(--text-xl)'}}>Lotus Cheesecake</h3>
+                <p className="text-[#FFD700] mb-4" style={{fontSize: 'var(--text-sm)'}}>Decadent golden brown cheesecake infused with Lotus cookie crumbles, crafted with premium ingredients.</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-[#FFD700] font-bold text-xl">$12</span>
+                  <span className="text-[#FFD700] font-bold" style={{fontSize: 'var(--text-xl)'}}>$12</span>
                   <Link href="/menu" className="bg-[#FFD700] hover:bg-[#E6C200] text-black font-bold py-2 px-4 rounded transition-colors duration-300">
                     View Details
                   </Link>
@@ -342,10 +344,10 @@ function Page() {
                 <div className="relative h-48 mb-4">
                   <OptimizedImage src="/images/1000008496.webp" alt="Chocolate Cupcake" fill className="object-cover rounded-lg" quality={85} />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Chocolate Cupcake</h3>
-                <p className="text-[#FFD700] mb-4">Rich chocolate cupcake with dark chocolate drizzle, made with premium cocoa and artisanal craftsmanship.</p>
+                <h3 className="font-bold text-white mb-2" style={{fontSize: 'var(--text-xl)'}}>Chocolate Cupcake</h3>
+                <p className="text-[#FFD700] mb-4" style={{fontSize: 'var(--text-sm)'}}>Rich chocolate cupcake with dark chocolate drizzle, made with premium cocoa and artisanal craftsmanship.</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-[#FFD700] font-bold text-xl">$6</span>
+                  <span className="text-[#FFD700] font-bold" style={{fontSize: 'var(--text-xl)'}}>$6</span>
                   <Link href="/menu" className="bg-[#FFD700] hover:bg-[#E6C200] text-black font-bold py-2 px-4 rounded transition-colors duration-300">
                     View Details
                   </Link>
@@ -355,10 +357,10 @@ function Page() {
                 <div className="relative h-48 mb-4">
                   <OptimizedImage src="/images/1000008447.webp" alt="Broski's Badazz Seasoning" fill className="object-cover rounded-lg" quality={85} />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Broski's Badazz Seasoning</h3>
-                <p className="text-[#FFD700] mb-4">Our signature blend of premium spices and herbs, the secret behind Broski's legendary flavor profile.</p>
+                <h3 className="font-bold text-white mb-2" style={{fontSize: 'var(--text-xl)'}}>Broski's Badazz Seasoning</h3>
+                <p className="text-[#FFD700] mb-4" style={{fontSize: 'var(--text-sm)'}}>Our signature blend of premium spices and herbs, the secret behind Broski's legendary flavor profile.</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-[#FFD700] font-bold text-xl">$15</span>
+                  <span className="text-[#FFD700] font-bold" style={{fontSize: 'var(--text-xl)'}}>$15</span>
                   <Link href="/menu" className="bg-[#FFD700] hover:bg-[#E6C200] text-black font-bold py-2 px-4 rounded transition-colors duration-300">
                     View Details
                   </Link>
