@@ -10,7 +10,7 @@ export async function GET() {
     const hasSecret = !!process.env.STRIPE_SECRET_KEY;
     const hasWebhook = !!process.env.STRIPE_WEBHOOK_SECRET;
     const stripeOk = (() => {
-      try { new Stripe(process.env.STRIPE_SECRET_KEY || "", { apiVersion: "2024-06-20" }); return !!hasSecret; }
+      try { new Stripe(process.env.STRIPE_SECRET_KEY || "", { apiVersion: "2025-02-24.acacia" }); return !!hasSecret; }
       catch { return false; }
     })();
 

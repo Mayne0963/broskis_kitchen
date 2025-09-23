@@ -10,12 +10,12 @@ import { Timestamp } from 'firebase-admin/firestore';
 import { adminDb, ensureAdmin } from '@/lib/firebaseAdmin';
 
 type Stage =
-  | 'all' | 'pending' | 'preparing' | 'ready' | 'out_for_delivery'
+  | 'all' | 'pending' | 'paid' | 'preparing' | 'ready' | 'out_for_delivery'
   | 'delivered' | 'completed' | 'cancelled';
 
 function normalizeStage(s?: string): Stage {
   const v = (s ?? 'all').toLowerCase() as Stage;
-  return ['all','pending','preparing','ready','out_for_delivery','delivered','completed','cancelled'].includes(v)
+  return ['all','pending','paid','preparing','ready','out_for_delivery','delivered','completed','cancelled'].includes(v)
     ? v : 'all';
 }
 

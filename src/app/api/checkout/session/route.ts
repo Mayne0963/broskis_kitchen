@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { getSessionCookie } from "@/lib/auth/session";
 
 function baseUrl() {
   return process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 }
 
-type InItem = { name?: unknown; price?: unknown; qty?: unknown };
+type InItem = { id?: unknown; name?: unknown; price?: unknown; qty?: unknown };
 
 function toCents(priceDollars: unknown) {
   const n = typeof priceDollars === "string"
@@ -20,11 +21,15 @@ export async function POST(req: Request) {
   if (!secret) {
     return NextResponse.json({ error: "missing_stripe_secret_key" }, { status: 500 });
   }
-  const stripe = new Stripe(secret, { apiVersion: "2024-04-10" });
+  const stripe = new Stripe(secret, { apiVersion: "2025-02-24.acacia" });
+
+  // Get user authentication context
+  const user = await getSessionCookie();
 
   const body = await req.json().catch(() => ({}));
   const items: InItem[] = Array.isArray(body?.items) ? body.items : [];
   const clean = items.map((it) => ({
+    id: String(it?.id ?? ""),
     name: String(it?.name ?? "Item"),
     qty: Math.max(1, Number(it?.qty ?? 1)),
     amount: toCents(it?.price),
@@ -36,9 +41,9 @@ export async function POST(req: Request) {
 
   // Calculate subtotal and tax
   const TAX_RATE = 0.0825; // 8.25% sales tax
-  const subtotal = clean.reduce((sum, item) => sum + (item.amount * item.qty), 0);
-  const taxAmount = Math.round(subtotal * TAX_RATE);
-  const totalCents = subtotal + taxAmount;
+  const subtotalCents = clean.reduce((sum, item) => sum + (item.amount * item.qty), 0);
+  const taxCents = Math.round(subtotalCents * TAX_RATE);
+  const totalCents = subtotalCents + taxCents;
 
   // Stripe minimum charge validation
   const MIN_USD_CENTS = 50;
@@ -71,27 +76,50 @@ export async function POST(req: Request) {
           name: `Sales Tax (${(TAX_RATE * 100).toFixed(2)}%)`,
           description: "State and local taxes"
         },
-        unit_amount: taxAmount,
+        unit_amount: taxCents,
       },
       quantity: 1,
     }
   ];
 
+  // Prepare cart items for metadata (with id, name, qty, priceCents)
+  const cartItems = clean.map(item => ({
+    id: item.id,
+    name: item.name,
+    qty: item.qty,
+    priceCents: item.amount
+  }));
+
   const session = await stripe.checkout.sessions.create({
-    mode: "payment",
-    payment_method_types: ["card"],
+    payment_method_types: ['card'],
     line_items: lineItems,
-    success_url: successUrl,
-    cancel_url: cancelUrl,
+    mode: 'payment',
+    success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cart`,
+    client_reference_id: user?.uid || '',
+    metadata: {
+      userId: user?.uid || '',
+      cartId: `cart_${Date.now()}_${user?.uid || 'anonymous'}`,
+      uid: user?.uid || '',
+      email: user?.email || '',
+      cart: JSON.stringify(cartItems),
+      subtotalCents: subtotalCents.toString(),
+      taxCents: taxCents.toString(),
+      totalCents: totalCents.toString(),
+    },
+    automatic_tax: {
+      enabled: true,
+    },
   });
 
   return NextResponse.json({ 
     url: session.url, 
     mode: "stripe", 
     itemsSent: clean.length,
-    subtotal: subtotal / 100,
-    tax: taxAmount / 100,
-    total: (subtotal + taxAmount) / 100
+    subtotal: subtotalCents / 100,
+    tax: taxCents / 100,
+    total: totalCents / 100,
+    sessionId: session.id
   });
 }
 

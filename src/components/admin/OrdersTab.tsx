@@ -268,6 +268,7 @@ const canAdvanceStatus = (status: OrderStatus) => {
             <SelectContent className="bg-gray-900 border-[#B7985A]/30">
               <SelectItem value="all" className="text-white hover:bg-[#B7985A]/20">All Status</SelectItem>
               <SelectItem value="pending" className="text-white hover:bg-[#B7985A]/20">Pending</SelectItem>
+              <SelectItem value="paid" className="text-white hover:bg-[#B7985A]/20">Paid</SelectItem>
               <SelectItem value="confirmed" className="text-white hover:bg-[#B7985A]/20">Confirmed</SelectItem>
               <SelectItem value="preparing" className="text-white hover:bg-[#B7985A]/20">Preparing</SelectItem>
               <SelectItem value="ready" className="text-white hover:bg-[#B7985A]/20">Ready</SelectItem>

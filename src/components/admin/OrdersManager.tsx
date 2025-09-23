@@ -6,6 +6,7 @@ import OrdersKanban from '@/components/admin/OrdersKanban';
 const STAGES = [
   { key: 'active', label: 'Active' },
   { key: 'pending', label: 'Pending' },
+  { key: 'paid', label: 'Paid' },
   { key: 'preparing', label: 'Preparing' },
   { key: 'ready', label: 'Ready' },
   { key: 'out_for_delivery', label: 'Out for Delivery' },
