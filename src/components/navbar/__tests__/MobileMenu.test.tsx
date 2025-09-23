@@ -4,7 +4,7 @@ import MobileMenu from '../MobileMenu'
 import { useAuth } from '@/lib/context/AuthContext'
 import { useCart } from '@/lib/context/CartContext'
 import { useAuthClaims } from '@/hooks/useAuthClaims'
-import { NAV_ITEMS } from '@/config/nav'
+import { MAIN_LINKS } from '@/components/nav/links'
 
 // Mock Next.js Link component
 vi.mock('next/link', () => {
@@ -82,33 +82,28 @@ describe('MobileMenu', () => {
   const defaultProps = {
     open: true,
     onOpenChange: vi.fn(),
-    items: NAV_ITEMS,
   }
 
   describe('when user is not authenticated', () => {
     it('renders all navigation items', () => {
       renderWithMocks({
         open: true,
-        onOpenChange: vi.fn(),
-        items: NAV_ITEMS
+        onOpenChange: vi.fn()
       })
       
-      NAV_ITEMS.forEach(item => {
-        if (item.label === 'Menu') {
-          // For "Menu", check specifically for the navigation link, not the header
-          const menuLinks = screen.getAllByText(item.label)
-          expect(menuLinks.length).toBeGreaterThan(0)
-        } else {
-          expect(screen.getByText(item.label)).toBeInTheDocument()
-        }
+      // Check that navigation links are present within the nav element
+      const navElement = screen.getByRole('navigation')
+      MAIN_LINKS.forEach(item => {
+        const linkElement = screen.getByRole('link', { name: item.label })
+        expect(linkElement).toBeInTheDocument()
+        expect(linkElement.getAttribute('href')).toBe(item.href)
       })
     })
 
     it('shows Sign In / Join CTA button', () => {
       renderWithMocks({
         open: true,
-        onOpenChange: vi.fn(),
-        items: NAV_ITEMS
+        onOpenChange: vi.fn()
       })
       
       expect(screen.getByText('Sign In / Join')).toBeInTheDocument()
@@ -117,8 +112,7 @@ describe('MobileMenu', () => {
     it('shows Cart button', () => {
       renderWithMocks({
         open: true,
-        onOpenChange: vi.fn(),
-        items: NAV_ITEMS
+        onOpenChange: vi.fn()
       })
       
       expect(screen.getByText('Cart')).toBeInTheDocument()
@@ -128,8 +122,7 @@ describe('MobileMenu', () => {
       renderWithMocks(
         {
           open: true,
-          onOpenChange: vi.fn(),
-          items: NAV_ITEMS
+          onOpenChange: vi.fn()
         },
         undefined,
         { itemCount: 2 }
@@ -141,8 +134,7 @@ describe('MobileMenu', () => {
     it('should not render authenticated user buttons', () => {
       renderWithMocks({
         open: true,
-        onOpenChange: vi.fn(),
-        items: NAV_ITEMS
+        onOpenChange: vi.fn()
       })
       
       expect(screen.queryByText('My Account')).not.toBeInTheDocument()
@@ -165,8 +157,7 @@ describe('MobileMenu', () => {
       renderWithMocks(
         {
           open: true,
-          onOpenChange: vi.fn(),
-          items: NAV_ITEMS
+          onOpenChange: vi.fn()
         },
         {
           user: mockUser,
@@ -195,8 +186,7 @@ describe('MobileMenu', () => {
       renderWithMocks(
         {
           open: true,
-          onOpenChange: vi.fn(),
-          items: NAV_ITEMS
+          onOpenChange: vi.fn()
         },
         {
           user: mockUser,
@@ -225,8 +215,7 @@ describe('MobileMenu', () => {
       renderWithMocks(
         {
           open: true,
-          onOpenChange: vi.fn(),
-          items: NAV_ITEMS
+          onOpenChange: vi.fn()
         },
         {
           user: mockUser,
@@ -246,8 +235,7 @@ describe('MobileMenu', () => {
       const onOpenChangeMock = vi.fn()
       renderWithMocks({
         open: true,
-        onOpenChange: onOpenChangeMock,
-        items: NAV_ITEMS
+        onOpenChange: onOpenChangeMock
       })
       
       const closeButton = screen.getByLabelText('Close menu')
@@ -260,11 +248,11 @@ describe('MobileMenu', () => {
       const onOpenChangeMock = vi.fn()
       renderWithMocks({
         open: true,
-        onOpenChange: onOpenChangeMock,
-        items: NAV_ITEMS
+        onOpenChange: onOpenChangeMock
       })
       
-      const backdrop = screen.getByLabelText('Close menu overlay')
+      // Find the backdrop div by data-testid
+      const backdrop = screen.getByTestId('mobile-menu-backdrop')
       fireEvent.click(backdrop)
       
       expect(onOpenChangeMock).toHaveBeenCalledWith(false)
@@ -276,8 +264,7 @@ describe('MobileMenu', () => {
       const onCloseMock = vi.fn()
       renderWithMocks({
         open: true,
-        onOpenChange: onCloseMock,
-        items: NAV_ITEMS
+        onOpenChange: onCloseMock
       })
       
       expect(document.body.style.overflow).toBe('hidden')
@@ -287,11 +274,10 @@ describe('MobileMenu', () => {
       const onCloseMock = vi.fn()
       const { rerender } = renderWithMocks({
         open: true,
-        onOpenChange: onCloseMock,
-        items: NAV_ITEMS
+        onOpenChange: onCloseMock
       })
       
-      rerender(<MobileMenu open={false} onOpenChange={onCloseMock} items={NAV_ITEMS} />)
+      rerender(<MobileMenu open={false} onOpenChange={onCloseMock} />)
       
       expect(document.body.style.overflow).toBe('')
     })
@@ -300,8 +286,7 @@ describe('MobileMenu', () => {
       const onCloseMock = vi.fn()
       renderWithMocks({
         open: true,
-        onOpenChange: onCloseMock,
-        items: NAV_ITEMS
+        onOpenChange: onCloseMock
       })
       
       fireEvent.keyDown(document, { key: 'Escape' })

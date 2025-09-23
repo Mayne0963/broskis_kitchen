@@ -3,23 +3,24 @@
 import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { FaTimes } from 'react-icons/fa'
 import { lockBodyScroll, unlockBodyScroll } from '../../lib/dom/lockBodyScroll'
 import { useAuth } from '../../lib/context/AuthContext'
 import { useAuthClaims } from '../../hooks/useAuthClaims'
 import { useCart } from '../../lib/context/CartContext'
-import type { NavItem } from '../../config/nav'
+import { MAIN_LINKS } from '../nav/links'
 
 interface MobileMenuProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  items: NavItem[]
 }
 
-export default function MobileMenu({ open, onOpenChange, items }: MobileMenuProps) {
+export default function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
   const { user } = useAuth()
   const { claims } = useAuthClaims()
   const { itemCount } = useCart()
+  const pathname = usePathname()
   
   const isAuthed = !!user
   const isAdmin = !!claims?.admin
@@ -37,15 +38,25 @@ export default function MobileMenu({ open, onOpenChange, items }: MobileMenuProp
     }
   }
 
-  // Body scroll lock
+  // Body scroll lock and 100vh fix for iOS
   useEffect(() => {
     if (open) {
-      lockBodyScroll()
+      // Fix 100vh iOS bug
+      const vh = window.innerHeight * 0.01
+      document.documentElement.style.setProperty('--vh', `${vh}px`)
+      
+      // Lock body scroll
+      document.documentElement.style.overflow = 'hidden'
+      document.body.style.overflow = 'hidden'
     } else {
-      unlockBodyScroll()
+      // Restore scroll
+      document.documentElement.style.overflow = ''
+      document.body.style.overflow = ''
     }
+    
     return () => {
-      unlockBodyScroll()
+      document.documentElement.style.overflow = ''
+      document.body.style.overflow = ''
     }
   }, [open])
 
@@ -113,52 +124,59 @@ export default function MobileMenu({ open, onOpenChange, items }: MobileMenuProp
       }`}
     >
       {/* Backdrop */}
-      <button
-        className="absolute inset-0 bg-black/60"
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={closeMenu}
-        aria-label="Close menu overlay"
-        tabIndex={-1}
+        aria-hidden="true"
+        data-testid="mobile-menu-backdrop"
       />
       
       {/* Panel */}
-      <div
+      <aside
         ref={panelRef}
         role="dialog"
         aria-modal="true"
-        aria-label="Menu"
+        aria-labelledby="mobile-menu-title"
         data-testid="mobile-menu"
-        className={`fixed inset-y-0 right-0 z-[100] w-full sm:w-[420px] bg-black text-white h-100dvh max-h-100dvh flex flex-col pb-[max(env(safe-area-inset-bottom),16px)] shadow-2xl ring-1 ring-white/10 transform transition-transform duration-300 ease-in-out ${
-          open ? 'translate-x-0' : 'translate-x-full'
-        }`}
+        className="bk-drawer fixed inset-0 z-[100] w-full sm:w-[420px] sm:inset-y-0 sm:right-0 sm:left-auto bg-black text-white shadow-2xl ring-1 ring-white/10 transform transition-transform duration-300 ease-in-out"
+        style={{
+          transform: open ? 'translateX(0)' : 'translateX(100%)',
+          height: 'calc(var(--vh, 1vh) * 100)'
+        }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/10 flex-shrink-0">
-          <h2 className="text-lg font-semibold text-white">Menu</h2>
+        <header className="flex items-center justify-between p-6 border-b border-white/10 flex-shrink-0">
+          <h2 id="mobile-menu-title" className="text-lg font-semibold text-white">Menu</h2>
           <button
             ref={closeButtonRef}
             data-mobile-menu-close
             onClick={closeMenu}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white"
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white min-h-[44px] min-w-[44px] flex items-center justify-center"
             aria-label="Close menu"
           >
             <FaTimes className="h-5 w-5" />
           </button>
-        </div>
+        </header>
         
         {/* Navigation */}
-        <nav className="mobile-scroll overflow-y-auto flex-1 min-h-0">
-          <ul className="divide-y divide-white/10">
-            {items.map((item) => (
-              <li key={item.href}>
+        <nav 
+          className="bk-scroll overflow-y-auto flex-1 min-h-0 -webkit-overflow-scrolling-touch"
+          aria-labelledby="mobile-menu-title"
+        >
+          <ul className="divide-y divide-white/10" role="list">
+            {MAIN_LINKS.map((link) => (
+              <li key={link.href}>
                 <Link
-                  href={item.href}
-                  target={item.external ? "_blank" : undefined}
-                  rel={item.external ? "noopener noreferrer" : undefined}
+                  href={link.href}
                   onClick={closeMenu}
                   data-testid="mobile-menu-link"
-                  className="block px-6 py-5 text-lg font-medium text-white hover:text-[#FFD700] transition-colors duration-200"
+                  className={`block px-4 py-4 text-lg font-medium transition-colors duration-200 min-h-[44px] flex items-center ${
+                    pathname === link.href 
+                      ? 'text-[#FFD700] bg-white/5' 
+                      : 'text-white hover:text-[#FFD700] hover:bg-white/5'
+                  }`}
                 >
-                  {item.label}
+                  {link.label}
                 </Link>
               </li>
             ))}
@@ -166,7 +184,7 @@ export default function MobileMenu({ open, onOpenChange, items }: MobileMenuProp
         </nav>
         
         {/* CTA Section */}
-        <div className="p-4 border-t border-white/10 space-y-3 flex-shrink-0">
+        <footer className="bk-footer flex-shrink-0 sticky bottom-0 bg-gradient-to-t from-black via-black/95 to-transparent border-t border-white/8 p-4 space-y-3">
           {isAuthed ? (
             <>
               <Link 
@@ -218,15 +236,15 @@ export default function MobileMenu({ open, onOpenChange, items }: MobileMenuProp
             href="/cart" 
             onClick={closeMenu} 
             data-testid="mobile-menu-cta"
-            className="btn w-full justify-between"
+            className="btn w-full justify-between min-h-[44px] flex items-center"
           >
             <span>Cart</span>
-            <span className="rounded-full px-2 py-0.5 text-sm bg-white/10">
+            <span className="rounded-full px-2 py-0.5 text-sm bg-white/10 min-w-[24px] text-center">
               {cartCount ?? 0}
             </span>
           </Link>
-        </div>
-      </div>
+        </footer>
+      </aside>
     </div>,
     document.body
   )

@@ -49,7 +49,9 @@
     "env:help": "node scripts/setup-vercel-env.js help",
     "env:setup": "node scripts/setup-vercel-env.js",
     "env:commands": "bash scripts/vercel-env-commands.sh",
-    "backfill-test-orders": "tsx scripts/backfill-test-orders.ts"
+    "backfill-test-orders": "tsx scripts/backfill-test-orders.ts",
+    "stripe:listen": "bash scripts/stripe-listen.sh",
+    "stripe:trigger": "bash scripts/stripe-trigger-checkout.sh"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",

@@ -185,8 +185,7 @@ const Navbar: React.FC = () => {
 
       <MobileMenu 
         open={mobileMenuOpen} 
-        onOpenChange={setMobileMenuOpen} 
-        items={visibleNav(NAV_ITEMS, { isMobile: true, isAuthed: !!user, isAdmin: !!claims?.admin })}
+        onOpenChange={setMobileMenuOpen}
       />
       </nav>
       <EmailVerificationBanner className="fixed top-20 left-0 right-0 z-40 mx-4" />

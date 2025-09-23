@@ -1,5 +1,9 @@
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+// Ensure no caching for real-time order updates
+export const fetchCache = 'force-no-store';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { Timestamp } from 'firebase-admin/firestore';
