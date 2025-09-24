@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
-import { getLoyaltyProfile, getPointsExpiringIn30Days } from '@/lib/rewards';
+import { getLoyaltyProfile } from '@/lib/rewards';
+import { getExpiringPoints } from '@/lib/services/rewardsService';
 import { BalanceResponse } from '@/types/rewards';
 
 export async function GET(req: NextRequest) {
@@ -19,7 +20,8 @@ export async function GET(req: NextRequest) {
     }
     
     // Get points expiring in 30 days
-    const expiringPoints = await getPointsExpiringIn30Days(user.uid);
+    const expiringPointsData = await getExpiringPoints(user.uid, 30);
+    const expiringPoints = expiringPointsData.reduce((total, points) => total + points.points, 0);
     
     const response: BalanceResponse = {
       success: true,
@@ -43,3 +45,5 @@ export async function GET(req: NextRequest) {
       success: false,
       error: 'Internal server error'
     }, { status: 500 });
+  }
+}

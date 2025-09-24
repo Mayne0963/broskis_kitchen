@@ -1,6 +1,6 @@
-import { NextApiRequest } from 'next';
-import { getAuth } from 'firebase-admin/auth';
-import { initializeFirebaseAdmin } from './firebase-admin';
+import { NextRequest } from 'next/server';
+import { auth } from '@/lib/firebaseAdmin';
+import { cookies } from 'next/headers';
 
 export interface AuthUser {
   uid: string;
@@ -9,42 +9,64 @@ export interface AuthUser {
   customClaims?: Record<string, any>;
 }
 
-export async function verifyAuthToken(req: NextApiRequest): Promise<AuthUser | null> {
+export async function requireAuth(req: NextRequest): Promise<AuthUser> {
   try {
-    // Initialize Firebase Admin
-    initializeFirebaseAdmin();
+    let token: string | undefined;
     
-    // Get token from Authorization header
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return null;
+    // First try to get token from session cookie
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get('__session');
+    
+    if (sessionCookie) {
+      // Verify session cookie
+      try {
+        const decodedToken = await auth.verifySessionCookie(sessionCookie.value);
+        return {
+          uid: decodedToken.uid,
+          email: decodedToken.email,
+          emailVerified: decodedToken.email_verified || false,
+          customClaims: decodedToken
+        };
+      } catch (cookieError) {
+        console.log('Session cookie verification failed, trying Bearer token');
+      }
     }
-
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
     
-    // Verify the token
-    const auth = getAuth();
-    const decodedToken = await auth.verifyIdToken(token);
+    // Fallback to Authorization header
+    const authHeader = req.headers.get('authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7); // Remove 'Bearer ' prefix
+      
+      // Verify the token using Firebase Admin
+      const decodedToken = await auth.verifyIdToken(token);
+      
+      return {
+        uid: decodedToken.uid,
+        email: decodedToken.email,
+        emailVerified: decodedToken.email_verified || false,
+        customClaims: decodedToken
+      };
+    }
     
-    return {
-      uid: decodedToken.uid,
-      email: decodedToken.email,
-      emailVerified: decodedToken.email_verified || false,
-      customClaims: decodedToken
-    };
+    throw new Error('No valid authentication found');
   } catch (error) {
     console.error('Error verifying auth token:', error);
+    throw new Error('Authentication failed');
+  }
+}
+
+export async function verifyUser(req: NextRequest): Promise<AuthUser | null> {
+  try {
+    return await requireAuth(req);
+  } catch (error) {
     return null;
   }
 }
 
-export async function verifyAdminToken(req: NextApiRequest): Promise<AuthUser | null> {
+export async function verifyAdminToken(req: NextRequest): Promise<AuthUser | null> {
   try {
-    const user = await verifyAuthToken(req);
-    if (!user) {
-      return null;
-    }
-
+    const user = await requireAuth(req);
+    
     // Check if user has admin claims
     const isAdmin = user.customClaims?.admin === true || 
                    user.customClaims?.role === 'admin';

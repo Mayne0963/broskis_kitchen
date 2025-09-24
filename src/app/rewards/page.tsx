@@ -19,6 +19,40 @@ export default function RewardsPage() {
   const { status, rewards, loading, error, refreshStatus, spinWheel, redeemReward } = useRewards()
   const [activeTab, setActiveTab] = useState("rewards")
   const [selectedReward, setSelectedReward] = useState(null)
+  const [showRedeemModal, setShowRedeemModal] = useState(false)
+  const [showSpinGame, setShowSpinGame] = useState(false)
+
+  // Check if user is authenticated
+  const isAuthenticated = !!user
+
+  // Get current status or defaults
+  const currentPoints = status?.currentPoints || 0
+  const currentTier = status?.tier || "Bronze"
+  const nextTier = status?.nextTier
+  const pointsToNextTier = status?.pointsToNextTier || 0
+  const canSpin = status?.canSpin || false
+  const pointsExpiring = status?.pointsExpiring || 0
+
+  // Handle selecting a reward
+  const handleSelectReward = (reward) => {
+    setSelectedReward(reward)
+    setShowRedeemModal(true)
+  }
+
+  // Handle closing the redeem modal
+  const handleCloseRedeemModal = () => {
+    setShowRedeemModal(false)
+    setSelectedReward(null)
+  }
+
+  // Group rewards by category
+  const categoryGroups = rewards.reduce((groups, reward) => {
+    if (!groups[reward.category]) {
+      groups[reward.category] = []
+    }
+    groups[reward.category].push(reward)
+    return groups
+  }, {})
 
   // Sacred Geometry Background Component
   const SacredGeometry = () => (
@@ -141,40 +175,6 @@ export default function RewardsPage() {
       </div>
     </section>
   )
-  const [showRedeemModal, setShowRedeemModal] = useState(false)
-  const [showSpinGame, setShowSpinGame] = useState(false)
-
-  // Check if user is authenticated
-  const isAuthenticated = !!user
-
-  // Get current status or defaults
-  const currentPoints = status?.currentPoints || 0
-  const currentTier = status?.tier || "Bronze"
-  const nextTier = status?.nextTier
-  const pointsToNextTier = status?.pointsToNextTier || 0
-  const canSpin = status?.canSpin || false
-  const pointsExpiring = status?.pointsExpiring || 0
-
-  // Handle selecting a reward
-  const handleSelectReward = (reward) => {
-    setSelectedReward(reward)
-    setShowRedeemModal(true)
-  }
-
-  // Handle closing the redeem modal
-  const handleCloseRedeemModal = () => {
-    setShowRedeemModal(false)
-    setSelectedReward(null)
-  }
-
-  // Group rewards by category
-  const categoryGroups = rewards.reduce((groups, reward) => {
-    if (!groups[reward.category]) {
-      groups[reward.category] = []
-    }
-    groups[reward.category].push(reward)
-    return groups
-  }, {})
 
   return (
     <div className="min-h-screen pb-20">

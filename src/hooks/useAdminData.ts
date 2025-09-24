@@ -94,12 +94,12 @@ export const useAdminData = () => {
   const [error, setError] = useState<string | null>(null)
   const role = useRole()
 
-  // Early return if user is not an admin
+  // Early return if user is not an admin or role is not available
   if (role !== 'admin') {
     return {
       data: null,
       loading: false,
-      error: 'Access denied: Admin role required',
+      error: role === null ? null : 'Access denied: Admin role required',
       refetch: () => Promise.resolve(),
       unsubscribe: () => {}
     }

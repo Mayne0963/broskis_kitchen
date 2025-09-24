@@ -23,8 +23,9 @@ export const RoleProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 export const useRole = (): RoleContextType => {
   const context = useContext(RoleContext);
-  if (context === undefined) {
-    throw new Error('useRole must be used within a RoleProvider');
+  if (!context) {
+    // Return null during build time or when outside provider
+    return null;
   }
-  return context;
+  return context.userRole;
 };
