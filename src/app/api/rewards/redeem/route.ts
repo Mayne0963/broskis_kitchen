@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { requireAuth } from '@/lib/auth'
+import { handleError } from '@/lib/error'
 import { 
   getUserRewards, 
   createUserRewards, 
@@ -59,18 +60,9 @@ function validateTotalCOGS(cogsValue: number, orderSubtotal: number): boolean {
 
 export async function POST(req: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const sessionCookie = cookieStore.get('__session')
-    
-    if (!sessionCookie) {
-      return NextResponse.json({
-        success: false,
-        error: 'Authentication required'
-      }, { status: 401 })
-    }
-
-    // TODO: Verify session and get actual user ID
-    const userId = 'mock-user-id' // Replace with actual user ID from session
+    // Authenticate user
+    const user = await requireAuth(req)
+    const userId = user.uid
     
     const body = await req.json()
     const { 
@@ -221,27 +213,16 @@ export async function POST(req: NextRequest) {
     
   } catch (error) {
     console.error('Redemption error:', error)
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to process redemption'
-    }, { status: 500 })
+    const errorResponse = handleError(error)
+    return NextResponse.json(errorResponse, { status: 500 })
   }
 }
 
 export async function GET(req: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const sessionCookie = cookieStore.get('__session')
-    
-    if (!sessionCookie) {
-      return NextResponse.json({
-        success: false,
-        error: 'Authentication required'
-      }, { status: 401 })
-    }
-
-    // TODO: Verify session and get actual user ID
-    const userId = 'mock-user-id' // Replace with actual user ID from session
+    // Authenticate user
+    const user = await requireAuth(req)
+    const userId = user.uid
     
     const { searchParams } = new URL(req.url)
     const orderId = searchParams.get('orderId')
@@ -277,9 +258,7 @@ export async function GET(req: NextRequest) {
     
   } catch (error) {
     console.error('Get redemptions error:', error)
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to get redemption history'
-    }, { status: 500 })
+    const errorResponse = handleError(error)
+    return NextResponse.json(errorResponse, { status: 500 })
   }
 }

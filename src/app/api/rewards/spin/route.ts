@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { requireAuth } from '@/lib/auth'
+import { handleError } from '@/lib/error'
 import { 
   getUserRewards, 
   createUserRewards, 
@@ -77,18 +78,9 @@ async function canUserSpin(userId: string): Promise<{ canSpin: boolean, nextSpin
 
 export async function POST(req: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const sessionCookie = cookieStore.get('__session')
-    
-    if (!sessionCookie) {
-      return NextResponse.json({
-        success: false,
-        error: 'Authentication required - guests cannot spin'
-      }, { status: 401 })
-    }
-
-    // TODO: Verify session and get actual user ID
-    const userId = 'mock-user-id' // Replace with actual user ID from session
+    // Authenticate user
+    const user = await requireAuth(req)
+    const userId = user.uid
     
     // Parse request body (optional idempotency key)
     const body = await req.json()
@@ -194,10 +186,8 @@ export async function POST(req: NextRequest) {
     
   } catch (error) {
     console.error('Spin error:', error)
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to process spin'
-    }, { status: 500 })
+    const errorResponse = handleError(error)
+    return NextResponse.json(errorResponse, { status: 500 })
   }
 }
 

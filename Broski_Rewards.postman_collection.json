@@ -1,0 +1,505 @@
+{
+	"info": {
+		"_postman_id": "broski-rewards-api",
+		"name": "Broski's Rewards API",
+		"description": "Complete test collection for Broski's Kitchen Rewards API endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Rewards Catalog",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Response has success field', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('success');",
+							"    pm.expect(jsonData.success).to.be.true;",
+							"});",
+							"",
+							"pm.test('Response has catalog array', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('catalog');",
+							"    pm.expect(jsonData.catalog).to.be.an('array');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{idToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base}}/api/rewards/catalog",
+					"host": [
+						"{{base}}"
+					],
+					"path": [
+						"api",
+						"rewards",
+						"catalog"
+					]
+				},
+				"description": "Get the rewards catalog with all available rewards"
+			},
+			"response": []
+		},
+		{
+			"name": "User Balance",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Response has points field', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('points');",
+							"    pm.expect(jsonData.points).to.be.a('number');",
+							"});",
+							"",
+							"pm.test('Response has canSpin field', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('canSpin');",
+							"    pm.expect(jsonData.canSpin).to.be.a('boolean');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{idToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base}}/api/rewards/balance",
+					"host": [
+						"{{base}}"
+					],
+					"path": [
+						"api",
+						"rewards",
+						"balance"
+					]
+				},
+				"description": "Get user's current points balance and spin status"
+			},
+			"response": []
+		},
+		{
+			"name": "Spin Wheel",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 or 429', function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 429]);",
+							"});",
+							"",
+							"if (pm.response.code === 200) {",
+							"    pm.test('Successful spin has pointsWon', function () {",
+							"        const jsonData = pm.response.json();",
+							"        pm.expect(jsonData).to.have.property('pointsWon');",
+							"        pm.expect(jsonData.pointsWon).to.be.a('number');",
+							"        pm.expect(jsonData.pointsWon).to.be.at.least(5);",
+							"    });",
+							"}",
+							"",
+							"if (pm.response.code === 429) {",
+							"    pm.test('Rate limited response has error', function () {",
+							"        const jsonData = pm.response.json();",
+							"        pm.expect(jsonData).to.have.property('error');",
+							"        pm.expect(jsonData.success).to.be.false;",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Generate unique idempotency key",
+							"const timestamp = Date.now();",
+							"const random = Math.random().toString(36).substring(7);",
+							"pm.globals.set('spinIdempotencyKey', `spin-${timestamp}-${random}`);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{idToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"idempotencyKey\": \"{{spinIdempotencyKey}}\"\n}"
+				},
+				"url": {
+					"raw": "{{base}}/api/rewards/spin",
+					"host": [
+						"{{base}}"
+					],
+					"path": [
+						"api",
+						"rewards",
+						"spin"
+					]
+				},
+				"description": "Spin the rewards wheel (24-hour cooldown)"
+			},
+			"response": []
+		},
+		{
+			"name": "Redeem - Insufficient Points",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 400', function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test('Response indicates insufficient points', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.be.false;",
+							"    pm.expect(jsonData.error).to.include('Insufficient');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Generate unique keys",
+							"const timestamp = Date.now();",
+							"const random = Math.random().toString(36).substring(7);",
+							"pm.globals.set('redeemIdempotencyKey1', `redeem-insufficient-${timestamp}-${random}`);",
+							"pm.globals.set('orderId1', `order-${timestamp}-${random}`);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{idToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"rewardId\": \"free_entree_500\",\n    \"orderId\": \"{{orderId1}}\",\n    \"orderSubtotal\": 25.99,\n    \"rewardType\": \"free_item\",\n    \"rewardValue\": \"entree\",\n    \"pointsCost\": 500,\n    \"idempotencyKey\": \"{{redeemIdempotencyKey1}}\"\n}"
+				},
+				"url": {
+					"raw": "{{base}}/api/rewards/redeem",
+					"host": [
+						"{{base}}"
+					],
+					"path": [
+						"api",
+						"rewards",
+						"redeem"
+					]
+				},
+				"description": "Attempt to redeem expensive reward with insufficient points"
+			},
+			"response": []
+		},
+		{
+			"name": "Redeem - Free Side",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 or 400', function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+							"});",
+							"",
+							"if (pm.response.code === 200) {",
+							"    pm.test('Successful redemption has newBalance', function () {",
+							"        const jsonData = pm.response.json();",
+							"        pm.expect(jsonData.success).to.be.true;",
+							"        pm.expect(jsonData).to.have.property('newBalance');",
+							"        pm.expect(jsonData).to.have.property('pointsDeducted');",
+							"        pm.expect(jsonData.pointsDeducted).to.equal(100);",
+							"    });",
+							"    ",
+							"    // Store redemption details for idempotency test",
+							"    const jsonData = pm.response.json();",
+							"    pm.globals.set('lastRedemptionId', jsonData.redemptionId);",
+							"    pm.globals.set('lastNewBalance', jsonData.newBalance);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Generate unique keys for this redemption",
+							"const timestamp = Date.now();",
+							"const random = Math.random().toString(36).substring(7);",
+							"pm.globals.set('redeemIdempotencyKey2', `redeem-side-${timestamp}-${random}`);",
+							"pm.globals.set('orderId2', `order-${timestamp}-${random}`);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{idToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"rewardId\": \"free_side_100\",\n    \"orderId\": \"{{orderId2}}\",\n    \"orderSubtotal\": 15.99,\n    \"rewardType\": \"free_item\",\n    \"rewardValue\": \"side_dish\",\n    \"pointsCost\": 100,\n    \"idempotencyKey\": \"{{redeemIdempotencyKey2}}\"\n}"
+				},
+				"url": {
+					"raw": "{{base}}/api/rewards/redeem",
+					"host": [
+						"{{base}}"
+					],
+					"path": [
+						"api",
+						"rewards",
+						"redeem"
+					]
+				},
+				"description": "Redeem free side dish (100 points)"
+			},
+			"response": []
+		},
+		{
+			"name": "Redeem - Idempotency Test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Idempotent response has cached flag', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.be.true;",
+							"    // Should return same redemption without double-deducting",
+							"    pm.expect(jsonData).to.have.property('cached');",
+							"    pm.expect(jsonData.cached).to.be.true;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{idToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"rewardId\": \"free_side_100\",\n    \"orderId\": \"{{orderId2}}\",\n    \"orderSubtotal\": 15.99,\n    \"rewardType\": \"free_item\",\n    \"rewardValue\": \"side_dish\",\n    \"pointsCost\": 100,\n    \"idempotencyKey\": \"{{redeemIdempotencyKey2}}\"\n}"
+				},
+				"url": {
+					"raw": "{{base}}/api/rewards/redeem",
+					"host": [
+						"{{base}}"
+					],
+					"path": [
+						"api",
+						"rewards",
+						"redeem"
+					]
+				},
+				"description": "Repeat same redemption to test idempotency (should not double-deduct)"
+			},
+			"response": []
+		},
+		{
+			"name": "Redemption History",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Response has redemptions array', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('redemptions');",
+							"    pm.expect(jsonData.redemptions).to.be.an('array');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{idToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base}}/api/rewards/redeem",
+					"host": [
+						"{{base}}"
+					],
+					"path": [
+						"api",
+						"rewards",
+						"redeem"
+					]
+				},
+				"description": "Get user's redemption history"
+			},
+			"response": []
+		},
+		{
+			"name": "Authentication Test - No Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 401', function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test('Response indicates authentication required', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.be.false;",
+							"    pm.expect(jsonData.error).to.include('Authentication');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base}}/api/rewards/balance",
+					"host": [
+						"{{base}}"
+					],
+					"path": [
+						"api",
+						"rewards",
+						"balance"
+					]
+				},
+				"description": "Test authentication requirement (should return 401)"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "base",
+			"value": "http://localhost:3000",
+			"description": "Base URL for the API (change to your deployment URL)"
+		},
+		{
+			"key": "idToken",
+			"value": "your-firebase-id-token-here",
+			"description": "Firebase ID token for authentication"
+		}
+	]
+}
