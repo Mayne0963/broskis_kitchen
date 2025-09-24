@@ -4,15 +4,37 @@ import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 import type { Reward, RewardHistory } from "@/types"
 import { rewards as rewardsData } from "@/data/rewards-data"
+import { useAuth } from "./AuthContext"
+
+interface RewardsStatus {
+  currentPoints: number
+  tier: string
+  nextTier: string | null
+  pointsToNextTier: number
+  totalPointsEarned: number
+  canSpin: boolean
+  nextSpinTime?: string
+  pointsExpiring: number
+  expiryDate?: string
+  recentActivity: any[]
+}
+
+interface SpinResult {
+  result: string
+  pointsAwarded: number
+  newBalance: number
+  isJackpot: boolean
+}
 
 interface RewardsContextType {
-  points: number
-  tier: string
+  status: RewardsStatus | null
   rewards: Reward[]
   history: RewardHistory[]
-  addPoints: (amount: number) => void
-  redeemReward: (reward: Reward) => boolean
-  spinWheel: () => number
+  loading: boolean
+  error: string | null
+  refreshStatus: () => Promise<void>
+  spinWheel: () => Promise<SpinResult | null>
+  redeemReward: (rewardId: string, orderId: string, orderSubtotal: number, rewardType: string, rewardValue: number, pointsCost: number) => Promise<boolean>
 }
 
 const RewardsContext = createContext<RewardsContextType | undefined>(undefined)
@@ -30,96 +52,159 @@ interface RewardsProviderProps {
 }
 
 export const RewardsProvider: React.FC<RewardsProviderProps> = ({ children }) => {
-  const [points, setPoints] = useState(0)
-  const [tier, setTier] = useState("Bronze")
+  const { user } = useAuth()
+  const [status, setStatus] = useState<RewardsStatus | null>(null)
   const [rewards, setRewards] = useState<Reward[]>([])
   const [history, setHistory] = useState<RewardHistory[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  // Load rewards data from localStorage on mount
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const savedPoints = localStorage.getItem("rewardsPoints")
-      const savedTier = localStorage.getItem("rewardsTier")
-      const savedHistory = localStorage.getItem("rewardsHistory")
-
-      if (savedPoints) setPoints(Number.parseInt(savedPoints, 10))
-      if (savedTier) setTier(savedTier)
-      if (savedHistory) setHistory(JSON.parse(savedHistory))
-
-      // Load static rewards data
-      setRewards(rewardsData)
-    }
-  }, [])
-
-  // Update localStorage when state changes
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("rewardsPoints", points.toString())
-      localStorage.setItem("rewardsTier", tier)
-      localStorage.setItem("rewardsHistory", JSON.stringify(history))
-    }
-  }, [points, tier, history])
-
-  // Update tier based on points
-  useEffect(() => {
-    if (points >= 1000) {
-      setTier("Gold")
-    } else if (points >= 500) {
-      setTier("Silver")
-    } else {
-      setTier("Bronze")
-    }
-  }, [points])
-
-  const addPoints = (amount: number) => {
-    setPoints((prevPoints) => prevPoints + amount)
-
-    // Add to history
-    const newHistoryItem: RewardHistory = {
-      id: `history-${Date.now()}`,
-      date: new Date().toISOString(),
-      action: "earned",
-      points: amount,
-    }
-
-    setHistory((prevHistory) => [newHistoryItem, ...prevHistory])
-  }
-
-  const redeemReward = (reward: Reward): boolean => {
-    if (points >= reward.pointsRequired) {
-      setPoints((prevPoints) => prevPoints - reward.pointsRequired)
-
-      // Add to history
-      const newHistoryItem: RewardHistory = {
-        id: `history-${Date.now()}`,
-        date: new Date().toISOString(),
-        action: "redeemed",
-        points: -reward.pointsRequired,
+  // Load rewards status from API
+  const refreshStatus = async () => {
+    if (!user) return
+    
+    setLoading(true)
+    setError(null)
+    
+    try {
+      const response = await fetch('/api/rewards/status')
+      if (!response.ok) {
+        throw new Error('Failed to fetch rewards status')
       }
-
-      setHistory((prevHistory) => [newHistoryItem, ...prevHistory])
-      return true
+      
+      const data = await response.json()
+      if (data.success) {
+        setStatus(data.status)
+      } else {
+        throw new Error(data.error || 'Failed to load rewards status')
+      }
+    } catch (err) {
+      console.error('Error fetching rewards status:', err)
+      setError(err instanceof Error ? err.message : 'Failed to load rewards')
+    } finally {
+      setLoading(false)
     }
-    return false
   }
 
-  const spinWheel = (): number => {
-    // Generate a random number of points between 10 and 100
-    const randomPoints = Math.floor(Math.random() * 91) + 10
-    addPoints(randomPoints)
-    return randomPoints
+  // Load rewards data on mount and when user changes
+  useEffect(() => {
+    if (user) {
+      refreshStatus()
+      setRewards(rewardsData)
+    } else {
+      setStatus(null)
+      setRewards([])
+      setHistory([])
+    }
+  }, [user])
+
+  // Spin wheel function
+  const spinWheel = async (): Promise<SpinResult | null> => {
+    if (!user) {
+      setError('Must be logged in to spin')
+      return null
+    }
+    
+    setLoading(true)
+    setError(null)
+    
+    try {
+      const response = await fetch('/api/rewards/spin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          idempotencyKey: `spin-${Date.now()}-${Math.random()}`
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (data.success) {
+        // Refresh status to get updated points
+        await refreshStatus()
+        return {
+          result: data.result,
+          pointsAwarded: data.pointsAwarded,
+          newBalance: data.newBalance,
+          isJackpot: data.isJackpot
+        }
+      } else {
+        throw new Error(data.error || 'Spin failed')
+      }
+    } catch (err) {
+      console.error('Error spinning wheel:', err)
+      setError(err instanceof Error ? err.message : 'Spin failed')
+      return null
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Redeem reward function
+  const redeemReward = async (
+    rewardId: string,
+    orderId: string,
+    orderSubtotal: number,
+    rewardType: string,
+    rewardValue: number,
+    pointsCost: number
+  ): Promise<boolean> => {
+    if (!user) {
+      setError('Must be logged in to redeem rewards')
+      return false
+    }
+    
+    setLoading(true)
+    setError(null)
+    
+    try {
+      const response = await fetch('/api/rewards/redeem', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          rewardId,
+          orderId,
+          orderSubtotal,
+          rewardType,
+          rewardValue,
+          pointsCost,
+          idempotencyKey: `redeem-${Date.now()}-${Math.random()}`
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (data.success) {
+        // Refresh status to get updated points
+        await refreshStatus()
+        return true
+      } else {
+        throw new Error(data.error || 'Redemption failed')
+      }
+    } catch (err) {
+      console.error('Error redeeming reward:', err)
+      setError(err instanceof Error ? err.message : 'Redemption failed')
+      return false
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <RewardsContext.Provider
       value={{
-        points,
-        tier,
+        status,
         rewards,
         history,
-        addPoints,
-        redeemReward,
+        loading,
+        error,
+        refreshStatus,
         spinWheel,
+        redeemReward,
       }}
     >
       {children}

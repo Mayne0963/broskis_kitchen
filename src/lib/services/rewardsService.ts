@@ -27,8 +27,38 @@ export interface UserRewards {
   ordersCount: number
   lifetimePoints: number
   redeemedPoints: number
+  lastSpinAt?: Date
   createdAt: Date
   updatedAt: Date
+}
+
+export interface PointsWithExpiry {
+  id?: string
+  userId: string
+  points: number
+  expiresAt: Date
+  source: string
+  orderId?: string
+}
+
+export interface SpinHistory {
+  id: string
+  userId: string
+  pointsWon: number
+  isJackpot: boolean
+  spunAt: Date
+}
+
+export interface RedemptionRecord {
+  id: string
+  userId: string
+  orderId: string
+  rewardType: 'free_item' | 'discount' | 'delivery_credit' | 'merchandise'
+  pointsUsed: number
+  cogsValue: number
+  description: string
+  redeemedAt: Date
+  idempotencyKey: string
 }
 
 export interface PointsTransaction {
@@ -80,6 +110,9 @@ const USER_REWARDS_COLLECTION = 'userRewards'
 const POINTS_TRANSACTIONS_COLLECTION = COLLECTIONS.REWARD_TRANSACTIONS
 const REWARD_OFFERS_COLLECTION = 'rewardOffers'
 const USER_REDEMPTIONS_COLLECTION = 'userRedemptions'
+const SPIN_HISTORY_COLLECTION = 'spinHistory'
+const REDEMPTION_RECORDS_COLLECTION = 'redemptionRecords'
+const POINTS_WITH_EXPIRY_COLLECTION = 'pointsWithExpiry'
 
 // Removed mock data - service now requires proper Firebase configuration
 
@@ -436,5 +469,219 @@ export async function getRewardsAnalytics(): Promise<{
       totalRedemptions: 0,
       topRedemptions: []
     }
+  }
+}
+
+// Spin History Functions
+export async function addSpinHistory(spinData: Omit<SpinHistory, 'id'>): Promise<SpinHistory | null> {
+  if (!isFirebaseConfigured()) {
+    throw new Error('Firebase not configured - rewards service unavailable')
+  }
+
+  try {
+    const spinHistoryData = {
+      ...spinData,
+      spunAt: Timestamp.fromDate(spinData.spunAt)
+    }
+
+    const docRef = await addDoc(collection(db, SPIN_HISTORY_COLLECTION), spinHistoryData)
+    
+    return {
+      id: docRef.id,
+      ...spinData
+    }
+  } catch (error) {
+    console.error('Error adding spin history:', error)
+    return null
+  }
+}
+
+export async function getUserSpinHistory(userId: string, limitCount: number = 10): Promise<SpinHistory[]> {
+  if (!isFirebaseConfigured()) {
+    throw new Error('Firebase not configured - rewards service unavailable')
+  }
+
+  try {
+    const q = query(
+      collection(db, SPIN_HISTORY_COLLECTION),
+      where('userId', '==', userId),
+      orderBy('spunAt', 'desc'),
+      limit(limitCount)
+    )
+    
+    const querySnapshot = await getDocs(q)
+    const spins: SpinHistory[] = []
+    
+    querySnapshot.forEach((doc) => {
+      const data = doc.data()
+      spins.push({
+        id: doc.id,
+        userId: data.userId,
+        pointsWon: data.pointsWon,
+        isJackpot: data.isJackpot,
+        spunAt: data.spunAt?.toDate() || new Date()
+      })
+    })
+    
+    return spins
+  } catch (error) {
+    console.error('Error fetching spin history:', error)
+    return []
+  }
+}
+
+// Redemption Records Functions
+export async function addRedemptionRecord(redemptionData: Omit<RedemptionRecord, 'id'>): Promise<RedemptionRecord | null> {
+  if (!isFirebaseConfigured()) {
+    throw new Error('Firebase not configured - rewards service unavailable')
+  }
+
+  try {
+    const recordData = {
+      ...redemptionData,
+      redeemedAt: Timestamp.fromDate(redemptionData.redeemedAt)
+    }
+
+    const docRef = await addDoc(collection(db, REDEMPTION_RECORDS_COLLECTION), recordData)
+    
+    return {
+      id: docRef.id,
+      ...redemptionData
+    }
+  } catch (error) {
+    console.error('Error adding redemption record:', error)
+    return null
+  }
+}
+
+export async function getRedemptionsByOrder(orderId: string): Promise<RedemptionRecord[]> {
+  if (!isFirebaseConfigured()) {
+    throw new Error('Firebase not configured - rewards service unavailable')
+  }
+
+  try {
+    const q = query(
+      collection(db, REDEMPTION_RECORDS_COLLECTION),
+      where('orderId', '==', orderId)
+    )
+    
+    const querySnapshot = await getDocs(q)
+    const redemptions: RedemptionRecord[] = []
+    
+    querySnapshot.forEach((doc) => {
+      const data = doc.data()
+      redemptions.push({
+        id: doc.id,
+        userId: data.userId,
+        orderId: data.orderId,
+        rewardType: data.rewardType,
+        pointsUsed: data.pointsUsed,
+        cogsValue: data.cogsValue,
+        description: data.description,
+        redeemedAt: data.redeemedAt?.toDate() || new Date(),
+        idempotencyKey: data.idempotencyKey
+      })
+    })
+    
+    return redemptions
+  } catch (error) {
+    console.error('Error fetching redemptions by order:', error)
+    return []
+  }
+}
+
+// Points with Expiry Functions
+export async function addPointsWithExpiry(pointsData: Omit<PointsWithExpiry, 'id'>): Promise<PointsWithExpiry | null> {
+  if (!isFirebaseConfigured()) {
+    throw new Error('Firebase not configured - rewards service unavailable')
+  }
+
+  try {
+    const expiryData = {
+      userId: pointsData.userId,
+      points: pointsData.points,
+      source: pointsData.source,
+      orderId: pointsData.orderId,
+      expiresAt: Timestamp.fromDate(pointsData.expiresAt)
+    }
+
+    const docRef = await addDoc(collection(db, POINTS_WITH_EXPIRY_COLLECTION), expiryData)
+    
+    return {
+      id: docRef.id,
+      ...pointsData
+    }
+  } catch (error) {
+    console.error('Error adding points with expiry:', error)
+    return null
+  }
+}
+
+export async function getExpiringPoints(userId: string, daysAhead: number = 7): Promise<PointsWithExpiry[]> {
+  if (!isFirebaseConfigured()) {
+    throw new Error('Firebase not configured - rewards service unavailable')
+  }
+
+  try {
+    const expiryDate = new Date()
+    expiryDate.setDate(expiryDate.getDate() + daysAhead)
+    
+    const q = query(
+      collection(db, POINTS_WITH_EXPIRY_COLLECTION),
+      where('userId', '==', userId),
+      where('expiresAt', '<=', Timestamp.fromDate(expiryDate)),
+      orderBy('expiresAt', 'asc')
+    )
+    
+    const querySnapshot = await getDocs(q)
+    const expiringPoints: PointsWithExpiry[] = []
+    
+    querySnapshot.forEach((doc) => {
+      const data = doc.data()
+      expiringPoints.push({
+        id: doc.id,
+        userId: data.userId,
+        points: data.points,
+        expiresAt: data.expiresAt?.toDate() || new Date(),
+        source: data.source,
+        orderId: data.orderId
+      })
+    })
+    
+    return expiringPoints
+  } catch (error) {
+    console.error('Error fetching expiring points:', error)
+    return []
+  }
+}
+
+export async function removeExpiredPoints(userId: string): Promise<number> {
+  if (!isFirebaseConfigured()) {
+    throw new Error('Firebase not configured - rewards service unavailable')
+  }
+
+  try {
+    const now = new Date()
+    const q = query(
+      collection(db, POINTS_WITH_EXPIRY_COLLECTION),
+      where('userId', '==', userId),
+      where('expiresAt', '<=', Timestamp.fromDate(now))
+    )
+    
+    const querySnapshot = await getDocs(q)
+    let totalExpiredPoints = 0
+    
+    const deletePromises = querySnapshot.docs.map(async (docSnapshot) => {
+      const data = docSnapshot.data()
+      totalExpiredPoints += data.points || 0
+      await deleteDoc(doc(db, POINTS_WITH_EXPIRY_COLLECTION, docSnapshot.id))
+    })
+    
+    await Promise.all(deletePromises)
+    
+    return totalExpiredPoints
+  } catch (error) {
+    console.error('Error removing expired points:', error)
+    return 0
   }
 }

@@ -1,22 +1,30 @@
-'use client';
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { subscribeToAuth } from '@/lib/auth';
+'use client'
 
-export type Role = 'admin' | 'manager' | 'user' | null;
+import { useAuth } from '@/lib/context/AuthContext';
+import { createContext, useContext, ReactNode } from 'react';
 
-const Ctx = createContext<Role>(null);
-
-export const useRole = () => useContext(Ctx);
-
-export function RoleProvider({ children }: { children: React.ReactNode }) {
-  const [role, setRole] = useState<Role>(null);
-  
-  useEffect(() => {
-    const unsubscribe = subscribeToAuth((user, userRole) => {
-      setRole(userRole as Role);
-    });
-    return unsubscribe;
-  }, []);
-  
-  return <Ctx.Provider value={role}>{children}</Ctx.Provider>;
+interface RoleContextType {
+  userRole: string | null;
+  isLoading: boolean;
 }
+
+const RoleContext = createContext<RoleContextType | undefined>(undefined);
+
+export const RoleProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { user, isLoading } = useAuth();
+  const userRole = user?.role || null;
+
+  return (
+    <RoleContext.Provider value={{ userRole, isLoading }}>
+      {children}
+    </RoleContext.Provider>
+  );
+};
+
+export const useRole = (): RoleContextType => {
+  const context = useContext(RoleContext);
+  if (context === undefined) {
+    throw new Error('useRole must be used within a RoleProvider');
+  }
+  return context;
+};

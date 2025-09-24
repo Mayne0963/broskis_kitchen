@@ -2,13 +2,14 @@
 
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
-import { FaPlay, FaLock } from "react-icons/fa"
+import { FaPlay, FaLock, FaUserPlus } from "react-icons/fa"
 import { useAuth } from "../../lib/context/AuthContext"
 import { useRewards } from "../../lib/context/RewardsContext"
 import Link from "next/link"
 
 interface SpinGameProps {
-  onComplete: (points: number) => void
+  onClose: () => void
+  onSpin: (result: { points: number; isJackpot: boolean }) => Promise<void>
 }
 
 const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
@@ -115,20 +116,26 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
   }
 
   // Function to handle the spinning animation
-  const spinTheWheel = () => {
-    if (!canSpin || isSpinning) return
-
+  const handleSpin = async () => {
+    if (isSpinning || !canSpin) return
+    
     setIsSpinning(true)
     setResult(null)
-
-    // Generate random spin: 3-7 full rotations plus random angle
-    const minRotations = 3
-    const maxRotations = 7
-    const randomRotations = Math.random() * (maxRotations - minRotations) + minRotations
-    const randomAngle = Math.random() * 360
-    const totalRotation = randomRotations * 360 + randomAngle
     
-    const finalAngle = spinAngle + totalRotation
+    // Generate random rotation (multiple full rotations + final position)
+    const minRotation = 1440 // 4 full rotations
+    const maxRotation = 2160 // 6 full rotations
+    const baseRotation = Math.random() * (maxRotation - minRotation) + minRotation
+    
+    // Calculate which segment we land on
+    const segmentAngle = 360 / segments.length
+    const normalizedRotation = baseRotation % 360
+    const segmentIndex = Math.floor((360 - normalizedRotation) / segmentAngle) % segments.length
+    
+    // Get points from the selected segment
+    const points = segments[segmentIndex].points
+    
+    const finalAngle = spinAngle + baseRotation
     setTargetAngle(finalAngle)
 
     // Animation duration
@@ -149,7 +156,7 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
       const easedTime = easeOutCubic(time)
 
       // Calculate the new angle
-      const newAngle = startAngle + (totalRotation * easedTime)
+      const newAngle = startAngle + (baseRotation * easedTime)
       setSpinAngle(newAngle)
 
       // Redraw the wheel
@@ -161,16 +168,24 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
       if (time < 1) {
         requestAnimationFrame(animate)
       } else {
-        // Calculate the winning segment based on final position
-        const winningSegmentIndex = calculateWinningSegment(newAngle)
-        const points = segments[winningSegmentIndex]
-        
         setFinalPoints(points)
         setIsSpinning(false)
         setResult(points)
         setCanSpin(false)
         
-        console.log(`Wheel stopped at angle: ${newAngle}, Winning segment: ${winningSegmentIndex}, Points: ${points}`)
+        console.log(`Wheel stopped at angle: ${newAngle}, Winning segment: ${segmentIndex}, Points: ${points}`)
+        
+        // Call onSpin callback with backend integration after animation completes
+        setTimeout(async () => {
+          try {
+            await onSpin({
+              points: points,
+              isJackpot: points >= 50
+            })
+          } catch (error) {
+            console.error('Error during spin:', error)
+          }
+        }, 0)
       }
     }
 
@@ -232,7 +247,7 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
         {!isSpinning && !result && (
           <button
             className="btn-primary flex items-center gap-2 text-lg px-8 py-4"
-            onClick={spinTheWheel}
+            onClick={handleSpin}
             disabled={!canSpin}
           >
             <FaPlay /> Spin the Wheel
