@@ -1,5 +1,4 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
     // Helper functions
@@ -9,179 +8,96 @@ service cloud.firestore {
     
     function isAdmin() {
       return isAuthenticated() && 
-             (request.auth.token.admin == true || 
-              request.auth.token.role == 'admin' ||
-              (request.auth.token.roles != null && request.auth.token.roles.admin == true));
-    }
-    
-    function isAdminOrManager() {
-      return isAuthenticated() && 
-             (request.auth.token.role == 'admin' || 
-              request.auth.token.role == 'manager' ||
-              request.auth.token.admin == true ||
-              (request.auth.token.roles != null && 
-               (request.auth.token.roles.admin == true || request.auth.token.roles.manager == true)));
+             resource.data.get('role', '') == 'admin' ||
+             request.auth.token.get('admin', false) == true;
     }
     
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
     
-    function isValidUser() {
-      return isAuthenticated() && request.auth.uid != null;
+    function isValidEmail() {
+      return isAuthenticated() && request.auth.token.email_verified == true;
     }
-    
-    // Orders collection
-    match /orders/{orderId} {
-      // Users can read their own orders
-      allow read: if isOwner(resource.data.userId);
-      
-      // Users can create orders for themselves
-      allow create: if isAuthenticated() && 
-                       request.auth.uid == request.resource.data.userId &&
-                       request.resource.data.keys().hasAll(['userId', 'status', 'items', 'subtotal', 'tax', 'total', 'createdAt']);
-      
-      // Users can update their own pending orders
-      allow update: if isOwner(resource.data.userId) && 
-                       resource.data.status == 'pending' &&
-                       request.resource.data.userId == resource.data.userId;
-      
-      // Admin can read/write all orders
-      allow read, write: if isAdmin();
-    }
-    
-    // Users collection
+
+    // Existing collections (users, orders, etc.)
     match /users/{userId} {
-      // Users can read and update their own profile
-      allow read, update: if isOwner(userId);
-      
-      // Users can create their own profile during signup
-      allow create: if isAuthenticated() && 
-                       request.auth.uid == userId &&
-                       request.resource.data.uid == userId;
-      
-      // Admin can read/write all user profiles
-      allow read, write: if isAdmin();
+      allow read, write: if isOwner(userId) || isAdmin();
     }
     
-    // Reward transactions collection
-    match /rewardTransactions/{transactionId} {
-      // Users can read their own reward transactions
-      allow read: if isAuthenticated() && 
-                     request.auth.uid == resource.data.userId;
-      
-      // Only admin can create/update reward transactions
-      allow write: if isAdmin();
+    match /orders/{orderId} {
+      allow read, write: if isAuthenticated();
     }
     
-    // Coupons collection
-    match /coupons/{couponId} {
-      // All authenticated users can read active coupons
-      allow read: if isAuthenticated() && 
-                     resource.data.isActive == true &&
-                     resource.data.startsAt <= request.time &&
-                     resource.data.endsAt > request.time;
-      
-      // Only admin can create/update/delete coupons
-      allow write: if isAdmin();
-    }
+    // REWARDS SYSTEM COLLECTIONS
     
-    // Offers collection
-    match /offers/{offerId} {
-      // All authenticated users can read active offers
-      allow read: if isAuthenticated() && 
-                     resource.data.active == true &&
-                     resource.data.startsAt <= request.time &&
-                     resource.data.endsAt > request.time;
-      
-      // Only admin can create/update/delete offers
-      allow write: if isAdmin();
-    }
-    
-    // Menu items collection (if exists)
-    match /menuItems/{itemId} {
-      // All users can read menu items
-      allow read: if true;
-      
-      // Only admin can modify menu items
-      allow write: if isAdmin();
-    }
-    
-    // Categories collection (if exists)
-    match /categories/{categoryId} {
-      // All users can read categories
-      allow read: if true;
-      
-      // Only admin can modify categories
-      allow write: if isAdmin();
-    }
-    
-    // Loyalty collection - user-specific loyalty data
+    // Loyalty profiles - users can read/write their own, admins can read/write all
     match /loyalty/{userId} {
-      // Users can read their own loyalty data
-      allow read: if isOwner(userId);
-      
-      // Only admin/manager can read all loyalty data and write
-      allow read, write: if isAdminOrManager();
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && isValidEmail() && 
+                   request.resource.data.keys().hasAll(['email', 'createdAt']) &&
+                   request.resource.data.email == request.auth.token.email &&
+                   request.resource.data.currentPoints == 0 &&
+                   request.resource.data.totalEarned == 0 &&
+                   request.resource.data.totalRedeemed == 0;
+      allow update: if (isOwner(userId) && 
+                       // Users can only update certain fields
+                       request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['lastActivity', 'name']) &&
+                       request.resource.data.email == resource.data.email &&
+                       request.resource.data.currentPoints == resource.data.currentPoints &&
+                       request.resource.data.totalEarned == resource.data.totalEarned &&
+                       request.resource.data.totalRedeemed == resource.data.totalRedeemed) ||
+                       isAdmin(); // Admins can update any field
+      allow delete: if isAdmin();
     }
     
-    // Points transactions collection
+    // Points transactions - users can read their own, only system/admin can write
     match /pointsTransactions/{transactionId} {
-      // Users can read their own points transactions
       allow read: if isAuthenticated() && 
-                     request.auth.uid == resource.data.userId;
-      
-      // Only admin/manager can read all transactions and write
-      allow read, write: if isAdminOrManager();
+                     (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if false; // Only server-side code can create transactions
+      allow update, delete: if false; // Transactions are immutable
     }
     
-    // User redemptions collection
+    // User redemptions - users can read their own, only system/admin can write
     match /userRedemptions/{redemptionId} {
-      // Users can read their own redemptions
       allow read: if isAuthenticated() && 
-                     request.auth.uid == resource.data.userId;
-      
-      // Only admin/manager can read all redemptions and write
-      allow read, write: if isAdminOrManager();
+                     (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if false; // Only server-side code can create redemptions
+      allow update, delete: if false; // Redemptions are immutable
     }
     
-    // Menu drops collection
-    match /menuDrops/{dropId} {
-      // All authenticated users can read active menu drops
+    // Spin history - users can read their own, only system/admin can write
+    match /spinHistory/{spinId} {
+      allow read: if isAuthenticated() && 
+                     (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if false; // Only server-side code can create spin records
+      allow update, delete: if false; // Spin history is immutable
+    }
+    
+    // Reward catalog - read-only for authenticated users, admin can write
+    match /rewardCatalog/{rewardId} {
       allow read: if isAuthenticated();
-      
-      // Only admin/manager can write menu drops
-      allow write: if isAdminOrManager();
+      allow create, update: if isAdmin() && 
+                              request.resource.data.keys().hasAll([
+                                'name', 'description', 'pointsCost', 'category', 
+                                'isActive', 'cogs', 'createdAt'
+                              ]);
+      allow delete: if isAdmin();
     }
     
-    // Analytics collection - admin only for global metrics
-    match /analytics/{document=**} {
-      // Only admin can read/write analytics - NO customer access to global data
+    // Admin-only collections for analytics and management
+    match /adminLogs/{logId} {
       allow read, write: if isAdmin();
     }
     
-    // Global metrics/aggregations - admin only
-    match /metrics/{document=**} {
-      // Only admin can read/write global metrics - prevents customers from seeing totals
-      allow read, write: if isAdmin();
+    // Idempotency keys - system use only
+    match /idempotencyKeys/{keyId} {
+      allow read, write: if false; // Only server-side code
     }
     
-    // KPI data - admin only
-    match /kpis/{document=**} {
-      // Only admin can read/write KPI data - prevents customers from seeing global totals
-      allow read, write: if isAdmin();
-    }
-    
-    // System configuration (if exists)
-    match /config/{configId} {
-      // All users can read public config
-      allow read: if true;
-      
-      // Only admin can modify config
-      allow write: if isAdmin();
-    }
-    
-    // Default deny rule for any other collections
+    // Default deny all other collections
     match /{document=**} {
       allow read, write: if false;
     }

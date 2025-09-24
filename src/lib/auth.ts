@@ -1,28 +1,65 @@
-import { auth, db, isFirebaseReady } from './firebaseClient';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { NextApiRequest } from 'next';
+import { getAuth } from 'firebase-admin/auth';
+import { initializeFirebaseAdmin } from './firebase-admin';
 
-export const subscribeToAuth = (callback: (user: User | null, role: string | null) => void) => {
-  // Skip auth subscription during build time or when Firebase is not ready
-  if (!isFirebaseReady()) {
-    // Return a no-op unsubscribe function for build time
-    callback(null, null);
-    return () => {};
-  }
+export interface AuthUser {
+  uid: string;
+  email?: string;
+  emailVerified: boolean;
+  customClaims?: Record<string, any>;
+}
 
-  return onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      try {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        const userData = userDoc.data();
-        const role = userData?.role || null;
-        callback(user, role);
-      } catch (error) {
-        console.error('Error fetching user role:', error);
-        callback(user, null);
-      }
-    } else {
-      callback(null, null);
+export async function verifyAuthToken(req: NextApiRequest): Promise<AuthUser | null> {
+  try {
+    // Initialize Firebase Admin
+    initializeFirebaseAdmin();
+    
+    // Get token from Authorization header
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return null;
     }
-  });
-};
+
+    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    
+    // Verify the token
+    const auth = getAuth();
+    const decodedToken = await auth.verifyIdToken(token);
+    
+    return {
+      uid: decodedToken.uid,
+      email: decodedToken.email,
+      emailVerified: decodedToken.email_verified || false,
+      customClaims: decodedToken
+    };
+  } catch (error) {
+    console.error('Error verifying auth token:', error);
+    return null;
+  }
+}
+
+export async function verifyAdminToken(req: NextApiRequest): Promise<AuthUser | null> {
+  try {
+    const user = await verifyAuthToken(req);
+    if (!user) {
+      return null;
+    }
+
+    // Check if user has admin claims
+    const isAdmin = user.customClaims?.admin === true || 
+                   user.customClaims?.role === 'admin';
+    
+    if (!isAdmin) {
+      return null;
+    }
+
+    return user;
+  } catch (error) {
+    console.error('Error verifying admin token:', error);
+    return null;
+  }
+}
+
+export function isAdmin(customClaims?: Record<string, any>): boolean {
+  return customClaims?.admin === true || customClaims?.role === 'admin';
+}
