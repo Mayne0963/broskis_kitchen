@@ -122,7 +122,7 @@ export default function RealTimeOrderStatus({ orderId, onOrderUpdate }: RealTime
         unsubscribe()
       }
     }
-  }, [orderId, onOrderUpdate])
+  }, [orderId, onOrderUpdate, user, isAuthenticated])
 
   const getStatusSteps = (currentStatus: OrderStatus, orderType: 'delivery' | 'pickup'): StatusStep[] => {
     const statusOrder: OrderStatus[] = [

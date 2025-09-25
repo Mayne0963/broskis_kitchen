@@ -89,7 +89,7 @@ export default function KitchenDisplay({ initialOrders = [] }: KitchenDisplayPro
       setIsLoading(false)
       setOrders(initialOrders)
     }
-  }, [])
+  }, [initialOrders])
 
   // Timer management
   useEffect(() => {

@@ -89,16 +89,6 @@ export const useAdminApiData = (): UseAdminApiDataReturn => {
   const [error, setError] = useState<string | null>(null)
   const role = useRole()
 
-  // Early return if user is not an admin or role is not available
-  if (role !== 'admin') {
-    return {
-      data: { overview: null, rewards: null, menuDrops: null },
-      loading: false,
-      error: role === null ? null : 'Access denied: Admin role required',
-      refetch: async () => {}
-    }
-  }
-
   const fetchOverviewData = useCallback(async (): Promise<OverviewMetrics | null> => {
     try {
       const response = await fetch('/api/admin/overview', {
@@ -184,8 +174,23 @@ export const useAdminApiData = (): UseAdminApiDataReturn => {
   }, [fetchOverviewData, fetchRewardsData, fetchMenuDropsData])
 
   useEffect(() => {
-    fetchAllData()
-  }, [fetchAllData])
+    if (role === 'admin') {
+      fetchAllData()
+    } else if (role !== null) {
+      setLoading(false)
+      setError('Access denied: Admin role required')
+    }
+  }, [fetchAllData, role])
+
+  // Handle non-admin users
+  if (role !== 'admin') {
+    return {
+      data: { overview: null, rewards: null, menuDrops: null },
+      loading: role === null ? loading : false,
+      error: role === null ? null : 'Access denied: Admin role required',
+      refetch: async () => {}
+    }
+  }
 
   return {
     data,

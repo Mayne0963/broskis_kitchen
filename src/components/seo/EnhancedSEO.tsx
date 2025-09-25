@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
 import { usePathname } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useMemo, useCallback } from 'react'
 
 interface EnhancedSEOProps {
   title?: string
@@ -71,17 +71,17 @@ export default function EnhancedSEO({
   const pathname = usePathname()
   const baseUrl = process.env.SITE_URL || 'https://broskiskitchen.com'
   
-  const seo = {
+  const seo = useMemo(() => ({
     title: title ? `${title} | ${siteName}` : defaultSEO.title,
     description: description || defaultSEO.description,
     keywords: [...defaultSEO.keywords, ...keywords].join(', '),
     image: image ? `${baseUrl}${image}` : `${baseUrl}${defaultSEO.image}`,
     url: url || `${baseUrl}${pathname}`,
     canonical: canonical || `${baseUrl}${pathname}`
-  }
+  }), [title, siteName, description, keywords, image, baseUrl, pathname, url, canonical])
 
   // Generate structured data
-  const generateStructuredData = () => {
+  const generateStructuredData = useCallback(() => {
     const baseStructuredData = {
       '@context': 'https://schema.org',
       '@type': type === 'restaurant' ? 'Restaurant' : 'WebSite',
@@ -135,7 +135,7 @@ export default function EnhancedSEO({
     }
 
     return baseStructuredData
-  }
+  }, [type, siteName, seo, author, publishedTime, modifiedTime, businessInfo, breadcrumbs, baseUrl])
 
   // Update document head dynamically
   useEffect(() => {
@@ -199,7 +199,7 @@ export default function EnhancedSEO({
     }
     structuredDataScript.textContent = JSON.stringify(structuredData)
     
-  }, [seo, type, breadcrumbs, businessInfo])
+  }, [seo, type, breadcrumbs, businessInfo, generateStructuredData])
 
   return null // This component doesn't render anything
 }

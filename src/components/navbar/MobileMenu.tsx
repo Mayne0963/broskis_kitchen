@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -30,13 +30,13 @@ export default function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
   const panelRef = useRef<HTMLDivElement>(null)
   const triggerElementRef = useRef<HTMLElement | null>(null)
   
-  const closeMenu = () => {
+  const closeMenu = useCallback(() => {
     onOpenChange(false)
     // Return focus to the trigger element (hamburger button)
     if (triggerElementRef.current) {
       triggerElementRef.current.focus()
     }
-  }
+  }, [onOpenChange])
 
   // Body scroll lock and 100vh fix for iOS
   useEffect(() => {
@@ -111,7 +111,7 @@ export default function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [open])
+  }, [open, closeMenu])
 
 
 

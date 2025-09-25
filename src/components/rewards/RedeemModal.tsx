@@ -1,13 +1,13 @@
 "use client"
 
-import type React from "react"
-import { useState } from "react"
+import React, { useState } from "react"
 import { FaTimes, FaSpinner, FaLock, FaUserPlus, FaGift, FaCheck, FaExclamationTriangle } from "react-icons/fa"
 import { useAuth } from "../../lib/context/AuthContext"
 import { useRewards } from "../../lib/context/RewardsContext"
 import { createCoupon } from "../../lib/services/couponService"
 import type { Reward } from "@/types/reward"
 import Link from "next/link"
+import Image from "next/image"
 
 interface RedeemModalProps {
   reward: Reward
@@ -29,7 +29,7 @@ const RedeemModal: React.FC<RedeemModalProps> = ({ reward, userPoints, onClose }
   // Handle redemption
   const handleRedeem = async () => {
     if (!hasEnoughPoints) {
-      setError("You don't have enough points to redeem this reward.")
+      setError("You don&apos;t have enough points to redeem this reward.")
       return
     }
 
@@ -105,7 +105,7 @@ const RedeemModal: React.FC<RedeemModalProps> = ({ reward, userPoints, onClose }
               </div>
               <h3 className="text-xl font-bold mb-4">Reward Redeemed!</h3>
               <p className="text-gray-300 mb-6">
-                You've successfully redeemed {reward.name} for {reward.pointsRequired} points.
+                You&apos;ve successfully redeemed {reward.name} for {reward.pointsRequired} points.
               </p>
               {couponCode && (
                 <div className="bg-[#111111] p-4 rounded-md mb-6">
@@ -121,10 +121,12 @@ const RedeemModal: React.FC<RedeemModalProps> = ({ reward, userPoints, onClose }
             <>
               <div className="flex items-center mb-6">
                 <div className="w-20 h-20 bg-cover bg-center rounded-md overflow-hidden flex-shrink-0 mr-4">
-                  <img
+                  <Image
                     src={reward.image || "/placeholder.svg"}
                     alt={reward.name}
                     className="w-full h-full object-cover"
+                    width={80}
+                    height={80}
                   />
                 </div>
                 <div>

@@ -195,7 +195,7 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
       setIsLoading(false)
       setOrders(initialOrders)
     }
-  }, [userId, initialOrders])
+  }, [userId, initialOrders, fetchOrdersFromAPI])
 
   // Initialize push notifications
   useEffect(() => {
@@ -453,9 +453,9 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
        setChatMessages(prev => [supportMessage, ...prev]);
        setIsChatLoading(false);
      }, 1500);
-   }, [chatInput, chatOrderContext]);
+   }, [chatInput, chatOrderContext, generateSupportResponse]);
 
-   const generateSupportResponse = (userMessage: string, order: Order | null): string => {
+   const generateSupportResponse = useCallback((userMessage: string, order: Order | null): string => {
      const lowerMessage = userMessage.toLowerCase();
      
      if (lowerMessage.includes('status') || lowerMessage.includes('where')) {
@@ -483,7 +483,7 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
      }
      
      return 'Thank you for contacting us! How can I assist you with your order today? I can help with order status, modifications, cancellations, and delivery information.';
-   };
+   }, []);
 
    const getStatusMessage = (status: OrderStatus): string => {
      switch (status) {

@@ -264,8 +264,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
                     <label className="block text-sm font-medium mb-2">Last Name *</label>
                     <input
                       type="text"
-                      value={formData.deliveryAddress?.lastName || ''}
-                      onChange={(e) => updateNestedFormData('deliveryAddress', 'lastName', e.target.value)}
+                      value={formData.deliveryAddress?.lastName || &apos;&apos;}
+                      onChange={(e) => updateNestedFormData(&apos;deliveryAddress&apos;, &apos;lastName&apos;, e.target.value)}
                       className="w-full p-3 bg-[#111111] border border-[#333333] rounded-lg focus:border-gold-foil focus:outline-none"
                     />
                   </div>
@@ -274,8 +274,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
                   <label className="block text-sm font-medium mb-2">Street Address *</label>
                   <input
                     type="text"
-                    value={formData.deliveryAddress?.street || ''}
-                    onChange={(e) => updateNestedFormData('deliveryAddress', 'street', e.target.value)}
+                    value={formData.deliveryAddress?.street || &apos;&apos;}
+                    onChange={(e) => updateNestedFormData(&apos;deliveryAddress&apos;, &apos;street&apos;, e.target.value)}
                     className="w-full p-3 bg-[#111111] border border-[#333333] rounded-lg focus:border-gold-foil focus:outline-none"
                     placeholder="123 Main Street"
                   />
@@ -286,8 +286,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
                     <label className="block text-sm font-medium mb-2">City *</label>
                     <input
                       type="text"
-                      value={formData.deliveryAddress?.city || ''}
-                      onChange={(e) => updateNestedFormData('deliveryAddress', 'city', e.target.value)}
+                      value={formData.deliveryAddress?.city || &apos;&apos;}
+                      onChange={(e) => updateNestedFormData(&apos;deliveryAddress&apos;, &apos;city&apos;, e.target.value)}
                       className="w-full p-3 bg-[#111111] border border-[#333333] rounded-lg focus:border-gold-foil focus:outline-none"
                     />
                   </div>
@@ -295,8 +295,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
                     <label className="block text-sm font-medium mb-2">State *</label>
                     <input
                       type="text"
-                      value={formData.deliveryAddress?.state || ''}
-                      onChange={(e) => updateNestedFormData('deliveryAddress', 'state', e.target.value)}
+                      value={formData.deliveryAddress?.state || &apos;&apos;}
+                      onChange={(e) => updateNestedFormData(&apos;deliveryAddress&apos;, &apos;state&apos;, e.target.value)}
                       className="w-full p-3 bg-[#111111] border border-[#333333] rounded-lg focus:border-gold-foil focus:outline-none"
                     />
                   </div>
@@ -304,8 +304,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
                     <label className="block text-sm font-medium mb-2">ZIP Code *</label>
                     <input
                       type="text"
-                      value={formData.deliveryAddress?.zipCode || ''}
-                      onChange={(e) => updateNestedFormData('deliveryAddress', 'zipCode', e.target.value)}
+                      value={formData.deliveryAddress?.zipCode || &apos;&apos;}
+                      onChange={(e) => updateNestedFormData(&apos;deliveryAddress&apos;, &apos;zipCode&apos;, e.target.value)}
                       className="w-full p-3 bg-[#111111] border border-[#333333] rounded-lg focus:border-gold-foil focus:outline-none"
                     />
                   </div>
@@ -313,8 +313,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
                 <div>
                   <label className="block text-sm font-medium mb-2">Delivery Instructions</label>
                   <textarea
-                    value={formData.deliveryAddress?.deliveryInstructions || ''}
-                    onChange={(e) => updateNestedFormData('deliveryAddress', 'deliveryInstructions', e.target.value)}
+                    value={formData.deliveryAddress?.deliveryInstructions || &apos;&apos;}
+                    onChange={(e) => updateNestedFormData(&apos;deliveryAddress&apos;, &apos;deliveryInstructions&apos;, e.target.value)}
                     className="w-full p-3 bg-[#111111] border border-[#333333] rounded-lg focus:border-gold-foil focus:outline-none"
                     rows={3}
                     placeholder="Leave at door, ring bell, etc."
@@ -325,7 +325,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
           )}
 
           {/* Pickup Location */}
-          {formData.orderType === 'pickup' && (
+          {formData.orderType === &apos;pickup&apos; && (
             <div className="bg-[#1A1A1A] p-6 rounded-lg border border-[#333333]">
               <h3 className="text-lg font-semibold mb-4">Pickup Location</h3>
               <div className="space-y-3">
@@ -336,7 +336,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
                       name="pickupLocation"
                       value={location.id}
                       checked={formData.pickupLocation === location.id}
-                      onChange={(e) => updateFormData('pickupLocation', e.target.value)}
+                      onChange={(e) => updateFormData(&apos;pickupLocation&apos;, e.target.value)}
                       className="mr-3"
                     />
                     <div>
@@ -372,9 +372,9 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
             <div className={`grid gap-4 ${isPremiumUser ? 'grid-cols-2' : 'grid-cols-1'}`}>
               <button
                 type="button"
-                onClick={() => updateFormData('paymentMethod', 'card')}
+                onClick={() => updateFormData(&apos;paymentMethod&apos;, &apos;card&apos;)}
                 className={`p-4 rounded-lg border-2 transition-colors ${
-                  formData.paymentMethod === 'card'
+                  formData.paymentMethod === &apos;card&apos;
                     ? 'border-gold-foil bg-gold-foil bg-opacity-10'
                     : 'border-[#333333] hover:border-[#555555]'
                 }`}
@@ -385,15 +385,15 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
               {isPremiumUser && (
                 <button
                   type="button"
-                  onClick={() => updateFormData('paymentMethod', 'cash')}
+                  onClick={() => updateFormData(&apos;paymentMethod&apos;, &apos;cash&apos;)}
                   className={`p-4 rounded-lg border-2 transition-colors ${
-                    formData.paymentMethod === 'cash'
+                    formData.paymentMethod === &apos;cash&apos;
                       ? 'border-gold-foil bg-gold-foil bg-opacity-10'
                       : 'border-[#333333] hover:border-[#555555]'
                   }`}
                 >
                   <div className="mx-auto mb-2 text-xl">&#128181;</div>
-                  <div className="font-medium">Cash {formData.orderType === 'delivery' ? 'on Delivery' : 'on Pickup'}</div>
+                  <div className="font-medium">Cash {formData.orderType === &apos;delivery&apos; ? &apos;on Delivery&apos; : &apos;on Pickup&apos;}</div>
                   <div className="text-xs text-gold-foil mt-1">Premium Only</div>
                 </button>
               )}
@@ -401,22 +401,20 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
             {!isPremiumUser && (
               <div className="mt-4 p-3 bg-[#111111] border border-[#333333] rounded-lg">
                 <p className="text-sm text-gray-400">
-                  &#128142; <span className="text-gold-foil font-medium">Cash on Delivery</span> is available for Gold tier members (1000+ points).
+                  💎 <span className="text-gold-foil font-medium">Cash on Delivery</span> is available for Gold tier members (1000+ points).
                   <br />Upgrade your membership to unlock this payment option!
                 </p>
               </div>
             )}
           </div>
 
-          // In the CheckoutForm component, replace the credit card form section with:
-
           {/* Credit Card Form - Replace with Stripe */}
-          {formData.paymentMethod === 'card' && (
+          {formData.paymentMethod === &apos;card&apos; && (
           <StripePaymentForm
             amount={total}
             onPaymentSuccess={(paymentIntentId) => {
               // Update form data with payment info
-              updateNestedFormData('paymentInfo', 'stripePaymentIntentId', paymentIntentId)
+              updateNestedFormData(&apos;paymentInfo&apos;, &apos;stripePaymentIntentId&apos;, paymentIntentId)
               // Proceed to create order
               handleSubmit(paymentIntentId)
             }}
@@ -436,8 +434,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
           <div className="bg-[#1A1A1A] p-6 rounded-lg border border-[#333333]">
             <h3 className="text-lg font-semibold mb-4">Special Instructions</h3>
             <textarea
-              value={formData.specialInstructions || ''}
-              onChange={(e) => updateFormData('specialInstructions', e.target.value)}
+              value={formData.specialInstructions || &apos;&apos;}
+              onChange={(e) => updateFormData(&apos;specialInstructions&apos;, e.target.value)}
               className="w-full p-3 bg-[#111111] border border-[#333333] rounded-lg focus:border-gold-foil focus:outline-none"
               rows={3}
               placeholder="Any special requests or dietary restrictions..."
@@ -490,7 +488,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
                   <span>Tax:</span>
                   <span>${tax.toFixed(2)}</span>
                 </div>
-                {formData.orderType === 'delivery' && subtotal < 50 && (
+                {formData.orderType === &apos;delivery&apos; && subtotal < 50 && (
                   <div className="flex justify-between">
                     <span>Delivery Fee:</span>
                     <span>$4.99</span>
@@ -498,7 +496,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
                 )}
                 <div className="flex justify-between font-bold text-lg border-t border-[#333333] pt-2 mt-2">
                   <span>Total:</span>
-                  <span className="text-gold-foil">${(total + (formData.orderType === 'delivery' && subtotal < 50 ? 4.99 : 0)).toFixed(2)}</span>
+                  <span className="text-gold-foil">${(total + (formData.orderType === &apos;delivery&apos; && subtotal < 50 ? 4.99 : 0)).toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -509,14 +507,14 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
             <h3 className="text-lg font-semibold mb-4">Delivery Information</h3>
             <div className="space-y-2">
               <p><strong>Contact:</strong> {formData.email} | {formData.phone}</p>
-              <p><strong>Order Type:</strong> {formData.orderType === 'delivery' ? 'Delivery' : 'Pickup'}</p>
-              {formData.orderType === 'delivery' && formData.deliveryAddress && (
+              <p><strong>Order Type:</strong> {formData.orderType === &apos;delivery&apos; ? &apos;Delivery&apos; : &apos;Pickup&apos;}</p>
+              {formData.orderType === &apos;delivery&apos; && formData.deliveryAddress && (
                 <p><strong>Address:</strong> {formData.deliveryAddress.street}, {formData.deliveryAddress.city}, {formData.deliveryAddress.state} {formData.deliveryAddress.zipCode}</p>
               )}
-              {formData.orderType === 'pickup' && formData.pickupLocation && (
+              {formData.orderType === &apos;pickup&apos; && formData.pickupLocation && (
                 <p><strong>Pickup Location:</strong> {pickupLocations.find(l => l.id === formData.pickupLocation)?.name}</p>
               )}
-              <p><strong>Payment:</strong> {formData.paymentMethod === 'card' ? 'Credit Card' : `Cash on ${formData.orderType === 'delivery' ? 'Delivery' : 'Pickup'}`}</p>
+              <p><strong>Payment:</strong> {formData.paymentMethod === &apos;card&apos; ? &apos;Credit Card&apos; : `Cash on ${formData.orderType === &apos;delivery&apos; ? &apos;Delivery&apos; : &apos;Pickup&apos;}`}</p>
             </div>
           </div>
 

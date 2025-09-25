@@ -1,7 +1,6 @@
 "use client"
 
-import type React from "react"
-import { createContext, useState, useContext, useEffect, type ReactNode } from "react"
+import React, { createContext, useState, useContext, useEffect, type ReactNode } from "react"
 import type { ChatContextType, ChatMessage } from "@/types"
 import { safeFetch } from "../utils/safeFetch"
 

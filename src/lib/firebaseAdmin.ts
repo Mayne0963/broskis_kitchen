@@ -1,5 +1,4 @@
 // src/lib/firebaseAdmin.ts
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getApps, initializeApp, applicationDefault, cert, getApp, App } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore, Timestamp, FieldValue, Firestore } from 'firebase-admin/firestore';
@@ -11,8 +10,6 @@ type ServiceAccount = {
   client_email: string;
   private_key: string;
 };
-
-let app: App;
 
 function init(): App {
   if (getApps().length) return getApp();
@@ -36,7 +33,7 @@ function init(): App {
   return initializeApp({ credential: applicationDefault() });
 }
 
-app = init();
+const app = init();
 
 const adminDb: Firestore = getFirestore(app);
 const auth = getAuth(app);

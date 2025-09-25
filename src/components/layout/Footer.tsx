@@ -133,7 +133,7 @@ const Footer = () => {
                 {isRewardsPolicyOpen && (
                   <div className="mt-4 p-4 bg-black border border-gray-700 rounded-lg text-sm">
                     <div className="space-y-3">
-                      <h4 className="text-yellow-400 font-semibold text-base">Broski's Rewards Policy</h4>
+                      <h4 className="text-yellow-400 font-semibold text-base">Broski&apos;s Rewards Policy</h4>
                       
                       <div>
                         <h5 className="text-yellow-400 font-medium mb-1">Earning Points:</h5>
@@ -172,7 +172,7 @@ const Footer = () => {
                       
                       <div>
                         <h5 className="text-yellow-400 font-medium mb-1">Rights Reserved:</h5>
-                        <p className="text-white opacity-90">Broski's may adjust, pause, or end the Rewards Program at any time.</p>
+                        <p className="text-white opacity-90">Broski&apos;s may adjust, pause, or end the Rewards Program at any time.</p>
                       </div>
                     </div>
                   </div>

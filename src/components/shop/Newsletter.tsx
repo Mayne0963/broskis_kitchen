@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import React, { useState } from "react"
 import { FaPaperPlane, FaCheck } from "react-icons/fa"
 
 const Newsletter: React.FC = () => {
@@ -51,7 +49,7 @@ const Newsletter: React.FC = () => {
             <FaCheck className="text-emerald-green text-xl" />
           </div>
           <h3 className="text-lg font-bold mb-2">Thank You for Subscribing!</h3>
-          <p>You're now on the list to receive our latest merch updates and exclusive offers.</p>
+          <p>You&apos;re now on the list to receive our latest merch updates and exclusive offers.</p>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
@@ -79,7 +77,7 @@ const Newsletter: React.FC = () => {
                   fill="none"
                   viewBox="0 0 24 24"
                 >
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth={4}></circle>
                   <path
                     className="opacity-75"
                     fill="currentColor"

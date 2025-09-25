@@ -69,7 +69,7 @@ export default function ResetPasswordPage() {
 
           <div className="space-y-4">
             <p className="text-sm text-gray-400 text-center">
-              Didn't receive the email? Check your spam folder or try again.
+              Didn&apos;t receive the email? Check your spam folder or try again.
             </p>
             
             <Button

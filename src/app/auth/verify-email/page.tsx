@@ -93,7 +93,7 @@ export default function VerifyEmailPage() {
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
               Please check your email and click the verification link to continue. 
-              Don't forget to check your spam folder!
+              Don&apos;t forget to check your spam folder!
             </AlertDescription>
           </Alert>
 
@@ -135,7 +135,7 @@ export default function VerifyEmailPage() {
           </div>
 
           <div className="text-center text-sm text-gray-500">
-            <p>Didn't receive the email?</p>
+            <p>Didn&apos;t receive the email?</p>
             <p>Check your spam folder or try resending.</p>
           </div>
         </CardContent>

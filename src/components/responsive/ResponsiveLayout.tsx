@@ -1,6 +1,7 @@
 "use client"
 
 import React from 'react'
+import Image from 'next/image'
 import { useEnhancedResponsive } from './MobileEnhancer'
 
 interface ResponsiveLayoutProps {
@@ -236,13 +237,13 @@ export function ResponsiveImage({
   `
 
   return (
-    <img
+    <Image
       src={src}
       alt={alt}
-      width={width}
-      height={height}
+      width={width || 400}
+      height={height || 300}
       className={imageClasses.trim()}
-      loading={priority ? 'eager' : 'lazy'}
+      priority={priority}
       sizes={sizes}
     />
   )

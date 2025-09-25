@@ -55,7 +55,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({ testimonial }) => {
             <FaStar key={i} className={i < testimonial.rating ? "text-gold-foil" : "text-gray-600"} size={16} />
           ))}
         </div>
-        <p className="text-gray-300 italic">"{testimonial.quote}"</p>
+        <p className="text-gray-300 italic">&quot;{testimonial.quote}&quot;</p>
       </div>
     </div>
   )

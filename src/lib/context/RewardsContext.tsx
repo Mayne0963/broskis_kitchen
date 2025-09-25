@@ -1,7 +1,6 @@
 "use client"
 
-import type React from "react"
-import { createContext, useContext, useState, useEffect } from "react"
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react"
 import type { Reward, RewardHistory } from "@/types"
 import { rewards as rewardsData } from "@/data/rewards-data"
 import { useAuth } from "./AuthContext"
@@ -60,7 +59,7 @@ export const RewardsProvider: React.FC<RewardsProviderProps> = ({ children }) =>
   const [error, setError] = useState<string | null>(null)
 
   // Load rewards status from API
-  const refreshStatus = async () => {
+  const refreshStatus = useCallback(async () => {
     if (!user) return
     
     setLoading(true)
@@ -84,7 +83,7 @@ export const RewardsProvider: React.FC<RewardsProviderProps> = ({ children }) =>
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
 
   // Load rewards data on mount and when user changes
   useEffect(() => {
@@ -96,7 +95,7 @@ export const RewardsProvider: React.FC<RewardsProviderProps> = ({ children }) =>
       setRewards([])
       setHistory([])
     }
-  }, [user])
+  }, [user, refreshStatus])
 
   // Spin wheel function
   const spinWheel = async (): Promise<SpinResult | null> => {

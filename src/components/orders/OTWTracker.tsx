@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -29,12 +29,7 @@ export default function OTWTracker({ order }: OTWTrackerProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Only show for delivery orders with OTW order ID
-  if (order.orderType !== 'delivery' || !order.otwOrderId) {
-    return null
-  }
-
-  const fetchTrackingInfo = async () => {
+  const fetchTrackingInfo = useCallback(async () => {
     if (!order.otwOrderId) return
     
     setLoading(true)
@@ -58,20 +53,28 @@ export default function OTWTracker({ order }: OTWTrackerProps) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [order.otwOrderId])
 
   useEffect(() => {
-    fetchTrackingInfo()
-    
-    // Auto-refresh tracking info every 30 seconds for active deliveries
-    const interval = setInterval(() => {
-      if (order.status === 'out_for_delivery' || order.status === 'preparing') {
-        fetchTrackingInfo()
-      }
-    }, 30000)
+    // Only fetch if this is a delivery order with OTW order ID
+    if (order.orderType === 'delivery' && order.otwOrderId) {
+      fetchTrackingInfo()
+      
+      // Auto-refresh tracking info every 30 seconds for active deliveries
+      const interval = setInterval(() => {
+        if (order.status === 'out_for_delivery' || order.status === 'preparing') {
+          fetchTrackingInfo()
+        }
+      }, 30000)
 
-    return () => clearInterval(interval)
-  }, [order.otwOrderId, order.status])
+      return () => clearInterval(interval)
+    }
+  }, [order.otwOrderId, order.status, order.orderType, fetchTrackingInfo])
+
+  // Only show for delivery orders with OTW order ID
+  if (order.orderType !== 'delivery' || !order.otwOrderId) {
+    return null
+  }
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {

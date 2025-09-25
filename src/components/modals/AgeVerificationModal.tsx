@@ -1,9 +1,7 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect } from "react"
-import { FaTimes } from "react-icons/fa"
+import React, { useState, useEffect } from "react"
+import { FaTimes, FaExclamationTriangle } from "react-icons/fa"
 import { toast } from "sonner"
 
 interface AgeVerificationModalProps {
@@ -18,6 +16,8 @@ const AgeVerificationModal: React.FC<AgeVerificationModalProps> = ({ isOpen, onC
   const [year, setYear] = useState("")
   const [currentYear, setCurrentYear] = useState(2024)
   const [years, setYears] = useState<number[]>([])
+  const [error, setError] = useState<string | null>(null)
+  const [isVerifying, setIsVerifying] = useState(false)
 
   useEffect(() => {
     const year = new Date().getFullYear()
@@ -39,10 +39,34 @@ const AgeVerificationModal: React.FC<AgeVerificationModalProps> = ({ isOpen, onC
     { value: "12", label: "December" },
   ]
 
+  const verifyAge = async (birthMonth: number, birthYear: number): Promise<boolean> => {
+    const today = new Date()
+    const birthDate = new Date(birthYear, birthMonth - 1, 1)
+    const age = today.getFullYear() - birthDate.getFullYear()
+    const monthDiff = today.getMonth() - birthDate.getMonth()
+    
+    const actualAge = monthDiff < 0 ? age - 1 : age
+    
+    if (actualAge >= 21) {
+      const dob = new Date(birthYear, birthMonth - 1, 1)
+      onVerify(dob)
+      toast.success('Age verified successfully!')
+      return true
+    } else {
+      setError('You must be 21 years or older to access this content.')
+      toast.error('Age verification failed')
+      return false
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
+    setIsVerifying(true)
 
     if (!month || !year) {
+      setError('Please select both month and year')
+      setIsVerifying(false)
       return
     }
 
@@ -51,6 +75,7 @@ const AgeVerificationModal: React.FC<AgeVerificationModalProps> = ({ isOpen, onC
     if (verified) {
       onClose()
     }
+    setIsVerifying(false)
   }
 
   return (
@@ -109,9 +134,9 @@ const AgeVerificationModal: React.FC<AgeVerificationModalProps> = ({ isOpen, onC
           </form>
 
           <p className="text-xs text-gray-500 mt-6 text-center">
-            By clicking "Verify Age", you confirm that you are 21 years of age or older and agree to our Terms of
-            Service and Privacy Policy.
-          </p>
+              By clicking &quot;Verify Age&quot;, you confirm that you are 21 years of age or older and agree to our Terms of
+              Service and Privacy Policy.
+            </p>
         </div>
       </div>
     </div>

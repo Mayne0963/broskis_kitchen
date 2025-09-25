@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import React, { useState } from "react"
 import { FaUser, FaEnvelope, FaPhone, FaComment, FaCheck, FaExclamationTriangle } from "react-icons/fa"
 import { AccessibleInput, AccessibleTextarea, AccessibleSelect, useFormValidation } from "../accessibility/AccessibleForm"
 import { FormLoading, ErrorState, useLoadingState } from "../common/EnhancedLoadingStates"
@@ -103,7 +101,7 @@ const ContactForm = () => {
             <FaCheck className="text-emerald-green text-2xl" />
           </div>
           <h3 className="text-xl font-bold mb-2">Message Sent!</h3>
-          <p className="text-gray-300 mb-6">Thank you for reaching out. We'll get back to you as soon as possible.</p>
+          <p className="text-gray-300 mb-6">Thank you for reaching out. We&apos;ll get back to you as soon as possible.</p>
           <button className="btn-primary" onClick={() => setIsSubmitted(false)}>
             Send Another Message
           </button>
@@ -144,7 +142,7 @@ const ContactForm = () => {
             value={formData.phone}
             onChange={handleChange}
             placeholder="(123) 456-7890"
-            description="Optional - We'll only call if needed"
+            description="Optional - We&apos;ll only call if needed"
             className="pl-10"
           />
 

@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useRef, useEffect } from "react"
+import React, { useRef, useEffect } from "react"
 import { FaCrown, FaQrcode } from "react-icons/fa"
 import type { User } from "@/types"
 

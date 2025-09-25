@@ -58,12 +58,12 @@ export default function PWAManager() {
     // Listen for online/offline status
     const handleOnline = () => {
       setIsOnline(true)
-      toast.success('You\'re back online! 🌐')
+      toast.success('You&apos;re back online! 🌐')
     }
 
     const handleOffline = () => {
       setIsOnline(false)
-      toast.info('You\'re offline. Some features may be limited. 📱')
+      toast.info('You&apos;re offline. Some features may be limited. 📱')
     }
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
@@ -182,7 +182,7 @@ export default function PWAManager() {
               </div>
               <div className="flex-1">
                 <h3 className="text-white font-semibold text-sm mb-1">
-                  Install Broski's Kitchen
+                  Install Broski&apos;s Kitchen
                 </h3>
                 <p className="text-gray-300 text-xs mb-3">
                   Get faster access and offline features by installing our app!
@@ -264,9 +264,9 @@ export function usePWA() {
 
   useEffect(() => {
     const checkInstalled = () => {
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-      const isInWebAppiOS = (window.navigator as any).standalone === true
-      setIsInstalled(isStandalone || isInWebAppiOS)
+      const isStandalonePWA = window.matchMedia('(display-mode: standalone)').matches
+      const isInWebAppiOSPWA = (window.navigator as any).standalone === true
+      setIsInstalled(isStandalonePWA || isInWebAppiOSPWA)
     }
 
     const handleBeforeInstallPrompt = () => {
@@ -278,22 +278,22 @@ export function usePWA() {
       setCanInstall(false)
     }
 
-    const handleOnline = () => setIsOnline(true)
-    const handleOffline = () => setIsOnline(false)
+    const handleOnlinePWA = () => setIsOnline(true)
+    const handleOfflinePWA = () => setIsOnline(false)
 
     checkInstalled()
     setIsOnline(navigator.onLine)
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
     window.addEventListener('appinstalled', handleAppInstalled)
-    window.addEventListener('online', handleOnline)
-    window.addEventListener('offline', handleOffline)
+    window.addEventListener('online', handleOnlinePWA)
+    window.addEventListener('offline', handleOfflinePWA)
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
       window.removeEventListener('appinstalled', handleAppInstalled)
-      window.removeEventListener('online', handleOnline)
-      window.removeEventListener('offline', handleOffline)
+      window.removeEventListener('online', handleOnlinePWA)
+      window.removeEventListener('offline', handleOfflinePWA)
     }
   }, [])
 

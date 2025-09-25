@@ -1,7 +1,6 @@
 "use client"
 
-import type React from "react"
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { FaTimes, FaCheck } from "react-icons/fa"
 import type { CustomizationCategory, CustomizationOption } from "@/types"
 

@@ -1,7 +1,6 @@
 "use client"
 
-import type React from "react"
-import { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 
 import { FaMapMarkerAlt, FaPhone, FaClock, FaChevronRight } from "react-icons/fa"
 import type { Location } from "@/types/location"
@@ -18,7 +17,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isSelected, onSel
   const [todayHours, setTodayHours] = useState("Loading...")
 
   // Determine if the location is currently open
-  const getCurrentStatus = () => {
+  const getCurrentStatus = useCallback(() => {
     const now = new Date()
     const day = now.toLocaleDateString("en-US", { weekday: "long" })
     const currentHour = now.getHours() * 100 + now.getMinutes()
@@ -34,7 +33,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isSelected, onSel
 
     const parseTimeStr = (timeStr: string) => {
       const [time, period] = timeStr.split(" ")
-      let [hours, minutes] = time.split(":").map(Number)
+      const [hours, minutes] = time.split(":").map(Number)
       if (period === "PM" && hours !== 12) hours += 12
       if (period === "AM" && hours === 12) hours = 0
       return hours * 100 + minutes
@@ -48,14 +47,14 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isSelected, onSel
     } else {
       return { isOpen: false, status: "Closed", hours: todayHours.hours }
     }
-  }
+  }, [location.hours])
 
   useEffect(() => {
     const { isOpen, status, hours } = getCurrentStatus()
     setIsOpen(isOpen)
     setStatus(status)
     setTodayHours(hours)
-  }, [location.hours])
+  }, [location.hours, getCurrentStatus])
 
   return (
     <div
@@ -93,7 +92,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isSelected, onSel
           <div className="flex items-start">
             <FaClock className="text-gold-foil mt-1 mr-2 flex-shrink-0" />
             <div className="text-gray-300 text-sm">
-              <p className="font-medium">Today's Hours:</p>
+              <p className="font-medium">Today&apos;s Hours:</p>
               <p>{todayHours}</p>
             </div>
           </div>

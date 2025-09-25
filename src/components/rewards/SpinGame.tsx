@@ -1,16 +1,32 @@
 "use client"
 
-import type React from "react"
-import { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { FaPlay, FaLock, FaUserPlus } from "react-icons/fa"
 import { useAuth } from "../../lib/context/AuthContext"
 import { useRewards } from "../../lib/context/RewardsContext"
 import Link from "next/link"
 
 interface SpinGameProps {
-  onClose: () => void
   onSpin: (result: { points: number; isJackpot: boolean }) => Promise<void>
+  onComplete: (points: number) => void
 }
+
+// Define wheel segments and colors outside component to prevent recreation
+const WHEEL_SEGMENTS = [50, 75, 100, 125, 150, 175, 200, 65, 85, 110, 135, 160]
+const WHEEL_COLORS = [
+  "#D4AF37", // gold-foil
+  "#880808", // blood-red
+  "#50C878", // emerald-green
+  "#7851A9", // royal-purple
+  "#D4AF37", // gold-foil
+  "#880808", // blood-red
+  "#50C878", // emerald-green
+  "#7851A9", // royal-purple
+  "#D4AF37", // gold-foil
+  "#880808", // blood-red
+  "#50C878", // emerald-green
+  "#7851A9", // royal-purple
+]
 
 const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
   const { user } = useAuth()
@@ -26,32 +42,17 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
   // Check if user is authenticated
   const isAuthenticated = !!user
 
-  // Define wheel segments (points values between 50-200)
-  const segments = [50, 75, 100, 125, 150, 175, 200, 65, 85, 110, 135, 160]
-  const colors = [
-    "#D4AF37", // gold-foil
-    "#880808", // blood-red
-    "#50C878", // emerald-green
-    "#7851A9", // royal-purple
-    "#D4AF37", // gold-foil
-    "#880808", // blood-red
-    "#50C878", // emerald-green
-    "#7851A9", // royal-purple
-    "#D4AF37", // gold-foil
-    "#880808", // blood-red
-    "#50C878", // emerald-green
-    "#7851A9", // royal-purple
-  ]
+
 
   // Function to draw the wheel
-  const drawWheel = (ctx: CanvasRenderingContext2D, width: number, height: number, angle: number) => {
+  const drawWheel = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number, angle: number) => {
     ctx.clearRect(0, 0, width, height)
     const centerX = width / 2
     const centerY = height / 2
     const radius = Math.min(centerX, centerY) - 10
-    const segmentAngle = (2 * Math.PI) / segments.length
+    const segmentAngle = (2 * Math.PI) / WHEEL_SEGMENTS.length
 
-    for (let i = 0; i < segments.length; i++) {
+    for (let i = 0; i < WHEEL_SEGMENTS.length; i++) {
       const startAngle = i * segmentAngle + (angle * Math.PI) / 180
       const endAngle = (i + 1) * segmentAngle + (angle * Math.PI) / 180
 
@@ -60,7 +61,7 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
       ctx.arc(centerX, centerY, radius, startAngle, endAngle)
       ctx.closePath()
 
-      ctx.fillStyle = colors[i]
+      ctx.fillStyle = WHEEL_COLORS[i]
       ctx.fill()
       ctx.strokeStyle = "#000"
       ctx.lineWidth = 1
@@ -72,7 +73,7 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
       ctx.textAlign = "right"
       ctx.fillStyle = "white"
       ctx.font = "bold 16px sans-serif"
-      ctx.fillText(segments[i].toString(), radius - 20, 5)
+      ctx.fillText(WHEEL_SEGMENTS[i].toString(), radius - 20, 5)
       ctx.restore()
     }
 
@@ -93,17 +94,17 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
     ctx.closePath()
     ctx.fillStyle = "#D4AF37"
     ctx.fill()
-  }
+  }, [])
 
   // Function to calculate which segment the wheel lands on
   const calculateWinningSegment = (finalAngle: number): number => {
-    const segmentAngle = 360 / segments.length
+    const segmentAngle = 360 / WHEEL_SEGMENTS.length
     // Normalize the angle to 0-360 range
     const normalizedAngle = ((finalAngle % 360) + 360) % 360
     // The pointer is at the top (0 degrees), so we need to account for that
     // Since the wheel rotates clockwise, we calculate from the top
     const pointerAngle = (360 - normalizedAngle) % 360
-    const segmentIndex = Math.floor(pointerAngle / segmentAngle) % segments.length
+    const segmentIndex = Math.floor(pointerAngle / segmentAngle) % WHEEL_SEGMENTS.length
     return segmentIndex
   }
 
@@ -128,12 +129,12 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
     const baseRotation = Math.random() * (maxRotation - minRotation) + minRotation
     
     // Calculate which segment we land on
-    const segmentAngle = 360 / segments.length
+    const segmentAngle = 360 / WHEEL_SEGMENTS.length
     const normalizedRotation = baseRotation % 360
-    const segmentIndex = Math.floor((360 - normalizedRotation) / segmentAngle) % segments.length
+    const segmentIndex = Math.floor((360 - normalizedRotation) / segmentAngle) % WHEEL_SEGMENTS.length
     
     // Get points from the selected segment
-    const points = segments[segmentIndex].points
+    const points = WHEEL_SEGMENTS[segmentIndex]
     
     const finalAngle = spinAngle + baseRotation
     setTargetAngle(finalAngle)
@@ -198,7 +199,7 @@ const SpinGame: React.FC<SpinGameProps> = ({ onComplete }) => {
     if (canvas && canvas.getContext("2d")) {
       drawWheel(canvas.getContext("2d"), canvas.width, canvas.height, spinAngle)
     }
-  }, [])
+  }, [spinAngle, drawWheel])
 
 
 

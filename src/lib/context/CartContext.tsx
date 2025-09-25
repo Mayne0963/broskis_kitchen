@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { createContext, useState, useContext, useEffect, type ReactNode } from "react"
+import React, { createContext, useState, useContext, useEffect, type ReactNode } from "react"
 import type { CartContextType, CartItem } from "@/types"
 import { toast } from "sonner"
 

@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { createContext, useState, useContext, type ReactNode } from "react"
+import React, { createContext, useState, useContext, type ReactNode } from "react"
 import type { DeliveryContextType, DeliveryAddress } from "@/types"
 
 // Create the context with a default undefined value

@@ -178,7 +178,7 @@ export default async function handler(
     });
 
     // Calculate redemption statistics
-    let totalRedemptions = redemptions.length;
+    const totalRedemptions = redemptions.length;
     let totalRedemptionValue = 0;
     let totalCOGS = 0;
     const rewardCounts: { [key: string]: { count: number; name: string; totalCOGS: number } } = {};
@@ -220,7 +220,7 @@ export default async function handler(
     });
 
     // Calculate spin statistics
-    let totalSpins = spins.length;
+    const totalSpins = spins.length;
     let totalSpinPointsAwarded = 0;
     const spinsByTier = {
       bronze: 0,

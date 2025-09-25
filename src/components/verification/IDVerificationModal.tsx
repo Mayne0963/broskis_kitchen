@@ -1,8 +1,7 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useRef, useEffect } from "react"
+import React, { useState, useRef, useEffect } from "react"
+import Image from "next/image"
 import { FaTimes, FaIdCard, FaCamera, FaCheck, FaExclamationTriangle } from "react-icons/fa"
 import { useAgeVerification } from "../../lib/context/AgeVerificationContext"
 import { auth } from "../../lib/services/firebase"
@@ -182,7 +181,7 @@ const IDVerificationModal: React.FC<IDVerificationModalProps> = ({ onClose, onSu
                 </div>
                 <h3 className="text-lg font-bold mb-2">Upload Your ID</h3>
                 <p className="text-gray-400">
-                  Please upload a clear photo of your government-issued ID (driver's license, passport, etc.)
+                  Please upload a clear photo of your government-issued ID (driver&apos;s license, passport, etc.)
                 </p>
               </div>
 
@@ -192,7 +191,7 @@ const IDVerificationModal: React.FC<IDVerificationModalProps> = ({ onClose, onSu
               >
                 {idImage ? (
                   <div className="relative">
-                    <img src={idImage || "/placeholder.svg"} alt="ID" className="max-h-48 mx-auto rounded" />
+                    <Image src={idImage || "/placeholder.svg"} alt="ID" className="max-h-48 mx-auto rounded" width={300} height={200} />
                     <div className="absolute top-2 right-2 bg-emerald-green rounded-full p-1">
                       <FaCheck className="text-black" />
                     </div>
@@ -234,7 +233,7 @@ const IDVerificationModal: React.FC<IDVerificationModalProps> = ({ onClose, onSu
               >
                 {selfieImage ? (
                   <div className="relative">
-                    <img src={selfieImage || "/placeholder.svg"} alt="Selfie" className="max-h-48 mx-auto rounded" />
+                    <Image src={selfieImage || "/placeholder.svg"} alt="Selfie" className="max-h-48 mx-auto rounded" width={300} height={200} />
                     <div className="absolute top-2 right-2 bg-emerald-green rounded-full p-1">
                       <FaCheck className="text-black" />
                     </div>

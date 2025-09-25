@@ -83,7 +83,7 @@ export default function OrderConfirmation({
           
           <h1 className="text-3xl font-bold text-white mb-2">Order Confirmed!</h1>
           <p className="text-gray-400 text-lg">
-            Thank you for your order. We're preparing your delicious meal!
+            Thank you for your order. We&apos;re preparing your delicious meal!
           </p>
           
           <div className="mt-6 p-4 bg-[var(--color-dark-charcoal)] rounded-lg border border-[var(--color-harvest-gold)]/20 inline-block">
@@ -260,10 +260,10 @@ export default function OrderConfirmation({
           <div className="bg-gold-foil/20 border border-gold-foil/30 rounded-lg p-6">
             <h4 className="text-lg font-semibold text-blue-300 mb-3">What's Next?</h4>
             <ul className="space-y-2 text-blue-200/80 text-sm">
-              <li>• We'll send you updates via SMS and email</li>
+              <li>• We&apos;ll send you updates via SMS and email</li>
               <li>• You can track your order in real-time</li>
               <li>• Our chef is already preparing your meal</li>
-              <li>• {checkoutData.deliveryType === 'delivery' ? 'Our driver will contact you when nearby' : 'We\'ll notify you when ready for pickup'}</li>
+              <li>• {checkoutData.deliveryType === 'delivery' ? 'Our driver will contact you when nearby' : 'We&apos;ll notify you when ready for pickup'}</li>
             </ul>
           </div>
           

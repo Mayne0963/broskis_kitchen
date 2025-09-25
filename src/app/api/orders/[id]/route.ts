@@ -15,9 +15,8 @@ export async function GET(
 ) {
   try {
     const { id } = params;
-    const db = adminDb;
     
-    const doc = await db.collection(COLLECTIONS.ORDERS).doc(id).get();
+    const doc = await adminDb.collection(COLLECTIONS.ORDERS).doc(id).get();
     
     if (!doc.exists) {
       return NextResponse.json(
@@ -80,8 +79,7 @@ export async function PATCH(
       );
     }
     
-    const db = adminDb;
-    const docRef = db.collection(COLLECTIONS.ORDERS).doc(id);
+    const docRef = adminDb.collection(COLLECTIONS.ORDERS).doc(id);
     
     // Check if order exists
     const doc = await docRef.get();

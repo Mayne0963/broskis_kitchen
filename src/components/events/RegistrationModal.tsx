@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import React, { useState } from "react"
 import { FaTimes, FaCalendarAlt, FaMapMarkerAlt, FaClock, FaTicketAlt, FaCheck } from "react-icons/fa"
 import type { Event } from "@/types/event"
 
@@ -399,7 +397,7 @@ const RegistrationModal: React.FC<RegistrationModalProps> = ({ event, onClose })
               <div>
                 <h3 className="text-xl font-bold mb-2">Registration Successful!</h3>
                 <p className="text-gray-300 mb-4">
-                  Thank you for registering for {event.title}. We've sent a confirmation email to {formData.email} with
+                  Thank you for registering for {event.title}. We&apos;ve sent a confirmation email to {formData.email} with
                   all the details.
                 </p>
               </div>

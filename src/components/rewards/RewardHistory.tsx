@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import React, { useState } from "react"
 import { FaPlus, FaMinus, FaExchangeAlt, FaSort, FaSortAmountDown, FaSortAmountUp } from "react-icons/fa"
 import type { RewardHistory as RewardHistoryType } from "@/types"
 
@@ -198,10 +196,10 @@ const RewardHistory: React.FC<RewardHistoryProps> = ({ history }) => {
           <h3 className="text-xl font-bold mb-2">No History Found</h3>
           <p className="text-gray-400">
             {filter === "all"
-              ? "You don't have any points history yet."
+              ? "You don&apos;t have any points history yet."
               : filter === "earned"
-                ? "You haven't earned any points yet."
-                : "You haven't redeemed any rewards yet."}
+                ? "You haven&apos;t earned any points yet."
+                : "You haven&apos;t redeemed any rewards yet."}
           </p>
         </div>
       )}

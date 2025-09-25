@@ -317,10 +317,10 @@ export default function ReviewStep({
         <div className="text-sm text-gray-400">
           <p>
             By placing this order, you agree to our{' '}
-            <a href="/terms" className="text-[var(--color-harvest-gold)] hover:underline">
-              Terms of Service
-            </a>{' '}
-            and{' '}
+                <a href="/terms" className="text-[var(--color-harvest-gold)] hover:underline">
+                  Terms of Service
+                </a>{' '}
+                and{' '}
             <a href="/privacy" className="text-[var(--color-harvest-gold)] hover:underline">
               Privacy Policy
             </a>

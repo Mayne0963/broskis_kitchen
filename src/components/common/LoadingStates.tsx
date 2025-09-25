@@ -135,7 +135,7 @@ export function PaymentLoading({ message = 'Processing payment...' }: { message?
         <CreditCard className="w-12 h-12 text-[#FFD700]" />
       </motion.div>
       <p className="text-white text-lg mb-2">{message}</p>
-      <p className="text-gray-400 text-sm mb-4">Please don't close this window</p>
+      <p className="text-gray-400 text-sm mb-4">Please don&apos;t close this window</p>
       <LoadingSpinner size="lg" className="text-[#FFD700]" />
     </div>
   )

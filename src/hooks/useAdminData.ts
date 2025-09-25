@@ -93,17 +93,7 @@ export const useAdminData = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const role = useRole()
-
-  // Early return if user is not an admin or role is not available
-  if (role !== 'admin') {
-    return {
-      data: null,
-      loading: false,
-      error: role === null ? null : 'Access denied: Admin role required',
-      refetch: () => Promise.resolve(),
-      unsubscribe: () => {}
-    }
-  }
+  const unsubRef = useRef<() => void>(() => {})
 
   // Calculate stats from orders and user analytics
   const calculateStats = useCallback((orders: Order[], userAnalytics: any, userActivity: any): AdminStats => {
@@ -146,8 +136,6 @@ export const useAdminData = () => {
       }
     }
   }, [])
-
-  const unsubRef = useRef<() => void>(() => {})
 
   // Fetch and combine various pieces of data into final admin state
   const fetchAdminData = useCallback(async () => {
@@ -234,6 +222,13 @@ export const useAdminData = () => {
 
   // Set up real-time listeners for all data
   useEffect(() => {
+    // Early exit if user is not an admin
+    if (role !== 'admin') {
+      setLoading(false)
+      setError(role === null ? null : 'Access denied: Admin role required')
+      return
+    }
+
     if (!isFirebaseConfigured || !db) {
       // Use empty data if Firebase is not configured
       setData({
@@ -349,8 +344,19 @@ export const useAdminData = () => {
     }
     unsubRef.current = cleanup
     return cleanup
-  }, [fetchAdminData])
+  }, [fetchAdminData, role])
 
+
+  // Handle non-admin users
+  if (role !== 'admin') {
+    return {
+      data: null,
+      loading,
+      error,
+      refetch: () => Promise.resolve(),
+      unsubscribe: () => {}
+    }
+  }
 
   return {
     data,

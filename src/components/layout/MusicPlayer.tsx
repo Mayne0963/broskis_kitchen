@@ -1,18 +1,12 @@
 "use client";
 
-import type React from "react"
-import { useState, useRef, useEffect } from "react"
+import React, { useState, useRef, useEffect } from "react"
 import { FaPlay, FaPause, FaForward, FaBackward, FaVolumeUp, FaVolumeDown, FaRandom, FaRedoAlt } from "react-icons/fa"
 import { useMediaPlayer } from "../../lib/context/MediaPlayerContext"
 import type { Track } from "../../types"
 
-const MusicPlayer = () => {
-  const { isPlaying, currentTrack, playTrack, pauseTrack, nextTrack, previousTrack, volume, setVolume, setPlaylistTracks } =
-    useMediaPlayer()
-  const audioRef = useRef<HTMLAudioElement>(null)
-
-  // Royalty-free music tracks
-  const chillLofi: Track[] = [
+// Royalty-free music tracks - moved outside component to prevent recreation on every render
+const chillLofi: Track[] = [
     {
       id: "1",
       title: "Chill Lofi Beat",
@@ -76,9 +70,9 @@ const MusicPlayer = () => {
       url: "/music/sunset-meditation.mp3",
       coverImage: "/images/relaxing-piano.svg",
     },
-  ]
+]
 
-  const upbeatTracks: Track[] = [
+const upbeatTracks: Track[] = [
     {
       id: "5",
       title: "Uplifting Corporate",
@@ -142,9 +136,9 @@ const MusicPlayer = () => {
       url: "/music/latin-fiesta.mp3",
       coverImage: "/images/lofi_study_beats.svg",
     },
-  ]
+]
 
-  const dinnerJazz: Track[] = [
+const dinnerJazz: Track[] = [
     {
       id: "19",
       title: "Smooth Dinner Jazz",
@@ -187,7 +181,12 @@ const MusicPlayer = () => {
       url: "/music/cocktail-hour-blues.mp3",
       coverImage: "/images/chilled-vibes.svg",
     },
-  ]
+]
+
+const MusicPlayer = () => {
+  const { isPlaying, currentTrack, playTrack, pauseTrack, nextTrack, previousTrack, volume, setVolume, setPlaylistTracks } =
+    useMediaPlayer()
+  const audioRef = useRef<HTMLAudioElement>(null)
 
   const [currentPlaylist, setCurrentPlaylist] = useState<Track[] | null>(null);
   const [isShuffled, setIsShuffled] = useState(false)
@@ -209,13 +208,9 @@ const MusicPlayer = () => {
     }
     // Auto-start background music with the first track from chill playlist
     if (chillLofi.length > 0 && !currentTrack) {
-      // Small delay to ensure component is fully mounted
-      const timer = setTimeout(() => {
-        playTrack(chillLofi[0]);
-      }, 1000);
-      return () => clearTimeout(timer);
+      playTrack(chillLofi[0]);
     }
-  }, []);
+  }, [setPlaylistTracks, nextTrack, currentTrack, playTrack]);
 
   // Sync audio element with context state
   useEffect(() => {

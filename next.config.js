@@ -7,10 +7,10 @@ const __dirname = path.dirname(__filename);
 
 const nextConfig = {
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   // Enhanced Vercel deployment configuration
   assetPrefix: process.env.NODE_ENV === 'production' ? undefined : undefined,

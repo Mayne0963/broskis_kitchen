@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import type { Location } from "../../types/location"
 
 // Extend Window interface to include Google Maps API
@@ -30,7 +28,7 @@ const ContactMap: React.FC<ContactMapProps> = ({ locations }) => {
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null)
 
   // Calculate center point of all locations
-  const calculateCenter = () => {
+  const calculateCenter = useCallback(() => {
     if (locations.length === 0) return { lat: 37.0902, lng: -95.7129 } // Default to US center
 
     const totalLat = locations.reduce((sum, loc) => sum + loc.coordinates.lat, 0)
@@ -40,7 +38,7 @@ const ContactMap: React.FC<ContactMapProps> = ({ locations }) => {
       lat: totalLat / locations.length,
       lng: totalLng / locations.length,
     }
-  }
+  }, [locations])
 
   useEffect(() => {
     // Load Google Maps script
@@ -206,7 +204,7 @@ const ContactMap: React.FC<ContactMapProps> = ({ locations }) => {
     } else {
       loadGoogleMapsScript()
     }
-  }, [locations])
+  }, [locations, calculateCenter])
 
   return (
     <div className="w-full h-full">

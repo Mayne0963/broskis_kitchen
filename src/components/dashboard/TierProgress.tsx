@@ -111,7 +111,7 @@ export default function TierProgress({ currentTier, nextTier, pointsToNext }: Ti
             <div className="text-sm">
               <p className="text-green-300 font-medium mb-1">Almost there!</p>
               <p className="text-green-200/80">
-                You're just {pointsToNext} points away from {nextTier} tier. 
+                You&apos;re just {pointsToNext} points away from {nextTier} tier. 
                 Place your next order to unlock these amazing benefits!
               </p>
             </div>

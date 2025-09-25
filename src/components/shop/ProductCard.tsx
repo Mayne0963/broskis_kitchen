@@ -1,9 +1,7 @@
 "use client"
 
-import type React from "react"
-
+import React, { useState } from "react"
 import Image from "next/image"
-import { useState } from "react"
 import { FaShoppingCart, FaEye, FaStar, FaFire } from "react-icons/fa"
 import type { Product } from "../../types/merch"
 

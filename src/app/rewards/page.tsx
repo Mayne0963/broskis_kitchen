@@ -314,7 +314,7 @@ export default function RewardsPage() {
                   </h2>
                   <p className="text-xl text-gray-300 mb-10 leading-relaxed max-w-2xl mx-auto">
                     Join the elite circle and access our exclusive rewards program with daily spins, 
-                    VIP perks, and luxury experiences that money can't buy.
+                    VIP perks, and luxury experiences that money can&apos;t buy.
                   </p>
                   
                   <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12">

@@ -15,15 +15,14 @@ import { cookies } from 'next/headers';
  * Aggregates global KPI data for admin users
  */
 async function aggregateGlobalKPIs() {
-  const db = adminDb;
   
   try {
     // Get total orders count
-    const ordersSnapshot = await db.collection(COLLECTIONS.ORDERS).count().get();
+    const ordersSnapshot = await adminDb.collection(COLLECTIONS.ORDERS).count().get();
     const totalOrders = ordersSnapshot.data().count;
     
     // Get revenue from completed orders
-    const completedOrdersSnapshot = await db
+    const completedOrdersSnapshot = await adminDb
       .collection(COLLECTIONS.ORDERS)
       .where('status', '==', 'completed')
       .get();
@@ -38,7 +37,7 @@ async function aggregateGlobalKPIs() {
     
     // Get active users count (users with at least one order in last 30 days)
     const thirtyDaysAgo = Timestamp.fromDate(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000));
-    const recentOrdersSnapshot = await db
+    const recentOrdersSnapshot = await adminDb
       .collection(COLLECTIONS.ORDERS)
       .where('createdAt', '>=', thirtyDaysAgo)
       .get();
@@ -81,8 +80,6 @@ export async function GET(request: NextRequest) {
       const userId = user.uid;
       const userRole = user.role || 'admin';
     
-      const db = adminDb;
-    
       // Handle KPI request (admin only)
       if (wantKpi) {
         const kpi = await aggregateGlobalKPIs();
@@ -90,7 +87,7 @@ export async function GET(request: NextRequest) {
       }
     
       // Admin can see all orders (limited to 100)
-      let ordersQuery = db
+      let ordersQuery = adminDb
         .collection(COLLECTIONS.ORDERS)
         .orderBy('createdAt', 'desc')
         .limit(100);

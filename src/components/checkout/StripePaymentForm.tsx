@@ -113,13 +113,14 @@ function PaymentForm({
 }
 
 export default function StripePaymentForm(props: StripePaymentFormProps) {
+  const { amount, orderId, orderMetadata, onPaymentError } = props
   const [clientSecret, setClientSecret] = useState('')
   const [isInitializing, setIsInitializing] = useState(true)
 
   useEffect(() => {
     const createPaymentIntent = async () => {
-      if (props.amount <= 0) {
-        props.onPaymentError('Invalid payment amount')
+      if (amount <= 0) {
+        onPaymentError('Invalid payment amount')
         return
       }
 
@@ -131,12 +132,12 @@ export default function StripePaymentForm(props: StripePaymentFormProps) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            amount: Math.round(props.amount * 100), // Convert to cents
+            amount: Math.round(amount * 100), // Convert to cents
             currency: 'usd',
             metadata: {
               source: 'broskis-kitchen-checkout',
-              orderId: props.orderId || '',
-              ...props.orderMetadata,
+              orderId: orderId || '',
+              ...orderMetadata,
             },
           }),
         })
@@ -155,14 +156,14 @@ export default function StripePaymentForm(props: StripePaymentFormProps) {
       } catch (error) {
         console.error('Error creating payment intent:', error)
         const errorMessage = error instanceof Error ? error.message : 'Failed to initialize payment'
-        props.onPaymentError(errorMessage)
+        onPaymentError(errorMessage)
       } finally {
         setIsInitializing(false)
       }
     }
 
     createPaymentIntent()
-  }, [props.amount, props.orderId, props.orderMetadata, props.onPaymentError])
+  }, [amount, orderId, orderMetadata, onPaymentError])
 
   const options = {
     clientSecret,

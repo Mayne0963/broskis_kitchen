@@ -26,7 +26,7 @@ const ComingSoonOverlay: React.FC<ComingSoonOverlayProps> = ({ onClose }) => {
             <span className="text-gold-foil font-bold">Stay Tuned</span>
           </div>
           <p className="text-gray-400 mb-4">
-            We're excited to bring you our premium infused culinary creations soon. Check back for updates!
+            We&apos;re excited to bring you our premium infused culinary creations soon. Check back for updates!
           </p>
         </div>
 

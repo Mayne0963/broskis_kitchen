@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { FaPlay, FaPause, FaForward, FaBackward, FaVolumeUp, FaVolumeDown, FaRandom, FaRedoAlt, FaHeart, FaRegHeart, FaList, FaMinus, FaExpand, FaCompress } from 'react-icons/fa'
 import { musicCredits } from '../../data/music-credits'
 
@@ -173,7 +173,7 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
     if (autoPlay && currentTrack) {
       handlePlay()
     }
-  }, [])
+  }, [autoPlay, currentTrack, handlePlay])
 
   // Update audio element when track changes
   useEffect(() => {
@@ -191,7 +191,7 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
       setCurrentTime(0)
       setError(null)
     }
-  }, [currentTrack])
+  }, [currentTrack, handleNext])
 
   // Update volume
   useEffect(() => {
@@ -228,7 +228,7 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
     setIsLoading(false)
   }
 
-  const handlePlay = async () => {
+  const handlePlay = useCallback(async () => {
     if (!audioRef.current || !currentTrack) return
     
     try {
@@ -242,7 +242,7 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [currentTrack])
 
   const handlePause = () => {
     if (audioRef.current) {
@@ -259,7 +259,7 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
     }
   }
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     let nextIndex
     if (isShuffled) {
       nextIndex = Math.floor(Math.random() * playlist.length)
@@ -270,7 +270,7 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
     if (isPlaying) {
       setTimeout(handlePlay, 100)
     }
-  }
+  }, [isShuffled, playlist.length, currentTrackIndex, isPlaying, handlePlay])
 
   const handlePrevious = () => {
     let prevIndex

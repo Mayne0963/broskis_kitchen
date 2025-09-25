@@ -60,7 +60,7 @@ export default function ForgotPasswordPage() {
           
           <CardContent className="space-y-4">
             <div className="text-sm text-gray-600 text-center">
-              <p>Didn't receive the email? Check your spam folder or try again.</p>
+              <p>Didn&apos;t receive the email? Check your spam folder or try again.</p>
             </div>
             
             <Button 

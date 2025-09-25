@@ -55,7 +55,7 @@ export async function generateChatResponse(messages: { role: string; text: strin
     })
 
     // Return the generated response
-    return response.choices[0].message.content || "I'm sorry, I couldn't generate a response."
+    return response.choices[0].message.content || "I&apos;m sorry, I couldn&apos;t generate a response."
   } catch (error: unknown) {
     console.error("Error generating chat response:", error)
     

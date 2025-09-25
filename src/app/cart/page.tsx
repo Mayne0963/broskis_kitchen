@@ -128,7 +128,7 @@ export default function CartPage() {
               <FaShoppingCart className="text-gray-500 text-3xl" />
             </div>
             <h2 className="text-2xl font-bold mb-4">Your cart is empty</h2>
-            <p className="text-gray-400 mb-8">Looks like you haven't added any items to your cart yet.</p>
+            <p className="text-gray-400 mb-8">Looks like you haven&apos;t added any items to your cart yet.</p>
             <Link href="/menu" className="btn-primary inline-flex items-center gap-2">
               <FaArrowLeft size={14} /> Browse Menu
             </Link>

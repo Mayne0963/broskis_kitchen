@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
 import { FaQuoteLeft, FaChevronLeft, FaChevronRight } from "react-icons/fa"
 

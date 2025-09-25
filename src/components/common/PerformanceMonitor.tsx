@@ -104,5 +104,5 @@ export function usePerformanceMonitor(componentName: string) {
         console.warn(`⚠️ Slow Component: ${componentName} took ${renderTime.toFixed(2)}ms to render`)
       }
     }
-  }, [])
+  }, [componentName])
 }
