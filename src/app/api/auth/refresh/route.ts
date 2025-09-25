@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
   const checkpoints: Record<string, number> = {};
   
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const sessionCookie = cookieStore.get("session");
     checkpoints.parseCookies = Date.now() - t0;
     

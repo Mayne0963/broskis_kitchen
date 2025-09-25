@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdmin } from '@/lib/auth/adminOnly';
+import { requireAdmin } from '@/lib/auth';
 import { db } from '@/lib/firebase/admin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
 import { RewardSummary, RewardTransaction } from '@/types/firestore';
@@ -12,18 +12,16 @@ import { RewardSummary, RewardTransaction } from '@/types/firestore';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-interface RouteParams {
-  params: {
-    userId: string;
-  };
-}
-
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ userId: string }> }
+) {
   try {
     // Verify admin authentication
-    await requireAdmin(request);
+    const adminOrRes = await requireAdmin(request as any);
+    if (adminOrRes instanceof Response) return adminOrRes;
     
-    const { userId } = params;
+    const { userId } = await params;
     
     if (!userId) {
       return NextResponse.json(

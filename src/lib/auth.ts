@@ -1,6 +1,8 @@
 import { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { auth } from '@/lib/firebaseAdmin';
 import { cookies } from 'next/headers';
+import { auth as adminAuth } from 'firebase-admin';
 
 export interface AuthUser {
   uid: string;
@@ -84,4 +86,32 @@ export async function verifyAdminToken(req: NextRequest): Promise<AuthUser | nul
 
 export function isAdmin(customClaims?: Record<string, any>): boolean {
   return customClaims?.admin === true || customClaims?.role === 'admin';
+}
+
+// Helper to decode cookie 'session'
+export async function getUserFromCookies(req: NextRequest) {
+  const token = req.cookies.get('session')?.value;
+  if (!token) return null;
+  try {
+    const decoded = await adminAuth().verifyIdToken(token, true);
+    return decoded as { uid: string; email?: string; roles?: string[] };
+  } catch {
+    return null;
+  }
+}
+
+// Require authenticated user
+export async function requireUser(req: NextRequest) {
+  const user = await getUserFromCookies(req);
+  if (!user) return NextResponse.json({ success:false, error:'UNAUTHORIZED' }, { status:401 });
+  return user;
+}
+
+// Require admin role
+export async function requireAdmin(req: NextRequest) {
+  const user = await getUserFromCookies(req);
+  if (!user || !(user.roles || []).includes('admin')) {
+    return NextResponse.json({ success:false, error:'FORBIDDEN' }, { status:403 });
+  }
+  return user;
 }

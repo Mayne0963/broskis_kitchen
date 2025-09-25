@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     })
 
     // Set session cookie for 12 hours
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     cookieStore.set('bk_session', 'authenticated', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

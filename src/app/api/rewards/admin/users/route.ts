@@ -7,7 +7,8 @@ import { AdminUsersResponse, AdminUserUpdateRequest } from '@/types/rewards';
 export async function GET(req: NextRequest) {
   try {
     // Authenticate admin
-    await requireAdmin(req);
+    const adminOrRes = await requireAdmin(req as any);
+    if (adminOrRes instanceof Response) return adminOrRes;
     
     // Parse query parameters
     const { searchParams } = new URL(req.url);
@@ -114,7 +115,8 @@ export async function GET(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     // Authenticate admin
-    await requireAdmin(req);
+    const adminOrRes = await requireAdmin(req as any);
+    if (adminOrRes instanceof Response) return adminOrRes;
     
     const body: AdminUserUpdateRequest = await req.json();
     const { userId, updates } = body;

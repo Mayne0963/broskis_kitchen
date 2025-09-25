@@ -31,12 +31,12 @@ interface DriverInfo {
 // GET - Get driver information
 export async function GET(
   request: NextRequest,
-  { params }: { params: { driverId: string } }
+  { params }: { params: Promise<{ driverId: string }> }
 ) {
   try {
     // Verify admin authentication
     await ensureAdmin(request);
-    const { driverId } = params;
+    const { driverId } = await params;
 
     // Admin access verified by ensureAdmin
 
@@ -76,12 +76,12 @@ export async function GET(
 // PUT - Update driver information
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { driverId: string } }
+  { params }: { params: Promise<{ driverId: string }> }
 ) {
   try {
     // Verify admin authentication
     await ensureAdmin(request);
-    const { driverId } = params;
+    const { driverId } = await params;
 
     const body = await request.json();
     const allowedFields = ['name', 'phone', 'email', 'vehicle'];

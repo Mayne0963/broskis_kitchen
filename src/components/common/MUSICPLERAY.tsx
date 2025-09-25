@@ -168,6 +168,40 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
 
   const currentTrack = playlist[currentTrackIndex]
 
+  // Define functions first to avoid circular dependencies
+  const handlePlay = useCallback(async () => {
+    if (!audioRef.current || !currentTrack) return
+    
+    try {
+      setIsLoading(true)
+      setError(null)
+      await audioRef.current.play()
+      setIsPlaying(true)
+    } catch (err) {
+      setError('Playback failed')
+      setIsPlaying(false)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [currentTrack])
+
+  const handleNext = useCallback(() => {
+    let nextIndex
+    if (isShuffled) {
+      nextIndex = Math.floor(Math.random() * playlist.length)
+    } else {
+      nextIndex = (currentTrackIndex + 1) % playlist.length
+    }
+    setCurrentTrackIndex(nextIndex)
+    if (isPlaying) {
+      setTimeout(() => {
+        if (audioRef.current && currentTrack) {
+          handlePlay()
+        }
+      }, 100)
+    }
+  }, [isShuffled, playlist.length, currentTrackIndex, isPlaying, currentTrack, handlePlay])
+
   // Auto-play on mount if enabled
   useEffect(() => {
     if (autoPlay && currentTrack) {
@@ -181,15 +215,23 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
       audioRef.current.src = currentTrack.url
       
       // Add error handling for audio loading
-      audioRef.current.addEventListener('error', (e) => {
+      const handleAudioError = (e: Event) => {
         console.warn('Audio loading error for:', currentTrack.title, e);
         // Skip to next track on error
         handleNext();
-      });
+      };
       
+      audioRef.current.addEventListener('error', handleAudioError);
       audioRef.current.load()
       setCurrentTime(0)
       setError(null)
+      
+      // Cleanup event listener
+      return () => {
+        if (audioRef.current) {
+          audioRef.current.removeEventListener('error', handleAudioError);
+        }
+      };
     }
   }, [currentTrack, handleNext])
 
@@ -228,22 +270,6 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
     setIsLoading(false)
   }
 
-  const handlePlay = useCallback(async () => {
-    if (!audioRef.current || !currentTrack) return
-    
-    try {
-      setIsLoading(true)
-      setError(null)
-      await audioRef.current.play()
-      setIsPlaying(true)
-    } catch (err) {
-      setError('Playback failed')
-      setIsPlaying(false)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [currentTrack])
-
   const handlePause = () => {
     if (audioRef.current) {
       audioRef.current.pause()
@@ -258,19 +284,6 @@ const MUSICPLERAY: React.FC<MUSICPLERAYProps> = ({
       handlePlay()
     }
   }
-
-  const handleNext = useCallback(() => {
-    let nextIndex
-    if (isShuffled) {
-      nextIndex = Math.floor(Math.random() * playlist.length)
-    } else {
-      nextIndex = (currentTrackIndex + 1) % playlist.length
-    }
-    setCurrentTrackIndex(nextIndex)
-    if (isPlaying) {
-      setTimeout(handlePlay, 100)
-    }
-  }, [isShuffled, playlist.length, currentTrackIndex, isPlaying, handlePlay])
 
   const handlePrevious = () => {
     let prevIndex

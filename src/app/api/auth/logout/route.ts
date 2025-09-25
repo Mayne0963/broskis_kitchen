@@ -4,7 +4,7 @@ import { cookies } from 'next/headers'
 export async function POST() {
   try {
     // Clear the session cookie
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     cookieStore.delete('bk_session')
 
     return NextResponse.json({

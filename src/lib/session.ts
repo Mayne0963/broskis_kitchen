@@ -9,7 +9,7 @@ export type AppUser = {
 };
 
 export async function getServerUser(): Promise<AppUser | null> {
-  const c = cookies();
+  const c = await cookies();
   const token = c.get('session')?.value; // Firebase ID token/JWT set at login
   if (!token) return null;
   

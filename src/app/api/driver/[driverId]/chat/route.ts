@@ -31,7 +31,7 @@ interface ChatMessage {
 // POST - Send a chat message
 export async function POST(
   request: NextRequest,
-  { params }: { params: { driverId: string } }
+  { params }: { params: Promise<{ driverId: string }> }
 ) {
   try {
     // Verify authentication
@@ -46,7 +46,7 @@ export async function POST(
     const token = authHeader.split('Bearer ')[1];
     const decodedToken = await auth.verifyIdToken(token);
     const senderId = decodedToken.uid;
-    const { driverId } = params;
+    const { driverId } = await params;
 
     const body = await request.json();
     const { deliveryId, message, messageType = 'text', metadata } = body;
@@ -182,7 +182,7 @@ export async function POST(
 // GET - Get chat messages for a delivery
 export async function GET(
   request: NextRequest,
-  { params }: { params: { driverId: string } }
+  { params }: { params: Promise<{ driverId: string }> }
 ) {
   try {
     // Verify authentication
@@ -197,7 +197,7 @@ export async function GET(
     const token = authHeader.split('Bearer ')[1];
     const decodedToken = await auth.verifyIdToken(token);
     const userId = decodedToken.uid;
-    const { driverId } = params;
+    const { driverId } = await params;
 
     const { searchParams } = new URL(request.url);
     const deliveryId = searchParams.get('deliveryId');

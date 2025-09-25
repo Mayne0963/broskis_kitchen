@@ -9,7 +9,7 @@ import { COLLECTIONS } from '@/lib/firebase/collections';
 // PUT - Update driver location
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { driverId: string } }
+  { params }: { params: Promise<{ driverId: string }> }
 ) {
   try {
     // Verify authentication
@@ -24,7 +24,7 @@ export async function PUT(
     const token = authHeader.split('Bearer ')[1];
     const decodedToken = await auth.verifyIdToken(token);
     const requestingUserId = decodedToken.uid;
-    const { driverId } = params;
+    const { driverId } = await params;
 
     // Check if user is the driver themselves or admin
     const isAdmin = decodedToken.admin === true;
@@ -124,7 +124,7 @@ export async function PUT(
 // GET - Get driver location history
 export async function GET(
   request: NextRequest,
-  { params }: { params: { driverId: string } }
+  { params }: { params: Promise<{ driverId: string }> }
 ) {
   try {
     // Verify authentication
@@ -139,7 +139,7 @@ export async function GET(
     const token = authHeader.split('Bearer ')[1];
     const decodedToken = await auth.verifyIdToken(token);
     const requestingUserId = decodedToken.uid;
-    const { driverId } = params;
+    const { driverId } = await params;
 
     // Check if user is admin, the driver themselves, or has delivery access
     const isAdmin = decodedToken.admin === true;

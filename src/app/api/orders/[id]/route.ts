@@ -11,10 +11,10 @@ const ALLOWED_STATUSES: Order['status'][] = ['pending', 'confirmed', 'preparing'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     const doc = await adminDb.collection(COLLECTIONS.ORDERS).doc(id).get();
     
@@ -57,13 +57,13 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Verify admin authentication for order updates
     const user = await ensureAdmin(request);
     
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { status } = body;
     

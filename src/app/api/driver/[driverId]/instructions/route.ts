@@ -42,11 +42,11 @@ interface DeliveryInstructions {
 // GET - Get delivery instructions
 export async function GET(
   request: NextRequest,
-  { params }: { params: { driverId: string } }
+  { params }: { params: Promise<{ driverId: string }> }
 ) {
   try {
     await ensureAdmin(request);
-    const { driverId } = params;
+    const { driverId } = await params;
 
     const { searchParams } = new URL(request.url);
     const deliveryId = searchParams.get('deliveryId');
@@ -130,11 +130,11 @@ export async function GET(
 // PUT - Update delivery instructions
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { driverId: string } }
+  { params }: { params: Promise<{ driverId: string }> }
 ) {
   try {
     await ensureAdmin(request);
-    const { driverId } = params;
+    const { driverId } = await params;
 
     const body = await request.json();
     const { deliveryId, pickupInstructions, deliveryInstructions, specialHandling } = body;

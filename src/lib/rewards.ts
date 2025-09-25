@@ -41,6 +41,12 @@ export function calculatePointsFromSubtotal(subtotal: number): number {
   return Math.floor(subtotal * POINTS_PER_DOLLAR);
 }
 
+export function calculatePointsFromAmount(amountUSD: number): number {
+  const safe = isFinite(amountUSD) && amountUSD > 0 ? amountUSD : 0;
+  // 1 point per $10 => 0.1 pt per $1
+  return Math.floor(safe * 0.1);
+}
+
 export function calculateExpiryDate(earnedAt: Date = new Date()): Date {
   const expiryDate = new Date(earnedAt);
   expiryDate.setDate(expiryDate.getDate() + POINTS_EXPIRY_DAYS);

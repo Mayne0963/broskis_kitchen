@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 // PUT /api/admin/users/[uid]/role - Update user role
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { uid: string } }
+  { params }: { params: Promise<{ uid: string }> }
 ) {
   try {
     // Verify admin access
@@ -20,7 +20,7 @@ export async function PUT(
       )
     }
 
-    const { uid } = params
+    const { uid } = await params
     const { role } = await request.json()
 
     // Validate input
@@ -77,7 +77,7 @@ export async function PUT(
 // GET /api/admin/users/[uid]/role - Get user role
 export async function GET(
   request: NextRequest,
-  { params }: { params: { uid: string } }
+  { params }: { params: Promise<{ uid: string }> }
 ) {
   try {
     // Verify admin access
@@ -89,7 +89,7 @@ export async function GET(
       )
     }
 
-    const { uid } = params
+    const { uid } = await params
 
     if (!uid) {
       return NextResponse.json(
