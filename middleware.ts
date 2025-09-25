@@ -10,6 +10,15 @@ export const config = {
     '/admin/:path*',
     // Match protected user routes
     '/profile',
+    '/dashboard',
+    '/dashboard/:path*',
+    '/dashboard-standalone',
+    '/dashboard-standalone/:path*',
+    '/account',
+    '/account/:path*',
+    '/orders',
+    '/rewards',
+    '/loyalty',
   ],
 }
 
@@ -39,21 +48,24 @@ export function middleware(request: NextRequest) {
   // Debug logging
   console.log(`[MIDDLEWARE] ${method} ${pathname} - cookies:`, request.cookies.getAll().map(c => c.name))
   
-  // Profile route protection (requires any valid session)
-  if (pathname === '/profile') {
-    const sessionCookie = request.cookies.get('__session')?.value
+  // Protected user routes (requires any valid session)
+  const protectedUserRoutes = ['/profile', '/dashboard', '/dashboard-standalone', '/account', '/orders', '/rewards', '/loyalty']
+  const isProtectedUserRoute = protectedUserRoutes.some(route => pathname === route || pathname.startsWith(route + '/'))
+  
+  if (isProtectedUserRoute) {
+    const sessionCookie = request.cookies.get('session')?.value || request.cookies.get('__session')?.value
     if (!sessionCookie) {
-      console.log('[MIDDLEWARE] No session cookie found for profile route')
-      const loginUrl = new URL('/auth/login', request.url)
-      loginUrl.searchParams.set('from', pathname)
-      return NextResponse.redirect(loginUrl, 302)
-    }
+        console.log('[MIDDLEWARE] No session cookie found for protected route:', pathname)
+        const loginUrl = new URL('/auth/login', request.url)
+        loginUrl.searchParams.set('from', pathname)
+        return NextResponse.redirect(loginUrl, 302)
+      }
     
     // Validate session token format and expiration
     try {
       const parts = sessionCookie.split('.')
       if (parts.length !== 3) {
-        console.log('[MIDDLEWARE] Invalid session token format for profile route')
+        console.log('[MIDDLEWARE] Invalid session token format for protected route:', pathname)
         const loginUrl = new URL('/auth/login', request.url)
         loginUrl.searchParams.set('from', pathname)
         return NextResponse.redirect(loginUrl, 302)
@@ -68,7 +80,7 @@ export function middleware(request: NextRequest) {
       
       // Check if token is expired
       if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
-        console.log('[MIDDLEWARE] Expired session token for profile route')
+        console.log('[MIDDLEWARE] Expired session token for protected route:', pathname)
         const loginUrl = new URL('/auth/login', request.url)
         loginUrl.searchParams.set('from', pathname)
         return NextResponse.redirect(loginUrl, 302)
@@ -76,16 +88,16 @@ export function middleware(request: NextRequest) {
       
       // Check if required fields are present
       if (!payload.uid || !payload.role) {
-        console.log('[MIDDLEWARE] Invalid session payload for profile route')
+        console.log('[MIDDLEWARE] Invalid session payload for protected route:', pathname)
         const loginUrl = new URL('/auth/login', request.url)
         loginUrl.searchParams.set('from', pathname)
         return NextResponse.redirect(loginUrl, 302)
       }
       
-      console.log('[MIDDLEWARE] Valid session for profile access:', { uid: payload.uid, role: payload.role })
+      console.log('[MIDDLEWARE] Valid session for protected route access:', { uid: payload.uid, role: payload.role, path: pathname })
     } catch (error) {
-      console.log('[MIDDLEWARE] Error validating session for profile route:', error)
-      const loginUrl = new URL('/login', request.url)
+      console.log('[MIDDLEWARE] Error validating session for protected route:', error)
+      const loginUrl = new URL('/auth/login', request.url)
       loginUrl.searchParams.set('from', pathname)
       return NextResponse.redirect(loginUrl, 302)
     }
@@ -103,7 +115,7 @@ export function middleware(request: NextRequest) {
       // Continue without auth check
     } else {
       // Check for session cookie and validate admin role
-      const sessionCookie = request.cookies.get('__session')?.value
+      const sessionCookie = request.cookies.get('session')?.value || request.cookies.get('__session')?.value
       if (!sessionCookie) {
         console.log('[MIDDLEWARE] No session cookie found for admin route:', pathname)
         const loginUrl = new URL('/auth/login', request.url)
