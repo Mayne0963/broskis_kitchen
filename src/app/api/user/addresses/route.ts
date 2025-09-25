@@ -6,8 +6,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerUser } from '@/lib/session';
 import { adminDb } from '@/lib/firebaseAdmin';
 
-export const dynamic = 'force-dynamic';
-
 // Helper to get user ID from session
 const getUserId = async () => {
   const user = await getServerUser();
