@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { getServerUser } from '@/lib/session'
 import { 
   getUserRewards, 
   createUserRewards, 
@@ -9,21 +9,23 @@ import {
 import { db } from '@/lib/services/firebase'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 
+export const dynamic = 'force-dynamic';
+
 // POST /api/rewards/points/award - Award points based on order with profit-focused logic
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const sessionCookie = cookieStore.get('__session')
-    
-    if (!sessionCookie) {
+    const user = await getServerUser();
+    if (!user) {
       return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
+        { success: false, error: 'UNAUTHORIZED' },
+        { 
+          status: 401,
+          headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+        }
+      );
     }
 
-    // TODO: Verify session and get actual user ID
-    const userId = 'mock-user-id' // Replace with actual user ID from session
+    const userId = user.uid;
     
     const body = await request.json()
     const { 
@@ -63,7 +65,9 @@ export async function POST(request: NextRequest) {
           newBalance: existingResult.newBalance,
           message: 'Points already awarded for this order',
           duplicate: true
-        })
+        }, {
+          headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+        });
       }
     }
     
@@ -172,13 +176,18 @@ export async function POST(request: NextRequest) {
         givebackPercentage: Math.round(givebackPercentage * 100) / 100
       },
       expiryDate: expiryDate.toISOString()
-    })
+    }, {
+      headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+    });
     
   } catch (error) {
     console.error('Error awarding points:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+      { success: false, error: 'INTERNAL' },
+      { 
+        status: 500,
+        headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+      }
+    );
   }
 }

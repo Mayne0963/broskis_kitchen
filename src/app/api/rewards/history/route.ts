@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/auth';
+import { getServerUser } from '@/lib/session';
 import { db } from '@/lib/firebase';
 import { HistoryResponse, PointsTransaction } from '@/types/rewards';
 
 export async function GET(req: NextRequest) {
   try {
-    // Authenticate user
-    const user = await requireAuth(req);
+    const user = await getServerUser();
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 });
+    }
     
     // Parse query parameters
     const { searchParams } = new URL(req.url);
@@ -115,13 +117,13 @@ export async function GET(req: NextRequest) {
       }
     };
     
-    return NextResponse.json(response);
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
+    return new NextResponse(JSON.stringify(response), { status: 200, headers });
     
   } catch (error) {
     console.error('Error fetching transaction history:', error);
-    return NextResponse.json({
-      success: false,
-      error: 'Internal server error'
-    }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'INTERNAL' }, { status: 500 });
   }
 }
+
+export const dynamic = 'force-dynamic';

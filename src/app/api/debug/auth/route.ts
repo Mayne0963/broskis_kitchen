@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getSessionCookie } from '@/lib/auth/session'
+import { getServerUser } from '@/lib/session'
 import { verifyAdminAccess } from '@/lib/auth/rbac'
 import { adminAuth, ensureAdmin } from '@/lib/firebaseAdmin'
 
@@ -16,8 +16,8 @@ export async function GET(request: NextRequest) {
     const auth = adminAuth
     console.log('Firebase Admin Auth initialized:', !!auth)
     
-    // Check session cookie
-    const sessionUser = await getSessionCookie()
+    // Check session user
+    const sessionUser = await getServerUser()
     console.log('Session user:', sessionUser)
     
     // Check admin access
@@ -32,19 +32,20 @@ export async function GET(request: NextRequest) {
     
     console.log('=== AUTH DEBUG END ===')
     
-    return NextResponse.json({
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
+    return new NextResponse(JSON.stringify({
       firebaseAdminInitialized: !!auth,
       sessionUser,
       adminVerification,
       sessionCookieExists: !!sessionCookie,
       sessionCookieLength: sessionCookie?.value?.length || 0,
       timestamp: new Date().toISOString()
-    })
+    }), { status: 200, headers })
   } catch (error) {
     console.error('Auth debug error:', error)
     return NextResponse.json({
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined
+      success: false,
+      error: 'INTERNAL'
     }, { status: 500 })
   }
 }

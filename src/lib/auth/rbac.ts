@@ -115,18 +115,16 @@ export function getDefaultRedirectPath(userRole: UserRole | undefined): string {
 export async function verifyRole(requiredRole: UserRole | UserRole[]): Promise<{ success: boolean; user?: any; error?: string }> {
   try {
     // Dynamic import to avoid Edge Runtime issues
-    const { getSessionCookie } = await import('./session')
-    const user = await getSessionCookie()
+    const { getServerUser } = await import('../session')
+    const user = await getServerUser()
     
     if (!user) {
       return { success: false, error: 'Authentication required' }
     }
 
-    if (!user.emailVerified) {
-      return { success: false, error: 'Email verification required' }
-    }
-
-    const userRole = user.role as UserRole || 'customer'
+    // For now, assume all authenticated users are customers unless they have admin role
+    // This can be enhanced later with proper role management
+    const userRole = (user as any).roles?.includes('admin') ? 'admin' as UserRole : 'customer' as UserRole
     const allowedRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole]
     
     if (!allowedRoles.includes(userRole)) {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { getServerUser } from '@/lib/session'
 import { 
   getUserRewards, 
   createUserRewards, 
@@ -8,21 +8,23 @@ import {
   getUserPointsHistory
 } from '@/lib/services/rewardsService'
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/rewards/points - Get user's rewards data
 export async function GET(request: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const sessionCookie = cookieStore.get('__session')
-    
-    if (!sessionCookie) {
+    const user = await getServerUser();
+    if (!user) {
       return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
+        { success: false, error: 'UNAUTHORIZED' },
+        { 
+          status: 401,
+          headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+        }
+      );
     }
     
-    // TODO: Verify session and get actual user ID
-    const userId = 'mock-user-id' // Replace with actual user ID from session
+    const userId = user.uid;
     
     const { searchParams } = new URL(request.url)
     const includeHistory = searchParams.get('includeHistory') === 'true'
@@ -44,32 +46,37 @@ export async function GET(request: NextRequest) {
       response.history = await getUserPointsHistory(userId, 50)
     }
     
-    return NextResponse.json(response)
+    return NextResponse.json(response, {
+      headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+    });
     
   } catch (error) {
     console.error('Error fetching rewards data:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+      { success: false, error: 'INTERNAL' },
+      { 
+        status: 500,
+        headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+      }
+    );
   }
 }
 
 // POST /api/rewards/points - Award points to user
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const sessionCookie = cookieStore.get('__session')
-    
-    if (!sessionCookie) {
+    const user = await getServerUser();
+    if (!user) {
       return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
+        { success: false, error: 'UNAUTHORIZED' },
+        { 
+          status: 401,
+          headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+        }
+      );
     }
     
-    // TODO: Verify session and get actual user ID
-    const userId = 'mock-user-id' // Replace with actual user ID from session
+    const userId = user.uid;
     
     const body = await request.json()
     const { points, type, description, orderId, referralId, promotionId } = body
@@ -131,32 +138,37 @@ export async function POST(request: NextRequest) {
       newBalance: newPoints,
       entry: pointsEntry,
       tierUpgrade: false // TODO: Implement tier upgrade logic
-    })
+    }, {
+      headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+    });
     
   } catch (error) {
     console.error('Error awarding points:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+      { success: false, error: 'INTERNAL' },
+      { 
+        status: 500,
+        headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+      }
+    );
   }
 }
 
 // PUT /api/rewards/points - Deduct points (for redemptions)
 export async function PUT(request: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const sessionCookie = cookieStore.get('__session')
-    
-    if (!sessionCookie) {
+    const user = await getServerUser();
+    if (!user) {
       return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
+        { success: false, error: 'UNAUTHORIZED' },
+        { 
+          status: 401,
+          headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+        }
+      );
     }
     
-    // TODO: Verify session and get actual user ID
-    const userId = 'mock-user-id' // Replace with actual user ID from session
+    const userId = user.uid;
     
     const body = await request.json()
     const { points, description, redemptionId } = body
@@ -215,13 +227,18 @@ export async function PUT(request: NextRequest) {
       pointsDeducted: points,
       newBalance: newPoints,
       entry: pointsEntry
-    })
+    }, {
+      headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+    });
     
   } catch (error) {
     console.error('Error deducting points:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+      { success: false, error: 'INTERNAL' },
+      { 
+        status: 500,
+        headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+      }
+    );
   }
 }

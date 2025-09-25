@@ -1,6 +1,5 @@
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { getSessionCookie } from '@/lib/auth/session'
+import { getServerUser } from '@/lib/session'
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -13,12 +12,12 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export default async function ProfilePage() {
-  // Verify session cookie on the server
-  const user = await getSessionCookie()
+  // Verify session on the server
+  const user = await getServerUser()
   
   // If no valid session, redirect to login (middleware should handle this, but this is a fallback)
   if (!user) {
-    redirect('/auth/login')
+    redirect('/login?next=/profile')
   }
 
   return (

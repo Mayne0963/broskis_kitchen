@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
     return NextResponse.json({
       success: true,
       message: 'Rewards API is healthy',
@@ -12,12 +15,13 @@ export async function GET() {
         spin: '/api/rewards/spin',
         redeem: '/api/rewards/redeem'
       }
-    });
+    }, { headers });
   } catch (error) {
     console.error('Health check error:', error);
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
     return NextResponse.json({
       success: false,
-      error: 'Health check failed'
-    }, { status: 500 });
+      error: 'INTERNAL'
+    }, { status: 500, headers });
   }
 }

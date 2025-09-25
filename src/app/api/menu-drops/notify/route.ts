@@ -1,16 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSessionCookie } from '@/lib/auth/session'
+import { getServerUser } from '@/lib/session'
+
+export const dynamic = 'force-dynamic';
 
 // Mock notification subscriptions - replace with actual database
 const mockNotifications: { [key: string]: string[] } = {}
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getSessionCookie()
+    const user = await getServerUser()
     
-    if (!session) {
+    if (!user) {
       return NextResponse.json(
-        { error: 'Authentication required' }, 
+        { success: false, error: 'UNAUTHORIZED' }, 
         { status: 401 }
       )
     }
@@ -36,27 +38,29 @@ export async function POST(request: NextRequest) {
       mockNotifications[dropId] = []
     }
     
-    const userIndex = mockNotifications[dropId].indexOf(session.uid)
+    const userIndex = mockNotifications[dropId].indexOf(user.uid)
     
     if (action === 'subscribe') {
       if (userIndex === -1) {
-        mockNotifications[dropId].push(session.uid)
+        mockNotifications[dropId].push(user.uid)
         
         // TODO: Store notification preference in database
         // TODO: Add user to email/SMS notification list
         // TODO: Send confirmation email/SMS
         
-        return NextResponse.json({
+        const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
+        return new NextResponse(JSON.stringify({
           message: 'Successfully subscribed to notifications',
           subscribed: true,
           totalSubscribers: mockNotifications[dropId].length
-        })
+        }), { status: 200, headers })
       } else {
-        return NextResponse.json({
+        const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
+        return new NextResponse(JSON.stringify({
           message: 'Already subscribed to notifications',
           subscribed: true,
           totalSubscribers: mockNotifications[dropId].length
-        })
+        }), { status: 200, headers })
       }
     } else { // unsubscribe
       if (userIndex !== -1) {
@@ -65,23 +69,25 @@ export async function POST(request: NextRequest) {
         // TODO: Remove notification preference from database
         // TODO: Remove user from email/SMS notification list
         
-        return NextResponse.json({
+        const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
+        return new NextResponse(JSON.stringify({
           message: 'Successfully unsubscribed from notifications',
           subscribed: false,
           totalSubscribers: mockNotifications[dropId].length
-        })
+        }), { status: 200, headers })
       } else {
-        return NextResponse.json({
+        const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
+        return new NextResponse(JSON.stringify({
           message: 'Not subscribed to notifications',
           subscribed: false,
           totalSubscribers: mockNotifications[dropId].length
-        })
+        }), { status: 200, headers })
       }
     }
   } catch (error) {
     console.error('Failed to handle notification request:', error)
     return NextResponse.json(
-      { error: 'Failed to process notification request' }, 
+      { success: false, error: 'INTERNAL' }, 
       { status: 500 }
     )
   }
@@ -89,11 +95,11 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getSessionCookie()
+    const user = await getServerUser()
     
-    if (!session) {
+    if (!user) {
       return NextResponse.json(
-        { error: 'Authentication required' }, 
+        { success: false, error: 'UNAUTHORIZED' }, 
         { status: 401 }
       )
     }
@@ -109,16 +115,17 @@ export async function GET(request: NextRequest) {
     }
     
     const subscribers = mockNotifications[dropId] || []
-    const isSubscribed = subscribers.includes(session.uid)
+    const isSubscribed = subscribers.includes(user.uid)
     
-    return NextResponse.json({
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
+    return new NextResponse(JSON.stringify({
       subscribed: isSubscribed,
       totalSubscribers: subscribers.length
-    })
+    }), { status: 200, headers })
   } catch (error) {
     console.error('Failed to get notification status:', error)
     return NextResponse.json(
-      { error: 'Failed to get notification status' }, 
+      { success: false, error: 'INTERNAL' }, 
       { status: 500 }
     )
   }
@@ -127,11 +134,11 @@ export async function GET(request: NextRequest) {
 // Admin endpoint to send notifications
 export async function PUT(request: NextRequest) {
   try {
-    const session = await getSessionCookie()
+    const user = await getServerUser()
     
-    if (!session) {
+    if (!user) {
       return NextResponse.json(
-        { error: 'Authentication required' }, 
+        { success: false, error: 'UNAUTHORIZED' }, 
         { status: 401 }
       )
     }
@@ -150,10 +157,11 @@ export async function PUT(request: NextRequest) {
     const subscribers = mockNotifications[dropId] || []
     
     if (subscribers.length === 0) {
-      return NextResponse.json({
-        message: 'No subscribers to notify',
-        notificationsSent: 0
-      })
+      const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
+    return new NextResponse(JSON.stringify({
+      message: 'No subscribers to notify',
+      notificationsSent: 0
+    }), { status: 200, headers })
     }
     
     // TODO: Send notifications to all subscribers
@@ -165,15 +173,16 @@ export async function PUT(request: NextRequest) {
     
     console.log(`Sending ${type || 'general'} notification to ${subscribers.length} users for drop ${dropId}:`, message)
     
-    return NextResponse.json({
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
+    return new NextResponse(JSON.stringify({
       message: 'Notifications sent successfully',
       notificationsSent: subscribers.length,
       subscribers: subscribers.length
-    })
+    }), { status: 200, headers })
   } catch (error) {
     console.error('Failed to send notifications:', error)
     return NextResponse.json(
-      { error: 'Failed to send notifications' }, 
+      { success: false, error: 'INTERNAL' }, 
       { status: 500 }
     )
   }

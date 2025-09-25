@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAuth } from '@/lib/auth'
-import { handleError } from '@/lib/error'
+import { getServerUser } from '@/lib/session'
 import { getUserRewards } from '@/lib/services/rewardsService'
 
 // Static rewards catalog
@@ -49,8 +48,10 @@ const REWARDS_CATALOG = [
 
 export async function GET(req: NextRequest) {
   try {
-    // Authenticate user
-    const user = await requireAuth(req)
+    const user = await getServerUser()
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 })
+    }
     const userId = user.uid
     
     // Get user rewards to check current points
@@ -74,16 +75,18 @@ export async function GET(req: NextRequest) {
       return a.pointsCost - b.pointsCost
     })
     
-    return NextResponse.json({
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+    return new NextResponse(JSON.stringify({
       success: true,
       catalog: sortedRewards,
       userPoints,
       totalRewards: sortedRewards.length
-    })
+    }), { status: 200, headers })
     
   } catch (error) {
     console.error('Catalog error:', error)
-    const errorResponse = handleError(error)
-    return NextResponse.json(errorResponse, { status: 500 })
+    return NextResponse.json({ success: false, error: 'INTERNAL' }, { status: 500 })
   }
 }
+
+export const dynamic = 'force-dynamic'

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAuth } from '@/lib/auth'
-import { handleError } from '@/lib/error'
+import { getServerUser } from '@/lib/session'
 import { 
   getUserRewards, 
   createUserRewards, 
@@ -60,8 +59,10 @@ function validateTotalCOGS(cogsValue: number, orderSubtotal: number): boolean {
 
 export async function POST(req: NextRequest) {
   try {
-    // Authenticate user
-    const user = await requireAuth(req)
+    const user = await getServerUser()
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 })
+    }
     const userId = user.uid
     
     const body = await req.json()
@@ -202,26 +203,28 @@ export async function POST(req: NextRequest) {
       }
     })
     
-    return NextResponse.json({
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+    return new NextResponse(JSON.stringify({
       success: true,
       redemptionId,
       pointsDeducted: pointsCost,
       newBalance,
       cogsValue,
       message: 'Reward redeemed successfully'
-    })
+    }), { status: 200, headers })
     
   } catch (error) {
     console.error('Redemption error:', error)
-    const errorResponse = handleError(error)
-    return NextResponse.json(errorResponse, { status: 500 })
+    return NextResponse.json({ success: false, error: 'INTERNAL' }, { status: 500 })
   }
 }
 
 export async function GET(req: NextRequest) {
   try {
-    // Authenticate user
-    const user = await requireAuth(req)
+    const user = await getServerUser()
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 })
+    }
     const userId = user.uid
     
     const { searchParams } = new URL(req.url)
@@ -248,17 +251,19 @@ export async function GET(req: NextRequest) {
       hasRedeemedForThisOrder = await hasRedeemedForOrder(userId, orderId)
     }
     
-    return NextResponse.json({
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+    return new NextResponse(JSON.stringify({
       success: true,
       redemptions,
       hasRedeemedForOrder: hasRedeemedForThisOrder,
       cogsLimits: COGS_CAPS,
       maxTotalCogsPercentage: MAX_TOTAL_COGS_PERCENTAGE
-    })
+    }), { status: 200, headers })
     
   } catch (error) {
     console.error('Get redemptions error:', error)
-    const errorResponse = handleError(error)
-    return NextResponse.json(errorResponse, { status: 500 })
+    return NextResponse.json({ success: false, error: 'INTERNAL' }, { status: 500 })
   }
 }
+
+export const dynamic = 'force-dynamic'

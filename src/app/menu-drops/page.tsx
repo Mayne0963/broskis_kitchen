@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import { Suspense } from 'react'
 import DropCard from '@/components/menu-drops/DropCard'
 import DropSchedule from '@/components/menu-drops/DropSchedule'
-import { getSessionCookie } from '@/lib/auth/session'
+import { getServerUser } from '@/lib/session'
 
 // Mock data for now - will be replaced with actual API calls
 const mockActiveDrops = [
@@ -44,7 +44,7 @@ const mockScheduledDrops = [
 ]
 
 export default async function MenuDropsPage() {
-  const session = await getSessionCookie()
+  const user = await getServerUser()
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-black to-[#1A1A1A] text-white py-12 px-4">
@@ -80,7 +80,7 @@ export default async function MenuDropsPage() {
                     <div className="h-4 bg-gray-700 rounded"></div>
                   </div>
                 }>
-                  <DropCard drop={drop} isActive={true} userId={session?.uid} />
+                  <DropCard drop={drop} isActive={true} userId={user?.uid} />
                 </Suspense>
               ))}
             </div>
@@ -101,7 +101,7 @@ export default async function MenuDropsPage() {
               <div className="h-32 bg-gray-700 rounded"></div>
             </div>
           }>
-            <DropSchedule drops={mockScheduledDrops} userId={session?.uid} />
+            <DropSchedule drops={mockScheduledDrops} userId={user?.uid} />
           </Suspense>
         </section>
       </div>

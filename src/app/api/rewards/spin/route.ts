@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { requireAuth } from '@/lib/auth'
-import { handleError } from '@/lib/error'
+import { NextResponse } from 'next/server'
+import { getServerUser } from '@/lib/session'
+import { utcDayKey } from '@/lib/daykey'
 import { 
   getUserRewards, 
   createUserRewards, 
@@ -8,7 +8,7 @@ import {
   addPointsTransaction
 } from '@/lib/services/rewardsService'
 import { db } from '@/lib/services/firebase'
-import { doc, getDoc, setDoc, query, where, collection, getDocs, orderBy, limit } from 'firebase/firestore'
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 
 // New spin wheel configuration with updated probabilities
 const SPIN_WHEEL_CONFIG = {
@@ -46,87 +46,63 @@ function executeSpin() {
   }
 }
 
-// Check if user can spin (24h cooldown)
-async function canUserSpin(userId: string): Promise<{ canSpin: boolean, nextSpinTime?: Date }> {
+// Check if user has already spun today using UTC dayKey
+async function hasSpunToday(userId: string): Promise<boolean> {
   try {
-    const spinHistoryQuery = query(
-      collection(db, 'spinHistory'),
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc'),
-      limit(1)
-    )
-    
-    const spinHistorySnapshot = await getDocs(spinHistoryQuery)
-    
-    if (spinHistorySnapshot.empty) {
-      return { canSpin: true }
-    }
-    
-    const lastSpin = spinHistorySnapshot.docs[0].data()
-    const lastSpinTime = lastSpin.createdAt.toDate()
-    const nextSpinTime = new Date(lastSpinTime.getTime() + (SPIN_WHEEL_CONFIG.cooldownHours * 60 * 60 * 1000))
-    
-    return {
-      canSpin: new Date() >= nextSpinTime,
-      nextSpinTime
-    }
+    const dayKey = utcDayKey()
+    const spinDocId = `spin_${userId}_${dayKey}`
+    const spinDoc = await getDoc(doc(db, 'SpinLedger', spinDocId))
+    return spinDoc.exists()
   } catch (error) {
-    console.error('Error checking spin availability:', error)
-    return { canSpin: false }
+    console.error('Error checking spin status:', error)
+    return true // Fail safe - assume already spun
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
-    // Authenticate user
-    const user = await requireAuth(req)
-    const userId = user.uid
+    const user = await getServerUser()
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 })
+    }
     
-    // Parse request body (optional idempotency key)
-    const body = await req.json()
-    const { idempotencyKey } = body
+    const userId = user.uid
+    const dayKey = utcDayKey()
+    
+    // Check if user has already spun today
+    if (await hasSpunToday(userId)) {
+      const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+      return new NextResponse(JSON.stringify({
+        success: false,
+        error: 'SPIN_USED',
+        nextResetUTC: '00:00'
+      }), { status: 429, headers })
+    }
     
     // Get user's rewards profile
     let userRewards = await getUserRewards(userId)
-    
     if (!userRewards) {
       userRewards = await createUserRewards(userId)
-    }
-    
-    // Check if user can spin (24h cooldown)
-    const spinCheck = await canUserSpin(userId)
-    if (!spinCheck.canSpin) {
-      return NextResponse.json({
-        success: false,
-        error: 'Spin cooldown active - one spin per 24 hours',
-        nextSpinTime: spinCheck.nextSpinTime?.toISOString()
-      }, { status: 429 })
-    }
-    
-    // No spin cost - spins are free but limited to once per day
-    // This is bonus points only, not deducting from user balance
-    
-    // Check for existing spin with same idempotency key (if provided)
-    if (idempotencyKey) {
-      const existingSpin = await getDoc(doc(db, 'spinHistory', idempotencyKey))
-      if (existingSpin.exists()) {
-        const spinData = existingSpin.data()
-        return NextResponse.json({
-          success: true,
-          result: spinData.result,
-          pointsAwarded: spinData.pointsAwarded,
-          newBalance: spinData.newBalance,
-          isJackpot: spinData.isJackpot,
-          cached: true
-        })
-      }
     }
     
     // Execute the spin
     const spinResult = executeSpin()
     
-    // Calculate new points balance (adding bonus points)
+    // Calculate new points balance
     const newBalance = userRewards.totalPoints + spinResult.pointsAwarded
+    
+    // Record spin in SpinLedger
+    const spinDocId = `spin_${userId}_${dayKey}`
+    const spinLedgerData = {
+      awardedPoints: spinResult.pointsAwarded,
+      createdAt: serverTimestamp(),
+      dayKey,
+      userId,
+      result: spinResult.result,
+      isJackpot: spinResult.isJackpot
+    }
+    
+    await setDoc(doc(db, 'SpinLedger', spinDocId), spinLedgerData)
     
     // Update user rewards
     const updatedRewards = {
@@ -138,24 +114,6 @@ export async function POST(req: NextRequest) {
     
     await updateUserRewards(userId, updatedRewards)
     
-    // Record spin in history
-    const spinHistoryData = {
-      userId,
-      result: spinResult.result,
-      pointsAwarded: spinResult.pointsAwarded,
-      newBalance,
-      isJackpot: spinResult.isJackpot,
-      createdAt: new Date(),
-      idempotencyKey
-    }
-    
-    if (idempotencyKey) {
-      await setDoc(doc(db, 'spinHistory', idempotencyKey), spinHistoryData)
-    } else {
-      const spinHistoryRef = doc(collection(db, 'spinHistory'))
-      await setDoc(spinHistoryRef, spinHistoryData)
-    }
-    
     // Create points transaction record
     await addPointsTransaction({
       userId,
@@ -165,71 +123,58 @@ export async function POST(req: NextRequest) {
       metadata: {
         spinResult: spinResult.result,
         isJackpot: spinResult.isJackpot,
-        source: 'daily_spin'
+        source: 'daily_spin',
+        dayKey
       }
     })
     
-    const result = {
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+    return new NextResponse(JSON.stringify({
+      success: true,
       result: spinResult.result,
       pointsAwarded: spinResult.pointsAwarded,
       newBalance,
       isJackpot: spinResult.isJackpot
-    }
-    
-    return NextResponse.json({
-      success: true,
-      result: result.result,
-      pointsAwarded: result.pointsAwarded,
-      newBalance: result.newBalance,
-      isJackpot: result.isJackpot
-    })
+    }), { status: 200, headers })
     
   } catch (error) {
     console.error('Spin error:', error)
-    const errorResponse = handleError(error)
-    return NextResponse.json(errorResponse, { status: 500 })
+    return NextResponse.json({ success: false, error: 'INTERNAL' }, { status: 500 })
   }
 }
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    const cookieStore = await cookies()
-    const sessionCookie = cookieStore.get('__session')
-    
-    if (!sessionCookie) {
-      return NextResponse.json({
-        success: false,
-        error: 'Authentication required'
-      }, { status: 401 })
+    const user = await getServerUser()
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 })
     }
-
-    // TODO: Verify session and get actual user ID
-    const userId = 'mock-user-id' // Replace with actual user ID from session
+    
+    const userId = user.uid
     
     // Get user's rewards profile
     let userRewards = await getUserRewards(userId)
-    
     if (!userRewards) {
       userRewards = await createUserRewards(userId)
     }
     
-    // Check if user can spin
-    const spinCheck = await canUserSpin(userId)
+    // Check if user can spin today
+    const canSpin = !(await hasSpunToday(userId))
     
-    return NextResponse.json({
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+    return new NextResponse(JSON.stringify({
       success: true,
-      canSpin: spinCheck.canSpin,
+      canSpin,
       currentPoints: userRewards.totalPoints,
-      nextSpinTime: spinCheck.nextSpinTime?.toISOString() || null,
+      nextResetUTC: canSpin ? null : '00:00',
       wheelConfig: SPIN_WHEEL_CONFIG,
       cooldownHours: SPIN_WHEEL_CONFIG.cooldownHours
-    })
+    }), { status: 200, headers })
     
   } catch (error) {
     console.error('Spin status error:', error)
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to get spin status'
-    }, { status: 500 })
+    return NextResponse.json({ success: false, error: 'INTERNAL' }, { status: 500 })
   }
 }
+
+export const dynamic = 'force-dynamic'

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { getSessionCookie } from "@/lib/auth/session";
+import { getServerUser } from "@/lib/session";
+
+export const dynamic = 'force-dynamic';
 
 function baseUrl() {
   return process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
@@ -24,7 +26,7 @@ export async function POST(req: Request) {
   const stripe = new Stripe(secret, { apiVersion: "2025-02-24.acacia" });
 
   // Get user authentication context
-  const user = await getSessionCookie();
+  const user = await getServerUser();
 
   const body = await req.json().catch(() => ({}));
   const items: InItem[] = Array.isArray(body?.items) ? body.items : [];
@@ -112,7 +114,8 @@ export async function POST(req: Request) {
     },
   });
 
-  return NextResponse.json({ 
+  const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
+  return new NextResponse(JSON.stringify({ 
     url: session.url, 
     mode: "stripe", 
     itemsSent: clean.length,
@@ -120,9 +123,9 @@ export async function POST(req: Request) {
     tax: taxCents / 100,
     total: totalCents / 100,
     sessionId: session.id
-  });
+  }), { status: 200, headers });
 }
 
 export async function GET() {
-  return NextResponse.json({ error: "method_not_allowed" }, { status: 405 });
+  return NextResponse.json({ success: false, error: "method_not_allowed" }, { status: 405 });
 }

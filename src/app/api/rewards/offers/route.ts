@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { getServerUser } from '@/lib/session'
 import { 
   getAllRewardOffers,
   createUserRedemption,
@@ -7,6 +7,8 @@ import {
   updateUserRewards,
   addPointsTransaction
 } from '@/lib/services/rewardsService'
+
+export const dynamic = 'force-dynamic';
 
 // Mock data fallback
 const mockOffers = [
@@ -148,16 +150,18 @@ export async function GET(request: NextRequest) {
     // Sort by points cost (ascending)
     filteredOffers.sort((a, b) => a.pointsCost - b.pointsCost)
     
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
     return NextResponse.json({
       offers: filteredOffers,
       total: filteredOffers.length
-    })
+    }, { headers })
     
   } catch (error) {
     console.error('Error fetching offers:', error)
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { success: false, error: 'INTERNAL' },
+      { status: 500, headers }
     )
   }
 }
@@ -165,18 +169,17 @@ export async function GET(request: NextRequest) {
 // POST /api/rewards/offers - Redeem an offer
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const sessionCookie = cookieStore.get('__session')
+    const user = await getServerUser();
     
-    if (!sessionCookie) {
+    if (!user) {
+      const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
       return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
+        { success: false, error: 'UNAUTHORIZED' },
+        { status: 401, headers }
       )
     }
     
-    // TODO: Verify session and get actual user ID
-    const userId = 'mock-user-id' // Replace with actual user ID from session
+    const userId = user.uid;
     
     const body = await request.json()
     const { offerId } = body
@@ -251,18 +254,20 @@ export async function POST(request: NextRequest) {
       code: `BK${Math.random().toString(36).substr(2, 8).toUpperCase()}`
     })
     
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
     return NextResponse.json({
       success: true,
       redemption,
       message: `Successfully redeemed ${offer.title}!`,
       pointsDeducted: offer.pointsCost
-    })
+    }, { headers })
     
   } catch (error) {
     console.error('Error redeeming offer:', error)
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { success: false, error: 'INTERNAL' },
+      { status: 500, headers }
     )
   }
 }
@@ -270,18 +275,17 @@ export async function POST(request: NextRequest) {
 // GET /api/rewards/offers/redemptions - Get user's redemption history
 export async function PUT(request: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const sessionCookie = cookieStore.get('__session')
+    const user = await getServerUser();
     
-    if (!sessionCookie) {
+    if (!user) {
+      const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
       return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
+        { success: false, error: 'UNAUTHORIZED' },
+        { status: 401, headers }
       )
     }
     
-    // TODO: Verify session and get actual user ID
-    const userId = 'mock-user-id' // Replace with actual user ID from session
+    const userId = user.uid;
     
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
@@ -302,17 +306,19 @@ export async function PUT(request: NextRequest) {
     // Apply pagination
     const paginatedRedemptions = redemptions.slice(offset, offset + limit)
     
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
     return NextResponse.json({
       redemptions: paginatedRedemptions,
       total: redemptions.length,
       hasMore: offset + limit < redemptions.length
-    })
+    }, { headers })
     
   } catch (error) {
     console.error('Error fetching redemptions:', error)
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { success: false, error: 'INTERNAL' },
+      { status: 500, headers }
     )
   }
 }

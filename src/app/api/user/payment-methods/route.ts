@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getSessionCookie } from '@/lib/auth/session';
+import { getServerUser } from '@/lib/session';
 import Stripe from 'stripe';
 import { adminDb } from '@/lib/firebaseAdmin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
@@ -37,42 +37,60 @@ async function getStripeCustomerId(userId: string) {
 // GET: List payment methods
 export async function GET() {
   try {
-    if (!stripe) return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
-    const session = await getSessionCookie();
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    const customerId = await getStripeCustomerId(session.uid);
+    if (!stripe) return NextResponse.json({ success: false, error: 'INTERNAL' }, { status: 500 });
+    
+    const user = await getServerUser();
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 });
+    }
+    
+    const customerId = await getStripeCustomerId(user.uid);
     const paymentMethods = await stripe.paymentMethods.list({ customer: customerId, type: 'card' });
-    return NextResponse.json(paymentMethods.data);
+    
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
+    return new NextResponse(JSON.stringify(paymentMethods.data), { status: 200, headers });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'INTERNAL' }, { status: 500 });
   }
 }
 
 // POST: Attach new payment method
 export async function POST(request: NextRequest) {
   try {
-    if (!stripe) return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
-    const session = await getSessionCookie();
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!stripe) return NextResponse.json({ success: false, error: 'INTERNAL' }, { status: 500 });
+    
+    const user = await getServerUser();
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 });
+    }
+    
     const { paymentMethodId } = await request.json();
-    const customerId = await getStripeCustomerId(session.uid);
+    const customerId = await getStripeCustomerId(user.uid);
     const paymentMethod = await stripe.paymentMethods.attach(paymentMethodId, { customer: customerId });
-    return NextResponse.json(paymentMethod);
+    
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
+    return new NextResponse(JSON.stringify(paymentMethod), { status: 200, headers });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'INTERNAL' }, { status: 500 });
   }
 }
 
 // DELETE: Detach payment method
 export async function DELETE(request: NextRequest) {
   try {
-    if (!stripe) return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
-    const session = await getSessionCookie();
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!stripe) return NextResponse.json({ success: false, error: 'INTERNAL' }, { status: 500 });
+    
+    const user = await getServerUser();
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 });
+    }
+    
     const { paymentMethodId } = await request.json();
     await stripe.paymentMethods.detach(paymentMethodId);
-    return NextResponse.json({ success: true });
+    
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
+    return new NextResponse(JSON.stringify({ success: true }), { status: 200, headers });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'INTERNAL' }, { status: 500 });
   }
 }

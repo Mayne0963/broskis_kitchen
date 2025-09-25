@@ -1,11 +1,12 @@
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-import { getServerUser } from "@/lib/authServer";
+import { getServerUser } from "@/lib/session";
 import { adminDb } from "@/lib/firebaseAdmin";
 import { orderTotalCents } from "@/lib/server/orderTotals";
 import { LuxeCard, LuxeCardHeader, LuxeCardTitle, LuxeCardContent } from "@/components/luxe/LuxeCard";
 import { LuxeTableWrap, LuxeTable, LuxeTableBody, LuxeTableCell, LuxeTableHead, LuxeTableHeader, LuxeTableRow } from "@/components/luxe/LuxeTable";
+import { redirect } from 'next/navigation';
 
 function usd(n: number) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
@@ -14,14 +15,7 @@ function usd(n: number) {
 export default async function OrdersPage() {
   const user = await getServerUser();
   if (!user) {
-    return (
-      <div className="max-w-6xl mx-auto px-4 py-8 text-white">
-        <LuxeCard>
-          <LuxeCardHeader><LuxeCardTitle>My Orders</LuxeCardTitle></LuxeCardHeader>
-          <LuxeCardContent>Please sign in to view your orders.</LuxeCardContent>
-        </LuxeCard>
-      </div>
-    );
+    redirect('/login?next=/account/orders');
   }
 
   const snap = await adminDb.collection("orders").where("userId", "==", user.uid).get();

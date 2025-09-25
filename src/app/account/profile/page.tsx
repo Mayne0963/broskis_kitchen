@@ -3,24 +3,14 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getServerUser } from "@/lib/authServer";
+import { getServerUser } from "@/lib/session";
+import { redirect } from 'next/navigation';
 
 export default async function ProfilePage() {
   const user = await getServerUser();
 
   if (!user) {
-    return (
-      <main className="p-6">
-        <Card className="border-[#FFD700] bg-[#0b0b0b] text-white">
-          <CardHeader>
-            <CardTitle>Sign in required</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Please sign in to view your profile.</p>
-          </CardContent>
-        </Card>
-      </main>
-    );
+    redirect('/login?next=/account/profile');
   }
 
   return (

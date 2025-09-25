@@ -1,25 +1,17 @@
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-import { getServerUser } from "@/lib/authServer";
+import { getServerUser } from "@/lib/session";
 import { getUserTotals } from "@/lib/server/orderTotals";
 import KpiCard from "@/components/kpi/KpiCard";
 import QuickActions from "@/components/QuickActions";
 import { LuxeCard, LuxeCardHeader, LuxeCardTitle, LuxeCardContent } from "@/components/luxe/LuxeCard";
+import { redirect } from 'next/navigation';
 
 export default async function DashboardPage() {
   const user = await getServerUser();
   if (!user) {
-    return (
-      <div className="min-h-screen bg-black text-white">
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <LuxeCard>
-            <LuxeCardHeader><LuxeCardTitle>Welcome</LuxeCardTitle></LuxeCardHeader>
-            <LuxeCardContent>Please sign in to view your dashboard.</LuxeCardContent>
-          </LuxeCard>
-        </div>
-      </div>
-    );
+    redirect('/login?next=/dashboard');
   }
 
   const totals = await getUserTotals(user.uid);

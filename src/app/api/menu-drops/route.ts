@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSessionCookie } from '@/lib/auth/session'
+import { getServerUser } from '@/lib/session'
 import { 
   getAllMenuDrops,
   getMenuDropsByStatus,
@@ -8,6 +8,8 @@ import {
   deleteMenuDrop,
   MenuDrop
 } from '@/lib/services/menuDropsService'
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -22,14 +24,15 @@ export async function GET(request: NextRequest) {
       drops = await getAllMenuDrops()
     }
     
-    return NextResponse.json({
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
+    return new NextResponse(JSON.stringify({
       drops,
       total: drops.length
-    })
+    }), { status: 200, headers })
   } catch (error) {
     console.error('Failed to fetch menu drops:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch menu drops' }, 
+      { success: false, error: 'INTERNAL' }, 
       { status: 500 }
     )
   }
@@ -37,11 +40,11 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getSessionCookie()
+    const user = await getServerUser()
     
-    if (!session) {
+    if (!user) {
       return NextResponse.json(
-        { error: 'Authentication required' }, 
+        { success: false, error: 'UNAUTHORIZED' }, 
         { status: 401 }
       )
     }
@@ -62,7 +65,7 @@ export async function POST(request: NextRequest) {
     // Create new menu drop
     const newDrop = await createMenuDrop({
       ...dropData,
-      createdBy: session.uid,
+      createdBy: user.uid,
       status: dropData.scheduledFor ? 'scheduled' : 'active',
       soldQuantity: 0,
       revenue: 0
@@ -72,11 +75,12 @@ export async function POST(request: NextRequest) {
     // TODO: Integrate with inventory API for automatic triggers
     // TODO: Send notifications to subscribed users
     
-    return NextResponse.json(newDrop, { status: 201 })
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
+    return new NextResponse(JSON.stringify(newDrop), { status: 201, headers })
   } catch (error) {
     console.error('Failed to create menu drop:', error)
     return NextResponse.json(
-      { error: 'Failed to create menu drop' }, 
+      { success: false, error: 'INTERNAL' }, 
       { status: 500 }
     )
   }
@@ -84,11 +88,11 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const session = await getSessionCookie()
+    const user = await getServerUser()
     
-    if (!session) {
+    if (!user) {
       return NextResponse.json(
-        { error: 'Authentication required' }, 
+        { success: false, error: 'UNAUTHORIZED' }, 
         { status: 401 }
       )
     }
@@ -115,11 +119,12 @@ export async function PUT(request: NextRequest) {
       )
     }
     
-    return NextResponse.json(updatedDrop)
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
+    return new NextResponse(JSON.stringify(updatedDrop), { status: 200, headers })
   } catch (error) {
     console.error('Failed to update menu drop:', error)
     return NextResponse.json(
-      { error: 'Failed to update menu drop' }, 
+      { success: false, error: 'INTERNAL' }, 
       { status: 500 }
     )
   }
@@ -127,11 +132,11 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await getSessionCookie()
+    const user = await getServerUser()
     
-    if (!session) {
+    if (!user) {
       return NextResponse.json(
-        { error: 'Authentication required' }, 
+        { success: false, error: 'UNAUTHORIZED' }, 
         { status: 401 }
       )
     }
@@ -156,11 +161,12 @@ export async function DELETE(request: NextRequest) {
       )
     }
     
-    return NextResponse.json({ message: 'Menu drop deleted successfully' })
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
+    return new NextResponse(JSON.stringify({ success: true, message: 'Menu drop deleted successfully' }), { status: 200, headers })
   } catch (error) {
     console.error('Failed to delete menu drop:', error)
     return NextResponse.json(
-      { error: 'Failed to delete menu drop' }, 
+      { success: false, error: 'INTERNAL' }, 
       { status: 500 }
     )
   }

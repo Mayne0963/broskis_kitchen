@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAuth } from '@/lib/auth'
+import { getServerUser } from '@/lib/session'
 import { handleError } from '@/lib/error'
 import { getUserRewards } from '@/lib/services/rewardsService'
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
     // Authenticate user
-    const user = await requireAuth(req)
+    const user = await getServerUser()
+    if (!user) return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 })
     const userId = user.uid
     
     // Get user rewards
@@ -25,7 +28,8 @@ export async function GET(req: NextRequest) {
     const canSpin = !lastSpin || (now.getTime() - lastSpin.getTime()) >= 24 * 60 * 60 * 1000
     const nextSpinAt = lastSpin ? new Date(lastSpin.getTime() + 24 * 60 * 60 * 1000) : null
     
-    return NextResponse.json({
+    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
+    return new NextResponse(JSON.stringify({
       success: true,
       points: userRewards.totalPoints,
       totalEarned: userRewards.totalEarned || 0,
@@ -35,11 +39,10 @@ export async function GET(req: NextRequest) {
       nextSpinAt: nextSpinAt?.toISOString() || null,
       lastSpinDate: userRewards.lastSpinDate?.toISOString() || null,
       expiringPoints: 0 // Simplified for now
-    })
+    }), { status: 200, headers })
     
   } catch (error) {
     console.error('Balance error:', error)
-    const errorResponse = handleError(error)
-    return NextResponse.json(errorResponse, { status: 500 })
+    return NextResponse.json({ success: false, error: 'INTERNAL' }, { status: 500 })
   }
 }

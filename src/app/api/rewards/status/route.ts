@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { getServerUser } from '@/lib/session'
 import { 
   getUserRewards, 
   createUserRewards
 } from '@/lib/services/rewardsService'
 import { db } from '@/lib/services/firebase'
 import { doc, getDoc, query, where, collection, getDocs, orderBy, limit } from 'firebase/firestore'
+
+export const dynamic = 'force-dynamic';
 
 // Tier thresholds based on total points earned
 const TIER_THRESHOLDS = {
@@ -165,18 +167,18 @@ async function getRecentActivity(userId: string) {
 
 export async function GET(req: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const sessionCookie = cookieStore.get('__session')
-    
-    if (!sessionCookie) {
-      return NextResponse.json({
-        success: false,
-        error: 'Authentication required'
-      }, { status: 401 })
+    const user = await getServerUser();
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'UNAUTHORIZED' },
+        { 
+          status: 401,
+          headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+        }
+      );
     }
 
-    // TODO: Verify session and get actual user ID
-    const userId = 'mock-user-id' // Replace with actual user ID from session
+    const userId = user.uid;
     
     // Get user rewards
     let userRewards = await getUserRewards(userId)
@@ -241,13 +243,18 @@ export async function GET(req: NextRequest) {
         inactiveAccount: daysSinceLastActivity !== null && daysSinceLastActivity > 90,
         lowBalance: userRewards.totalPoints < 50
       }
-    })
+    }, {
+      headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+    });
     
   } catch (error) {
     console.error('Status error:', error)
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to get user status'
-    }, { status: 500 })
+    return NextResponse.json(
+      { success: false, error: 'INTERNAL' },
+      { 
+        status: 500,
+        headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
+      }
+    );
   }
 }
