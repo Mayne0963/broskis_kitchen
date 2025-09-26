@@ -45,9 +45,11 @@ async function loadCatalog(): Promise<CatalogItem[]> {
 }
 
 export default async function RewardsPage() {
+  // ✅ Auth: user required, but NOT admin-only
   const user = await getServerUser();
   if (!user) redirect('/login?next=/rewards');
 
+  // No role checks here — any signed-in user can see rewards
   const [balance, catalog] = await Promise.all([
     loadBalance(user.uid),
     loadCatalog(),
@@ -64,7 +66,6 @@ export default async function RewardsPage() {
             <div><strong>Next Daily Spin:</strong> {new Date(balance.nextSpinUTC).toUTCString()}</div>
           )}
         </div>
-
         {balance.expiringSoon?.length ? (
           <div className="mt-3">
             <strong>Expiring Soon:</strong>
@@ -92,7 +93,7 @@ export default async function RewardsPage() {
                   <img src={c.imageUrl} alt={c.title} className="w-full h-32 object-cover rounded-md mb-3" />
                 ) : null}
                 <div className="text-lg font-semibold">{c.title}</div>
-                <div className="text-sm opacity-80">{c.description}</div>
+                {c.description && <div className="text-sm opacity-80">{c.description}</div>}
                 <div className="mt-2">
                   <span className="text-sm">Requires </span>
                   <strong>{c.pointsRequired} points</strong>
