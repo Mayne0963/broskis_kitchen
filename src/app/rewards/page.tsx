@@ -51,7 +51,7 @@ async function loadCatalog(): Promise<CatalogItem[]> {
 export default async function RewardsPage() {
   // ✅ Auth: user required, but NOT admin-only
   const user = await getServerUser();
-  if (!user) redirect('/login?next=/rewards');
+  if (!user) redirect('/auth/login?next=/rewards');
 
   // No role checks here — any signed-in user can see rewards
   const [balance, catalog] = await Promise.all([
