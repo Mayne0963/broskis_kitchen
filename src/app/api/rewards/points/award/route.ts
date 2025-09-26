@@ -76,8 +76,8 @@ export async function POST(request: NextRequest) {
     const eligibleAmount = orderSubtotal
     const pointsToAward = Math.floor(eligibleAmount * 0.1)
     
-    // Minimum 1 point for any purchase
-    const finalPoints = Math.max(pointsToAward, 1)
+    // NEW PROFIT LOGIC - Remove minimum 1 point guarantee
+    const finalPoints = pointsToAward
     
     // Get current user rewards
     let userRewards = await getUserRewards(userId)

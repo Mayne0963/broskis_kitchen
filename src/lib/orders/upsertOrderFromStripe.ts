@@ -2,6 +2,7 @@ import Stripe from 'stripe';
 import { adminDb, auth, Timestamp } from '@/lib/firebaseAdmin';
 import { logError, logInfo, logDebug } from '@/lib/log';
 import { Order, OrderItem, OrderStatus } from '@/types/order';
+import { getLoyaltyProfile, shouldApplyVolunteerDiscount, calculateVolunteerDiscount } from '@/lib/rewards';
 
 interface StripeEventData {
   processedAt: FirebaseFirestore.Timestamp;
@@ -72,6 +73,31 @@ async function processCheckoutSession(session: Stripe.Checkout.Session, eventId:
   // Link to Firebase user
   const userInfo = await linkUserByEmail(customerEmail);
 
+  // Check for volunteer discount eligibility
+  let volunteerDiscountCents = 0;
+  let hasVolunteerDiscount = false;
+  
+  if (userInfo?.uid) {
+    try {
+      const loyaltyProfile = await getLoyaltyProfile(userInfo.uid);
+      if (loyaltyProfile) {
+        const orderSubtotalDollars = subtotalCents / 100;
+        const hasOtherDiscounts = false; // TODO: Check for other applied discounts
+        
+        if (shouldApplyVolunteerDiscount(loyaltyProfile.tier, orderSubtotalDollars, hasOtherDiscounts)) {
+          const discountDollars = calculateVolunteerDiscount(orderSubtotalDollars);
+          volunteerDiscountCents = Math.round(discountDollars * 100);
+          hasVolunteerDiscount = true;
+        }
+      }
+    } catch (error) {
+      logError('Error checking volunteer discount eligibility', { error, userId: userInfo.uid });
+    }
+  }
+
+  // Apply volunteer discount to total if applicable
+  const finalTotalCents = totalCents - volunteerDiscountCents;
+
   // Determine if this is a test order
   const isTest = !session.livemode;
 
@@ -89,12 +115,15 @@ async function processCheckoutSession(session: Stripe.Checkout.Session, eventId:
     items,
     subtotalCents,
     taxCents,
-    totalCents,
+    totalCents: finalTotalCents,
     currency: session.currency || 'usd',
     isTest,
     stripePaymentIntentId: session.payment_intent as string,
     stripeSessionId: session.id,
     stripeCustomerId: session.customer as string,
+    // Volunteer discount information
+    volunteerDiscountCents: hasVolunteerDiscount ? volunteerDiscountCents : undefined,
+    hasVolunteerDiscount,
     address: session.customer_details?.address ? {
       line1: session.customer_details.address.line1 || '',
       line2: session.customer_details.address.line2 || null,

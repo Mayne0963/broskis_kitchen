@@ -36,6 +36,12 @@ import {
   VOLUNTEER_DISCOUNT_PERCENTAGE
 } from '../types/rewards';
 
+// Constants - NEW PROFIT LOGIC
+export const SPIN_COST_POINTS = 10; // Regular users
+export const SENIOR_SPIN_COST_POINTS = 5; // Senior users
+export const JACKPOT_PROBABILITY = 0.02; // 2% (reduced from 5%)
+export const TARGET_GIVEBACK_PERCENTAGE = 0.08; // 8%
+
 // Points calculation utilities
 export function calculatePointsFromSubtotal(subtotal: number): number {
   return Math.floor(subtotal * POINTS_PER_DOLLAR);

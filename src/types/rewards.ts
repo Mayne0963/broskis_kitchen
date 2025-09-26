@@ -197,15 +197,16 @@ export interface ErrorResponse {
   details?: Record<string, any>;
 }
 
-// Constants
+// Constants - NEW PROFIT LOGIC
 
 export const POINTS_PER_DOLLAR = 0.1; // 1 point = $0.10 spend
 export const POINTS_EXPIRY_DAYS = 30;
 export const SPIN_COOLDOWN_HOURS = 24;
-export const SENIOR_SPIN_COST = 5;
-export const JACKPOT_MAX_PROBABILITY = 0.02; // 2%
+export const SPIN_COST_POINTS = 10; // Regular users
+export const SENIOR_SPIN_COST_POINTS = 5; // Senior users
+export const JACKPOT_PROBABILITY = 0.02; // 2% (reduced from 5%)
 export const TARGET_GIVEBACK_PERCENTAGE = 0.08; // 8%
-export const VOLUNTEER_DISCOUNT_THRESHOLD = 50; // $50 minimum order
+export const VOLUNTEER_DISCOUNT_THRESHOLD = 50; // $50
 export const VOLUNTEER_DISCOUNT_PERCENTAGE = 0.1; // 10%
 
 // Spin Wheel Configuration

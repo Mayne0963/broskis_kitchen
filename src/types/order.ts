@@ -75,6 +75,9 @@ export interface Order {
     isTest?: boolean
     [key: string]: any
   }
+  // Volunteer discount fields
+  volunteerDiscountCents?: number
+  hasVolunteerDiscount?: boolean
 }
 
 export type OrderStatus = 
