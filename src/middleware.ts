@@ -35,6 +35,7 @@ export async function middleware(req: NextRequest) {
   // Paths that require ADMIN:
   const isAdminPath =
     pathname.startsWith('/admin') ||
+    pathname.startsWith('/rewards/admin') ||
     pathname.startsWith('/api/rewards/admin');
 
   const user = await decodeSessionCookie(req);
