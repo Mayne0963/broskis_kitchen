@@ -32,16 +32,20 @@ async function loadBalance(uid: string) {
 async function loadCatalog(): Promise<CatalogItem[]> {
   const db = admin.firestore();
   const snap = await db.collection('rewards_catalog').get();
-  return snap.docs.map((d) => {
-    const v = d.data() as any;
-    return {
-      id: d.id,
-      title: String(v.title ?? 'Reward'),
-      pointsRequired: Number(v.pointsRequired ?? 0),
-      description: v.description ?? '',
-      imageUrl: v.imageUrl ?? '',
-    };
-  });
+
+  return snap.docs.map(
+    (doc: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>) => {
+      const v = doc.data() as Record<string, any>;
+      return {
+        id: doc.id,
+        title: String(v.title ?? 'Reward'),
+        // ✅ fix typo: pointsRequired (not pointRequired)
+        pointsRequired: Number(v.pointsRequired ?? 0),
+        description: v.description ? String(v.description) : '',
+        imageUrl: v.imageUrl ? String(v.imageUrl) : '',
+      };
+    }
+  );
 }
 
 export default async function RewardsPage() {

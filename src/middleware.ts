@@ -26,11 +26,14 @@ export async function middleware(req: NextRequest) {
 
   // Paths that require a signed-in user (but NOT admin):
   const USER_ONLY = [
-    '/rewards', '/dashboard', '/profile'
+    '/dashboard', '/profile'
   ];
-  // Prefix matches (e.g., /rewards/*)
+  // Prefix matches (e.g., /dashboard/*)
   const isUserOnly =
     USER_ONLY.some(p => pathname === p || pathname.startsWith(p + '/'));
+
+  // Check if this is the rewards page (requires auth but not admin)
+  const isRewardsPage = pathname === '/rewards' || (pathname.startsWith('/rewards/') && !pathname.startsWith('/rewards/admin'));
 
   // Paths that require ADMIN:
   const isAdminPath =
@@ -57,7 +60,18 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Handle USER-ONLY area (rewards/dashboard/profile)
+  // Handle REWARDS page (requires auth but not admin)
+  if (isRewardsPage) {
+    if (!user) {
+      const url = req.nextUrl.clone();
+      url.pathname = '/login';
+      url.searchParams.set('next', pathname + (searchParams.size ? `?${searchParams.toString()}` : ''));
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next();
+  }
+
+  // Handle USER-ONLY area (dashboard/profile)
   if (isUserOnly) {
     if (!user) {
       const url = req.nextUrl.clone();
