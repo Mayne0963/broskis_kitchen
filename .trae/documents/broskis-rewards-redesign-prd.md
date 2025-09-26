@@ -1,10 +1,10 @@
-# Broski's Rewards System Redesign - Product Requirements Document
+# Broski's Rewards Page Redesign - Product Requirements Document
 
 ## 1. Product Overview
 
-Broski's Rewards is a profit-optimized loyalty program that transforms customer spending into strategic engagement through points accrual, spin-to-win mechanics, and tiered rewards. The system enforces strict profit margins while delivering a premium street-luxury experience that reflects Broski's brand identity.
+Redesign the Broski's Rewards page with a street-luxury aesthetic that embodies the brand's premium cannabis kitchen identity through sophisticated visual design, interactive elements, and seamless user experience.
 
-The redesigned system addresses profitability concerns by capping reward values at 10% of customer spend, implementing 30-day point expiry, and focusing on bonus points rather than free meals through the spin wheel mechanism.
+The redesign transforms the current basic rewards interface into an engaging, gamified experience that drives customer loyalty and repeat visits while maintaining the existing backend functionality and Firebase integration.
 
 ## 2. Core Features
 
@@ -12,162 +12,250 @@ The redesigned system addresses profitability concerns by capping reward values 
 
 | Role | Registration Method | Core Permissions |
 |------|---------------------|------------------|
-| Guest User | No registration required | Can view rewards page, cannot earn/redeem points |
-| Registered User | Email/phone registration | Can earn points, spin wheel daily, redeem rewards |
-| Senior User | Age verification (65+) | Reduced spin cost (5 pts instead of 10 pts) |
-| Volunteer | Manual verification by admin | Auto 10% discount on orders ≥$50, standard rewards |
-| Admin | Internal access only | Manage rewards, view analytics, handle verifications |
+| Guest User | No registration required | Can view rewards program overview, sign-up CTA |
+| Regular Member | Email/phone registration | Can earn points, spin wheel (10 pts), redeem rewards |
+| Senior Member | Age verification (65+) | Reduced spin cost (5 pts), birthday/anniversary bonuses |
+| Volunteer Member | Community verification | Special badges, achievement nominations, exclusive rewards |
 
 ### 2.2 Feature Module
 
-Our rewards system consists of the following main pages:
+Our rewards page redesign consists of the following main sections:
 
-1. **Rewards Landing Page**: hero banner, points tracker, daily spin card, rewards grid, community section
-2. **Spin Wheel Modal**: interactive wheel interface, animation effects, result display, countdown timer
-3. **Rewards Catalog**: tabbed grid layout, redemption interface, point cost display, expiry notifications
-4. **Profile Integration**: points history, tier status, badge display, verification forms
-5. **Admin Dashboard**: reward management, user verification, analytics, point adjustments
+1. **Hero Banner**: brand messaging, value proposition, primary CTA for sign-up
+2. **Points Tracker Dashboard**: live balance display, expiry notifications, progress indicators
+3. **Daily Spin Wheel**: interactive game modal with animated wheel and reward distribution
+4. **Rewards Catalog Grid**: categorized rewards with filtering, redemption interface
+5. **Community Features**: special occasion spins, achievement system, tier badges
+6. **Profile Integration**: user authentication, tier status, transaction history
 
 ### 2.3 Page Details
 
 | Page Name | Module Name | Feature description |
 |-----------|-------------|---------------------|
-| Rewards Landing | Hero Banner | Display "Broski's Rewards: Eat. Earn. Spin. Win." with brand styling, CTA button for registration |
-| Rewards Landing | Points Tracker | Show available points, expiring soon pill, progress bars to next spin and major rewards |
-| Rewards Landing | Daily Spin Card | Countdown timer, spin button, last win display, eligibility status |
-| Rewards Landing | Rewards Grid | Tabbed interface (Food/Discounts/Merch/Experiences), card layout with images and point costs |
-| Rewards Landing | Community Section | Birthday/Anniversary spin eligibility, achievement nomination form, badge verification CTAs |
-| Spin Wheel Modal | Wheel Interface | Interactive spinning wheel with 5/10/20/25 pt slices, rare 50pt jackpot with glow effect |
-| Spin Wheel Modal | Animation System | Smooth easing, confetti on win, coin drop effects, jackpot sparkle pulse |
-| Rewards Catalog | Category Tabs | Filter by Food, Discounts, Merch, Experiences with visual indicators |
-| Rewards Catalog | Redemption Cards | Product images, point costs, COGS caps, "Redeem" buttons, 30-day expiry notes |
-| Profile Integration | Points History | Transaction log, earning/redemption details, expiry tracking |
-| Profile Integration | Badge System | Senior/Volunteer status display, verification forms, achievement showcase |
-| Admin Dashboard | Reward Management | Create/edit rewards, set COGS caps, manage availability |
-| Admin Dashboard | User Verification | Approve senior/volunteer status, handle achievement nominations |
-| Admin Dashboard | Analytics | Track giveback percentage, jackpot hit rates, user engagement metrics |
+| Rewards Page | Hero Banner | Display "Broski's Rewards: Eat. Earn. Spin. Win." title, loyalty tagline, animated background with sacred geometry, prominent [Join Broski's Rewards] CTA button |
+| Rewards Page | Points Tracker | Show current available points with large typography, "expiring soon" notification pill, progress bars for spin eligibility (10 pts) and major reward thresholds (100+ pts) |
+| Rewards Page | Daily Spin Card | Interactive wheel modal with 5/10/20/25/50 point segments, jackpot slice with glow effect, countdown timer for next spin availability, smooth easing animations |
+| Rewards Page | Rewards Grid | Tabbed interface (Food, Discounts, Merch, Experiences), reward cards with images, point costs, "Redeem" buttons, 30-day expiry notices |
+| Rewards Page | Community Section | Birthday Spin and Anniversary Spin features requiring profile dates, Achievement Nomination form with name/reason fields, Senior/Volunteer badge displays with verification CTAs |
+| Rewards Page | Authentication Flow | Login/register modals, user profile integration, tier status display, transaction history access |
 
 ## 3. Core Process
 
 **Guest User Flow:**
-Guests can browse the rewards page to understand the program benefits but cannot earn or redeem points. They see compelling CTAs to register and join the program.
+Guest visits rewards page → Views hero banner and program overview → Clicks "Join Broski's Rewards" → Redirected to registration → Account created → Returns to rewards dashboard
 
-**Registered User Flow:**
-Users earn points automatically on qualifying orders (1 point per $0.10 spend), can spin the wheel daily for bonus points, and redeem accumulated points for rewards within the 30-day expiry window.
+**Member Earning Flow:**
+Member places order → Points automatically credited (1 pt per $10) → Notification of points earned → Points appear in tracker → Progress bars update → Spin wheel becomes available at 10 pts
 
-**Admin Flow:**
-Admins manage the reward catalog, verify special user statuses, monitor system performance, and ensure profitability targets are met.
+**Spin Wheel Flow:**
+Member has 10+ points → Clicks spin wheel → Modal opens with animated wheel → Clicks spin button → Wheel rotates with easing → Lands on segment → Confetti animation → Points awarded → Balance updates → Next spin timer starts
+
+**Redemption Flow:**
+Member browses rewards grid → Filters by category → Selects reward → Confirms redemption → Points deducted → Reward applied to next order → Confirmation displayed
 
 ```mermaid
 graph TD
-    A[Rewards Landing Page] --> B[User Registration]
-    A --> C[Spin Wheel Modal]
-    A --> D[Rewards Catalog]
-    B --> E[Profile Setup]
-    C --> F[Point Award]
-    D --> G[Redemption Process]
-    E --> H[Badge Verification]
-    F --> A
-    G --> I[Order Integration]
-    H --> J[Admin Approval]
+    A[Rewards Page] --> B{User Authenticated?}
+    B -->|No| C[Hero Banner + Sign Up]
+    B -->|Yes| D[Points Dashboard]
+    C --> E[Registration Flow]
+    E --> D
+    D --> F[Spin Wheel Available?]
+    F -->|Yes| G[Daily Spin Modal]
+    F -->|No| H[Rewards Grid]
+    G --> I[Spin Animation]
+    I --> J[Points Awarded]
+    J --> H
+    H --> K[Select Reward]
+    K --> L[Redemption Flow]
+    L --> M[Order Integration]
 ```
 
 ## 4. User Interface Design
 
 ### 4.1 Design Style
 
-- **Primary Colors**: #000000 (base black), #FFD700 (gold), #40E0D0 (turquoise)
-- **Secondary Colors**: White at 90% opacity for text, subtle grays for backgrounds
-- **Button Style**: Gold fill with glow effects, hover states with brightness increase and scale transform
-- **Typography**: Bold modern sans-serif for headers (Inter/Montserrat), clean sans-serif for body text
-- **Layout Style**: Card-based design with sacred geometry background patterns at 3-5% opacity
-- **Icon Style**: Geometric icons with gold accents, glowing effects for interactive elements
+**Color Palette:**
+- Primary: #000000 (deep black base)
+- Accent Gold: #FFD700 (luxury gold for CTAs and highlights)
+- Accent Turquoise: #40E0D0 (energy and freshness)
+- Text: rgba(255, 255, 255, 0.9) (90% white for readability)
+
+**Typography:**
+- Headers: Bold modern sans-serif (Inter Black, Montserrat Bold)
+- Body: Clean sans-serif (Inter Regular, system fonts)
+- Sizes: H1 (48px), H2 (32px), H3 (24px), Body (16px), Small (14px)
+
+**Visual Elements:**
+- Background: Subtle sacred geometry patterns at 3-5% opacity
+- Buttons: Gold fill with glow effects, hover states with brightness increase and 1.05x scale
+- Cards: Dark backgrounds with subtle borders, glass morphism effects
+- Icons: Outlined style with gold/turquoise accents
+
+**Animation Style:**
+- Smooth easing curves (cubic-bezier)
+- Micro-interactions on hover/click
+- Particle effects for celebrations
+- Smooth transitions (300ms standard)
 
 ### 4.2 Page Design Overview
 
 | Page Name | Module Name | UI Elements |
 |-----------|-------------|-------------|
-| Rewards Landing | Hero Banner | Black background with gold text, turquoise accent lines, sacred geometry overlay, glowing CTA button |
-| Rewards Landing | Points Tracker | Circular progress indicators, gold point counters, red "expiring soon" pills, animated progress bars |
-| Rewards Landing | Daily Spin Card | Glowing wheel preview, countdown timer with turquoise digits, disabled state styling |
-| Rewards Landing | Rewards Grid | Card grid with hover effects, gold point badges, category tabs with active states |
-| Spin Wheel Modal | Wheel Interface | Large spinning wheel with gold rim, glowing jackpot slice, smooth rotation animations |
-| Rewards Catalog | Category Tabs | Horizontal tab navigation, active tab highlighting, smooth transitions |
-| Rewards Catalog | Redemption Cards | Product images, point cost badges, redemption buttons with loading states |
+| Rewards Page | Hero Banner | Full-width section with black gradient background, sacred geometry overlay at 5% opacity, centered "Broski's Rewards: Eat. Earn. Spin. Win." in 48px gold text, subtitle in 18px white, gold CTA button with glow effect |
+| Rewards Page | Points Tracker | Card layout with dark background, large point display in gold (32px), small expiry pill in turquoise, horizontal progress bars with gold fill, animated counters |
+| Rewards Page | Spin Wheel Modal | Centered modal with dark overlay, circular wheel with 6 segments in alternating gold/turquoise colors, jackpot segment with pulsing glow, pointer at top, spin button below |
+| Rewards Page | Rewards Grid | Tab navigation in gold, 3-column grid on desktop, reward cards with image, title, point cost in gold, redeem button, hover effects with scale and glow |
+| Rewards Page | Community Section | Horizontal layout with badge displays, special spin cards with countdown timers, nomination form with dark inputs and gold submit button |
 
 ### 4.3 Responsiveness
 
-The rewards system is mobile-first with desktop enhancement. Touch interactions are optimized for the spin wheel, with haptic feedback on supported devices. The layout adapts from single-column mobile to multi-column desktop grids.
+Desktop-first design with mobile-adaptive breakpoints:
+- Desktop (1200px+): Full layout with 3-column grids
+- Tablet (768px-1199px): 2-column grids, condensed navigation
+- Mobile (320px-767px): Single column, stacked layout, touch-optimized buttons
 
-## 5. Business Rules
+Touch interaction optimization for mobile spin wheel with gesture support and haptic feedback where available.
 
-### 5.1 Points Accrual
-- Formula: `points = floor(order_subtotal * 0.1)`
-- Excludes: taxes, tips, delivery fees, alcohol, gift cards
-- Minimum order: No minimum required for point earning
-- Maximum points per order: No cap (naturally limited by order size)
+## 5. Technical Requirements
 
-### 5.2 Reward Thresholds
-- 100 pts = Free Side (max COGS $2.00)
-- 150 pts = Free Dessert (max COGS $4.00)
-- 300 pts = 10% Off Food Subtotal
-- 400 pts = Branded Hat (max cost $8.00)
-- 500 pts = Free Burger (max COGS $6.00)
-- 600 pts = Branded Shirt (max cost $12.00)
-- 700 pts = 20% Off Food Subtotal
-- 1000 pts = Cookbook (max cost $20.00)
+### 5.1 Frontend Framework
+- Next.js 14 with React 18
+- TypeScript for type safety
+- Tailwind CSS for styling
+- Framer Motion for animations
 
-### 5.3 Spin Wheel Mechanics
-- Daily spin cost: 10 points (5 points for verified seniors)
-- Wheel slices: 5 pts (30%), 10 pts (30%), 20 pts (25%), 25 pts (13%), 50 pts (2%)
-- Cooldown: 24 hours from last spin
-- Guest restriction: Must be registered to spin
+### 5.2 Backend Integration
+- Firebase Firestore for data persistence
+- Existing rewards API endpoints
+- Real-time updates for point balances
+- Authentication via Firebase Auth
 
-### 5.4 Point Expiry
-- Expiration period: 30 days from earning date
-- Cleanup schedule: Nightly automated job
-- Warning system: 7-day and 1-day expiry notifications
-- Grace period: None (strict 30-day enforcement)
+### 5.3 Performance Targets
+- First Contentful Paint < 1.5s
+- Largest Contentful Paint < 2.5s
+- Cumulative Layout Shift < 0.1
+- Time to Interactive < 3s
 
-### 5.5 Guardrails
-- One reward redemption per order
-- Percentage discounts apply after fixed-value rewards
-- No stacking of discounts
-- Volunteer discounts don't stack with redeemed rewards
-- Average giveback target: ≤8% of revenue
-- Jackpot hit rate target: ≤2% of spins
+### 5.4 Accessibility
+- WCAG 2.1 AA compliance
+- Keyboard navigation support
+- Screen reader compatibility
+- High contrast mode support
+- Focus indicators on all interactive elements
 
-## 6. Acceptance Criteria
+## 6. Content Strategy
 
-### 6.1 Functional Requirements
-- [ ] Points calculation matches formula exactly
-- [ ] Reward COGS caps are enforced at redemption
-- [ ] Spin wheel probabilities match specified percentages
-- [ ] Point expiry occurs precisely at 30-day mark
-- [ ] Senior users pay 5 points for spins
-- [ ] Volunteer discounts trigger only on orders ≥$50
-- [ ] One reward per order limitation is enforced
-- [ ] Expired points cannot be redeemed
+### 6.1 Messaging
 
-### 6.2 UI/UX Requirements
-- [ ] Brand colors (#000000, #FFD700, #40E0D0) used consistently
-- [ ] Sacred geometry background visible at 3-5% opacity
-- [ ] Wheel animations smooth with proper easing
-- [ ] Jackpot slice has distinctive glow effect
-- [ ] Points tracker shows live balances
-- [ ] Expiry warnings display prominently
-- [ ] All CTAs link to appropriate sign-up/redemption flows
-- [ ] Mobile responsiveness maintained across all components
+**Hero Section:**
+- Primary: "Broski's Rewards: Eat. Earn. Spin. Win."
+- Secondary: "Loyalty pays at Broski's — stack points, spin wheels, unlock surprises."
+- CTA: "Join Broski's Rewards"
 
-### 6.3 Performance Requirements
-- [ ] Average giveback percentage ≤8%
-- [ ] Jackpot hit rate ≤2%
-- [ ] Page load time <3 seconds
-- [ ] Spin animation completes in 2-4 seconds
-- [ ] Real-time point updates within 1 second
+**Program Explanation:**
+"1 point for every $10. 10 pts = spin. 100+ pts = real rewards. Points expire in 30 days—stay eating, stay winning."
 
-### 6.4 Security Requirements
-- [ ] Idempotency keys prevent duplicate spins/redemptions
-- [ ] User authentication required for all point operations
-- [ ] Admin verification required for special status badges
-- [ ] Point manipulation attempts logged and blocked
+**Call-to-Actions:**
+- Primary: "Sign Up & Start Spinning"
+- Secondary: "Redeem Now", "Spin Wheel", "View Rewards"
+
+### 6.2 Reward Categories
+
+**Food Rewards:**
+- Free sides and appetizers (100-200 pts)
+- Percentage discounts on meals (150-300 pts)
+- Free entrees (400-600 pts)
+
+**Merchandise:**
+- Branded apparel and accessories (200-500 pts)
+- Limited edition items (600-1000 pts)
+
+**Experiences:**
+- VIP dining experiences (800-1200 pts)
+- Cannabis education sessions (500-800 pts)
+- Chef meet-and-greets (1000+ pts)
+
+## 7. Animation Specifications
+
+### 7.1 Point Earning Animation
+- Coin drop effect from top of screen
+- Golden particles with physics simulation
+- Counter animation with easing
+- Duration: 2-3 seconds
+
+### 7.2 Spin Wheel Animation
+- Smooth rotation with cubic-bezier easing
+- Deceleration over 3-4 seconds
+- Confetti burst on win
+- Jackpot glow with pulsing effect
+- Sound effects (optional, user-controlled)
+
+### 7.3 Micro-Interactions
+- Button hover: brightness increase + 1.05x scale
+- Card hover: subtle lift with shadow
+- Progress bar fill: smooth animation
+- Badge pulse: gentle scale animation
+
+## 8. Success Metrics
+
+### 8.1 Engagement Metrics
+- Daily active users on rewards page
+- Spin wheel usage rate
+- Reward redemption conversion
+- Time spent on rewards page
+
+### 8.2 Business Metrics
+- New member sign-ups
+- Repeat order frequency
+- Average order value increase
+- Customer lifetime value improvement
+
+### 8.3 Technical Metrics
+- Page load performance
+- Animation frame rate
+- Error rates
+- Mobile usability scores
+
+## 9. Implementation Phases
+
+### Phase 1: Core UI Redesign
+- Hero banner implementation
+- Points tracker dashboard
+- Basic rewards grid
+- Authentication integration
+
+### Phase 2: Interactive Features
+- Spin wheel modal and animations
+- Redemption flow
+- Progress indicators
+- Mobile optimization
+
+### Phase 3: Community Features
+- Special occasion spins
+- Achievement system
+- Tier badges and verification
+- Advanced animations
+
+### Phase 4: Optimization
+- Performance tuning
+- A/B testing setup
+- Analytics integration
+- Accessibility audit
+
+## 10. Risk Mitigation
+
+### 10.1 Technical Risks
+- Animation performance on low-end devices
+- Firebase rate limiting during high traffic
+- Cross-browser compatibility issues
+
+### 10.2 User Experience Risks
+- Overwhelming visual complexity
+- Unclear reward value proposition
+- Mobile usability challenges
+
+### 10.3 Business Risks
+- Increased reward redemption costs
+- User confusion during transition
+- Brand consistency concerns

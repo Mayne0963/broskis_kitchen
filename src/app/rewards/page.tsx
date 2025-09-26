@@ -1,125 +1,207 @@
-import { redirect } from 'next/navigation';
-import { admin } from '@/lib/firebase';
-import { getServerUser } from '@/lib/session';
+"use client"
 
-export const dynamic = 'force-dynamic';
+import { useEffect, useState, useMemo } from 'react'
+import { useAuth } from '@/lib/context/AuthContext'
+import { useRewards } from '@/lib/context/RewardsContext'
+import { getUserRewards } from '@/lib/services/rewardsService'
+import { Reward } from '@/lib/services/rewardsService'
+import { collection, getDocs } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
+import { Loader2 } from 'lucide-react'
+import { HeroBanner } from '@/components/rewards/HeroBanner'
+import { PointsTrackerDashboard } from '@/components/rewards/PointsTrackerDashboard'
+import { SpinWheelModal } from '@/components/rewards/SpinWheelModal'
+import { RewardsGrid } from '@/components/rewards/RewardsGrid'
+import { CommunitySection } from '@/components/rewards/CommunitySection'
 
-type BalanceDoc = {
-  points?: number;
-  nextSpinUTC?: string | null;
-  expiringSoon?: Array<{ points: number; expiresAt: number }>;
-};
+export default function RewardsPage() {
+  const { user } = useAuth()
+  const { status, refreshStatus, spinWheel, redeemReward } = useRewards()
+  const [rewards, setRewards] = useState<Reward[]>([])
+  const [loading, setLoading] = useState(true)
+  const [showSpinModal, setShowSpinModal] = useState(false)
+  const [isSpinning, setIsSpinning] = useState(false)
 
-type CatalogItem = {
-  id: string;
-  title: string;
-  pointsRequired: number;
-  description?: string;
-  imageUrl?: string;
-};
+  // Calculate derived values using useMemo to ensure proper initialization
+  const canSpin = useMemo(() => {
+    if (!status?.nextSpinTime) return true
+    return new Date(status.nextSpinTime) <= new Date()
+  }, [status?.nextSpinTime])
 
-async function loadBalance(uid: string) {
-  const db = admin.firestore();
-  const snap = await db.collection('rewards_balances').doc(uid).get();
-  const data = (snap.exists ? (snap.data() as BalanceDoc) : {}) || {};
-  return {
-    points: Number(data.points ?? 0),
-    nextSpinUTC: data.nextSpinUTC ?? null,
-    expiringSoon: Array.isArray(data.expiringSoon) ? data.expiringSoon : [],
-  };
-}
+  const userTier = useMemo(() => {
+    return status?.tier || 'bronze'
+  }, [status?.tier])
 
-async function loadCatalog(): Promise<CatalogItem[]> {
-  const db = admin.firestore();
-  const snap = await db.collection('rewards_catalog').get();
-
-  return snap.docs.map(
-    (doc: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>) => {
-      const v = doc.data() as Record<string, any>;
-      return {
-        id: doc.id,
-        title: String(v.title ?? 'Reward'),
-        // ✅ fix typo: pointsRequired (not pointRequired)
-        pointsRequired: Number(v.pointsRequired ?? 0),
-        description: v.description ? String(v.description) : '',
-        imageUrl: v.imageUrl ? String(v.imageUrl) : '',
-      };
+  // Mock data for community features
+  const mockEvents = [
+    {
+      id: '1',
+      type: 'birthday' as const,
+      title: 'Birthday Celebration',
+      description: 'Claim your special birthday spin!',
+      date: 'Today',
+      reward: '50 bonus points',
+      isActive: true
     }
-  );
-}
+  ]
 
-export default async function RewardsPage() {
-  // ✅ Auth: user required, but NOT admin-only
-  const user = await getServerUser();
-  if (!user) redirect('/auth/login?next=/rewards');
+  const mockAchievements = [
+    {
+      id: '1',
+      name: 'First Order',
+      description: 'Complete your first order',
+      icon: '🎯',
+      tier: 'Bronze',
+      isUnlocked: true,
+      unlockedAt: '2024-01-15'
+    },
+    {
+      id: '2',
+      name: 'Loyal Customer',
+      description: 'Place 10 orders',
+      icon: '❤️',
+      tier: 'Silver',
+      progress: 7,
+      maxProgress: 10,
+      isUnlocked: false
+    }
+  ]
 
-  // No role checks here — any signed-in user can see rewards
-  const [balance, catalog] = await Promise.all([
-    loadBalance(user.uid),
-    loadCatalog(),
-  ]);
+  useEffect(() => {
+    const loadData = async () => {
+      if (!user) return
+      
+      try {
+        // Load user rewards status
+        await refreshStatus()
+        
+        // Load rewards catalog
+        const rewardsSnapshot = await getDocs(collection(db, 'rewards'))
+        const rewardsData = rewardsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as Reward[]
+        
+        setRewards(rewardsData)
+      } catch (error) {
+        console.error('Error loading rewards data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadData()
+  }, [user, refreshStatus])
+
+  const handleSpinWheel = async () => {
+    if (!user || isSpinning) return
+    
+    setIsSpinning(true)
+    try {
+      await spinWheel()
+      await refreshStatus()
+    } catch (error) {
+      console.error('Error spinning wheel:', error)
+    } finally {
+      setIsSpinning(false)
+      setShowSpinModal(false)
+    }
+  }
+
+  const handleRedeemReward = async (rewardId: string) => {
+    if (!user) return
+    
+    try {
+      await redeemReward(rewardId)
+      await refreshStatus()
+    } catch (error) {
+      console.error('Error redeeming reward:', error)
+    }
+  }
+
+  const handleClaimBirthdaySpin = () => {
+    setShowSpinModal(true)
+  }
+
+  const handleNominateAchievement = (achievementId: string) => {
+    console.log('Nominating achievement:', achievementId)
+    // TODO: Implement achievement nomination
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-white mb-4">Please sign in to view rewards</h1>
+          <p className="text-gray-400">You need to be logged in to access the rewards program.</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-turquoise-400" />
+      </div>
+    )
+  }
 
   return (
-    <main className="rewards-page">
-      {/* Summary */}
-      <section className="summary">
-        <h1 className="text-2xl">Rewards Program</h1>
-        <div className="mt-2 flex gap-6">
-          <div><strong>Available Points:</strong> {balance.points}</div>
-          {balance.nextSpinUTC && (
-            <div><strong>Next Daily Spin:</strong> {new Date(balance.nextSpinUTC).toUTCString()}</div>
-          )}
-        </div>
-        {balance.expiringSoon?.length ? (
-          <div className="mt-3">
-            <strong>Expiring Soon:</strong>
-            <ul className="list-disc pl-5">
-              {balance.expiringSoon.map((e, i) => (
-                <li key={i}>
-                  {e.points} pts • expires {new Date(e.expiresAt).toLocaleDateString()}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
-      </section>
+    <div className="min-h-screen bg-black">
+      {/* Sacred Geometry Background Pattern */}
+      <div className="fixed inset-0 opacity-5 pointer-events-none">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FFD700' fill-opacity='0.1'%3E%3Cpath d='M30 30l15-15v30l-15-15zm0 0l-15 15h30l-15-15z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+        }} />
+      </div>
 
-      {/* Catalog (read-only) */}
-      <section className="catalog mt-8">
-        <h2 className="text-xl mb-3">Rewards</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {catalog.map((c) => {
-            const canRedeem = balance.points >= c.pointsRequired;
-            return (
-              <div key={c.id} className="card rounded-lg border border-white/10 p-4 bg-black/30">
-                {c.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={c.imageUrl} alt={c.title} className="w-full h-32 object-cover rounded-md mb-3" />
-                ) : null}
-                <div className="text-lg font-semibold">{c.title}</div>
-                {c.description && <div className="text-sm opacity-80">{c.description}</div>}
-                <div className="mt-2">
-                  <span className="text-sm">Requires </span>
-                  <strong>{c.pointsRequired} points</strong>
-                </div>
-                <button
-                  disabled={!canRedeem}
-                  className={`mt-3 px-3 py-2 rounded-md ${
-                    canRedeem ? 'bg-yellow-500 text-black' : 'bg-white/10 text-white/50 cursor-not-allowed'
-                  }`}
-                  aria-disabled={!canRedeem}
-                  title={canRedeem ? 'Enough points to redeem' : 'Not enough points'}
-                >
-                  Redeem (coming soon)
-                </button>
-              </div>
-            );
-          })}
-          {!catalog.length && (
-            <div className="opacity-70">No rewards available yet. Check back soon.</div>
-          )}
-        </div>
-      </section>
-    </main>
-  );
+      <div className="relative z-10 max-w-7xl mx-auto px-4 py-8 space-y-8">
+        {/* Hero Banner */}
+        <HeroBanner 
+          onSpinClick={() => setShowSpinModal(true)}
+          canSpin={canSpin}
+          nextSpinTime={status?.nextSpinTime}
+        />
+
+        {/* Points Tracker Dashboard */}
+        <PointsTrackerDashboard 
+          currentPoints={status?.currentPoints || 0}
+          expiringPoints={status?.expiringPoints || 0}
+          expiryDate={status?.expiryDate}
+          tier={userTier}
+          nextSpinTime={status?.nextSpinTime}
+        />
+
+        {/* Rewards Grid */}
+        <RewardsGrid 
+          rewards={rewards}
+          userPoints={status?.currentPoints || 0}
+          userTier={userTier}
+          onRedeemReward={handleRedeemReward}
+        />
+
+        {/* Community Section */}
+        <CommunitySection 
+          userTier={userTier}
+          upcomingEvents={mockEvents}
+          achievements={mockAchievements}
+          onClaimBirthdaySpin={handleClaimBirthdaySpin}
+          onNominateAchievement={handleNominateAchievement}
+        />
+      </div>
+
+      {/* Spin Wheel Modal */}
+      {showSpinModal && (
+        <SpinWheelModal 
+          isOpen={showSpinModal}
+          onClose={() => setShowSpinModal(false)}
+          onSpin={handleSpinWheel}
+          isSpinning={isSpinning}
+          userPoints={status?.currentPoints || 0}
+          userTier={userTier}
+        />
+      )}
+    </div>
+  )
 }
