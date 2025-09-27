@@ -65,9 +65,6 @@ const optionalVars = {
   
   // Additional Google Services (optional)
   // GOOGLE_MAPS_API_KEY: 'Moved to required variables',
-  
-  // Monitoring
-  SENTRY_DSN: 'Sentry DSN for error tracking'
 }
 
 function validateEnvironment() {

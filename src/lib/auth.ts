@@ -114,3 +114,24 @@ export async function requireAdmin(req: NextRequest) {
   }
   return user;
 }
+
+// Get current user ID from session
+export async function getUserId(): Promise<string> {
+  // In development mode, check for middleware-attached user
+  if (process.env.NODE_ENV === 'development') {
+    return 'guest_dev';
+  }
+
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get('__session')?.value || cookieStore.get('session')?.value;
+  if (!sessionCookie) {
+    throw new Error('No authentication found');
+  }
+
+  try {
+    const decoded = await auth.verifySessionCookie(sessionCookie);
+    return decoded.uid;
+  } catch (error) {
+    throw new Error('Invalid authentication');
+  }
+}

@@ -10,7 +10,11 @@ import { db } from '@/lib/firebase'
 import { Loader2 } from 'lucide-react'
 import { HeroBanner } from '@/components/rewards/HeroBanner'
 import { PointsTrackerDashboard } from '@/components/rewards/PointsTrackerDashboard'
-import { SpinWheelModal } from '@/components/rewards/SpinWheelModal'
+import dynamic from 'next/dynamic'
+
+const LuxuryWheel = dynamic(() => import('@/components/rewards/LuxuryWheel'), {
+  ssr: false
+})
 import { RewardsGrid } from '@/components/rewards/RewardsGrid'
 import { CommunitySection } from '@/components/rewards/CommunitySection'
 
@@ -23,7 +27,6 @@ export default function RewardsPage() {
   const [rewards, setRewards] = useState<Reward[]>([])
   const [loading, setLoading] = useState(true)
   const [showSpinModal, setShowSpinModal] = useState(false)
-  const [isSpinning, setIsSpinning] = useState(false)
   const [guestMode, setGuestMode] = useState(false)
 
   // Calculate derived values using useMemo to ensure proper initialization
@@ -114,47 +117,9 @@ export default function RewardsPage() {
   }, [user, refreshStatus])
 
   const handleSpinWheel = async () => {
-    if (isSpinning) return
-    
-    // In development mode, allow guest users to spin
-    if (isDevelopment && guestMode) {
-      setIsSpinning(true)
-      try {
-        // Make direct API call for guest users
-        const response = await fetch('/api/rewards/spin', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-        
-        if (response.ok) {
-          const result = await response.json()
-          console.log('Guest spin result:', result)
-          // Show success message or update UI as needed
-        }
-      } catch (error) {
-        console.error('Error spinning wheel (guest mode):', error)
-      } finally {
-        setIsSpinning(false)
-        setShowSpinModal(false)
-      }
-      return
-    }
-    
-    // For authenticated users
-    if (!user) return
-    
-    setIsSpinning(true)
-    try {
-      await spinWheel()
-      await refreshStatus()
-    } catch (error) {
-      console.error('Error spinning wheel:', error)
-    } finally {
-      setIsSpinning(false)
-      setShowSpinModal(false)
-    }
+    // The LuxuryWheel component handles its own spinning logic
+    // This function is kept for compatibility with other components
+    setShowSpinModal(true)
   }
 
   const handleRedeemReward = async (rewardId: string) => {
@@ -251,6 +216,17 @@ export default function RewardsPage() {
           nextSpinTime={status?.nextSpinTime}
         />
 
+        {/* Luxury Wheel Section */}
+        <div className="bg-gradient-to-br from-gray-900/50 to-black/50 border border-gray-800/50 rounded-2xl p-8">
+          <div className="text-center mb-6">
+            <h2 className="text-3xl font-bold text-white mb-2">Luxury Rewards Wheel</h2>
+            <p className="text-gray-400">Spin the wheel to win amazing prizes!</p>
+          </div>
+          <div className="flex justify-center">
+            <LuxuryWheel />
+          </div>
+        </div>
+
         {/* Points Tracker Dashboard */}
         <PointsTrackerDashboard 
           currentPoints={status?.currentPoints || 0}
@@ -278,17 +254,7 @@ export default function RewardsPage() {
         />
       </div>
 
-      {/* Spin Wheel Modal */}
-      {showSpinModal && (
-        <SpinWheelModal 
-          isOpen={showSpinModal}
-          onClose={() => setShowSpinModal(false)}
-          onSpin={handleSpinWheel}
-          isSpinning={isSpinning}
-          userPoints={status?.currentPoints || 0}
-          userTier={userTier}
-        />
-      )}
+
     </div>
   )
 }
