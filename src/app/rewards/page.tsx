@@ -14,6 +14,9 @@ import { SpinWheelModal } from '@/components/rewards/SpinWheelModal'
 import { RewardsGrid } from '@/components/rewards/RewardsGrid'
 import { CommunitySection } from '@/components/rewards/CommunitySection'
 
+// Check if we're in development mode
+const isDevelopment = process.env.NODE_ENV === 'development'
+
 export default function RewardsPage() {
   const { user } = useAuth()
   const { status, refreshStatus, spinWheel, redeemReward } = useRewards()
@@ -21,6 +24,7 @@ export default function RewardsPage() {
   const [loading, setLoading] = useState(true)
   const [showSpinModal, setShowSpinModal] = useState(false)
   const [isSpinning, setIsSpinning] = useState(false)
+  const [guestMode, setGuestMode] = useState(false)
 
   // Calculate derived values using useMemo to ensure proper initialization
   const canSpin = useMemo(() => {
@@ -69,20 +73,36 @@ export default function RewardsPage() {
 
   useEffect(() => {
     const loadData = async () => {
-      if (!user) return
-      
       try {
-        // Load user rewards status
-        await refreshStatus()
+        // In development mode, allow guest access
+        if (isDevelopment && !user) {
+          setGuestMode(true)
+          // Load rewards catalog for guest users
+          const rewardsSnapshot = await getDocs(collection(db, 'rewards'))
+          const rewardsData = rewardsSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          })) as Reward[]
+          setRewards(rewardsData)
+          setLoading(false)
+          return
+        }
         
-        // Load rewards catalog
-        const rewardsSnapshot = await getDocs(collection(db, 'rewards'))
-        const rewardsData = rewardsSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as Reward[]
-        
-        setRewards(rewardsData)
+        // For authenticated users or production mode
+        if (user) {
+          setGuestMode(false)
+          // Load user rewards status
+          await refreshStatus()
+          
+          // Load rewards catalog
+          const rewardsSnapshot = await getDocs(collection(db, 'rewards'))
+          const rewardsData = rewardsSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          })) as Reward[]
+          
+          setRewards(rewardsData)
+        }
       } catch (error) {
         console.error('Error loading rewards data:', error)
       } finally {
@@ -94,7 +114,36 @@ export default function RewardsPage() {
   }, [user, refreshStatus])
 
   const handleSpinWheel = async () => {
-    if (!user || isSpinning) return
+    if (isSpinning) return
+    
+    // In development mode, allow guest users to spin
+    if (isDevelopment && guestMode) {
+      setIsSpinning(true)
+      try {
+        // Make direct API call for guest users
+        const response = await fetch('/api/rewards/spin', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        
+        if (response.ok) {
+          const result = await response.json()
+          console.log('Guest spin result:', result)
+          // Show success message or update UI as needed
+        }
+      } catch (error) {
+        console.error('Error spinning wheel (guest mode):', error)
+      } finally {
+        setIsSpinning(false)
+        setShowSpinModal(false)
+      }
+      return
+    }
+    
+    // For authenticated users
+    if (!user) return
     
     setIsSpinning(true)
     try {
@@ -109,6 +158,30 @@ export default function RewardsPage() {
   }
 
   const handleRedeemReward = async (rewardId: string) => {
+    // In development mode, allow guest users to redeem
+    if (isDevelopment && guestMode) {
+      try {
+        // Make direct API call for guest users
+        const response = await fetch('/api/rewards/redeem', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ rewardId })
+        })
+        
+        if (response.ok) {
+          const result = await response.json()
+          console.log('Guest redeem result:', result)
+          // Show success message or update UI as needed
+        }
+      } catch (error) {
+        console.error('Error redeeming reward (guest mode):', error)
+      }
+      return
+    }
+    
+    // For authenticated users
     if (!user) return
     
     try {
@@ -128,7 +201,8 @@ export default function RewardsPage() {
     // TODO: Implement achievement nomination
   }
 
-  if (!user) {
+  // Only require authentication in production mode
+  if (!user && !isDevelopment) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
@@ -157,6 +231,19 @@ export default function RewardsPage() {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 py-8 space-y-8">
+        {/* Development Mode Notice */}
+        {isDevelopment && guestMode && (
+          <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-4 mb-6">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+              <h3 className="text-yellow-400 font-semibold">Development Mode - Guest Access</h3>
+            </div>
+            <p className="text-yellow-300/80 text-sm mt-1">
+              You're viewing the rewards page in guest mode. API calls will work with mock authentication.
+            </p>
+          </div>
+        )}
+
         {/* Hero Banner */}
         <HeroBanner 
           onSpinClick={() => setShowSpinModal(true)}
