@@ -1,77 +1,71 @@
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { startOfDay, endOfDay } from "date-fns";
 import { rollPrize } from "@/lib/rewards/rollPrize";
-import { getUserId } from "@/lib/auth";
+import { getUserIdOrNull } from "@/lib/auth/serverSession";
 import { consumeOneEligibility } from "@/lib/rewards/eligibility";
 
 export async function POST() {
+  const userId = await getUserIdOrNull();
+  if (!userId) {
+    return NextResponse.json(
+      { error: "UNAUTHORIZED" },
+      { status: 401 }
+    );
+  }
+
+  const now = new Date();
   try {
-    const u = await getUserId();
-    if (!u) {
-      return NextResponse.json(
-        { error: "UNAUTHORIZED" },
-        { status: 401 }
-      );
-    }
-    
-    const now = new Date();
-    
-    const res = await db.$transaction(async (tx) => {
-      // Check if user already spun today
+    const out = await db.$transaction(async (tx) => {
       const already = await tx.rewardSpin.findFirst({
         where: {
-          userId: u,
+          userId,
           createdAt: {
             gte: startOfDay(now),
             lte: endOfDay(now)
           }
-        }
+        },
+        select: { id: true }
       });
       
-      if (already) {
-        return { error: "COOLDOWN" };
-      }
+      if (already) return { error: "COOLDOWN" } as const;
       
-      // Consume one eligibility token
-      const token = await consumeOneEligibility(tx, u);
-      if (!token) {
-        return { error: "NOT_ELIGIBLE" };
-      }
+      const token = await consumeOneEligibility(tx as any, userId);
+      if (!token) return { error: "NOT_ELIGIBLE" } as const;
       
-      // Roll for prize
       const prize = rollPrize();
       
-      // Record the spin
       await tx.rewardSpin.create({
         data: {
-          userId: u,
+          userId,
           resultKey: prize.key
         }
       });
       
-      // Add points to ledger if prize has points
       if (prize.points) {
         await tx.rewardPointLedger.create({
           data: {
-            userId: u,
+            userId,
             delta: prize.points,
             reason: `wheel:${prize.key}`
           }
         });
       }
       
-      return { ok: true, prize };
+      return { ok: true, prize } as const;
     });
     
-    if ("error" in res) {
-      const status = res.error === "COOLDOWN" ? 409 : 403;
-      return NextResponse.json(res, { status });
+    if ("error" in out) {
+      return NextResponse.json(out, { 
+        status: out.error === "COOLDOWN" ? 409 : 403 
+      });
     }
     
-    return NextResponse.json(res);
+    return NextResponse.json(out);
   } catch (e) {
-    console.error('Error in spin endpoint:', e);
+    console.error("spin error", e);
     return NextResponse.json(
       { error: "SERVER_ERROR" },
       { status: 500 }

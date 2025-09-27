@@ -23,6 +23,7 @@
     "validate-env": "node scripts/validate-env.js",
     "validate-vercel": "node scripts/vercel-prebuild.js",
     "prebuild": "npm run validate-env",
+    "postbuild": "prisma generate && prisma migrate deploy",
     "security-check": "npm audit && npm run validate-env",
     "build-production": "NODE_ENV=production npm run vercel-prebuild && next build",
     "build-vercel": "npm run validate-vercel && npm run security-check && next build",

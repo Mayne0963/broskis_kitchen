@@ -8,15 +8,13 @@ import { Reward } from '@/lib/services/rewardsService'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 import { HeroBanner } from '@/components/rewards/HeroBanner'
 import { PointsTrackerDashboard } from '@/components/rewards/PointsTrackerDashboard'
-import dynamic from 'next/dynamic'
-
-const LuxuryWheel = dynamic(() => import('@/components/rewards/LuxuryWheel'), {
-  ssr: false
-})
+import AuthGate from '@/components/rewards/AuthGate'
 import { RewardsGrid } from '@/components/rewards/RewardsGrid'
 import { CommunitySection } from '@/components/rewards/CommunitySection'
+import { RewardsErrorBoundary } from '@/components/rewards/RewardsErrorBoundary'
 
 // Check if we're in development mode
 const isDevelopment = process.env.NODE_ENV === 'development'
@@ -107,7 +105,7 @@ export default function RewardsPage() {
           setRewards(rewardsData)
         }
       } catch (error) {
-        console.error('Error loading rewards data:', error)
+        toast.error('Failed to load rewards data. Please try again.')
       } finally {
         setLoading(false)
       }
@@ -141,7 +139,7 @@ export default function RewardsPage() {
           // Show success message or update UI as needed
         }
       } catch (error) {
-        console.error('Error redeeming reward (guest mode):', error)
+        toast.error('Failed to redeem reward. Please try again.')
       }
       return
     }
@@ -153,7 +151,7 @@ export default function RewardsPage() {
       await redeemReward(rewardId)
       await refreshStatus()
     } catch (error) {
-      console.error('Error redeeming reward:', error)
+      toast.error('Failed to redeem reward. Please try again.')
     }
   }
 
@@ -187,7 +185,8 @@ export default function RewardsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <RewardsErrorBoundary>
+      <div className="min-h-screen bg-black">
       {/* Sacred Geometry Background Pattern */}
       <div className="fixed inset-0 opacity-5 pointer-events-none">
         <div className="absolute inset-0" style={{
@@ -223,7 +222,7 @@ export default function RewardsPage() {
             <p className="text-gray-400">Spin the wheel to win amazing prizes!</p>
           </div>
           <div className="flex justify-center">
-            <LuxuryWheel />
+            <AuthGate />
           </div>
         </div>
 
@@ -253,8 +252,7 @@ export default function RewardsPage() {
           onNominateAchievement={handleNominateAchievement}
         />
       </div>
-
-
-    </div>
+      </div>
+    </RewardsErrorBoundary>
   )
 }
