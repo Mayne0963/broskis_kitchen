@@ -1,12 +1,12 @@
-import 'server-only';
-import { getApps } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
-import { ensureAdmin } from '../firebaseAdmin';
+import { cert, getApps, initializeApp } from "firebase-admin/app";
+import { getFirestore } from "firebase-admin/firestore";
 
-// Initialize the admin app
-ensureAdmin();
+const svc = process.env.FIREBASE_SERVICE_ACCOUNT
+  ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+  : undefined;
 
-// Get the initialized app
-const app = getApps()[0]!;
+export const firebaseApp =
+  getApps()[0] ||
+  initializeApp(svc ? { credential: cert(svc) } : undefined);
 
-export const db = getFirestore(app);
+export const fdb = getFirestore(firebaseApp);
