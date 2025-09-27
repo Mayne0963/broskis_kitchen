@@ -61,25 +61,12 @@ async function hasSpunToday(userId: string): Promise<boolean> {
 
 export async function POST(req: Request) {
   try {
-    // Check for middleware-attached user in development
-    let user = await getServerUser()
-    if (!user && process.env.NODE_ENV === "development") {
-      // Use fake user from middleware headers in development
-      const devUserHeader = req.headers.get("x-dev-user")
-      if (devUserHeader) {
-        const devUser = JSON.parse(devUserHeader)
-        if (devUser && devUser.id === "guest_dev") {
-          user = { uid: "guest_dev", isAnonymous: false }
-        }
-      }
+    const user = await getServerUser()
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 })
     }
     
-    if (!user) {
-      return NextResponse.json({ success: false, error: "UNAUTHORIZED" }, { status: 401 })
-    }
-    if (!user) {
-      return NextResponse.json({ success: false, error: "UNAUTHORIZED" }, { status: 401 })
-    }
+    // NEW PROFIT LOGIC - Block guest users
     if (user.isAnonymous) {
       return NextResponse.json({ success: false, error: 'GUESTS_BLOCKED' }, { status: 403 })
     }
