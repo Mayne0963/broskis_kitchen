@@ -204,6 +204,7 @@ export const POINTS_EXPIRY_DAYS = 30;
 export const SPIN_COOLDOWN_HOURS = 24;
 export const SPIN_COST_POINTS = 10; // Regular users
 export const SENIOR_SPIN_COST_POINTS = 5; // Senior users
+export const SENIOR_SPIN_COST = SENIOR_SPIN_COST_POINTS; // Alias for compatibility
 export const JACKPOT_PROBABILITY = 0.02; // 2% (reduced from 5%)
 export const TARGET_GIVEBACK_PERCENTAGE = 0.08; // 8%
 export const VOLUNTEER_DISCOUNT_THRESHOLD = 50; // $50

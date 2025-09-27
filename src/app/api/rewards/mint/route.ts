@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { mintTokensForUser } from "@/lib/rewards/mintTokens";
 import { verifyAdminAccess } from "@/lib/auth/rbac";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request) {
   try {
     // Check if user is authenticated and has admin role
