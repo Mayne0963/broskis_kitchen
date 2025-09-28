@@ -4,6 +4,40 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { calcPrice } from "@/lib/catering/price";
 import { fdb } from "@/lib/firebase/admin";
+import type { CateringMenu } from "@/types/catering";
+
+// Menu rules for each package type
+const MENU_RULES = {
+  standard: { meats: 2, sides: 2, drinks: 0, appetizers: 0, desserts: 0 },
+  premium: { meats: 3, sides: 3, drinks: 1, appetizers: 0, desserts: 0 },
+  luxury: { meats: 3, sides: 3, drinks: 1, appetizers: 2, desserts: 1 }
+};
+
+// Server-side menu validation function
+function serverValidateMenu(menu: CateringMenu | undefined, rule: typeof MENU_RULES.standard) {
+  if (!menu) return { ok: false, msg: "Menu required" };
+  
+  if ((menu.meats || []).length > rule.meats) {
+    return { ok: false, msg: `Choose up to ${rule.meats} meats` };
+  }
+  if ((menu.meats || []).length < 1) {
+    return { ok: false, msg: "Pick at least 1 meat" };
+  }
+  if ((menu.sides || []).length > rule.sides) {
+    return { ok: false, msg: `Choose up to ${rule.sides} sides` };
+  }
+  if (rule.drinks && (menu.drinks || []).length !== rule.drinks) {
+    return { ok: false, msg: `Choose ${rule.drinks} drink` };
+  }
+  if (rule.appetizers && (menu.appetizers || []).length !== rule.appetizers) {
+    return { ok: false, msg: `Choose ${rule.appetizers} appetizer${rule.appetizers > 1 ? 's' : ''}` };
+  }
+  if (rule.desserts && (menu.desserts || []).length !== rule.desserts) {
+    return { ok: false, msg: `Choose ${rule.desserts} dessert` };
+  }
+  
+  return { ok: true };
+}
 
 export async function POST(req: Request) {
   const b = await req.json();
@@ -17,6 +51,24 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "MIN_GUESTS" }, { status: 422 });
   }
   
+  // Validate package ID and get menu rules
+  const rule = MENU_RULES[packageId as keyof typeof MENU_RULES];
+  if (!rule) {
+    return NextResponse.json({ error: "INVALID_PACKAGE" }, { status: 400 });
+  }
+  
+  // Validate menu selection
+  const menuValidation = serverValidateMenu(menu, rule);
+  if (!menuValidation.ok) {
+    // Log invalid submission for debugging
+    console.warn("Bad menu submission", { 
+      packageId, 
+      menu, 
+      ip: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'
+    });
+    return NextResponse.json({ error: menuValidation.msg }, { status: 422 });
+  }
+  
   const price = calcPrice(packageId, guests, addons);
   const ref = fdb.collection("cateringRequests").doc();
   
@@ -28,7 +80,7 @@ export async function POST(req: Request) {
     packageId,
     guests,
     addons,
-    ...(menu && { menu }),
+    menu,
     price,
     status: "pending"
   };
