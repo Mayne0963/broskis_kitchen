@@ -57,3 +57,14 @@ export interface CateringEstimate {
   totalPrice: number;
   deposit: number;
 }
+
+// Admin types
+export type CateringAdminQuery = {
+  status?: string;
+  from?: string;
+  to?: string;
+  q?: string;
+  limit?: number;
+};
+
+export type CateringStatus = "pending" | "quoted" | "confirmed" | "canceled";

@@ -8,7 +8,7 @@ interface AdminGateProps {
   children: React.ReactNode;
 }
 
-export function AdminGate({ children }: AdminGateProps) {
+export default function AdminGate({ children }: AdminGateProps) {
   const { claims, loading } = useAuthClaims();
   const router = useRouter();
 
