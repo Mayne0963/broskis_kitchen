@@ -4,8 +4,16 @@ import { getToken } from "next-auth/jwt";
 
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl;
+  
+  // 1. First: Handle www → apex domain redirect
+  const host = req.headers.get("host") || "";
+  if (host.startsWith("www.")) {
+    const redirectUrl = new URL(req.url);
+    redirectUrl.host = host.replace(/^www\./, "");
+    return NextResponse.redirect(redirectUrl, 301);
+  }
 
-  // Only guard /api/rewards routes
+  // 2. Then: Handle API auth for /api/rewards routes
   if (url.pathname.startsWith("/api/rewards")) {
     if (process.env.NODE_ENV === "development") {
       // In dev: allow guests but attach fake token for testing
@@ -28,3 +36,7 @@ export async function middleware(req: NextRequest) {
 
   return NextResponse.next();
 }
+
+export const config = {
+  matcher: ["/((?!_next|api|static|.*\\..*).*)"]
+};

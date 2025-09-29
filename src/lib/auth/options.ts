@@ -4,6 +4,8 @@ import { JWT } from "next-auth/jwt";
 // NextAuth configuration for JWT-based sessions
 // This works alongside the existing Firebase Auth setup
 export const authOptions: NextAuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
+  trustHost: true, // Required for Vercel proxy compatibility
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -64,6 +66,4 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
     error: "/auth/error",
   },
-  
-  secret: process.env.NEXTAUTH_SECRET,
 };
