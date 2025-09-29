@@ -169,16 +169,16 @@ export async function POST(request: NextRequest) {
     if (body.id) {
       // Update existing offer
       offerId = body.id;
-      await adminCollections.offers.doc(offerId).update(offerData);
+      await db.collection(COLLECTIONS.OFFERS).doc(offerId).update(offerData);
     } else {
       // Create new offer
       offerData.createdAt = now;
-      const docRef = await adminCollections.offers.add(offerData);
+      const docRef = await db.collection(COLLECTIONS.OFFERS).add(offerData);
       offerId = docRef.id;
     }
     
     // Fetch and return the created/updated offer
-    const offerDoc = await adminCollections.offers.doc(offerId).get();
+    const offerDoc = await db.collection(COLLECTIONS.OFFERS).doc(offerId).get();
     const offer = {
       id: offerDoc.id,
       ...offerDoc.data()

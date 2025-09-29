@@ -2,14 +2,14 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { fdb } from "@/lib/firebase/admin";
+import { db } from "@/lib/firebase/admin";
 import { assertAdmin } from "@/lib/auth/adminGuard";
 
 export async function GET(req: Request) {
   try {
     await assertAdmin();
     
-    const snap = await fdb
+    const snap = await db
       .collection("cateringRequests")
       .orderBy("createdAt", "desc")
       .limit(1000)

@@ -2,7 +2,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { fdb } from "@/lib/firebase/admin";
+import { db } from "@/lib/firebase/admin";
 import { assertAdmin } from "@/lib/auth/adminGuard";
 
 export async function PATCH(req: Request) {
@@ -21,7 +21,7 @@ export async function PATCH(req: Request) {
       );
     }
     
-    const ref = fdb.collection("cateringRequests").doc(id);
+    const ref = db.collection("cateringRequests").doc(id);
     await ref.update({
       status,
       updatedAt: new Date().toISOString()

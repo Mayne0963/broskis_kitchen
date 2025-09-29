@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 import { calcPrice } from "@/lib/catering/price";
-import { fdb } from "@/lib/firebase/admin";
+import { db } from "@/lib/firebase/admin";
 import type { CateringMenu } from "@/types/catering";
 
 // Menu rules for each package type
@@ -70,7 +70,7 @@ export async function POST(req: Request) {
   }
   
   const price = calcPrice(packageId, guests, addons);
-  const ref = fdb.collection("cateringRequests").doc();
+  const ref = db.collection("cateringRequests").doc();
   
   const payload = {
     id: ref.id,

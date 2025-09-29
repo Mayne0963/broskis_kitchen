@@ -2,7 +2,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { fdb } from "@/lib/firebase/admin";
+import { db } from "@/lib/firebase/admin";
 import { assertAdmin } from "@/lib/auth/adminGuard";
 
 export async function GET(req: Request) {
@@ -16,7 +16,7 @@ export async function GET(req: Request) {
     const q = (searchParams.get("q") || "").toLowerCase();
     const limit = Number(searchParams.get("limit") || "50");
     
-    let ref = fdb.collection("cateringRequests") as FirebaseFirestore.Query;
+    let ref = db.collection("cateringRequests") as FirebaseFirestore.Query;
     
     if (status) {
       ref = ref.where("status", "==", status);

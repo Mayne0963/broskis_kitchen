@@ -1,12 +1,14 @@
-import { cert, getApps, initializeApp } from "firebase-admin/app";
-import { getFirestore } from "firebase-admin/firestore";
+import * as admin from "firebase-admin";
 
-const svc = process.env.FIREBASE_SERVICE_ACCOUNT
-  ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
-  : undefined;
+if (!admin.apps.length) {
+  const svc = process.env.FIREBASE_SERVICE_ACCOUNT;
+  if (!svc) throw new Error("FIREBASE_SERVICE_ACCOUNT is required");
+  admin.initializeApp({
+    credential: admin.credential.cert(JSON.parse(svc)),
+  });
+}
 
-export const firebaseApp =
-  getApps()[0] ||
-  initializeApp(svc ? { credential: cert(svc) } : undefined);
+const db = admin.firestore();
+const auth = admin.auth();
 
-export const fdb = getFirestore(firebaseApp);
+export { admin, db, auth };

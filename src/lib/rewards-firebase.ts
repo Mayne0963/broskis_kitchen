@@ -1,4 +1,4 @@
-import { fdb } from "@/lib/firebase/admin";
+import { db } from "@/lib/firebase/admin";
 import { startOfDay, endOfDay } from "date-fns";
 
 export const PRIZES = [
@@ -21,13 +21,13 @@ export function rollPrize() {
 
 export async function getSpinStatus(uid: string) {
   const now = new Date();
-  const spins = await fdb
+  const spins = await db
     .collection("rewardSpins")
     .where("userId", "==", uid)
     .where("createdAt", ">=", startOfDay(now))
     .where("createdAt", "<=", endOfDay(now))
     .get();
-  const tokens = await fdb
+  const tokens = await db
     .collection("rewardEligibility")
     .where("userId", "==", uid)
     .where("consumedAt", "==", null)
@@ -40,8 +40,8 @@ export async function getSpinStatus(uid: string) {
 }
 
 export async function consumeOneEligibilityTx(uid: string) {
-  return await fdb.runTransaction(async (tx) => {
-    const q = fdb
+  return await db.runTransaction(async (tx) => {
+    const q = db
       .collection("rewardEligibility")
       .where("userId", "==", uid)
       .where("consumedAt", "==", null)
@@ -56,14 +56,14 @@ export async function consumeOneEligibilityTx(uid: string) {
 }
 
 export async function recordSpinAndPrize(uid: string, prize: any) {
-  const b = fdb.batch();
-  b.set(fdb.collection("rewardSpins").doc(), {
+  const b = db.batch();
+  b.set(db.collection("rewardSpins").doc(), {
     userId: uid,
     resultKey: prize.key,
     createdAt: new Date()
   });
   if (prize.points) {
-    b.set(fdb.collection("rewardPointLedger").doc(), {
+    b.set(db.collection("rewardPointLedger").doc(), {
       userId: uid,
       delta: prize.points,
       reason: `wheel:${prize.key}`,

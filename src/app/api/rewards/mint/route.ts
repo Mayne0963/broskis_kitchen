@@ -2,7 +2,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { fdb } from "@/lib/firebase/admin";
+import { db } from "@/lib/firebase/admin";
 
 export async function POST(req: Request) {
   const { userId, isVip, spentUsdLast24h, profileComplete } = await req.json();
@@ -11,9 +11,9 @@ export async function POST(req: Request) {
   if (spentUsdLast24h >= 20) add.push("order:$20+");
   if (profileComplete) add.push("profile:complete");
   
-  const b = fdb.batch();
+  const b = db.batch();
   add.forEach(() => 
-    b.set(fdb.collection("rewardEligibility").doc(), {
+    b.set(db.collection("rewardEligibility").doc(), {
       userId,
       rule: "auto",
       createdAt: new Date(),
