@@ -50,6 +50,12 @@ export const authOptions: NextAuthOptions = {
       if (token) {
         session.user.id = token.id;
       }
+      
+      // Add admin flag based on ALLOWED_ADMIN_EMAILS
+      const allowed = (process.env.ALLOWED_ADMIN_EMAILS || "").split(",").map(s=>s.trim().toLowerCase());
+      const email = (session.user?.email || "").toLowerCase();
+      (session.user as any).isAdmin = allowed.includes(email);
+      
       return session;
     },
   },
