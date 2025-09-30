@@ -1,16 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdmin } from '@/lib/auth/adminOnly'
+import { fastAdminGuard } from '@/lib/auth/fastGuard'
 import { db } from '@/lib/firebase/admin'
 import { COLLECTIONS } from '@/lib/firebase/collections'
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
 export const preferredRegion = ["iad1"]; // Co-locate near US East for admin traffic
 
 export async function GET(request: NextRequest) {
   try {
-    // Verify admin access
-    await requireAdmin(request)
+    // Fast admin authentication guard
+    const authResponse = await fastAdminGuard(request);
+    if (authResponse) return authResponse;
 
     // Get rewards data from Firestore
     const [offersSnapshot, rewardTransactionsSnapshot] = await Promise.all([
@@ -43,7 +46,7 @@ export async function GET(request: NextRequest) {
     const topRedemptions = rewardTransactionsSnapshot.docs
       .filter(doc => doc.data().type === 'redeemed')
       .map(doc => ({ id: doc.id, ...doc.data() }))
-      .sort((a, b) => Math.abs(b.points || 0) - Math.abs(a.points || 0))
+      .sort((a: any, b: any) => Math.abs(b.points || 0) - Math.abs(a.points || 0))
       .slice(0, 5)
 
     const rewardsData = {

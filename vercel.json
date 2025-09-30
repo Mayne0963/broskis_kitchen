@@ -4,6 +4,7 @@
   "outputDirectory": ".next",
   "framework": "nextjs",
   "installCommand": "npm install",
+  "regions": ["iad1"],
   "headers": [
     {
       "source": "/(.*)",

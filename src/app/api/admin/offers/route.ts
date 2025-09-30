@@ -12,6 +12,8 @@ import { Timestamp } from 'firebase-admin/firestore';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
 export const preferredRegion = ["iad1"]; // Co-locate near US East for admin traffic
 
 export async function GET(request: NextRequest) {

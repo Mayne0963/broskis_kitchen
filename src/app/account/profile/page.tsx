@@ -1,6 +1,8 @@
 // app/account/profile/page.tsx
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getServerUser } from "@/lib/session";
@@ -30,7 +32,7 @@ export default async function ProfilePage() {
           </div>
           <div>
             <span className="text-white/70">Role:</span>
-            <span className="ml-2">{user.role ?? "customer"}</span>
+            <span className="ml-2">{(user as any).role ?? "customer"}</span>
           </div>
         </CardContent>
       </Card>

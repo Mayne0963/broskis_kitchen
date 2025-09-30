@@ -200,17 +200,28 @@ const MusicPlayer = () => {
     
     // Add error handling for audio loading
     if (audioRef.current) {
-      audioRef.current.addEventListener('error', (e) => {
+      const handleError = (e: Event) => {
         console.warn('Audio loading error:', e);
         // Skip to next track on error
         nextTrack();
-      });
+      };
+      audioRef.current.addEventListener('error', handleError);
+      
+      // Cleanup event listener
+      return () => {
+        if (audioRef.current) {
+          audioRef.current.removeEventListener('error', handleError);
+        }
+      };
     }
-    // Auto-start background music with the first track from chill playlist
+  }, []); // Remove problematic dependencies to prevent infinite re-renders
+
+  // Separate effect for auto-starting music
+  useEffect(() => {
     if (chillLofi.length > 0 && !currentTrack) {
       playTrack(chillLofi[0]);
     }
-  }, [setPlaylistTracks, nextTrack, currentTrack, playTrack]);
+  }, [currentTrack, playTrack]);
 
   // Sync audio element with context state
   useEffect(() => {

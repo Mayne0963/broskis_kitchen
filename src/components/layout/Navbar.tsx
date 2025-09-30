@@ -27,7 +27,7 @@ const Navbar: React.FC = () => {
   const { claims, loading } = useAuthClaims()
   const dropdownRef = useRef<HTMLDivElement>(null)
   const [isScrolled, setIsScrolled] = useState(false)
-  const [lastScrollY, setLastScrollY] = useState(0)
+  const lastScrollYRef = useRef(0)
   const [isVisible, setIsVisible] = useState(true)
 
   // Close mobile menu when route changes
@@ -49,9 +49,7 @@ const Navbar: React.FC = () => {
     }
   }, [])
 
-
-
-  // Handle scroll behavior
+  // Handle scroll behavior - optimized to prevent re-renders
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY
@@ -60,18 +58,18 @@ const Navbar: React.FC = () => {
       setIsScrolled(currentScrollY > 10)
       
       // Hide/show navbar based on scroll direction
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+      if (currentScrollY > lastScrollYRef.current && currentScrollY > 100) {
         setIsVisible(false)
       } else {
         setIsVisible(true)
       }
       
-      setLastScrollY(currentScrollY)
+      lastScrollYRef.current = currentScrollY
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [lastScrollY])
+  }, []) // Remove lastScrollY dependency to prevent re-renders
 
   return (
     <>

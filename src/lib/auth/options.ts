@@ -15,7 +15,6 @@ export const authOptions: NextAuthOptions = {
     maxAge: 60 * 60 * 24 * 30, // 30 days
     updateAge: 60 * 60 * 12     // 12 hours
   },
-  trustHost: true,
   useSecureCookies: process.env.NODE_ENV === "production",
   cookies: {
     sessionToken: {
@@ -25,7 +24,8 @@ export const authOptions: NextAuthOptions = {
         sameSite: 'lax',
         path: '/',
         secure: process.env.NODE_ENV === "production",
-        domain: process.env.NODE_ENV === "production" ? ".broskiskitchen.com" : undefined
+        // Only serve at broskiskitchen.com (no subdomains)
+        domain: process.env.NODE_ENV === "production" ? "broskiskitchen.com" : undefined
       }
     }
   },
