@@ -1,5 +1,6 @@
 "use client";
-import { useSession, signIn } from "next-auth/react";
+import { useAuth } from "@/lib/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 /**
  * Simplified AdminGate - purely for UI after server authorization
@@ -7,20 +8,21 @@ import { useSession, signIn } from "next-auth/react";
  * This component only provides fallback UI for edge cases
  */
 export default function AdminGate({ children }: { children: React.ReactNode }) {
-  const { data: session, status } = useSession();
+  const { user, claims, isLoading } = useAuth();
+  const router = useRouter();
 
   // Loading state
-  if (status === "loading") {
+  if (isLoading) {
     return <div className="p-6 text-slate-200">Loading…</div>;
   }
 
   // Not authenticated - show sign in
-  if (!session?.user) {
+  if (!user) {
     return (
       <div className="p-6 text-slate-200">
         <p>Admin access required.</p>
         <button 
-          onClick={() => signIn("firebase", { callbackUrl: "/admin/catering" })} 
+          onClick={() => router.push("/login?redirect=/admin/catering")} 
           className="bg-yellow-500 px-4 py-2 rounded mt-2 text-black"
         >
           Sign in
@@ -29,8 +31,8 @@ export default function AdminGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Check role from NextAuth session (computed in JWT)
-  const userRole = (session.user as any).role;
+  // Check role from Firebase claims
+  const userRole = claims.role || user.role;
   if (userRole !== "admin") {
     return (
       <div className="p-6 text-red-400">

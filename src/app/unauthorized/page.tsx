@@ -24,7 +24,7 @@ export default function UnauthorizedPage() {
             asChild
             className="w-full bg-gold-foil hover:bg-gold-foil/90 text-rich-black font-semibold"
           >
-            <Link href="/dashboard">
+            <Link href="/dashboard" prefetch={false}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Return to Dashboard
             </Link>

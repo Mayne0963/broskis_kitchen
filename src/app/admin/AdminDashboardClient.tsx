@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signOut } from 'next-auth/react';
+import { useAuth } from '@/lib/context/AuthContext';
 import AdminKPI from '@/components/kpi/AdminKPI';
 import { safeFetch } from '@/lib/utils/safeFetch';
 
@@ -34,6 +34,7 @@ export default function AdminDashboardClient({ adminEmail, adminName }: AdminDas
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const { logout } = useAuth();
 
   useEffect(() => {
     fetchOrders();
@@ -85,7 +86,8 @@ export default function AdminDashboardClient({ adminEmail, adminName }: AdminDas
 
   const handleLogout = async () => {
     try {
-      await signOut({ callbackUrl: '/login' });
+      await logout();
+      router.push('/login');
     } catch (error) {
       console.error('Logout failed:', error);
     }

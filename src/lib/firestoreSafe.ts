@@ -1,253 +1,108 @@
-/**
- * Firestore Safety Net Wrapper
- * 
- * Provides graceful handling of Firestore queries when indexes are still building
- * or missing. Prevents application crashes during index creation periods.
- */
-
-import { db } from "@/lib/firebase/admin";
+import { admin } from "@/lib/firebase/admin";
 
 // Firestore error codes
 const FAILED_PRECONDITION = 9;
-const RESOURCE_EXHAUSTED = 8;
-const DEADLINE_EXCEEDED = 4;
 
 /**
- * Interface for building index placeholder response
- */
-interface BuildingIndexResponse {
-  buildingIndex: true;
-  message: string;
-  timestamp: number;
-  retryAfter?: number;
-}
-
-/**
- * Interface for query retry configuration
- */
-interface RetryConfig {
-  maxRetries?: number;
-  baseDelay?: number;
-  maxDelay?: number;
-  backoffMultiplier?: number;
-}
-
-/**
- * Default retry configuration
- */
-const DEFAULT_RETRY_CONFIG: Required<RetryConfig> = {
-  maxRetries: 3,
-  baseDelay: 1000, // 1 second
-  maxDelay: 10000, // 10 seconds
-  backoffMultiplier: 2
-};
-
-/**
- * Sleep utility for retry delays
- */
-const sleep = (ms: number): Promise<void> => 
-  new Promise(resolve => setTimeout(resolve, ms));
-
-/**
- * Calculate exponential backoff delay
- */
-function calculateDelay(attempt: number, config: Required<RetryConfig>): number {
-  const delay = config.baseDelay * Math.pow(config.backoffMultiplier, attempt);
-  return Math.min(delay, config.maxDelay);
-}
-
-/**
- * Safe query wrapper that handles missing indexes gracefully
+ * Safety-net wrapper for Firestore queries that handles missing indexes gracefully.
+ * 
+ * When Firestore indexes are still building, queries can fail with FAILED_PRECONDITION (code 9).
+ * This wrapper catches those errors and returns a placeholder response instead of throwing,
+ * allowing the application to continue functioning while indexes are being built.
  * 
  * @param fn - Async function that performs the Firestore query
- * @param options - Optional retry configuration
- * @returns Promise that resolves to query result or building index placeholder
+ * @returns Promise that resolves to the query result or a placeholder object
+ * 
+ * @example
+ * ```typescript
+ * import { db } from "@/lib/firebase/admin";
+ * import { safeQuery } from "@/lib/firestoreSafe";
+ * 
+ * const result = await safeQuery(async () => 
+ *   db.collection("users")
+ *     .where("role", "==", "admin")
+ *     .orderBy("createdAt", "desc")
+ *     .limit(50)
+ *     .get()
+ * );
+ * 
+ * // Check if index is still building
+ * if ('buildingIndex' in result) {
+ *   console.log("Index still building, showing fallback UI");
+ *   return;
+ * }
+ * 
+ * // Process normal result
+ * result.docs.forEach(doc => console.log(doc.data()));
+ * ```
  */
-export async function safeQuery<T>(
-  fn: () => Promise<T>, 
-  options: RetryConfig = {}
-): Promise<T | BuildingIndexResponse> {
-  const config = { ...DEFAULT_RETRY_CONFIG, ...options };
-  let lastError: any;
-
-  for (let attempt = 0; attempt <= config.maxRetries; attempt++) {
-    try {
-      return await fn();
-    } catch (error: any) {
-      lastError = error;
+export async function safeQuery<T>(fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (e: any) {
+    // Check if this is a Firestore FAILED_PRECONDITION error (index still building)
+    if (e?.code === FAILED_PRECONDITION || e?.code === 'failed-precondition') {
+      console.warn("Firestore index still building:", e?.message || e);
       
-      // Handle index building errors
-      if (error?.code === FAILED_PRECONDITION) {
-        console.warn(`Firestore index still building (attempt ${attempt + 1}):`, error?.message);
-        
-        // If this is the last attempt, return placeholder
-        if (attempt === config.maxRetries) {
-          return {
-            buildingIndex: true,
-            message: "Firestore index is still building. Please try again in a few minutes.",
-            timestamp: Date.now(),
-            retryAfter: 300000 // 5 minutes
-          } as BuildingIndexResponse;
-        }
-        
-        // Wait before retrying
-        const delay = calculateDelay(attempt, config);
-        await sleep(delay);
-        continue;
-      }
-      
-      // Handle rate limiting
-      if (error?.code === RESOURCE_EXHAUSTED) {
-        console.warn(`Firestore rate limit exceeded (attempt ${attempt + 1}):`, error?.message);
-        
-        if (attempt === config.maxRetries) {
-          throw new Error("Firestore rate limit exceeded. Please try again later.");
-        }
-        
-        // Longer delay for rate limiting
-        const delay = calculateDelay(attempt + 2, config);
-        await sleep(delay);
-        continue;
-      }
-      
-      // Handle timeout errors
-      if (error?.code === DEADLINE_EXCEEDED) {
-        console.warn(`Firestore query timeout (attempt ${attempt + 1}):`, error?.message);
-        
-        if (attempt === config.maxRetries) {
-          throw new Error("Firestore query timeout. Please try again.");
-        }
-        
-        const delay = calculateDelay(attempt, config);
-        await sleep(delay);
-        continue;
-      }
-      
-      // For other errors, throw immediately
-      throw error;
+      // Return a harmless placeholder that indicates the index is building
+      // This allows the application to handle the case gracefully
+      // @ts-ignore - We know this isn't the correct type, but it's a safe fallback
+      return { buildingIndex: true, message: "Index is still building" } as T;
     }
+    
+    // Re-throw all other errors
+    throw e;
+  }
+}
+
+/**
+ * Type guard to check if a query result indicates a building index
+ */
+export function isBuildingIndex(result: any): result is { buildingIndex: true; message: string } {
+  return result && typeof result === 'object' && result.buildingIndex === true;
+}
+
+/**
+ * Wrapper specifically for Firestore QuerySnapshot results
+ * Provides better typing for the most common use case
+ */
+export async function safeQuerySnapshot(
+  fn: () => Promise<admin.firestore.QuerySnapshot>
+): Promise<admin.firestore.QuerySnapshot | { buildingIndex: true; message: string }> {
+  return safeQuery(fn);
+}
+
+/**
+ * Wrapper specifically for Firestore DocumentSnapshot results
+ */
+export async function safeDocumentQuery(
+  fn: () => Promise<admin.firestore.DocumentSnapshot>
+): Promise<admin.firestore.DocumentSnapshot | { buildingIndex: true; message: string }> {
+  return safeQuery(fn);
+}
+
+/**
+ * Helper to safely execute a query and return docs array or empty array if building
+ */
+export async function safeQueryDocs<T = any>(
+  fn: () => Promise<admin.firestore.QuerySnapshot>
+): Promise<admin.firestore.QueryDocumentSnapshot<T>[]> {
+  const result = await safeQuerySnapshot(fn);
+  
+  if (isBuildingIndex(result)) {
+    console.warn("Index building, returning empty docs array");
+    return [];
   }
   
-  // This should never be reached, but just in case
-  throw lastError;
+  return result.docs as admin.firestore.QueryDocumentSnapshot<T>[];
 }
 
 /**
- * Safe query wrapper specifically for collection queries
- * Returns empty array if index is building
+ * Helper to safely execute a query and return data array or empty array if building
  */
-export async function safeCollectionQuery<T>(
-  fn: () => Promise<FirebaseFirestore.QuerySnapshot<T>>,
-  options: RetryConfig = {}
-): Promise<FirebaseFirestore.QuerySnapshot<T> | T[]> {
-  try {
-    const result = await safeQuery(fn, options);
-    
-    // If index is building, return empty array
-    if (result && typeof result === 'object' && 'buildingIndex' in result) {
-      console.info("Index building, returning empty results");
-      return [] as T[];
-    }
-    
-    return result as FirebaseFirestore.QuerySnapshot<T>;
-  } catch (error) {
-    console.error("Safe collection query failed:", error);
-    return [] as T[];
-  }
+export async function safeQueryData<T = any>(
+  fn: () => Promise<admin.firestore.QuerySnapshot>
+): Promise<T[]> {
+  const docs = await safeQueryDocs<T>(fn);
+  return docs.map(doc => ({ id: doc.id, ...doc.data() } as T));
 }
-
-/**
- * Safe query wrapper for document queries
- * Returns null if index is building or document not found
- */
-export async function safeDocumentQuery<T>(
-  fn: () => Promise<FirebaseFirestore.DocumentSnapshot<T>>,
-  options: RetryConfig = {}
-): Promise<FirebaseFirestore.DocumentSnapshot<T> | null> {
-  try {
-    const result = await safeQuery(fn, options);
-    
-    // If index is building, return null
-    if (result && typeof result === 'object' && 'buildingIndex' in result) {
-      console.info("Index building, returning null document");
-      return null;
-    }
-    
-    return result as FirebaseFirestore.DocumentSnapshot<T>;
-  } catch (error) {
-    console.error("Safe document query failed:", error);
-    return null;
-  }
-}
-
-/**
- * Check if a response indicates an index is building
- */
-export function isIndexBuilding(response: any): response is BuildingIndexResponse {
-  return response && typeof response === 'object' && response.buildingIndex === true;
-}
-
-/**
- * Utility function to create a safe query with predefined collection
- */
-export function createSafeCollectionQuery<T>(collectionName: string) {
-  return {
-    /**
-     * Safe where query
-     */
-    where: (field: string, operator: FirebaseFirestore.WhereFilterOp, value: any) => ({
-      orderBy: (field: string, direction: 'asc' | 'desc' = 'asc') => ({
-        limit: (count: number) => ({
-          get: (options?: RetryConfig) => safeCollectionQuery<T>(
-            () => db.collection(collectionName)
-              .where(field, operator, value)
-              .orderBy(field, direction)
-              .limit(count)
-              .get(),
-            options
-          )
-        }),
-        get: (options?: RetryConfig) => safeCollectionQuery<T>(
-          () => db.collection(collectionName)
-            .where(field, operator, value)
-            .orderBy(field, direction)
-            .get(),
-          options
-        )
-      }),
-      limit: (count: number) => ({
-        get: (options?: RetryConfig) => safeCollectionQuery<T>(
-          () => db.collection(collectionName)
-            .where(field, operator, value)
-            .limit(count)
-            .get(),
-          options
-        )
-      }),
-      get: (options?: RetryConfig) => safeCollectionQuery<T>(
-        () => db.collection(collectionName)
-          .where(field, operator, value)
-          .get(),
-        options
-      )
-    })
-  };
-}
-
-/**
- * Pre-configured safe query helpers for common collections
- */
-export const safeQueries = {
-  users: createSafeCollectionQuery('users'),
-  orders: createSafeCollectionQuery('orders'),
-  cateringRequests: createSafeCollectionQuery('cateringRequests'),
-  rewards: createSafeCollectionQuery('rewards'),
-  spins: createSafeCollectionQuery('spins'),
-  coupons: createSafeCollectionQuery('coupons'),
-  offers: createSafeCollectionQuery('offers'),
-  menuItems: createSafeCollectionQuery('menuItems'),
-  events: createSafeCollectionQuery('events')
-};
-
-// Export types for TypeScript users
-export type { BuildingIndexResponse, RetryConfig };
