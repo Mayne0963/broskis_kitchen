@@ -1,0 +1,128 @@
+name: Firestore Indexes
+
+on:
+  push:
+    branches: [ main, staging, develop ]
+    paths:
+      - 'firestore.indexes.json'
+  workflow_dispatch:
+
+concurrency:
+  group: firestore-indexes-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-indexes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Firebase CLI
+        run: npm i -g firebase-tools
+
+      - name: Validate firestore.indexes.json
+        run: |
+          if [ ! -f "firestore.indexes.json" ]; then
+            echo "Error: firestore.indexes.json not found"
+            exit 1
+          fi
+          
+          # Validate JSON syntax
+          if ! jq empty firestore.indexes.json; then
+            echo "Error: Invalid JSON in firestore.indexes.json"
+            exit 1
+          fi
+          
+          echo "✅ firestore.indexes.json is valid"
+
+      - name: Select project by branch
+        run: |
+          if [[ "${GITHUB_REF##*/}" == "main" ]]; then
+            echo "FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_PROD || 'broskis-kitchen-44d2d' }}" >> $GITHUB_ENV
+            echo "🚀 Deploying to PRODUCTION: broskis-kitchen-44d2d"
+          elif [[ "${GITHUB_REF##*/}" == "staging" ]]; then
+            echo "FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_STAGING || 'broskis-kitchen-44d2d' }}" >> $GITHUB_ENV
+            echo "🔧 Deploying to STAGING: ${FIREBASE_PROJECT_ID}"
+          else
+            echo "FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_DEV || 'broskis-kitchen-44d2d' }}" >> $GITHUB_ENV
+            echo "🧪 Deploying to DEVELOPMENT: ${FIREBASE_PROJECT_ID}"
+          fi
+
+      # --- AUTH METHOD 1: Firebase CI token (simple) ---
+      - name: Deploy indexes (via FIREBASE_TOKEN)
+        if: ${{ secrets.FIREBASE_TOKEN != '' }}
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          echo "🔑 Authenticating with Firebase CI Token..."
+          firebase use "$FIREBASE_PROJECT_ID" --token "$FIREBASE_TOKEN"
+          
+          echo "📋 Current project: $(firebase use --token "$FIREBASE_TOKEN")"
+          
+          echo "🚀 Deploying Firestore indexes..."
+          firebase deploy --only firestore:indexes --token "$FIREBASE_TOKEN" --force
+          
+          echo "✅ Firestore indexes deployed successfully!"
+
+      # --- AUTH METHOD 2: Service Account (secure) ---
+      - name: Auth with Google (SA)
+        if: ${{ secrets.FIREBASE_TOKEN == '' && secrets.GCP_SA_KEY != '' }}
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Deploy indexes (via SA)
+        if: ${{ secrets.FIREBASE_TOKEN == '' && secrets.GCP_SA_KEY != '' }}
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
+        run: |
+          echo "🔑 Authenticating with Service Account..."
+          firebase use "$FIREBASE_PROJECT_ID"
+          
+          echo "📋 Current project: $(firebase use)"
+          
+          echo "🚀 Deploying Firestore indexes..."
+          firebase deploy --only firestore:indexes --force
+          
+          echo "✅ Firestore indexes deployed successfully!"
+
+      # --- FALLBACK: No authentication configured ---
+      - name: Authentication Error
+        if: ${{ secrets.FIREBASE_TOKEN == '' && secrets.GCP_SA_KEY == '' }}
+        run: |
+          echo "❌ ERROR: No authentication method configured!"
+          echo ""
+          echo "Please configure one of the following in your repository secrets:"
+          echo "1. FIREBASE_TOKEN (get via: firebase login:ci)"
+          echo "2. GCP_SA_KEY (JSON of Firebase Admin service account)"
+          echo ""
+          echo "Also ensure you have set the appropriate project ID secrets:"
+          echo "- FIREBASE_PROJECT_ID_PROD (for main branch)"
+          echo "- FIREBASE_PROJECT_ID_STAGING (for staging branch)"
+          echo "- FIREBASE_PROJECT_ID_DEV (for develop branch)"
+          exit 1
+
+      - name: Post-deployment verification
+        if: ${{ success() }}
+        run: |
+          echo "🎉 Deployment completed successfully!"
+          echo "📊 Deployment summary:"
+          echo "  - Branch: ${GITHUB_REF##*/}"
+          echo "  - Project: $FIREBASE_PROJECT_ID"
+          echo "  - Commit: ${{ github.sha }}"
+          echo "  - Triggered by: ${{ github.actor }}"
+
+    env:
+      # Set secrets in repo settings → Actions → Secrets
+      FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+      GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
