@@ -1,0 +1,27 @@
+[debug] [2025-09-30T21:30:57.002Z] ----------------------------------------------------------------------
+[debug] [2025-09-30T21:30:57.005Z] Command:       /usr/local/bin/node /usr/local/bin/firebase login:ci
+[debug] [2025-09-30T21:30:57.005Z] CLI Version:   14.17.0
+[debug] [2025-09-30T21:30:57.005Z] Platform:      darwin
+[debug] [2025-09-30T21:30:57.005Z] Node Version:  v22.14.0
+[debug] [2025-09-30T21:30:57.005Z] Time:          Tue Sep 30 2025 17:30:57 GMT-0400 (Eastern Daylight Time)
+[debug] [2025-09-30T21:30:57.006Z] ----------------------------------------------------------------------
+[debug] 
+[warn] ⚠  Authenticating with a `login:ci` token is deprecated and will be removed in a future major version of `firebase-tools`. Instead, use a service account key with `GOOGLE_APPLICATION_CREDENTIALS`: https://cloud.google.com/docs/authentication/getting-started 
+[info] 
+[info] Visit this URL on this device to log in:
+[info] https://accounts.google.com/o/oauth2/auth?client_id=563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com&scope=email%20openid%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloudplatformprojects.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Ffirebase%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloud-platform&response_type=code&state=9742443&redirect_uri=http%3A%2F%2Flocalhost%3A9005
+[info] 
+[info] Waiting for authentication...
+[debug] [2025-09-30T21:31:46.195Z] ----------------------------------------------------------------------
+[debug] [2025-09-30T21:31:46.199Z] Command:       /usr/local/bin/node /usr/local/bin/firebase login --reauth
+[debug] [2025-09-30T21:31:46.200Z] CLI Version:   14.17.0
+[debug] [2025-09-30T21:31:46.200Z] Platform:      darwin
+[debug] [2025-09-30T21:31:46.200Z] Node Version:  v22.14.0
+[debug] [2025-09-30T21:31:46.200Z] Time:          Tue Sep 30 2025 17:31:46 GMT-0400 (Eastern Daylight Time)
+[debug] [2025-09-30T21:31:46.200Z] ----------------------------------------------------------------------
+[debug] 
+[info] 
+[info] Visit this URL on this device to log in:
+[info] https://accounts.google.com/o/oauth2/auth?client_id=563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com&scope=email%20openid%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloudplatformprojects.readonly%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Ffirebase%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloud-platform&response_type=code&state=647539828&redirect_uri=http%3A%2F%2Flocalhost%3A9005&login_hint=broskiskitchen.socialmedia%40gmail.com
+[info] 
+[info] Waiting for authentication...
