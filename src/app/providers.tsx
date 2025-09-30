@@ -1,18 +1,10 @@
 "use client";
-import { Toaster } from "sonner";
-import PWAManager from "../components/pwa/PWAManager";
-import AccessibilityAudit from "../components/accessibility/AccessibilityAudit";
-import { getFirebaseApp } from "../lib/firebaseClient";
+import { SessionProvider } from "next-auth/react";
 
-// Initialize Firebase App Check on client side
-getFirebaseApp();
-
-export default function ClientProviders() {
+export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <>
-      <Toaster richColors position="top-right" closeButton />
-      <PWAManager />
-      <AccessibilityAudit />
-    </>
+    <SessionProvider refetchOnWindowFocus refetchInterval={60} refetchWhenOffline={false} basePath="/api/auth">
+      {children}
+    </SessionProvider>
   );
 }

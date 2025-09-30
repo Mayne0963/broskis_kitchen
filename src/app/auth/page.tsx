@@ -18,6 +18,7 @@ import AuthLayout from '@/components/auth/AuthLayout'
 import GoogleSignInButton from '@/components/auth/GoogleSignInButton'
 import PasswordStrengthMeter from '@/components/auth/PasswordStrengthMeter'
 import { checkPasswordStrength } from '@/lib/utils/validation'
+import { useAfterSignIn } from '@/lib/auth/afterSignIn'
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -48,6 +49,7 @@ export default function AuthPage() {
   const [signupSuccess, setSignupSuccess] = useState(false)
   const { login, signup } = useAuth()
   const router = useRouter()
+  const afterSignIn = useAfterSignIn()
 
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -73,7 +75,7 @@ export default function AuthPage() {
     try {
       const success = await login(values.email, values.password)
       if (success) {
-        router.push('/dashboard')
+        await afterSignIn('/dashboard')
       }
     } catch (error) {
       console.error('Login error:', error)

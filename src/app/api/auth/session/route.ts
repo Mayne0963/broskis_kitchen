@@ -1,20 +1,15 @@
-import { NextResponse } from 'next/server'
-import { getServerUser } from '@/lib/session'
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
+
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth/options";
 
 export async function GET() {
-  try {
-    const user = await getServerUser()
-    
-    const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' }
-    return new NextResponse(JSON.stringify({
-      authenticated: !!user,
-      user: user || null
-    }), { status: 200, headers })
-    
-  } catch (error) {
-    console.error('Session check error:', error)
-    return NextResponse.json({ authenticated: false, user: null }, { status: 200 })
-  }
+  const s = await getServerSession(authOptions as any);
+  return new Response(JSON.stringify({ ok: !!s, user: s?.user ?? null, role: (s?.user as any)?.role ?? null }), {
+    status: 200,
+    headers: { "content-type": "application/json", "cache-control": "no-store, private, max-age=0" },
+  });
 }
-
-export const dynamic = 'force-dynamic'

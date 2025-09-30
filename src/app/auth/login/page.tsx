@@ -15,6 +15,7 @@ import { Eye, EyeOff, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/lib/context/AuthContext'
 import AuthLayout from '@/components/auth/AuthLayout'
 import GoogleSignInButton from '@/components/auth/GoogleSignInButton'
+import { useAfterSignIn } from '@/lib/auth/afterSignIn'
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -28,6 +29,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const { login } = useAuth()
   const router = useRouter()
+  const afterSignIn = useAfterSignIn()
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -43,7 +45,7 @@ export default function LoginPage() {
     try {
       const success = await login(values.email, values.password)
       if (success) {
-        router.push('/dashboard')
+        await afterSignIn('/dashboard')
       }
     } catch (error) {
       console.error('Login error:', error)
