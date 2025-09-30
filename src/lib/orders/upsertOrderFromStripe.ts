@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { adminDb, auth, Timestamp } from '@/lib/firebaseAdmin';
+import { adminDb, auth, Timestamp } from '@/lib/firebase/admin';
 import { logError, logInfo, logDebug } from '@/lib/log';
 import { Order, OrderItem, OrderStatus } from '@/types/order';
 import { getLoyaltyProfile, shouldApplyVolunteerDiscount, calculateVolunteerDiscount } from '@/lib/rewards';

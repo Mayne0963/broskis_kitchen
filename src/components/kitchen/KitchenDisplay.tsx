@@ -18,7 +18,7 @@ import {
   Eye
 } from 'lucide-react'
 import { Order, OrderStatus } from '@/types/order'
-import { db, isFirebaseConfigured } from '@/lib/firebase'
+import { db, isFirebaseConfigured } from '@/lib/firebase/client'
 import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, Timestamp } from 'firebase/firestore'
 import { COLLECTIONS } from '@/lib/firebase/collections'
 import OrderStatusUpdate from '@/components/orders/OrderStatusUpdate'
@@ -45,7 +45,7 @@ export default function KitchenDisplay({ initialOrders = [] }: KitchenDisplayPro
 
   // Real-time Firebase listener
   useEffect(() => {
-    if (!isFirebaseConfigured()) {
+    if (!isFirebaseConfigured || !db) {
       console.log('Firebase not configured, using initial orders')
       return
     }

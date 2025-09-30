@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth';
-import { db } from '@/lib/firebase';
+import { db } from '@/lib/firebase/admin';
 import { AdminUsersResponse, AdminUserUpdateRequest } from '@/types/rewards';
 
 // GET /api/rewards/admin/users - List users with pagination and filtering

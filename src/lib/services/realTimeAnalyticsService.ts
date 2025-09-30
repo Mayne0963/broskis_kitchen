@@ -1,6 +1,6 @@
 'use client'
 
-import { db, isFirebaseConfigured } from '@/lib/firebase'
+import { db, isFirebaseConfigured } from '@/lib/firebase/client'
 import {
   collection,
   query,
@@ -86,6 +86,11 @@ class RealTimeAnalyticsService {
   }
 
   private setupOrdersListener() {
+    if (!db) {
+      console.error('Firebase not configured')
+      return
+    }
+
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
@@ -120,6 +125,11 @@ class RealTimeAnalyticsService {
   }
 
   private setupUsersListener() {
+    if (!db) {
+      console.error('Firebase not configured')
+      return
+    }
+
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 

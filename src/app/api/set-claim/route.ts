@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextResponse } from 'next/server';
-import { ensureAdmin, adminAuth } from '@/lib/firebaseAdmin';
+import { ensureAdmin, adminAuth } from '@/lib/firebase/admin';
 
 export async function POST(req: Request) {
   try {

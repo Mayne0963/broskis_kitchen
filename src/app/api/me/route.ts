@@ -4,7 +4,7 @@ export const revalidate = 0;
 
 import { NextResponse } from "next/server";
 import { getServerUser } from "@/lib/authServer";
-import { adminDb } from "@/lib/firebaseAdmin";
+import { adminDb } from "@/lib/firebase/admin";
 
 export async function GET() {
   const user = await getServerUser();

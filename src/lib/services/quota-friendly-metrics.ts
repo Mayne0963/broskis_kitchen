@@ -7,7 +7,7 @@ export const revalidate = 0;
  * Prevents Firestore quota exhaustion through efficient data fetching
  */
 
-import { adminDb } from '@/lib/firebaseAdmin';
+import { adminDb } from '@/lib/firebase/admin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
 
 // Cache configuration

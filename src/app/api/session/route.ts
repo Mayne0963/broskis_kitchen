@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextResponse } from "next/server";
-import { adminAuth, ensureAdmin } from "@/lib/firebaseAdmin";
+import { adminAuth, ensureAdmin } from "@/lib/firebase/admin";
 
 const COOKIE_NAME = "__session"; // standard on Vercel/Edge-friendly name
 

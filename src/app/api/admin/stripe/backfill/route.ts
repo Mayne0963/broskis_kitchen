@@ -32,7 +32,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { adminDb, Timestamp } from "@/lib/firebaseAdmin";
+import { adminDb, Timestamp } from "@/lib/firebase/admin";
 import { toOrderDocFromSession } from "@/lib/orders/normalizeStripeOrder";
 import { requireAdmin } from "@/lib/auth/adminOnly";
 

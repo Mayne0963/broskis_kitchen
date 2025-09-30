@@ -8,7 +8,7 @@ import {
   updateLoyaltyProfile,
   createPointsTransaction
 } from '@/lib/rewards';
-import { db } from '@/lib/firebase';
+import { db } from '@/lib/firebase/admin';
 import { runTransaction } from 'firebase/firestore';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {

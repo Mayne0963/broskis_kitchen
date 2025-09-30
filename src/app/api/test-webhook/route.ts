@@ -1,6 +1,6 @@
 // Test endpoint to verify webhook logic without signature validation
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb, Timestamp } from '@/lib/firebaseAdmin';
+import { adminDb, Timestamp } from '@/lib/firebase/admin';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {

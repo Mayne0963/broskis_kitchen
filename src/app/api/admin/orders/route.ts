@@ -7,7 +7,7 @@ export const fetchCache = 'force-no-store';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { Timestamp } from 'firebase-admin/firestore';
-import { adminDb, ensureAdmin } from '@/lib/firebaseAdmin';
+import { adminDb, ensureAdmin } from '@/lib/firebase/admin';
 
 type Stage =
   | 'all' | 'pending' | 'paid' | 'preparing' | 'ready' | 'out_for_delivery'

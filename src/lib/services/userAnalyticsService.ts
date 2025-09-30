@@ -1,6 +1,6 @@
 'use client'
 
-import { db, isFirebaseConfigured } from '@/lib/firebase'
+import { db, isFirebaseConfigured } from '@/lib/firebase/admin'
 import {
   collection,
   query,

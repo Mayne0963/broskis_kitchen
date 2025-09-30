@@ -5,7 +5,7 @@ export const revalidate = 0;
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerUser } from '@/lib/session'
 import { verifyAdminAccess } from '@/lib/auth/rbac'
-import { adminAuth, ensureAdmin } from '@/lib/firebaseAdmin'
+import { adminAuth, ensureAdmin } from '@/lib/firebase/admin'
 
 export async function GET(request: NextRequest) {
   try {

@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { ensureAdmin, adminDb, Timestamp } from '@/lib/firebaseAdmin';
+import { ensureAdmin, adminDb, Timestamp } from '@/lib/firebase/admin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
 import { Order } from '@/types/firestore';
 import { isAdmin } from '@/lib/rbac';

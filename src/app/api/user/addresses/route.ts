@@ -4,7 +4,7 @@ export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerUser } from '@/lib/session';
-import { adminDb } from '@/lib/firebaseAdmin';
+import { adminDb } from '@/lib/firebase/admin';
 
 // Helper to get user ID from session
 const getUserId = async () => {

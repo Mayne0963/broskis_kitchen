@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb, auth } from '@/lib/firebaseAdmin';
+import { adminDb, auth } from '@/lib/firebase/admin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
 
 interface NotificationPreferences {

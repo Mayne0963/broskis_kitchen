@@ -39,7 +39,7 @@ import {
   Calculator
 } from 'lucide-react'
 import { Order, OrderStatus } from '@/types/order'
-import { db, isFirebaseConfigured } from '@/lib/firebase'
+import { db, isFirebaseConfigured } from '@/lib/firebase/client'
 import { collection, query, where, orderBy, onSnapshot, Timestamp } from 'firebase/firestore'
 import { toast } from 'sonner'
 import { pushNotificationService } from '@/lib/services/push-notification-service'

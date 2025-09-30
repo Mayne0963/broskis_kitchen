@@ -1,4 +1,4 @@
-import { adminDb } from '@/lib/firebaseAdmin';
+import { adminDb } from '@/lib/firebase/admin';
 const db = adminDb;
 
 export type RewardsBalance = {

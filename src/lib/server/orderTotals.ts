@@ -1,5 +1,5 @@
 import "server-only";
-import { adminDb, Timestamp } from "@/lib/firebaseAdmin";
+import { adminDb, Timestamp } from "@/lib/firebase/admin";
 
 function toCentsAny(x: unknown): number {
   if (x == null) return 0;

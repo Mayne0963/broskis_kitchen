@@ -2,7 +2,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-import { adminDb } from '@/lib/firebaseAdmin';
+import { adminDb } from '@/lib/firebase/admin';
 import { logger } from '@/lib/services/logging-service';
 import { saveOrder, getOrderById, updateOrderStatus, trackOrder, cancelOrder } from '@/lib/services/orderService';
 import { NotificationService } from '@/lib/services/notification-service';

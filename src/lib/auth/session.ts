@@ -22,7 +22,7 @@ export async function getSessionCookie(): Promise<SessionUser | null> {
 
     // Direct Firebase Admin verification (no HTTP calls)
     console.log('Verifying session cookie directly...');
-    const { adminAuth } = await import('@/lib/firebaseAdmin');
+    const { adminAuth } = await import('@/lib/firebase/admin');
     
     if (!adminAuth) {
       console.error('Firebase Admin not initialized');

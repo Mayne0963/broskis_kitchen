@@ -4,7 +4,7 @@ export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { analyticsService } from '@/lib/services/analytics-service';
-import { auth } from '@/lib/firebaseAdmin';
+import { auth } from '@/lib/firebase/admin';
 
 export async function GET(request: NextRequest) {
   try {

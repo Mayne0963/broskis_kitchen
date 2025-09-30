@@ -8,7 +8,7 @@ export const revalidate = 0;
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { adminAuth, ensureAdmin } from '@/lib/firebaseAdmin';
+import { adminAuth, ensureAdmin } from '@/lib/firebase/admin';
 
 // Inline verifyIdToken function to avoid duplicate admin config
 async function verifyIdToken(idToken: string, checkRevoked: boolean = true) {

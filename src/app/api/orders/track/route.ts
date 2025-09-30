@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server'
-import { adminDb } from '@/lib/firebaseAdmin'
+import { adminDb } from '@/lib/firebase/admin'
 
 // In-memory fallback storage
 let orders: any[] = []

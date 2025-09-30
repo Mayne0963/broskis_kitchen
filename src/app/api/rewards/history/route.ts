@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerUser } from '@/lib/session';
-import { db } from '@/lib/firebase';
+import { db } from '@/lib/firebase/admin';
 import { HistoryResponse, PointsTransaction } from '@/types/rewards';
 
 export async function GET(req: NextRequest) {

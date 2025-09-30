@@ -4,7 +4,7 @@ export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/services/logging-service';
-import { auth } from '@/lib/firebaseAdmin';
+import { auth } from '@/lib/firebase/admin';
 
 interface RequestContext {
   requestId: string;

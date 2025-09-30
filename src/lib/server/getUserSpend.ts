@@ -1,5 +1,5 @@
 import "server-only";
-import { adminDb } from "@/lib/firebaseAdmin";
+import { adminDb } from "@/lib/firebase/admin";
 
 type Totals = {
   ordersCount: number;

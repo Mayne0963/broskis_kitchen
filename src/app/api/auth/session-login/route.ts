@@ -4,7 +4,7 @@ export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { adminAuth, ensureAdmin } from '@/lib/firebaseAdmin'
+import { adminAuth, ensureAdmin } from '@/lib/firebase/admin'
 
 export async function POST(request: NextRequest) {
   if (process.env.NEXT_PHASE === 'phase-production-build') {

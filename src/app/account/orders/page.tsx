@@ -2,7 +2,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 import { getServerUser } from "@/lib/session";
-import { adminDb } from "@/lib/firebaseAdmin";
+import { adminDb } from "@/lib/firebase/admin";
 import { orderTotalCents } from "@/lib/server/orderTotals";
 import { LuxeCard, LuxeCardHeader, LuxeCardTitle, LuxeCardContent } from "@/components/luxe/LuxeCard";
 import { LuxeTableWrap, LuxeTable, LuxeTableBody, LuxeTableCell, LuxeTableHead, LuxeTableHeader, LuxeTableRow } from "@/components/luxe/LuxeTable";

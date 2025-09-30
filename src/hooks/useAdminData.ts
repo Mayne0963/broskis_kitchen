@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { db, isFirebaseConfigured } from '@/lib/firebase'
+import { db, isFirebaseConfigured } from '@/lib/firebase/client'
 import {
   collection,
   query,
@@ -142,6 +142,12 @@ export const useAdminData = () => {
     try {
       setLoading(true)
       setError(null)
+
+      if (!db) {
+        console.error('Firebase not configured')
+        setLoading(false)
+        return
+      }
 
       const ordersQuery = query(
         collection(db, COLLECTIONS.ORDERS),

@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth, adminDb } from '@/lib/firebaseAdmin';
+import { auth, adminDb } from '@/lib/firebase/admin';
 import webpush from 'web-push';
 
 interface NotificationPayload {

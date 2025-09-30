@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ensureAdmin } from '@/lib/firebaseAdmin';
+import { ensureAdmin } from '@/lib/firebase/admin';
 import { getOrderMetrics, getUserMetrics, checkRateLimit } from '@/lib/services/quota-friendly-metrics';
 
 export const runtime = 'nodejs';

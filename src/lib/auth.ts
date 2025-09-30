@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/firebaseAdmin';
+import { auth } from '@/lib/firebase/admin';
 import { cookies } from 'next/headers';
 import { auth as adminAuth } from 'firebase-admin';
 

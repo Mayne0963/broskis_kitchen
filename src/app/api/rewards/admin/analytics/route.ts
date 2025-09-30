@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth';
-import { db } from '@/lib/firebase';
+import { db } from '@/lib/firebase/admin';
 import { calculateGivebackPercentage } from '@/lib/rewards';
 import { AdminAnalyticsResponse } from '@/types/rewards';
 

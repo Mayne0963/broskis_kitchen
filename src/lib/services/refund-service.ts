@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { db } from '@/lib/firebase';
+import { db } from '@/lib/firebase/admin';
 import { doc, updateDoc, getDoc, addDoc, collection } from 'firebase/firestore';
 import { otwService } from './otw-service';
 

@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { ensureAdmin, adminDb, Timestamp } from '@/lib/firebaseAdmin';
+import { ensureAdmin, adminDb, Timestamp } from '@/lib/firebase/admin';
 import { Coupon, CouponsQuery, CouponsResponse } from '@/types/firestore';
 import { COLLECTIONS } from '@/lib/firebase/collections';
 

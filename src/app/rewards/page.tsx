@@ -6,7 +6,7 @@ import { useRewards } from '@/lib/context/RewardsContext'
 import { getUserRewards } from '@/lib/services/rewardsService'
 import { Reward } from '@/lib/services/rewardsService'
 import { collection, getDocs } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
+import { db } from '@/lib/firebase/client';
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { HeroBanner } from '@/components/rewards/HeroBanner'
@@ -79,6 +79,11 @@ export default function RewardsPage() {
         if (isDevelopment && !user) {
           setGuestMode(true)
           // Load rewards catalog for guest users
+          if (!db) {
+            console.error('Firebase not configured')
+            setLoading(false)
+            return
+          }
           const rewardsSnapshot = await getDocs(collection(db, 'rewards'))
           const rewardsData = rewardsSnapshot.docs.map(doc => ({
             id: doc.id,
@@ -96,6 +101,11 @@ export default function RewardsPage() {
           await refreshStatus()
           
           // Load rewards catalog
+          if (!db) {
+            console.error('Firebase not configured')
+            setLoading(false)
+            return
+          }
           const rewardsSnapshot = await getDocs(collection(db, 'rewards'))
           const rewardsData = rewardsSnapshot.docs.map(doc => ({
             id: doc.id,
