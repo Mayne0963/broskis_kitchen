@@ -4,6 +4,8 @@ import { logger } from '@/lib/services/logging-service';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
 
 export const GET = withErrorHandler(async (request: NextRequest, context) => {
   // Require admin authentication

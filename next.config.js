@@ -5,6 +5,14 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Build-time environment validation
+const required = ["NEXTAUTH_SECRET","NEXTAUTH_URL","ALLOWED_ADMIN_EMAILS"];
+required.forEach(k => {
+  if (!process.env[k]) {
+    throw new Error(`[Build] Missing required env: ${k}`);
+  }
+});
+
 const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
