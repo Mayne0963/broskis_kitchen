@@ -1,3 +1,6 @@
+import { initializeApp, cert, getApps, App } from "firebase-admin/app";
+import { getFirestore } from "firebase-admin/firestore";
+import { getAuth } from "firebase-admin/auth";
 import * as admin from "firebase-admin";
 import type { NextRequest } from 'next/server';
 import { cookies, headers } from 'next/headers';
@@ -13,18 +16,18 @@ function getServiceAccount() {
   return parsed;
 }
 
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert(getServiceAccount()),
-    // Optional: set project & bucket explicitly
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-  });
-}
+// Initialize Firebase Admin with simplified setup
+const svc = getServiceAccount();
+const app: App = getApps()[0] || initializeApp({ 
+  credential: cert(svc),
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+});
 
-export const adminApp = admin.app();
-export const auth = admin.auth();
-export const db = admin.firestore();
+// Export core services
+export const db = getFirestore(app);
+export const adminApp = app;
+export const auth = getAuth(app);
 
 /**
  * ensureAdmin: verifies the caller is an authenticated admin.

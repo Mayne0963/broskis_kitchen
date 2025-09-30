@@ -2,34 +2,50 @@ import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { adminAuth } from "@/lib/firebase/admin";
 
-/**
- * Streamlined NextAuth configuration with zero extra fetches
- * - Computes admin role once in JWT callback
- * - Uses server-side rendering for admin gates
- * - Eliminates client-side polling and double checks
- */
+const ADMIN_LIST = (process.env.ALLOWED_ADMIN_EMAILS || "")
+  .split(",")
+  .map(v => v.trim().toLowerCase())
+  .filter(Boolean);
+
+const isProd = process.env.NODE_ENV === "production";
+const domain = isProd ? ".broskiskitchen.com" : undefined;
+
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
-  session: { 
-    strategy: "jwt", 
-    maxAge: 60 * 60 * 24 * 30, // 30 days
-    updateAge: 60 * 60 * 12     // 12 hours
-  },
-  useSecureCookies: process.env.NODE_ENV === "production",
+  session: { strategy: "jwt", maxAge: 60 * 60 * 8 }, // 8h
   cookies: {
+    // Helps Safari/Edge cases in prod; harmless locally.
     sessionToken: {
-      name: `next-auth.session-token`,
+      name: `__Secure-next-auth.session-token`,
       options: {
         httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === "production",
-        // Only serve at broskiskitchen.com (no subdomains)
-        domain: process.env.NODE_ENV === "production" ? "broskiskitchen.com" : undefined
+        sameSite: "lax",
+        path: "/",
+        secure: isProd,
+        ...(domain ? { domain } : {})
       }
-    }
+    },
   },
-  
+  callbacks: {
+    async jwt({ token, user }) {
+      const email = (user?.email || token?.email || "").toLowerCase();
+      token.email = email;
+      token.role = ADMIN_LIST.includes(email) ? "admin" : "user";
+      if (user?.id) {
+        token.uid = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.email = (token.email as string) || "";
+        (session.user as any).role = (token.role as string) || "user";
+        (session.user as any).uid = token.uid;
+      }
+      return session;
+    },
+  },
+  // keep existing providers here (Google/Email/etc)
   providers: [
     CredentialsProvider({
       id: "firebase",
@@ -60,30 +76,10 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   
-  callbacks: {
-    async jwt({ token, user, account, profile }) {
-      // Attach role once during initial sign-in
-      if (user?.email) {
-        const email = user.email.toLowerCase();
-        const admins = (process.env.ALLOWED_ADMIN_EMAILS || "")
-          .toLowerCase().split(",").map(s => s.trim());
-        token.role = admins.includes(email) ? "admin" : "user";
-        token.email = email;
-        token.uid = user.id;
-      }
-      return token;
-    },
-    
-    async session({ session, token }) {
-      // Pass role from JWT to session (no extra fetches)
-      (session.user as any).role = token.role || "user";
-      (session.user as any).uid = token.uid;
-      return session;
-    },
-  },
-  
   pages: {
     signIn: "/login",
     error: "/auth/error",
   },
 };
+
+export default authOptions;

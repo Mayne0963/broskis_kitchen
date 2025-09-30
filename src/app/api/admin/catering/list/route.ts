@@ -1,56 +1,25 @@
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const preferredRegion = ["iad1"];
 
-import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth/options";
 import { db } from "@/lib/firebase/admin";
-import { assertAdmin } from "@/lib/auth/adminGuard";
 
-export async function GET(req: Request) {
+function j(d:any, s=200){return new Response(JSON.stringify(d),{status:s,headers:{"content-type":"application/json"}})}
+
+export async function GET() {
+  const s = await getServerSession(authOptions as any);
+  console.log("[ADMIN] list session", !!s, s?.user?.email, (s?.user as any)?.role);
+  if (!(s?.user && (s.user as any).role === "admin")) return j({ error:"forbidden" }, 403);
+
   try {
-    await assertAdmin();
-    
-    const { searchParams } = new URL(req.url);
-    const status = searchParams.get("status") || "";
-    const from = searchParams.get("from");
-    const to = searchParams.get("to");
-    const q = (searchParams.get("q") || "").toLowerCase();
-    const limit = Number(searchParams.get("limit") || "50");
-    
-    let ref = db.collection("cateringRequests") as FirebaseFirestore.Query;
-    
-    if (status) {
-      ref = ref.where("status", "==", status);
-    }
-    
-    if (from) {
-      ref = ref.where("createdAt", ">=", from);
-    }
-    
-    if (to) {
-      ref = ref.where("createdAt", "<=", to);
-    }
-    
-    const snap = await ref.orderBy("createdAt", "desc").limit(limit).get();
-    let items = snap.docs.map(d => d.data());
-    
-    if (q) {
-      items = items.filter((it: any) => {
-        return [
-          it.customer?.name,
-          it.customer?.email,
-          it.event?.address,
-          it.packageId,
-          it.id
-        ].some(v => String(v || "").toLowerCase().includes(q));
-      });
-    }
-    
-    return NextResponse.json({ ok: true, items });
-  } catch (e: any) {
-    const code = e?.message === "FORBIDDEN" ? 403 : 500;
-    return NextResponse.json(
-      { ok: false, error: e?.message || "SERVER_ERROR" },
-      { status: code }
-    );
+    const snap = await db.collection("cateringRequests").orderBy("createdAt","desc").limit(50).get();
+    const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    console.log("[ADMIN] list count", items.length);
+    return j({ items }, 200);
+  } catch (e:any) {
+    console.error("[ADMIN] list error", e?.message);
+    return j({ error: e?.message || "unknown" }, 500);
   }
 }

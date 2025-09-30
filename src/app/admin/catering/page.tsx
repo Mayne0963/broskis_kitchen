@@ -6,25 +6,11 @@ export const fetchCache = "force-no-store";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/options";
-import AdminClient from "./AdminClient";
+import CateringAdminView from "./CateringAdminView";
 
-function isAdminEmail(email?: string) {
-  const list = (process.env.ALLOWED_ADMIN_EMAILS || "")
-    .split(",").map(s=>s.trim().toLowerCase()).filter(Boolean);
-  return !!email && list.includes(email.toLowerCase());
-}
-
-export default async function AdminCatering() {
-  const session = await getServerSession(authOptions as any);
-  const email = session?.user?.email || "";
-  const flag = (session as any)?.user?.isAdmin === true;
-
-  if (!session) {
-    redirect(`/api/auth/signin?callbackUrl=/admin/catering`);
-  }
-  if (!(flag || isAdminEmail(email))) {
-    redirect(`/unauthorized`);
-  }
-
-  return <AdminClient adminEmail={email} />;
+export default async function Page() {
+  const s = await getServerSession(authOptions as any);
+  if (!s) redirect(`/api/auth/signin?callbackUrl=/admin/catering`);
+  if ((s.user as any)?.role !== "admin") redirect("/403?m=admin_only");
+  return <CateringAdminView adminEmail={s.user?.email || ""} />;
 }
