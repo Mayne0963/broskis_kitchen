@@ -5,6 +5,7 @@ import { COLLECTIONS } from '@/lib/firebase/collections'
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const preferredRegion = ["iad1"]; // Co-locate near US East for admin traffic
 
 export async function GET(request: NextRequest) {
   try {

@@ -5,17 +5,22 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { ensureAdmin, adminDb, Timestamp } from '@/lib/firebase/admin';
+import { fastAdminGuard } from '@/lib/auth/fastGuard';
+import { adminDb, Timestamp } from '@/lib/firebase/admin';
 import { Coupon, CouponsQuery, CouponsResponse } from '@/types/firestore';
 import { COLLECTIONS } from '@/lib/firebase/collections';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+export const preferredRegion = ["iad1"]; // Co-locate near US East for admin traffic
 
 export async function GET(request: NextRequest) {
   try {
-    // Verify admin authentication
-    const user = await ensureAdmin(request);
+    // Fast admin authentication guard
+    const authResponse = await fastAdminGuard(request);
+    if (authResponse) return authResponse;
     
     const { searchParams } = new URL(request.url);
     
@@ -114,8 +119,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify admin authentication
-    const user = await ensureAdmin(request);
+    // Fast admin authentication guard
+    const authResponse = await fastAdminGuard(request);
+    if (authResponse) return authResponse;
     
     const body = await request.json();
     

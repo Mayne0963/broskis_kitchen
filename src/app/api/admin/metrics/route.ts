@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ensureAdmin } from '@/lib/firebase/admin';
+import { fastAdminGuard } from '@/lib/auth/fastGuard';
 import { getOrderMetrics, getUserMetrics, checkRateLimit } from '@/lib/services/quota-friendly-metrics';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+export const preferredRegion = ["iad1"]; // Co-locate near US East for admin traffic
 
 export async function GET(request: NextRequest) {
-  // Check admin authentication
-  const user = await ensureAdmin(request);
+  // Fast admin authentication guard
+  const authResponse = await fastAdminGuard(request);
+  if (authResponse) return authResponse;
   
   // Rate limiting check
   const clientId = request.headers.get('x-forwarded-for') || 'unknown';

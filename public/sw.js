@@ -12,9 +12,14 @@ const STATIC_ASSETS = [
   '/offline.html', // Fallback page
 ]
 
-// Network-first strategy for API calls
+// Network-first strategy for API calls (excluding auth routes)
 const API_ROUTES = [
   '/api/',
+]
+
+// Routes to exclude from service worker caching
+const EXCLUDED_ROUTES = [
+  '/api/auth/',
   '/auth/',
 ]
 
@@ -98,6 +103,11 @@ self.addEventListener('fetch', (event) => {
   
   // Skip chrome-extension and other non-http(s) requests
   if (!url.protocol.startsWith('http')) {
+    return
+  }
+  
+  // Skip excluded routes (auth routes)
+  if (isExcludedRoute(request)) {
     return
   }
   
@@ -258,6 +268,10 @@ async function updateCacheInBackground(request) {
 // Helper functions
 function isAPIRequest(request) {
   return API_ROUTES.some(route => request.url.includes(route))
+}
+
+function isExcludedRoute(request) {
+  return EXCLUDED_ROUTES.some(route => request.url.includes(route))
 }
 
 function isStaticAsset(request) {

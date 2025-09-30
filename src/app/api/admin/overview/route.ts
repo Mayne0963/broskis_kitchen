@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/lib/auth/adminOnly';
+import { fastAdminGuard } from '@/lib/auth/fastGuard';
 import { db } from '@/lib/firebase/admin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+export const preferredRegion = ["iad1"]; // Co-locate near US East for admin traffic
 
 // Environment variable check
 ['FIREBASE_ADMIN_PROJECT_ID','FIREBASE_ADMIN_CLIENT_EMAIL','FIREBASE_ADMIN_PRIVATE_KEY']
@@ -36,11 +39,9 @@ function setCachedData(key: string, data: any): void {
  * Get comprehensive admin overview metrics
  */
 export async function GET(request: NextRequest) {
-  // Check admin authentication
-  const adminCheck = await verifyAdminAuth(request);
-  if (adminCheck instanceof Response) {
-    return adminCheck;
-  }
+  // Fast admin authentication guard
+  const authResponse = await fastAdminGuard(request);
+  if (authResponse) return authResponse;
 
   try {
     const { searchParams } = new URL(request.url);

@@ -1,46 +1,45 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper functions
-    function isAuthenticated() {
+    // Optimized helper functions with fast short-circuit evaluation
+    function isSignedIn() {
       return request.auth != null;
     }
     
-    function isAdmin() {
-      return isAuthenticated() && 
-             resource.data.get('role', '') == 'admin' ||
-             request.auth.token.get('admin', false) == true;
+    function isSelf(uid) {
+      return isSignedIn() && request.auth.uid == uid;
     }
     
-    function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.role == "admin";
     }
     
     function isValidEmail() {
-      return isAuthenticated() && request.auth.token.email_verified == true;
+      return isSignedIn() && request.auth.token.email_verified == true;
     }
 
-    // Existing collections (users, orders, etc.)
-    match /users/{userId} {
-      allow read, write: if isOwner(userId) || isAdmin();
+    // Optimized users collection with O(1) lookups
+    match /users/{uid} {
+      allow read: if isSelf(uid) || isAdmin();
+      allow write: if isSelf(uid) || isAdmin();
     }
     
     match /orders/{orderId} {
-      allow read, write: if isAuthenticated();
+      allow read, write: if isSignedIn();
     }
     
     // REWARDS SYSTEM COLLECTIONS
     
     // Loyalty profiles - users can read/write their own, admins can read/write all
     match /loyalty/{userId} {
-      allow read: if isOwner(userId) || isAdmin();
-      allow create: if isOwner(userId) && isValidEmail() && 
+      allow read: if isSelf(userId) || isAdmin();
+      allow create: if isSelf(userId) && isValidEmail() && 
                    request.resource.data.keys().hasAll(['email', 'createdAt']) &&
                    request.resource.data.email == request.auth.token.email &&
                    request.resource.data.currentPoints == 0 &&
                    request.resource.data.totalEarned == 0 &&
                    request.resource.data.totalRedeemed == 0;
-      allow update: if (isOwner(userId) && 
+      allow update: if (isSelf(userId) && 
                        // Users can only update certain fields
                        request.resource.data.diff(resource.data).affectedKeys()
                          .hasOnly(['lastActivity', 'name']) &&
@@ -54,7 +53,7 @@ service cloud.firestore {
     
     // Points transactions - users can read their own, only system/admin can write
     match /pointsTransactions/{transactionId} {
-      allow read: if isAuthenticated() && 
+      allow read: if isSignedIn() && 
                      (resource.data.userId == request.auth.uid || isAdmin());
       allow create: if false; // Only server-side code can create transactions
       allow update, delete: if false; // Transactions are immutable
@@ -62,7 +61,7 @@ service cloud.firestore {
     
     // User redemptions - users can read their own, only system/admin can write
     match /userRedemptions/{redemptionId} {
-      allow read: if isAuthenticated() && 
+      allow read: if isSignedIn() && 
                      (resource.data.userId == request.auth.uid || isAdmin());
       allow create: if false; // Only server-side code can create redemptions
       allow update, delete: if false; // Redemptions are immutable
@@ -70,7 +69,7 @@ service cloud.firestore {
     
     // Spin history - users can read their own, only system/admin can write
     match /spinHistory/{spinId} {
-      allow read: if isAuthenticated() && 
+      allow read: if isSignedIn() && 
                      (resource.data.userId == request.auth.uid || isAdmin());
       allow create: if false; // Only server-side code can create spin records
       allow update, delete: if false; // Spin history is immutable
@@ -78,7 +77,7 @@ service cloud.firestore {
     
     // Reward catalog - read-only for authenticated users, admin can write
     match /rewardCatalog/{rewardId} {
-      allow read: if isAuthenticated();
+      allow read: if isSignedIn();
       allow create, update: if isAdmin() && 
                               request.resource.data.keys().hasAll([
                                 'name', 'description', 'pointsCost', 'category', 

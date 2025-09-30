@@ -1,6 +1,7 @@
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+export const preferredRegion = ["iad1"]; // Co-locate near US East for admin traffic
 
 // Ensure no caching for real-time order updates
 export const fetchCache = 'force-no-store';

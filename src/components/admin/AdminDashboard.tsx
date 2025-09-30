@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -22,12 +23,39 @@ import {
   Activity,
   RefreshCw
 } from 'lucide-react'
-import OrdersTab from './OrdersTab'
-import MenuDropsTab from './MenuDropsTab'
-import RewardsTab from './RewardsTab'
-import UserManagement from './UserManagement'
 import { useRealTimeMetrics } from '@/hooks/useRealTimeMetrics'
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+
+// Dynamic imports for heavy components with SSR disabled
+const OrdersTab = dynamic(() => import('./OrdersTab'), { 
+  ssr: false, 
+  loading: () => <div className="flex items-center justify-center py-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FFD700]"></div></div>
+})
+
+const MenuDropsTab = dynamic(() => import('./MenuDropsTab'), { 
+  ssr: false, 
+  loading: () => <div className="flex items-center justify-center py-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FFD700]"></div></div>
+})
+
+const RewardsTab = dynamic(() => import('./RewardsTab'), { 
+  ssr: false, 
+  loading: () => <div className="flex items-center justify-center py-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FFD700]"></div></div>
+})
+
+const UserManagement = dynamic(() => import('./UserManagement'), { 
+  ssr: false, 
+  loading: () => <div className="flex items-center justify-center py-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FFD700]"></div></div>
+})
+
+// Dynamic chart component with SSR disabled
+const LineChart = dynamic(() => import('recharts').then(mod => ({ default: mod.LineChart })), { 
+  ssr: false, 
+  loading: () => <div className="h-32 bg-gray-800/50 rounded animate-pulse"></div>
+})
+const Line = dynamic(() => import('recharts').then(mod => ({ default: mod.Line })), { ssr: false })
+const XAxis = dynamic(() => import('recharts').then(mod => ({ default: mod.XAxis })), { ssr: false })
+const YAxis = dynamic(() => import('recharts').then(mod => ({ default: mod.YAxis })), { ssr: false })
+const Tooltip = dynamic(() => import('recharts').then(mod => ({ default: mod.Tooltip })), { ssr: false })
+const ResponsiveContainer = dynamic(() => import('recharts').then(mod => ({ default: mod.ResponsiveContainer })), { ssr: false })
 
 interface AdminDashboardProps {
   data: {
@@ -186,7 +214,40 @@ const formatCurrency = (amount: number) => {
   }).format(amount)
 }
 
-export default function AdminDashboard({ data, refetch, metricsData }: AdminDashboardProps & { refetch?: () => void }) {
+export default function AdminDashboard({ data, refetch, metricsData, recentOrders, menuDrops, rewardsData }: AdminDashboardProps & { 
+  refetch?: () => void
+  recentOrders: Array<{
+    id: string
+    customerName: string
+    items: string[]
+    total: number
+    status: 'preparing' | 'ready' | 'delivered' | 'cancelled'
+    orderTime: Date
+    estimatedReady?: Date
+    deliveredTime?: Date
+  }>
+  menuDrops: Array<{
+    id: string
+    name: string
+    status: 'active' | 'scheduled' | 'ended'
+    startTime: Date
+    endTime: Date
+    totalQuantity: number
+    soldQuantity: number
+    revenue: number
+  }>
+  rewardsData: {
+    totalPointsIssued: number
+    totalPointsRedeemed: number
+    activeOffers: number
+    totalRedemptions: number
+    topRedemptions: Array<{
+      offer: string
+      count: number
+      points: number
+    }>
+  }
+}) {
   const [activeTab, setActiveTab] = useState('overview')
   const [isRefreshing, setIsRefreshing] = useState(false)
   const { metrics: realTimeMetrics, loading: metricsLoading, error: metricsError } = useRealTimeMetrics()
@@ -419,8 +480,8 @@ export default function AdminDashboard({ data, refetch, metricsData }: AdminDash
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {data.recentOrders && data.recentOrders.length > 0 ? (
-                      data.recentOrders.slice(0, 5).map((order) => (
+                    {recentOrders && recentOrders.length > 0 ? (
+                      recentOrders.slice(0, 5).map((order) => (
                         <div key={order.id} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-black/50 border border-[#B7985A]/10 hover:shadow-md hover:border-[#B7985A]/30 transition-all duration-200">
                           <div className="space-y-2">
                             <p className="font-semibold text-white">{order.customerName}</p>
@@ -468,8 +529,8 @@ export default function AdminDashboard({ data, refetch, metricsData }: AdminDash
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {data.menuDrops && data.menuDrops.length > 0 ? (
-                      data.menuDrops.slice(0, 3).map((drop) => (
+                    {menuDrops && menuDrops.length > 0 ? (
+                      menuDrops.slice(0, 3).map((drop) => (
                         <div key={drop.id} className="p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-black/50 border border-[#B7985A]/10 hover:shadow-md hover:border-[#B7985A]/30 transition-all duration-200">
                           <div className="flex items-center justify-between mb-3">
                             <p className="font-semibold text-white">{drop.name}</p>
@@ -524,25 +585,25 @@ export default function AdminDashboard({ data, refetch, metricsData }: AdminDash
                   <div className="p-4 rounded-xl bg-gradient-to-br from-[#B7985A]/10 to-[#D2BA6A]/10 border border-[#B7985A]/20">
                     <p className="text-sm font-semibold text-[#D2BA6A] mb-2">Points Issued</p>
                     <p className="text-3xl font-bold text-[#FFD700]">
-                      {data.rewardsData.totalPointsIssued.toLocaleString()}
+                      {rewardsData.totalPointsIssued.toLocaleString()}
                     </p>
                   </div>
                   <div className="p-4 rounded-xl bg-gradient-to-br from-green-900/20 to-green-800/20 border border-green-600/20">
                     <p className="text-sm font-semibold text-green-300 mb-2">Points Redeemed</p>
                     <p className="text-3xl font-bold text-green-400">
-                      {data.rewardsData.totalPointsRedeemed.toLocaleString()}
+                      {rewardsData.totalPointsRedeemed.toLocaleString()}
                     </p>
                   </div>
                   <div className="p-4 rounded-xl bg-gradient-to-br from-orange-900/20 to-orange-800/20 border border-orange-600/20">
                     <p className="text-sm font-semibold text-orange-300 mb-2">Active Offers</p>
                     <p className="text-3xl font-bold text-orange-400">
-                      {data.rewardsData.activeOffers}
+                      {rewardsData.activeOffers}
                     </p>
                   </div>
                   <div className="p-4 rounded-xl bg-gradient-to-br from-[#B7985A]/10 to-[#D2BA6A]/10 border border-[#B7985A]/20">
                     <p className="text-sm font-semibold text-[#D2BA6A] mb-2">Total Redemptions</p>
                     <p className="text-3xl font-bold text-[#FFD700]">
-                      {data.rewardsData.totalRedemptions}
+                      {rewardsData.totalRedemptions}
                     </p>
                   </div>
                 </div>
@@ -553,8 +614,8 @@ export default function AdminDashboard({ data, refetch, metricsData }: AdminDash
                     <span>Top Redemptions</span>
                   </h4>
                   <div className="space-y-3">
-                    {data.rewardsData.topRedemptions && data.rewardsData.topRedemptions.length > 0 ? (
-                      data.rewardsData.topRedemptions.map((redemption, index) => (
+                    {rewardsData.topRedemptions && rewardsData.topRedemptions.length > 0 ? (
+                      rewardsData.topRedemptions.map((redemption, index) => (
                         <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-black/50 border border-[#B7985A]/10 hover:shadow-md hover:border-[#B7985A]/30 transition-all duration-200">
                           <div className="flex items-center space-x-3">
                             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#B7985A]/20 to-[#D2BA6A]/20 flex items-center justify-center">
@@ -685,15 +746,15 @@ export default function AdminDashboard({ data, refetch, metricsData }: AdminDash
           </TabsContent>
 
           <TabsContent value="orders">
-            <OrdersTab initialOrders={data.recentOrders} />
+            <OrdersTab initialOrders={recentOrders} />
           </TabsContent>
 
           <TabsContent value="menu-drops">
-            <MenuDropsTab menuDrops={data.menuDrops} />
+            <MenuDropsTab menuDrops={menuDrops} />
           </TabsContent>
 
           <TabsContent value="rewards">
-            <RewardsTab rewardsData={data.rewardsData} />
+            <RewardsTab rewardsData={rewardsData} />
           </TabsContent>
 
           <TabsContent value="users">

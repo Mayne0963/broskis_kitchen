@@ -157,7 +157,8 @@ const Navbar: React.FC = () => {
               </AccessibleMenuItem>
               {!loading && claims?.admin && (
                 <AccessibleMenuItem
-                  href="/login"
+                  href="/admin"
+                  prefetch={false}
                   onClick={() => setUserDropdownOpen(false)}
                   className="text-red-600 font-medium"
                 >

@@ -1,113 +1,189 @@
 /**
- * Admin Users API endpoint
- * GET /api/admin/users - Retrieve users with search and pagination
+ * Optimized Admin Users API endpoint
+ * GET /api/admin/users - Retrieve users with indexed queries and pagination
+ * 
+ * Features:
+ * - O(1) indexed queries for role filtering
+ * - Optimized email search using indexed email field
+ * - Cursor-based pagination for consistent performance
+ * - Standardized user document structure
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdmin } from '@/lib/auth/adminOnly';
-import { db } from '@/lib/firebase/admin';
-import { User, UsersQuery, UsersResponse, UserRoles } from '@/types/firestore';
-import { COLLECTIONS } from '@/lib/firebase/collections';
+import { fastAdminGuard } from '@/lib/auth/fastGuard';
+import { 
+  getUsersByRole, 
+  searchUsersByEmail, 
+  getUserStats,
+  UserWithId,
+  UserDocument 
+} from '@/lib/user';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+export const preferredRegion = ["iad1"]; // Co-locate near US East for admin traffic
 
-// Environment variable check
-['FIREBASE_ADMIN_PROJECT_ID','FIREBASE_ADMIN_CLIENT_EMAIL','FIREBASE_ADMIN_PRIVATE_KEY']
-  .forEach(k => { if (!process.env[k]) console.warn(`Missing env: ${k}`); });
+// Response interfaces
+interface UsersQuery {
+  query?: string;
+  cursor?: string;
+  limit: number; // Always defined after parsing
+  role?: "admin" | "user";
+}
+
+interface UsersResponse {
+  data: UserWithId[];
+  hasMore: boolean;
+  nextCursor?: string;
+  stats?: {
+    totalUsers: number;
+    adminUsers: number;
+    regularUsers: number;
+    recentUsers: number;
+  };
+}
 
 export async function GET(request: NextRequest) {
   try {
-    // Verify admin authentication
-    await requireAdmin(request);
+    // Fast admin authentication guard
+    const authResponse = await fastAdminGuard(request);
+    if (authResponse) return authResponse;
     
     const { searchParams } = new URL(request.url);
     
-    // Parse query parameters
+    // Parse query parameters with validation
     const query: UsersQuery = {
       query: searchParams.get('query') || undefined,
       cursor: searchParams.get('cursor') || undefined,
-      limit: parseInt(searchParams.get('limit') || '20'),
-      role: searchParams.get('role') as keyof UserRoles || undefined
+      limit: Math.min(parseInt(searchParams.get('limit') || '20'), 100), // Cap at 100
+      role: (() => {
+        const role = searchParams.get('role');
+        return (role === 'admin' || role === 'user') ? role : undefined;
+      })()
     };
     
-    // Validate limit
-    if (query.limit > 100) {
-      query.limit = 100;
-    }
+    // Include stats in response if requested
+    const includeStats = searchParams.get('includeStats') === 'true';
     
-    // Build Firestore query
-    let firestoreQuery = db.collection(COLLECTIONS.USERS).orderBy('createdAt', 'desc');
-    
-    // Apply role filter
-    if (query.role) {
-      firestoreQuery = firestoreQuery.where(`roles.${query.role}`, '==', true);
-    }
-    
-    // Apply cursor for pagination
-    if (query.cursor) {
-      try {
-        const cursorDoc = await db.collection(COLLECTIONS.USERS).doc(query.cursor).get();
-        if (cursorDoc.exists) {
-          firestoreQuery = firestoreQuery.startAfter(cursorDoc);
-        }
-      } catch (error) {
-        console.warn('Invalid cursor provided:', query.cursor);
-      }
-    }
-    
-    // Apply limit (fetch one extra to check if there are more results)
-    firestoreQuery = firestoreQuery.limit(query.limit + 1);
-    
-    // Execute query
-    const snapshot = await firestoreQuery.get();
-    
-    // Process results
-    let users: User[] = [];
+    let users: UserWithId[] = [];
     let hasMore = false;
     let nextCursor: string | undefined;
+    let stats: UsersResponse['stats'] | undefined;
     
-    snapshot.docs.forEach((doc, index) => {
-      if (index < query.limit) {
-        const data = doc.data();
-        users.push({
-          uid: doc.id,
-          ...data,
-          // Convert Firestore Timestamps to JavaScript Dates for JSON serialization
-          createdAt: data.createdAt,
-          updatedAt: data.updatedAt
-        } as User);
-      } else {
-        // We have more results
-        hasMore = true;
-        nextCursor = snapshot.docs[query.limit - 1].id;
-      }
-    });
-    
-    // Apply text search filter (client-side filtering for simplicity)
-    // For production, consider using Algolia or similar for better search performance
+    // Handle email search with optimized indexed queries
     if (query.query) {
-      const searchTerm = query.query.toLowerCase();
-      users = users.filter(user => 
-        user.email.toLowerCase().includes(searchTerm) ||
-        user.displayName.toLowerCase().includes(searchTerm) ||
-        (user.phone && user.phone.includes(searchTerm))
-      );
-      
-      // Recalculate pagination after filtering
-      if (users.length < query.limit && hasMore) {
-        // We might need to fetch more results to fill the page
-        // For simplicity, we'll just indicate there might be more
-        hasMore = true;
+      try {
+        users = await searchUsersByEmail(query.query, query.limit);
+        hasMore = users.length === query.limit;
+        nextCursor = hasMore ? users[users.length - 1].id : undefined;
+      } catch (error) {
+        console.error('Error searching users by email:', error);
+        // Fallback to empty results
+        users = [];
+        hasMore = false;
+      }
+    } 
+    // Handle role-based filtering with indexed queries
+    else if (query.role) {
+      try {
+        // Get cursor document for pagination
+        let startAfterDoc: FirebaseFirestore.DocumentSnapshot | undefined;
+        if (query.cursor) {
+          const { db } = await import('@/lib/firebase/admin');
+          try {
+            startAfterDoc = await db.collection('users').doc(query.cursor).get();
+            if (!startAfterDoc.exists) {
+              startAfterDoc = undefined;
+            }
+          } catch (error) {
+            console.warn('Invalid cursor provided:', query.cursor);
+          }
+        }
+        
+        // Fetch one extra to check for more results
+        const fetchLimit = query.limit + 1;
+        const fetchedUsers = await getUsersByRole(query.role, fetchLimit, startAfterDoc);
+        
+        // Check if there are more results
+        if (fetchedUsers.length > query.limit) {
+          hasMore = true;
+          users = fetchedUsers.slice(0, query.limit);
+          nextCursor = users[users.length - 1].id;
+        } else {
+          hasMore = false;
+          users = fetchedUsers;
+        }
+      } catch (error) {
+        console.error('Error getting users by role:', error);
+        users = [];
+        hasMore = false;
+      }
+    } 
+    // Handle general pagination without filters
+    else {
+      try {
+        const { db } = await import('@/lib/firebase/admin');
+        
+        // Build query for all users
+        let firestoreQuery = db
+          .collection('users')
+          .orderBy('createdAt', 'desc')
+          .limit(query.limit + 1);
+        
+        // Apply cursor for pagination
+        if (query.cursor) {
+          try {
+            const cursorDoc = await db.collection('users').doc(query.cursor).get();
+            if (cursorDoc.exists) {
+              firestoreQuery = firestoreQuery.startAfter(cursorDoc);
+            }
+          } catch (error) {
+            console.warn('Invalid cursor provided:', query.cursor);
+          }
+        }
+        
+        const snapshot = await firestoreQuery.get();
+        
+        // Process results
+        const fetchedUsers = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data() as UserDocument
+        }));
+        
+        // Check if there are more results
+        if (fetchedUsers.length > query.limit) {
+          hasMore = true;
+          users = fetchedUsers.slice(0, query.limit);
+          nextCursor = users[users.length - 1].id;
+        } else {
+          hasMore = false;
+          users = fetchedUsers;
+        }
+      } catch (error) {
+        console.error('Error getting all users:', error);
+        users = [];
+        hasMore = false;
       }
     }
     
-    // Prepare response
+    // Get user statistics if requested
+    if (includeStats) {
+      try {
+        stats = await getUserStats();
+      } catch (error) {
+        console.error('Error getting user stats:', error);
+        // Continue without stats
+      }
+    }
+    
+    // Prepare optimized response
     const response: UsersResponse = {
       data: users,
       hasMore,
       nextCursor: hasMore ? nextCursor : undefined,
-      total: undefined // We don't calculate total for performance reasons
+      stats
     };
     
     return NextResponse.json(response);

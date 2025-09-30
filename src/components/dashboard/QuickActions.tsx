@@ -39,7 +39,7 @@ export default function QuickActions({ role }: QuickActionsProps) {
         </Link>
 
         {admin && (
-          <Link href="/admin">
+          <Link href="/admin" prefetch={false}>
             <Card className="hover:shadow-md transition-shadow cursor-pointer">
               <CardContent className="p-4">
                 <div className="flex items-center space-x-3">

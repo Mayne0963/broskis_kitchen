@@ -1,22 +1,39 @@
-import { NextAuthOptions } from "next-auth";
-import { JWT } from "next-auth/jwt";
+import type { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { adminAuth } from "@/lib/firebase/admin";
 
-// NextAuth configuration for JWT-based sessions
-// This works alongside the existing Firebase Auth setup
+/**
+ * Streamlined NextAuth configuration with zero extra fetches
+ * - Computes admin role once in JWT callback
+ * - Uses server-side rendering for admin gates
+ * - Eliminates client-side polling and double checks
+ */
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
-  trustHost: true, // Required for Vercel proxy compatibility
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+  session: { 
+    strategy: "jwt", 
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+    updateAge: 60 * 60 * 12     // 12 hours
+  },
+  trustHost: true,
+  useSecureCookies: process.env.NODE_ENV === "production",
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === "production",
+        domain: process.env.NODE_ENV === "production" ? ".broskiskitchen.com" : undefined
+      }
+    }
   },
   
   providers: [
-    // Custom provider to work with Firebase Auth
-    {
+    CredentialsProvider({
       id: "firebase",
       name: "Firebase",
-      type: "credentials",
       credentials: {
         idToken: { label: "ID Token", type: "text" },
       },
@@ -26,38 +43,41 @@ export const authOptions: NextAuthOptions = {
         }
         
         try {
-          // In a real implementation, you would verify the Firebase ID token here
-          // For now, we'll return a basic user object
+          // Verify Firebase ID token
+          const decodedToken = await adminAuth.verifyIdToken(credentials.idToken);
+          
           return {
-            id: "firebase-user",
-            email: "user@example.com",
+            id: decodedToken.uid,
+            email: decodedToken.email || "",
+            name: decodedToken.name || decodedToken.email || "",
+            emailVerified: decodedToken.email_verified || false,
           };
         } catch (error) {
           console.error("Firebase auth error:", error);
           return null;
         }
       },
-    },
+    }),
   ],
   
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user?: any }) {
-      if (user) {
-        token.id = user.id;
+    async jwt({ token, user, account, profile }) {
+      // Attach role once during initial sign-in
+      if (user?.email) {
+        const email = user.email.toLowerCase();
+        const admins = (process.env.ALLOWED_ADMIN_EMAILS || "")
+          .toLowerCase().split(",").map(s => s.trim());
+        token.role = admins.includes(email) ? "admin" : "user";
+        token.email = email;
+        token.uid = user.id;
       }
       return token;
     },
     
-    async session({ session, token }: { session: any; token: JWT }) {
-      if (token) {
-        session.user.id = token.id;
-      }
-      
-      // Add admin flag based on ALLOWED_ADMIN_EMAILS
-      const allowed = (process.env.ALLOWED_ADMIN_EMAILS || "").split(",").map(s=>s.trim().toLowerCase());
-      const email = (session.user?.email || "").toLowerCase();
-      (session.user as any).isAdmin = allowed.includes(email);
-      
+    async session({ session, token }) {
+      // Pass role from JWT to session (no extra fetches)
+      (session.user as any).role = token.role || "user";
+      (session.user as any).uid = token.uid;
       return session;
     },
   },
