@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { CATERING_PACKAGES, ADDONS, MIN_GUESTS } from "@/config/catering";
 
 // Menu options for different categories
@@ -57,9 +59,10 @@ function OptionGrid({ title, items, selected, max, onToggle }: {
 }
 
 export default function Catering() {
+  const { data: session } = useSession();
   const [pkg, setPkg] = useState("standard");
   const [guests, setGuests] = useState(50);
-  const [addons, setAddons] = useState([]);
+  const [addons, setAddons] = useState<{id: string; qty: number}[]>([]);
   const [estimate, setEstimate] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [customer, setCustomer] = useState({ name: "", email: "" });
@@ -200,6 +203,23 @@ export default function Catering() {
           </p>
         </div>
       </div>
+
+      {/* Admin Button - Only visible to admin users */}
+      {session?.user && (
+        <div className="bg-slate-900/30 px-6 py-4">
+          <div className="max-w-6xl mx-auto flex justify-end">
+            <Link href={
+              (session.user as any).role === "admin" 
+                ? "/admin/catering" 
+                : "/admin/signin?next=%2Fadmin%2Fcatering"
+            }>
+              <button className="bg-yellow-500 text-black font-bold px-4 py-2 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:bg-yellow-400 hover:scale-105">
+                Admin Catering
+              </button>
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Progress Bar */}
       <div className="bg-slate-900/50 px-6 py-4">

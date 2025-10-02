@@ -9,8 +9,18 @@ import { authOptions } from "@/lib/auth/options";
 import CateringAdminView from "./CateringAdminView";
 
 export default async function Page() {
-  const s = await getServerSession(authOptions as any);
-  if (!s) redirect(`/api/auth/signin?callbackUrl=/admin/catering`);
-  if ((s.user as any)?.role !== "admin") redirect("/403?m=admin_only");
-  return <CateringAdminView adminEmail={s.user?.email || ""} />;
+  const session = await getServerSession(authOptions);
+  
+  // Redirect to sign in if not authenticated
+  if (!session?.user) {
+    redirect(`/api/auth/signin?callbackUrl=${encodeURIComponent('/admin/catering')}`);
+  }
+  
+  // Check admin role from NextAuth session
+  const userRole = (session.user as any).role;
+  if (userRole !== "admin") {
+    redirect("/403?m=admin_only");
+  }
+  
+  return <CateringAdminView adminEmail={session.user.email || ""} />;
 }
