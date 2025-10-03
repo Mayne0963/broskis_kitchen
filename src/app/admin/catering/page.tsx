@@ -6,21 +6,24 @@ export const fetchCache = "force-no-store";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/options";
-import CateringAdminView from "./CateringAdminView";
 
-export default async function Page() {
+export default async function AdminCateringPage() {
   const session = await getServerSession(authOptions);
   
-  // Redirect to sign in if not authenticated
   if (!session?.user) {
-    redirect(`/api/auth/signin?callbackUrl=${encodeURIComponent('/admin/catering')}`);
+    redirect("/admin/signin?next=%2Fadmin%2Fcatering");
   }
   
-  // Check admin role from NextAuth session
-  const userRole = (session.user as any).role;
-  if (userRole !== "admin") {
-    redirect("/403?m=admin_only");
+  if ((session.user as any).role !== "admin") {
+    redirect("/403");
   }
   
-  return <CateringAdminView adminEmail={session.user.email || ""} />;
+  return (
+    <main className="container mx-auto px-4 py-8">
+      <section>
+        <h1 className="text-2xl font-bold mb-4">Catering Admin</h1>
+        <p className="opacity-80">Manage requests, deposits, menus, and schedules.</p>
+      </section>
+    </main>
+  );
 }

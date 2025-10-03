@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { CATERING_PACKAGES, ADDONS, MIN_GUESTS } from "@/config/catering";
+import AdminCateringCTA from "./_components/AdminCateringCTA";
 
 // Menu options for different categories
 export const MENU_OPTIONS = {
@@ -59,7 +60,18 @@ function OptionGrid({ title, items, selected, max, onToggle }: {
 }
 
 export default function Catering() {
-  const { data: session } = useSession();
+  const { data, status } = useSession(); // ← no destructure of user yet
+  const session = data ?? null;
+
+  // Show loading state while session is loading
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <div className="animate-pulse opacity-70 text-yellow-300 text-xl">Loading catering...</div>
+      </div>
+    );
+  }
+
   const [pkg, setPkg] = useState("standard");
   const [guests, setGuests] = useState(50);
   const [addons, setAddons] = useState<{id: string; qty: number}[]>([]);
@@ -164,7 +176,9 @@ export default function Catering() {
     if (menuError) {
       setErrors(prev => ({ ...prev, menu: menuError }));
       setLoading(false);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
       return;
     }
     
@@ -183,7 +197,9 @@ export default function Catering() {
     const d = await res.json();
     setLoading(false);
     if (d?.stripe?.checkoutUrl) {
-      window.location.href = d.stripe.checkoutUrl;
+      if (typeof window !== "undefined") {
+        window.location.href = d.stripe.checkoutUrl;
+      }
     } else {
       alert("Submitted!");
     }
@@ -204,22 +220,8 @@ export default function Catering() {
         </div>
       </div>
 
-      {/* Admin Button - Only visible to admin users */}
-      {session?.user && (
-        <div className="bg-slate-900/30 px-6 py-4">
-          <div className="max-w-6xl mx-auto flex justify-end">
-            <Link href={
-              (session.user as any).role === "admin" 
-                ? "/admin/catering" 
-                : "/admin/signin?next=%2Fadmin%2Fcatering"
-            }>
-              <button className="bg-yellow-500 text-black font-bold px-4 py-2 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:bg-yellow-400 hover:scale-105">
-                Admin Catering
-              </button>
-            </Link>
-          </div>
-        </div>
-      )}
+      {/* Admin-only control (client) */}
+      <AdminCateringCTA />
 
       {/* Progress Bar */}
       <div className="bg-slate-900/50 px-6 py-4">

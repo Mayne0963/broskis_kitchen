@@ -24,6 +24,7 @@ export const ROLE_ROUTES = {
   admin: [
     '/admin',
     '/admin/dashboard',
+    '/admin/catering',
     '/admin/orders',
     '/admin/analytics',
     '/admin/users',
