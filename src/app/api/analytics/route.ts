@@ -5,6 +5,7 @@ export const revalidate = 0;
 import { NextRequest, NextResponse } from 'next/server';
 import { analyticsService } from '@/lib/services/analytics-service';
 import { auth } from '@/lib/firebase/admin';
+import { isUserAdmin } from '@/lib/auth/roleUtils';
 
 export async function GET(request: NextRequest) {
   try {
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if user has admin access
-    const isAdmin = decodedToken.admin === true || decodedToken.role === 'admin';
+    const isAdmin = isUserAdmin(decodedToken);
     if (!isAdmin) {
       return NextResponse.json(
         { error: 'Insufficient permissions. Admin access required.' },
@@ -152,7 +153,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user has admin access
-    const isAdmin = decodedToken.admin === true || decodedToken.role === 'admin';
+    const isAdmin = isUserAdmin(decodedToken);
     if (!isAdmin) {
       return NextResponse.json(
         { error: 'Insufficient permissions. Admin access required.' },

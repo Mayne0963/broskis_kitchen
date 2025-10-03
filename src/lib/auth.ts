@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/firebase/admin';
 import { cookies } from 'next/headers';
 import { auth as adminAuth } from 'firebase-admin';
+import { isUserAdmin } from './auth/roleUtils';
 
 export interface AuthUser {
   uid: string;
@@ -69,8 +70,7 @@ export async function verifyAdminToken(req: NextRequest): Promise<AuthUser | nul
     const user = await requireAuth(req);
     
     // Check if user has admin claims
-    const isAdmin = user.customClaims?.admin === true || 
-                   user.customClaims?.role === 'admin';
+    const isAdmin = isUserAdmin(user.customClaims);
     
     if (!isAdmin) {
       return null;
@@ -84,7 +84,7 @@ export async function verifyAdminToken(req: NextRequest): Promise<AuthUser | nul
 }
 
 export function isAdmin(customClaims?: Record<string, any>): boolean {
-  return customClaims?.admin === true || customClaims?.role === 'admin';
+  return isUserAdmin(customClaims);
 }
 
 // Helper to decode cookie 'session'

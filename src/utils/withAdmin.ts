@@ -1,6 +1,7 @@
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { verifyIdToken } from '@/lib/auth/session';
 import { cookies } from 'next/headers';
+import { isUserAdmin } from '@/lib/auth/roleUtils';
 
 /**
  * Higher-order function that wraps getServerSideProps to enforce admin access
@@ -39,7 +40,7 @@ export function withAdmin<P extends { [key: string]: any } = { [key: string]: an
 
       // Check if user has admin role
       const userRole = decodedToken.role;
-      const isAdmin = userRole === 'admin' || decodedToken.admin === true;
+      const isAdmin = isUserAdmin(decodedToken);
       
       if (!isAdmin) {
         console.log(`User ${decodedToken.email} does not have admin role (role: ${userRole}), redirecting to dashboard`);
@@ -144,7 +145,7 @@ export async function checkAdminAccess(request: Request): Promise<{
     }
 
     // Check admin role
-    const isAdmin = decodedToken.role === 'admin' || decodedToken.admin === true;
+    const isAdmin = isUserAdmin(decodedToken);
     
     if (!isAdmin) {
       return {

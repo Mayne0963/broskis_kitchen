@@ -40,42 +40,6 @@ export const authOptions: NextAuthOptions = {
   // keep existing providers here (Google/Email/etc)
   providers: [
     CredentialsProvider({
-      id: "credentials",
-      name: "Email and Password",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
-        
-        try {
-          // For demo purposes - in production, verify against your user database
-          // This is a simplified example - implement proper password verification
-          const email = credentials.email.toLowerCase();
-          const isAdmin = ENV.ALLOWED_ADMIN_EMAILS.includes(email);
-          
-          if (!isAdmin) {
-            return null;
-          }
-          
-          // In production, verify password against hashed password in database
-          // For now, allowing any password for admin emails (SECURITY RISK - FIX IN PRODUCTION)
-          return {
-            id: email,
-            email: email,
-            name: email,
-            emailVerified: true,
-          };
-        } catch (error) {
-          console.error("Credentials auth error:", error);
-          return null;
-        }
-      },
-    }),
-    CredentialsProvider({
       id: "firebase",
       name: "Firebase",
       credentials: {

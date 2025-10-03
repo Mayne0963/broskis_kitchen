@@ -5,6 +5,7 @@ export const revalidate = 0;
 import { NextRequest, NextResponse } from 'next/server';
 import { auth, adminDb } from '@/lib/firebase/admin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
+import { isUserAdmin } from '@/lib/auth/roleUtils';
 
 interface ChatMessage {
   id?: string;
@@ -81,7 +82,7 @@ export async function POST(
     
     // Determine sender type and verify permissions
     let senderType: 'customer' | 'driver' | 'support';
-    const isAdmin = decodedToken.admin === true;
+    const isAdmin = isUserAdmin(decodedToken);
     const isDriver = decodedToken.role === 'driver';
     const isCustomer = senderId === deliveryData?.customerId;
     const isAssignedDriver = senderId === driverId && driverId === deliveryData?.driverId;
@@ -223,7 +224,7 @@ export async function GET(
     const deliveryData = deliveryDoc.data();
     
     // Verify user has access to this chat
-    const isAdmin = decodedToken.admin === true;
+    const isAdmin = isUserAdmin(decodedToken);
     const isDriver = decodedToken.role === 'driver' && userId === driverId && driverId === deliveryData?.driverId;
     const isCustomer = userId === deliveryData?.customerId;
 

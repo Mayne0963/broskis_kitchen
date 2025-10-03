@@ -70,7 +70,7 @@ export async function ensureAdmin(req: NextRequest) {
     }
 
     const isClaimAdmin = !!(decoded as any).admin;
-    const adminEmails = (process.env.ALLOWED_ADMIN_EMAILS || '')
+    const adminEmails = (process.env.ADMIN_EMAILS || '')
       .split(',')
       .map((s) => s.trim().toLowerCase())
       .filter(Boolean);

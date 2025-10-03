@@ -11,15 +11,10 @@ export default async function AdminCateringPage() {
   const session = await getServerSession(authOptions);
   
   if (!session?.user) {
-    redirect("/admin/signin?callbackUrl=%2Fadmin%2Fcatering");
+    redirect("/admin/signin?next=%2Fadmin%2Fcatering");
   }
   
-  // Check admin role more safely
-  const userRole = (session.user as any)?.role;
-  const userEmail = session.user?.email?.toLowerCase();
-  const isAdmin = userRole === "admin" || (userEmail && process.env.ALLOWED_ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()).includes(userEmail));
-  
-  if (!isAdmin) {
+  if ((session.user as any).role !== "admin") {
     redirect("/403");
   }
   

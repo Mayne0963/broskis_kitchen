@@ -4,6 +4,7 @@ export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { auth, adminDb } from '@/lib/firebase/admin';
+import { isUserAdmin } from '@/lib/auth/roleUtils';
 
 type DriverStatus = 'available' | 'busy' | 'offline' | 'on_delivery';
 
@@ -28,7 +29,7 @@ export async function PUT(
     const { driverId } = await params;
 
     // Check if user is the driver themselves or admin
-    const isAdmin = decodedToken.admin === true;
+    const isAdmin = isUserAdmin(decodedToken);
     const isDriver = decodedToken.role === 'driver' && requestingUserId === driverId;
     
     if (!isAdmin && !isDriver) {
@@ -171,7 +172,7 @@ export async function GET(
     const { driverId } = await params;
 
     // Check if user is admin or the driver themselves
-    const isAdmin = decodedToken.admin === true;
+    const isAdmin = isUserAdmin(decodedToken);
     const isDriver = decodedToken.role === 'driver' && requestingUserId === driverId;
     
     if (!isAdmin && !isDriver) {

@@ -9,6 +9,7 @@ import Link from 'next/link';
 import type { User as FirebaseUser } from 'firebase/auth';
 import AdminKPI from '@/components/kpi/AdminKPI';
 import QuickActions from '@/components/QuickActions';
+import { isUserAdmin } from '@/lib/auth/roleUtils';
 
 interface AuthState {
   user: FirebaseUser | null;
@@ -171,7 +172,7 @@ export default function StandaloneDashboard() {
     );
   }
 
-  const isAdmin = authState.claims?.role === 'admin' || authState.claims?.admin === true;
+  const isAdmin = isUserAdmin(authState.claims);
   const userRole = authState.claims?.role || 'customer';
 
   return (
