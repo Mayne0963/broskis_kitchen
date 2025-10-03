@@ -5,7 +5,6 @@ export const revalidate = 0;
 import { NextRequest, NextResponse } from 'next/server';
 import { auth, adminDb } from '@/lib/firebase/admin';
 import webpush from 'web-push';
-import { isUserAdmin } from '@/lib/auth/roleUtils';
 
 interface NotificationPayload {
   title: string;
@@ -73,7 +72,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Authorization check: users can send to themselves, or admins can send to anyone
-    const isAdmin = isUserAdmin(decodedToken);
+    const isAdmin = decodedToken.admin === true;
     if (!isAdmin && body.userId !== requestingUserId) {
       return NextResponse.json(
         { error: 'Cannot send notifications to other users' },
@@ -237,7 +236,7 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0');
 
     // Authorization check
-    const isAdmin = isUserAdmin(decodedToken);
+    const isAdmin = decodedToken.admin === true;
     if (!isAdmin && userId !== requestingUserId) {
       return NextResponse.json(
         { error: 'Cannot access notification history for other users' },

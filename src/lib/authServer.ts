@@ -4,7 +4,6 @@ import { cookies, headers } from "next/headers";
 import { adminAuth } from "./firebase/admin";
 import { getUserByUID } from "./user";
 import { UserCache } from "./cache";
-import { isUserAdmin } from "./auth/roleUtils";
 
 /**
  * Get authenticated user from NextAuth session (zero extra fetches)
@@ -31,7 +30,7 @@ export async function getServerUser() {
  */
 export async function isServerAdmin(): Promise<boolean> {
   const user = await getServerUser();
-  return isUserAdmin(user);
+  return user?.role === "admin";
 }
 
 /**

@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { isUserAdmin } from "@/lib/auth/roleUtils";
 
 export default function AdminCateringCTA() {
   const { data, status } = useSession();
-  const isAdmin = isUserAdmin(data?.user);
+  const isAdmin = (data?.user as any)?.role === "admin";
 
   if (status === "loading") return null; // no flicker / no crash
   if (!isAdmin) return null;

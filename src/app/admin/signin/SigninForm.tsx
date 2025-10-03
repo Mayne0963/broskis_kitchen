@@ -4,7 +4,6 @@
 import { useState, useEffect } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { isUserAdmin } from '@/lib/auth/roleUtils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,19 +26,19 @@ export default function SigninForm() {
     if (status === "authenticated" && session?.user) {
       // Check if user has admin role
       const userRole = (session.user as any).role;
-      if (isUserAdmin(session?.user))
+      if (userRole === "admin") {
         router.replace(callbackUrl);
       } else {
         setError("Admin access required");
       }
     }
-  , [status, session, callbackUrl, router]);
+  }, [status, session, callbackUrl, router]);
 
   if (status === "loading") {
     return <div className="text-center text-sm opacity-70">Checking session…</div>;
   }
 
-  if (status === "authenticated" && session?.user && isUserAdmin(session?.user)) {
+  if (status === "authenticated" && session?.user && (session.user as any).role === "admin") {
     return <div className="text-center text-sm opacity-70">Redirecting…</div>;
   }
 

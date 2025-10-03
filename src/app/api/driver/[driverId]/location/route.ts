@@ -5,7 +5,6 @@ export const revalidate = 0;
 import { NextRequest, NextResponse } from 'next/server';
 import { auth, adminDb } from '@/lib/firebase/admin';
 import { COLLECTIONS } from '@/lib/firebase/collections';
-import { isUserAdmin } from '@/lib/auth/roleUtils';
 
 // PUT - Update driver location
 export async function PUT(
@@ -28,7 +27,7 @@ export async function PUT(
     const { driverId } = await params;
 
     // Check if user is the driver themselves or admin
-    const isAdmin = isUserAdmin(decodedToken);
+    const isAdmin = decodedToken.admin === true;
     const isDriver = decodedToken.role === 'driver' && requestingUserId === driverId;
     
     if (!isAdmin && !isDriver) {
@@ -143,7 +142,7 @@ export async function GET(
     const { driverId } = await params;
 
     // Check if user is admin, the driver themselves, or has delivery access
-    const isAdmin = isUserAdmin(decodedToken);
+    const isAdmin = decodedToken.admin === true;
     const isDriver = decodedToken.role === 'driver' && requestingUserId === driverId;
     
     if (!isAdmin && !isDriver) {
