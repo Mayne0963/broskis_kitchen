@@ -74,7 +74,11 @@ export default function CateringTable({
         <table className="w-full text-sm" role="table" aria-label="Catering requests">
           <thead
             className="sticky top-0 z-10 backdrop-blur"
-            style={{ background: "rgba(0,0,0,0.6)", borderBottom: "1px solid var(--bk-border)" }}
+            style={{ 
+              background: "rgba(0,0,0,0.6)", 
+              borderBottom: "1px solid var(--bk-border)",
+              boxShadow: "0 6px 12px rgba(0,0,0,0.2)"
+            }}
           >
             <tr
               className="[&>th]:text-left [&>th]:py-2 [&>th]:px-3 uppercase tracking-wide text-xs"

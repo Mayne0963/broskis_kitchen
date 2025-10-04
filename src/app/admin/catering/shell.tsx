@@ -63,7 +63,7 @@ export default function CateringDashboardClient({
   const tableQ = useMemo(() => filters.q, [filters]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <CateringFilters initial={filters} onChange={handleFilters} />
       
       <div className="bg-neutral-900 border border-white/10 rounded-lg p-4">
