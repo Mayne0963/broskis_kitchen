@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getFirestore } from "firebase-admin/firestore";
 import { isAdmin, normalizeRole } from "@/lib/roles";
+import { mapDoc } from "@/lib/catering/transform";
 import type { CateringRequest, CateringUpdateRequest } from "@/types/catering";
 
 const db = getFirestore();
@@ -24,10 +25,8 @@ export async function GET(
       return NextResponse.json({ error: "Catering request not found" }, { status: 404 });
     }
 
-    const cateringRequest: CateringRequest = {
-      id: doc.id,
-      ...doc.data()
-    } as CateringRequest;
+    // Transform document using mapDoc for nested/flat compatibility
+    const cateringRequest = mapDoc(doc.id, doc.data()) as CateringRequest;
 
     return NextResponse.json(cateringRequest);
 
@@ -97,10 +96,7 @@ export async function PATCH(
     
     // Fetch and return updated document
     const updatedDoc = await docRef.get();
-    const updatedRequest: CateringRequest = {
-      id: updatedDoc.id,
-      ...updatedDoc.data()
-    } as CateringRequest;
+    const updatedRequest = mapDoc(updatedDoc.id, updatedDoc.data()) as CateringRequest;
 
     return NextResponse.json(updatedRequest);
 

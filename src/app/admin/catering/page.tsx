@@ -14,10 +14,10 @@ export default async function AdminCateringPage({
   if (role !== "admin") redirect("/not-authorized");
 
   return (
-    <div className="mx-auto max-w-6xl p-4 md:p-6 space-y-4">
-      <div>
-        <h1 className="text-3xl font-bold">Admin Catering</h1>
-        <p className="text-sm text-white/60">
+    <div className="admin-surface mx-auto max-w-6xl p-4 md:p-6 space-y-4">
+      <div className="rounded-xl border px-5 py-4 bk-gradient" style={{ borderColor: "var(--bk-border)" }}>
+        <h1 className="text-3xl font-bold text-white">Admin Catering</h1>
+        <p className="text-sm" style={{ color: "var(--bk-text-dim)" }}>
           Welcome, {session.user?.name}. This page is protected server-side with normalized role checking.
         </p>
       </div>

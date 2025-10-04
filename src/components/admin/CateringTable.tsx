@@ -29,6 +29,7 @@ export default function CateringTable({
         <td className={`${cellPad}`}><div className="skel-line w-40" /></td>
         <td className={`${cellPad}`}><div className="skel-line w-10" /></td>
         <td className={`${cellPad}`}><div className="skel-line w-16" /></td>
+        <td className={`${cellPad}`}><div className="skel-line w-20" /></td>
         <td className={`${cellPad}`}><div className="skel h-5 w-16" /></td>
         <td className={`${cellPad} text-right`}><div className="skel h-8 w-16 ml-auto" /></td>
       </tr>
@@ -69,17 +70,24 @@ export default function CateringTable({
 
   return (
     <div className="card">
-      <div className="overflow-x-auto">
+      <div className="overflow-auto rounded-md">
         <table className="w-full text-sm" role="table" aria-label="Catering requests">
-          <thead className="sticky top-0 z-10 bg-black/60 backdrop-blur border-b border-white/10">
-            <tr className="[&>th]:text-left [&>th]:py-2 [&>th]:px-3 text-white/70">
-              <th scope="col">Created</th>
-              <th scope="col">Name</th>
-              <th scope="col">Email</th>
-              <th scope="col">Guests</th>
-              <th scope="col">Tier</th>
-              <th scope="col">Status</th>
-              <th scope="col" className="text-right">Actions</th>
+          <thead
+            className="sticky top-0 z-10 backdrop-blur"
+            style={{ background: "rgba(0,0,0,0.6)", borderBottom: "1px solid var(--bk-border)" }}
+          >
+            <tr
+              className="[&>th]:text-left [&>th]:py-2 [&>th]:px-3 uppercase tracking-wide text-xs"
+              style={{ color: "var(--bk-text-soft)" }}
+            >
+              <th>Created</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Guests</th>
+              <th>Tier</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th className="text-right">Actions</th>
             </tr>
           </thead>
 
@@ -95,20 +103,29 @@ export default function CateringTable({
             {!loading && rows.map((r, i) => (
               <tr
                 key={r.id}
-                className={`border-b border-white/10 ${i % 2 ? "bg-white/5" : "bg-transparent"}`}
+                className={`tr-lift border-b ${i % 2 ? "bg-white/5" : "bg-transparent"}`}
+                style={{ borderColor: "var(--bk-border)" }}
               >
-                <td className={`${cellPad} whitespace-nowrap`}>
+                <td className="py-2 px-3 whitespace-nowrap">
                   {r.createdAt ? new Date(r.createdAt).toLocaleString() : "—"}
                 </td>
-                <td className={`${cellPad}`}>{r.name}</td>
-                <td className={`${cellPad}`}>{r.email}</td>
-                <td className={`${cellPad}`}>{r.guestCount ?? "—"}</td>
-                <td className={`${cellPad} capitalize`}>{r.packageTier ?? "—"}</td>
-                <td className={`${cellPad}`}>
-                  <StatusBadge status={r.status as any} />
+                <td className="px-3">{r.customer?.name ?? "—"}</td>
+                <td className="px-3">{r.customer?.email ?? "—"}</td>
+                <td className="px-3">{r.event?.guests ?? "—"}</td>
+                <td className="px-3 capitalize">{r.packageTier ?? "—"}</td>
+                <td className="px-3">
+                  {typeof r.price?.total === "number"
+                    ? new Intl.NumberFormat(undefined, { style: "currency", currency: r.price?.currency || "USD" }).format(r.price.total)
+                    : "—"}
                 </td>
-                <td className={`${cellPad} text-right`}>
-                  <a className="btn-ghost" href={`/admin/catering?id=${r.id}`} aria-label={`View request ${r.id}`}>
+                <td className="px-3"><StatusBadge status={r.status as any} /></td>
+                <td className="px-3 text-right">
+                  <a
+                    className="btn-ghost border"
+                    style={{ borderColor: "var(--bk-border)", color: "var(--bk-silver)" }}
+                    href={`/admin/catering?id=${r.id}`}
+                    aria-label={`View request ${r.id}`}
+                  >
                     View
                   </a>
                 </td>
@@ -118,7 +135,7 @@ export default function CateringTable({
             {/* Empty state */}
             {!loading && rows.length === 0 && (
               <tr>
-                <td colSpan={7} className="py-6 text-center text-white/60">
+                <td colSpan={8} className="py-8 text-center text-white/60">
                   No requests match your filters.
                 </td>
               </tr>
@@ -127,10 +144,10 @@ export default function CateringTable({
         </table>
       </div>
 
-      {error && <p className="text-rose-300 mt-3">{error}</p>}
+      {error && <p className="text-rose-300 mt-4 px-4">{error}</p>}
 
-      <div className="mt-3">
-        {cursor && (
+      {cursor && (
+        <div className="mt-3">
           <button
             onClick={() => load(false)}
             className="btn-primary"
@@ -139,8 +156,8 @@ export default function CateringTable({
           >
             {loading ? "Loading…" : "Load more"}
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

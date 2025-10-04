@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getFirestore } from "firebase-admin/firestore";
 import { isAdmin, normalizeRole } from "@/lib/roles";
+import { mapDoc } from "@/lib/catering/transform";
 import type { CateringRequest, CateringListResponse } from "@/types/catering";
 
 const db = getFirestore();
@@ -43,11 +44,8 @@ export async function GET(req: NextRequest) {
     // Execute query
     const snap = await query.limit(pageSize).get();
     
-    // Transform documents to typed objects
-    const items: CateringRequest[] = snap.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as CateringRequest));
+    // Transform documents using mapDoc for nested/flat compatibility
+    const items: CateringRequest[] = snap.docs.map(doc => mapDoc(doc.id, doc.data()) as CateringRequest);
 
     // Apply text search filter (client-side for flexibility)
     const filtered = q 

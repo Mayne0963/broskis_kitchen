@@ -1359,3 +1359,99 @@ main {
   position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
   clip:rect(0,0,0,0); white-space:nowrap; border:0;
 }
+
+/* ===== Broski Luxe Tokens ===== */
+:root {
+  --bk-bg: #0b0c0f; /* obsidian */
+  --bk-panel: rgba(16,17,22,0.78);
+  --bk-border: rgba(255,255,255,0.10);
+  --bk-border-2: rgba(255,255,255,0.16);
+  --bk-text-dim: rgba(255,255,255,0.68);
+  --bk-text-soft: rgba(255,255,255,0.52);
+  --bk-gold: #f1c453; /* primary gold */
+  --bk-gold-2: #e9b949; /* hover gold */
+  --bk-gold-3: #d4a12f; /* deeper */
+  --bk-silver: rgba(255,255,255,0.85);
+  --bk-focus: rgba(241,196,83,0.35);
+}
+
+/* page base (only affects admin area container) */
+.admin-surface { background: var(--bk-bg); }
+
+/* Luxe gradient strip (use on top headings) */
+.bk-gradient {
+  background: linear-gradient(
+    90deg,
+    rgba(241,196,83,0.18),
+    rgba(241,196,83,0.06) 35%,
+    transparent 70%
+  );
+}
+
+/* Buttons */
+.btn {
+  @apply inline-flex items-center justify-center rounded-md border px-3 py-2 text-sm font-medium transition;
+  border-color: var(--bk-border);
+}
+.btn:hover { border-color: var(--bk-border-2); }
+.btn-primary { background: rgba(241,196,83,0.12); color: var(--bk-silver); }
+.btn-primary:hover { background: rgba(241,196,83,0.18); }
+.btn-ghost { background: transparent; color: var(--bk-silver); }
+.btn-ghost:hover { background: rgba(255,255,255,0.06); }
+
+/* Inputs */
+.input, .select {
+  @apply rounded-md px-3 py-2 text-sm outline-none ring-0;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid var(--bk-border);
+  color: #fff;
+}
+.input:focus, .select:focus {
+  box-shadow: 0 0 0 3px var(--bk-focus);
+  border-color: var(--bk-border-2);
+}
+
+/* Cards */
+.card {
+  @apply rounded-xl p-5 shadow-lg;
+  background: var(--bk-panel);
+  border: 1px solid var(--bk-border);
+  backdrop-filter: blur(8px);
+}
+
+/* Status badge colors re-mapped to luxe palette */
+.badge {
+  @apply inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide;
+}
+.badge--new { border-color: #60a5fa55; color:#bfdbfe; background:#1e293b66; }
+.badge--in_review { border-color: #fbbf2455; color:#fde68a; background:#78350f55; }
+.badge--quoted { border-color: #a78bfa55; color:#ddd6fe; background:#312e8155; }
+.badge--confirmed { border-color: #34d39955; color:#a7f3d0; background:#064e3b55; }
+.badge--cancelled { border-color: #f8717155; color:#fecaca; background:#7f1d1d55; }
+.badge--archived { border-color: #94a3b855; color:#cbd5e1; background:#0f172a55; }
+.badge--paid { border-color: var(--bk-gold); color:#ffe8b3; background: rgba(241,196,83,0.16); }
+
+/* Table row hover animation */
+.tr-lift {
+  transition: transform .18s ease, background-color .18s ease;
+}
+.tr-lift:hover {
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.05);
+}
+
+/* Optional shimmer placeholders for loading */
+.skel-line {
+  background: linear-gradient(90deg, #333 25%, #444 37%, #333 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* thin luxe scrollbar */
+*::-webkit-scrollbar { height: 10px; width: 10px; }
+*::-webkit-scrollbar-thumb { background: rgba(241,196,83,0.28); border-radius: 999px; }
+*::-webkit-scrollbar-track { background: transparent; }

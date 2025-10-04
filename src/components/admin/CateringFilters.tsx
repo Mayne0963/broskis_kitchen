@@ -21,8 +21,8 @@ export default function CateringFilters({
   return (
     <div className="card">
       <div className="flex flex-wrap items-center gap-3">
-        <label className="text-sm">
-          <span className="mr-2 text-white/80">Status</span>
+        <label className="text-sm" style={{ color: "var(--bk-silver)" }}>
+          <span className="mr-2" style={{ color: "var(--bk-text-dim)" }}>Status</span>
           <select
             className="select min-w-[160px]"
             value={status}
@@ -35,11 +35,12 @@ export default function CateringFilters({
             <option value="confirmed">Confirmed</option>
             <option value="cancelled">Cancelled</option>
             <option value="archived">Archived</option>
+            <option value="paid">Paid</option>
           </select>
         </label>
 
         <input
-          className="input min-w-[240px]"
+          className="input min-w-[260px]"
           placeholder="Search name or email…"
           value={q}
           onChange={(e) => setQ(e.target.value)}
@@ -47,7 +48,16 @@ export default function CateringFilters({
         />
 
         <div className="ml-auto">
-          <a href="/api/admin/catering/export" className="btn-primary" aria-label="Export catering requests as CSV">
+          <a
+            href="/api/admin/catering/export"
+            className="btn border-[1.5px]"
+            aria-label="Export catering requests as CSV"
+            style={{
+              background: "linear-gradient(180deg, rgba(241,196,83,0.18), rgba(241,196,83,0.10))",
+              borderColor: "var(--bk-gold)",
+              color: "#1a1400",
+            }}
+          >
             Export CSV
           </a>
         </div>

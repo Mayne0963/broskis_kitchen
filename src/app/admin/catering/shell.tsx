@@ -63,37 +63,43 @@ export default function CateringDashboardClient({
   const tableQ = useMemo(() => filters.q, [filters]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <CateringFilters initial={filters} onChange={handleFilters} />
       
-      <div className="flex items-center justify-between">
-        <div className="text-xs text-white/50">Showing requests</div>
-        <div className="flex items-center gap-2">
-          <label className="text-xs text-white/70">Density</label>
-          <select
-            aria-label="Row density"
-            className="select h-8 py-1"
-            value={density}
-            onChange={(e) => setDensity(e.target.value as any)}
-          >
-            <option value="compact">Compact</option>
-            <option value="comfy">Comfy</option>
-          </select>
+      <div className="bg-neutral-900 border border-white/10 rounded-lg p-4">
+        <div className="flex items-center justify-between">
+          <div className="uppercase tracking-wide text-xs text-white/60">Showing requests</div>
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2">
+              <span className="uppercase tracking-wide text-xs text-white/60">Density</span>
+              <select
+                aria-label="Row density"
+                className="bg-neutral-800 border border-white/10 rounded px-3 py-1 text-white text-sm focus:border-yellow-400 focus:outline-none transition-colors"
+                value={density}
+                onChange={(e) => setDensity(e.target.value as any)}
+              >
+                <option value="compact">Compact</option>
+                <option value="comfy">Comfy</option>
+              </select>
+            </label>
+          </div>
         </div>
       </div>
       
       <CateringTable status={tableStatus} q={tableQ} density={density} />
       {activeId && (
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Request Detail</h2>
-            <button
-              className="btn-ghost"
-              onClick={() => pushQuery({ id: null })}
-              aria-label="Close detail"
-            >
-              Close
-            </button>
+        <div className="space-y-4">
+          <div className="bg-neutral-900 border border-white/10 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-white">Request Detail</h2>
+              <button
+                className="bg-neutral-800 hover:bg-neutral-700 text-white border border-white/10 px-4 py-2 rounded transition-colors"
+                onClick={() => pushQuery({ id: null })}
+                aria-label="Close detail"
+              >
+                Close
+              </button>
+            </div>
           </div>
           <CateringDetail id={activeId} />
         </div>

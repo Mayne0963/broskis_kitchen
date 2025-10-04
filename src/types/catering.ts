@@ -9,20 +9,53 @@ export type CateringStatus =
   | "quoted" 
   | "confirmed" 
   | "cancelled" 
-  | "archived";
+  | "archived"
+  | "paid";
 
 export type CateringRequest = {
   id: string;
   createdAt: number;
-  eventDate?: number;
-  name: string;
-  email: string;
-  phone?: string;
-  guestCount?: number;
+  
+  // Nested customer data
+  customer?: {
+    name: string;
+    email: string;
+    phone?: string;
+  };
+  
+  // Nested event data
+  event?: {
+    date: string;
+    address: string;
+    guests: number;
+  };
+  
+  // Nested price data
+  price?: {
+    currency: string;
+    addons: number;
+    deposit?: number;
+    perGuest?: number;
+    subtotal?: number;
+    total?: number;
+  };
+  
+  // Nested stripe data
+  stripe?: {
+    checkoutUrl?: string;
+  };
+  
   packageTier?: "standard" | "premium" | "luxury";
-  selections?: string[];
   notes?: string;
   status: CateringStatus;
+  
+  // Legacy flat fields for backward compatibility
+  eventDate?: number;
+  name?: string;
+  email?: string;
+  phone?: string;
+  guestCount?: number;
+  selections?: string[];
   totalEstimate?: number;
   source?: "site" | "contact" | "manual";
   updatedAt?: number;
