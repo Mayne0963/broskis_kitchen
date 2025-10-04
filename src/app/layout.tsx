@@ -2,8 +2,8 @@ import type React from "react"
 import type { Metadata } from "next"
 import "./globals.css"
 import "./chat-animations.css"
-import ConditionalNavbar from "../components/layout/ConditionalNavbar"
-import Footer from "../components/layout/Footer"
+import NavBar from "../components/site/NavBar"
+import Footer from "../components/site/Footer"
 import { Providers } from "../lib/context/Providers"
 import MusicPlayer from "../components/layout/MusicPlayer"
 import ErrorBoundary from "../components/common/ErrorBoundary"
@@ -128,7 +128,7 @@ export default async function RootLayout({
               <ChunkErrorHandler />
               <Providers>
                 <SkipNavigation />
-                <ConditionalNavbar />
+                <NavBar />
                 {/* Server-rendered Admin button for zero flicker */}
                 {showAdmin && (
                   <div className="fixed top-2 right-4 z-[70]">
