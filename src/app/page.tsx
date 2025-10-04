@@ -32,25 +32,6 @@ function Page() {
   return (
     <MobileEnhancer enableSwipeGestures={true} enableTouchOptimizations={true}>
       <div className="min-h-screen bg-black text-white">
-        
-        {/* Broski Luxe Hero Section */}
-        <section className="container-xl py-20">
-          <div className="rounded-2xl border shadow-luxe p-10 bk-gradient" 
-               style={{ borderColor:"var(--bk-border)" }}>
-            <h1 className="h1 mb-3">Broski's Kitchen</h1>
-            <p className="text-lg mb-6" style={{ color:"var(--bk-text-dim)" }}>
-              Elevated flavors, delivered with luxury.
-            </p>
-            <div className="flex gap-3">
-              <a href="/order" className="btn btn-lg border-[1.5px]" 
-                 style={{ background:"linear-gradient(180deg, rgba(241,196,83,.22), rgba(241,196,83,.12))", borderColor:"var(--bk-gold)", color:"#1a1400" }}>
-                Order Now
-              </a>
-              <a href="/catering" className="btn-ghost btn-lg">Catering</a>
-            </div>
-          </div>
-        </section>
-
       {/* Hero Section - Fullscreen */}
       <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
         {/* OTW Delivery Button - Top Right Corner */}
