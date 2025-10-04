@@ -1,70 +1,47 @@
-export interface CateringPackage {
+/**
+ * Catering Dashboard Types
+ * Data models for the Admin Catering Dashboard system
+ */
+
+export type CateringStatus = 
+  | "new" 
+  | "in_review" 
+  | "quoted" 
+  | "confirmed" 
+  | "cancelled" 
+  | "archived";
+
+export type CateringRequest = {
   id: string;
-  name: string;
-  description: string;
-  basePrice: number;
-  minGuests: number;
-  maxGuests: number;
-}
-
-export interface CateringAddon {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  type: 'per_person' | 'flat_rate';
-}
-
-export interface CateringMenu {
-  meats: string[];
-  sides: string[];
-  drinks?: string[];
-  appetizers?: string[];
-  desserts?: string[];
-}
-
-export interface CateringCustomer {
+  createdAt: number;
+  eventDate?: number;
   name: string;
   email: string;
-  phone: string;
-  company?: string;
-}
-
-export interface CateringEvent {
-  date: string;
-  time: string;
-  location: string;
-  type: string;
+  phone?: string;
+  guestCount?: number;
+  packageTier?: "standard" | "premium" | "luxury";
+  selections?: string[];
   notes?: string;
-}
-
-export interface CateringRequest {
-  id?: string;
-  customer: CateringCustomer;
-  event: CateringEvent;
-  packageId: string;
-  guests: number;
-  addons: string[];
-  menu: CateringMenu;
-  price: number;
-  status: 'pending' | 'confirmed' | 'cancelled';
-  createdAt: string;
-}
-
-export interface CateringEstimate {
-  packagePrice: number;
-  addonPrice: number;
-  totalPrice: number;
-  deposit: number;
-}
-
-// Admin types
-export type CateringAdminQuery = {
-  status?: string;
-  from?: string;
-  to?: string;
-  q?: string;
-  limit?: number;
+  status: CateringStatus;
+  totalEstimate?: number;
+  source?: "site" | "contact" | "manual";
+  updatedAt?: number;
 };
 
-export type CateringStatus = "pending" | "quoted" | "confirmed" | "canceled";
+export type CateringListResponse = {
+  items: CateringRequest[];
+  nextCursor: string | null;
+};
+
+export type CateringFilters = {
+  status?: string;
+  q?: string;
+  limit?: number;
+  cursor?: string;
+};
+
+export type CateringUpdateRequest = {
+  status?: CateringStatus;
+  notes?: string;
+  totalEstimate?: number;
+};

@@ -1,66 +1,86 @@
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-export const fetchCache = "force-no-store";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { isAdmin } from "@/lib/roles";
+import { getFirestore } from "firebase-admin/firestore";
 
-import { NextResponse } from "next/server";
-import { db } from "@/lib/firebase/admin";
-import { assertAdmin } from "@/lib/auth/adminGuard";
+const db = getFirestore();
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
-    await assertAdmin();
-    
-    const snap = await db
+    // Check admin authentication
+    const session = await getServerSession(authOptions);
+    if (!isAdmin(session?.user)) {
+      return NextResponse.json({ error: "forbidden" }, { status: 403 });
+    }
+
+    // Fetch all catering requests
+    const snapshot = await db
       .collection("cateringRequests")
       .orderBy("createdAt", "desc")
-      .limit(1000)
       .get();
-    
-    const rows = [[
-      "id",
-      "createdAt",
-      "status",
-      "packageId",
-      "guests",
-      "name",
-      "email",
-      "phone",
-      "date",
-      "address",
-      "subtotal",
-      "deposit"
-    ].join(",")];
-    
-    snap.forEach(doc => {
-      const it: any = doc.data();
-      rows.push([
-        it.id,
-        it.createdAt,
-        it.status,
-        it.packageId,
-        it.guests,
-        it.customer?.name,
-        it.customer?.email,
-        it.customer?.phone,
-        it.event?.date,
-        JSON.stringify(it.event?.address || ""),
-        it.price?.subtotal,
-        it.price?.deposit
-      ].map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(","));
-    });
-    
-    return new NextResponse(rows.join("\n"), {
+
+    const requests = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    // Generate CSV content
+    const headers = [
+      "ID",
+      "Created At",
+      "Event Date", 
+      "Name",
+      "Email",
+      "Phone",
+      "Guest Count",
+      "Package Tier",
+      "Selections",
+      "Notes",
+      "Status",
+      "Total Estimate",
+      "Source",
+      "Updated At"
+    ];
+
+    const csvRows = [
+      headers.join(","),
+      ...requests.map(req => [
+        req.id,
+        req.createdAt ? new Date(req.createdAt).toISOString() : "",
+        req.eventDate ? new Date(req.eventDate).toISOString() : "",
+        `"${(req.name || "").replace(/"/g, '""')}"`,
+        `"${(req.email || "").replace(/"/g, '""')}"`,
+        `"${(req.phone || "").replace(/"/g, '""')}"`,
+        req.guestCount || "",
+        req.packageTier || "",
+        `"${(req.selections || []).join("; ").replace(/"/g, '""')}"`,
+        `"${(req.notes || "").replace(/"/g, '""')}"`,
+        req.status || "",
+        req.totalEstimate || "",
+        req.source || "",
+        req.updatedAt ? new Date(req.updatedAt).toISOString() : ""
+      ].join(","))
+    ];
+
+    const csvContent = csvRows.join("\n");
+    const timestamp = new Date().toISOString().split('T')[0];
+    const filename = `catering-requests-${timestamp}.csv`;
+
+    return new NextResponse(csvContent, {
+      status: 200,
       headers: {
         "Content-Type": "text/csv",
-        "Content-Disposition": "attachment; filename=catering.csv"
+        "Content-Disposition": `attachment; filename="${filename}"`,
+        "Cache-Control": "no-cache"
       }
     });
-  } catch (e: any) {
-    const code = e?.message === "FORBIDDEN" ? 403 : 500;
+
+  } catch (error: any) {
+    console.error("CSV export error:", error);
     return NextResponse.json(
-      { ok: false, error: e?.message || "SERVER_ERROR" },
-      { status: code }
+      { error: "Failed to export CSV" },
+      { status: 500 }
     );
   }
 }
