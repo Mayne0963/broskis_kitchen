@@ -20,6 +20,7 @@ import ServiceWorkerCleanup from "../components/common/ServiceWorkerCleanup"
 import { getServerSession } from "next-auth"
 import { authOptions } from "./api/auth/[...nextauth]/route"
 import Link from "next/link"
+import { isAdmin } from "../lib/roles"
 
 import { playfair, montserrat } from "./fonts"
 import StructuredData, { OrganizationStructuredData } from "../components/seo/StructuredData"
@@ -95,7 +96,7 @@ export default async function RootLayout({
   
   // Server-side session check for admin button
   const session = await getServerSession(authOptions);
-  const isAdmin = session?.user?.role === "admin";
+  const showAdmin = isAdmin((session?.user as any)?.role);
   
   return (
     <html lang="en" suppressHydrationWarning>
@@ -129,7 +130,7 @@ export default async function RootLayout({
                 <SkipNavigation />
                 <ConditionalNavbar />
                 {/* Server-rendered Admin button for zero flicker */}
-                {isAdmin && (
+                {showAdmin && (
                   <div className="fixed top-2 right-4 z-[70]">
                     <Link
                       href="/admin/catering"

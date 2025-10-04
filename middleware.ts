@@ -8,7 +8,7 @@ export const config = {
 
 // NOTE: 
 // For best performance, let the server page guard handle role checks.
-// Parsing NextAuth session cookies inside middleware adds complexity.
+// Admin routes use lightweight middleware - pages handle authentication.
 // This middleware focuses on caching and basic route protection.
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl;
@@ -19,6 +19,11 @@ export async function middleware(req: NextRequest) {
       url.pathname.startsWith("/api/admin") || 
       url.pathname.startsWith("/admin")) {
     response.headers.set("Cache-Control", "no-store, private, max-age=0");
+  }
+
+  // Lightweight admin route handling - let pages handle auth
+  if (url.pathname.startsWith("/admin")) {
+    return response;
   }
 
   // Guard /api/rewards routes
