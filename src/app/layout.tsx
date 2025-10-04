@@ -17,6 +17,9 @@ import SEOAudit from "../components/seo/SEOAudit"
 import SchemaGenerator from "../components/seo/SchemaGenerator"
 import { NetworkStatus } from "../components/common/EnhancedLoadingStates"
 import ServiceWorkerCleanup from "../components/common/ServiceWorkerCleanup"
+import { getServerSession } from "next-auth"
+import { authOptions } from "./api/auth/[...nextauth]/route"
+import Link from "next/link"
 
 import { playfair, montserrat } from "./fonts"
 import StructuredData, { OrganizationStructuredData } from "../components/seo/StructuredData"
@@ -82,13 +85,17 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   // Ensure font variables are properly defined with fallbacks
   const fontClasses = `${playfair?.variable || ''} ${montserrat?.variable || ''} font-sans`;
+  
+  // Server-side session check for admin button
+  const session = await getServerSession(authOptions);
+  const isAdmin = session?.user?.role === "ADMIN";
   
   return (
     <html lang="en" suppressHydrationWarning>
@@ -121,6 +128,17 @@ export default function RootLayout({
               <Providers>
                 <SkipNavigation />
                 <ConditionalNavbar />
+                {/* Server-rendered Admin button for zero flicker */}
+                {isAdmin && (
+                  <div className="fixed top-2 right-4 z-[70]">
+                    <Link
+                      href="/admin/catering"
+                      className="inline-flex items-center rounded-md px-3 py-2 text-sm font-medium bg-red-600 text-white border border-red-700 hover:bg-red-700 transition-colors duration-200 shadow-lg"
+                    >
+                      Admin Catering
+                    </Link>
+                  </div>
+                )}
                 <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
                 <Footer />
                 <MusicPlayer />

@@ -22,7 +22,6 @@
     "vercel-prebuild": "node scripts/vercel-prebuild.js",
     "validate-env": "node scripts/validate-env.js",
     "validate-vercel": "node scripts/vercel-prebuild.js",
-
     "security-check": "npm audit && npm run validate-env",
     "build-production": "NODE_ENV=production npm run vercel-prebuild && next build",
     "build-vercel": "npm run validate-vercel && npm run security-check && next build",
@@ -56,7 +55,6 @@
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
     "@hookform/resolvers": "^3.9.1",
-
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
     "@radix-ui/react-aspect-ratio": "1.1.1",
@@ -97,7 +95,7 @@
     "cmdk": "1.0.4",
     "date-fns": "^4.1.0",
     "embla-carousel-react": "8.5.1",
-    "firebase": "^12.0.0",
+    "firebase": "^12.3.0",
     "firebase-admin": "^12.7.0",
     "framer-motion": "^11.18.2",
     "input-otp": "^1.4.2",
@@ -108,7 +106,6 @@
     "node-fetch": "^3.3.2",
     "openai": "^5.0.1",
     "postcss": "^8.4.49",
-
     "react": "19.0.0",
     "react-day-picker": "^9.7.0",
     "react-dom": "19.0.0",

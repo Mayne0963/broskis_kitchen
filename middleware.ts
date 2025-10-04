@@ -6,6 +6,10 @@ export const config = {
   matcher: ["/api/auth/:path*", "/api/admin/:path*", "/admin/:path*", "/api/rewards/:path*"] 
 };
 
+// NOTE: 
+// For best performance, let the server page guard handle role checks.
+// Parsing NextAuth session cookies inside middleware adds complexity.
+// This middleware focuses on caching and basic route protection.
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl;
   const response = NextResponse.next();
