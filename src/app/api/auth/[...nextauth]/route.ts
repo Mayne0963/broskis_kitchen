@@ -12,7 +12,7 @@ export const authOptions: NextAuthOptions = {
         if (!idToken) return null;
         // Verify once with Firebase Admin on login
         const decoded = await adminAuth.verifyIdToken(idToken);
-        const role = decoded.admin ? "ADMIN" : "USER";
+        const role = decoded.admin ? "admin" : "user";
         return {
           id: decoded.uid,
           email: decoded.email,

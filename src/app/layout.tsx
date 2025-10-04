@@ -95,7 +95,7 @@ export default async function RootLayout({
   
   // Server-side session check for admin button
   const session = await getServerSession(authOptions);
-  const isAdmin = session?.user?.role === "ADMIN";
+  const isAdmin = session?.user?.role === "admin";
   
   return (
     <html lang="en" suppressHydrationWarning>

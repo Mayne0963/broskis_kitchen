@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 export default function AdminButton() {
   const { data: session, status } = useSession();
   if (status === "loading") return null; // avoid flicker
-  if (session?.user?.role !== "ADMIN") return null;
+  if (session?.user?.role !== "admin") return null;
   return (
     <Link
       href="/admin/catering"
