@@ -14,11 +14,13 @@ export default async function AdminCateringPage({
   if (role !== "admin") redirect("/not-authorized");
 
   return (
-    <div className="p-6 space-y-4">
-      <h1 className="text-2xl font-semibold">Admin Catering</h1>
-      <p className="text-sm text-neutral-500">
-        Welcome, {session.user?.name}. This page is protected server-side.
-      </p>
+    <div className="mx-auto max-w-6xl p-4 md:p-6 space-y-4">
+      <div>
+        <h1 className="text-3xl font-bold">Admin Catering</h1>
+        <p className="text-sm text-white/60">
+          Welcome, {session.user?.name}. This page is protected server-side with normalized role checking.
+        </p>
+      </div>
       <CateringDashboardClient
         initialStatus={searchParams.status ?? "all"}
         initialQ={searchParams.q ?? ""}

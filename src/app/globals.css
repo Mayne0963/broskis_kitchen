@@ -1325,3 +1325,23 @@ main {
 .debug-fixed *[style*="position: fixed"], .debug-fixed .fixed {
   outline: 1px solid red !important;
 }
+
+/* Admin Catering polish */
+.glass {
+  @apply bg-black/30 backdrop-blur-md border border-white/10 shadow-lg;
+}
+.btn {
+  @apply inline-flex items-center justify-center rounded-md border border-white/15 px-3 py-2 text-sm font-medium transition;
+}
+.btn:hover { @apply border-white/25; }
+.btn-primary { @apply btn bg-white/10 hover:bg-white/15; }
+.btn-ghost { @apply btn bg-transparent hover:bg-white/10; }
+.input {
+  @apply rounded-md border border-white/15 bg-black/40 px-3 py-2 text-sm outline-none ring-0 placeholder:text-white/40;
+}
+.input:focus { @apply border-white/25 shadow-[0_0_0_3px_rgba(255,255,255,0.06)]; }
+.select { @apply input pr-7 appearance-none bg-[url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white"><path d="M5 7l5 5 5-5"/></svg>')] bg-[length:16px_16px] bg-no-repeat bg-[right_0.5rem_center]; }
+.badge {
+  @apply inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide;
+}
+.card { @apply glass rounded-xl p-5; }

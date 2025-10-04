@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
 import type { CateringRequest } from "@/types/catering";
+import StatusBadge from "./StatusBadge";
 
 export default function CateringTable({
   status,
@@ -47,38 +48,38 @@ export default function CateringTable({
   const empty = useMemo(() => !loading && rows.length === 0, [loading, rows]);
 
   return (
-    <div className="mt-4">
-      <div className="overflow-x-auto">
+    <div className="card">
+      <div className="overflow-auto rounded-md">
         <table className="w-full text-sm">
-          <thead className="border-b bg-black/10">
-            <tr className="[&>th]:text-left [&>th]:py-2">
+          <thead className="sticky top-0 z-10 bg-black/60 backdrop-blur border-b border-white/10">
+            <tr className="[&>th]:text-left [&>th]:py-2 [&>th]:px-3 text-white/70">
               <th>Created</th>
               <th>Name</th>
               <th>Email</th>
               <th>Guests</th>
               <th>Tier</th>
               <th>Status</th>
-              <th>Actions</th>
+              <th className="text-right">Actions</th>
             </tr>
           </thead>
-
           <tbody>
-            {rows.map((r) => (
-              <tr key={r.id} className="border-b">
-                <td className="py-2">
+            {rows.map((r, i) => (
+              <tr
+                key={r.id}
+                className={`border-b border-white/10 ${i % 2 ? "bg-white/5" : "bg-transparent"}`}
+              >
+                <td className="py-2 px-3 whitespace-nowrap">
                   {r.createdAt ? new Date(r.createdAt).toLocaleString() : "—"}
                 </td>
-                <td>{r.name}</td>
-                <td>{r.email}</td>
-                <td>{r.guestCount ?? "—"}</td>
-                <td className="capitalize">{r.packageTier ?? "—"}</td>
-                <td>
-                  <span className="uppercase text-[11px] px-2 py-1 border rounded">
-                    {r.status}
-                  </span>
+                <td className="px-3">{r.name}</td>
+                <td className="px-3">{r.email}</td>
+                <td className="px-3">{r.guestCount ?? "—"}</td>
+                <td className="px-3 capitalize">{r.packageTier ?? "—"}</td>
+                <td className="px-3">
+                  <StatusBadge status={r.status} />
                 </td>
-                <td>
-                  <a className="underline" href={`/admin/catering?id=${r.id}`}>
+                <td className="px-3 text-right">
+                  <a className="btn-ghost" href={`/admin/catering?id=${r.id}`}>
                     View
                   </a>
                 </td>
@@ -88,15 +89,14 @@ export default function CateringTable({
         </table>
       </div>
 
-      {error && <p className="text-red-500 mt-3">{error}</p>}
-
-      {empty && <p className="text-sm text-neutral-500 mt-3">No results.</p>}
+      {error && <p className="text-rose-300 mt-3">{error}</p>}
+      {empty && <p className="text-sm text-white/60 mt-3">No results.</p>}
 
       <div className="mt-3">
         {cursor && (
           <button
             onClick={() => load(false)}
-            className="border rounded px-3 py-1"
+            className="btn-primary"
             disabled={loading}
           >
             {loading ? "Loading…" : "Load more"}
