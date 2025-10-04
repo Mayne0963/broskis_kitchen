@@ -43,10 +43,11 @@ export default function CateringFilters({
           placeholder="Search name or email…"
           value={q}
           onChange={(e) => setQ(e.target.value)}
+          aria-label="Search by name or email"
         />
 
         <div className="ml-auto">
-          <a href="/api/admin/catering/export" className="btn-primary">
+          <a href="/api/admin/catering/export" className="btn-primary" aria-label="Export catering requests as CSV">
             Export CSV
           </a>
         </div>

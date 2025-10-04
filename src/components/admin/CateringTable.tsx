@@ -6,14 +6,34 @@ import StatusBadge from "./StatusBadge";
 export default function CateringTable({
   status,
   q,
+  density = "compact",
 }: {
   status: string;
   q: string;
+  density?: "compact" | "comfy";
 }) {
   const [rows, setRows] = useState<CateringRequest[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Row padding helper
+  const cellPad = density === "compact" ? "py-2 px-3" : "py-3 px-4";
+
+  // Skeleton rows helper function
+  function SkeletonRow() {
+    return (
+      <tr className="border-b border-white/10">
+        <td className={`${cellPad}`}><div className="skel-line w-28" /></td>
+        <td className={`${cellPad}`}><div className="skel-line w-32" /></td>
+        <td className={`${cellPad}`}><div className="skel-line w-40" /></td>
+        <td className={`${cellPad}`}><div className="skel-line w-10" /></td>
+        <td className={`${cellPad}`}><div className="skel-line w-16" /></td>
+        <td className={`${cellPad}`}><div className="skel h-5 w-16" /></td>
+        <td className={`${cellPad} text-right`}><div className="skel h-8 w-16 ml-auto" /></td>
+      </tr>
+    );
+  }
 
   async function load(reset = false) {
     setLoading(true);
@@ -49,48 +69,65 @@ export default function CateringTable({
 
   return (
     <div className="card">
-      <div className="overflow-auto rounded-md">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm" role="table" aria-label="Catering requests">
           <thead className="sticky top-0 z-10 bg-black/60 backdrop-blur border-b border-white/10">
             <tr className="[&>th]:text-left [&>th]:py-2 [&>th]:px-3 text-white/70">
-              <th>Created</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Guests</th>
-              <th>Tier</th>
-              <th>Status</th>
-              <th className="text-right">Actions</th>
+              <th scope="col">Created</th>
+              <th scope="col">Name</th>
+              <th scope="col">Email</th>
+              <th scope="col">Guests</th>
+              <th scope="col">Tier</th>
+              <th scope="col">Status</th>
+              <th scope="col" className="text-right">Actions</th>
             </tr>
           </thead>
+
           <tbody>
-            {rows.map((r, i) => (
+            {/* Loading state */}
+            {loading && rows.length === 0 && (
+              <>
+                <SkeletonRow /><SkeletonRow /><SkeletonRow />
+              </>
+            )}
+
+            {/* Data rows */}
+            {!loading && rows.map((r, i) => (
               <tr
                 key={r.id}
                 className={`border-b border-white/10 ${i % 2 ? "bg-white/5" : "bg-transparent"}`}
               >
-                <td className="py-2 px-3 whitespace-nowrap">
+                <td className={`${cellPad} whitespace-nowrap`}>
                   {r.createdAt ? new Date(r.createdAt).toLocaleString() : "—"}
                 </td>
-                <td className="px-3">{r.name}</td>
-                <td className="px-3">{r.email}</td>
-                <td className="px-3">{r.guestCount ?? "—"}</td>
-                <td className="px-3 capitalize">{r.packageTier ?? "—"}</td>
-                <td className="px-3">
-                  <StatusBadge status={r.status} />
+                <td className={`${cellPad}`}>{r.name}</td>
+                <td className={`${cellPad}`}>{r.email}</td>
+                <td className={`${cellPad}`}>{r.guestCount ?? "—"}</td>
+                <td className={`${cellPad} capitalize`}>{r.packageTier ?? "—"}</td>
+                <td className={`${cellPad}`}>
+                  <StatusBadge status={r.status as any} />
                 </td>
-                <td className="px-3 text-right">
-                  <a className="btn-ghost" href={`/admin/catering?id=${r.id}`}>
+                <td className={`${cellPad} text-right`}>
+                  <a className="btn-ghost" href={`/admin/catering?id=${r.id}`} aria-label={`View request ${r.id}`}>
                     View
                   </a>
                 </td>
               </tr>
             ))}
+
+            {/* Empty state */}
+            {!loading && rows.length === 0 && (
+              <tr>
+                <td colSpan={7} className="py-6 text-center text-white/60">
+                  No requests match your filters.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
 
       {error && <p className="text-rose-300 mt-3">{error}</p>}
-      {empty && <p className="text-sm text-white/60 mt-3">No results.</p>}
 
       <div className="mt-3">
         {cursor && (
@@ -98,6 +135,7 @@ export default function CateringTable({
             onClick={() => load(false)}
             className="btn-primary"
             disabled={loading}
+            aria-busy={loading}
           >
             {loading ? "Loading…" : "Load more"}
           </button>
