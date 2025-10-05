@@ -4,7 +4,9 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { calcPrice } from "@/lib/catering/price";
 import { db } from "@/lib/firebase/admin";
-import type { CateringMenu } from "@/types/catering";
+import Stripe from "stripe";
+import { Redis } from "@upstash/redis";
+import { Ratelimit } from "@upstash/ratelimit";
 
 // Menu rules for each package type
 const MENU_RULES = {
@@ -14,7 +16,7 @@ const MENU_RULES = {
 };
 
 // Server-side menu validation function
-function serverValidateMenu(menu: CateringMenu | undefined, rule: typeof MENU_RULES.standard) {
+function serverValidateMenu(menu: any, rule: typeof MENU_RULES.standard) {
   if (!menu) return { ok: false, msg: "Menu required" };
   
   if ((menu.meats || []).length > rule.meats) {
@@ -39,12 +41,99 @@ function serverValidateMenu(menu: CateringMenu | undefined, rule: typeof MENU_RU
   return { ok: true };
 }
 
-export async function POST(req: Request) {
-  const b = await req.json();
-  const { customer, event, packageId, guests, addons = [], menu } = b;
+// Initialize rate limiter
+let ratelimit: Ratelimit | null = null;
+
+if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+  const redis = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  });
+
+  ratelimit = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(10, "10 m"), // 10 requests per 10 minutes
+    analytics: true,
+  });
+}
+
+// Helper function to get client IP
+function getClientIP(req: Request): string {
+  const forwarded = req.headers.get("x-forwarded-for");
+  const realIP = req.headers.get("x-real-ip");
   
+  if (forwarded) {
+    return forwarded.split(",")[0].trim();
+  }
+  
+  if (realIP) {
+    return realIP;
+  }
+  
+  return "unknown";
+}
+
+// Helper function to verify hCaptcha token
+async function verifyHCaptcha(token: string): Promise<boolean> {
+  if (!token) return false;
+  
+  const secretKey = process.env.HCAPTCHA_SECRET_KEY;
+  if (!secretKey) {
+    console.warn("hCaptcha secret key not configured");
+    return false;
+  }
+  
+  try {
+    const response = await fetch("https://hcaptcha.com/siteverify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        secret: secretKey,
+        response: token,
+      }),
+    });
+    
+    const data = await response.json();
+    return data.success === true;
+  } catch (error) {
+    console.error("hCaptcha verification error:", error);
+    return false;
+  }
+}
+
+export async function POST(req: Request) {
+  // Check rate limit first
+  if (ratelimit) {
+    const clientIP = getClientIP(req);
+    const { success, limit, reset, remaining } = await ratelimit.limit(clientIP);
+    
+    if (!success) {
+      return NextResponse.json(
+        { 
+          error: "RATE_LIMITED",
+          message: "Too many requests. Please try again later.",
+          limit,
+          reset,
+          remaining
+        }, 
+        { status: 429 }
+      );
+    }
+  }
+
+  const b = await req.json();
+  const { customer, event, packageId, guests, addons = [], menu, captchaToken } = b;
+
   if (!customer?.name || !customer?.email || !event?.date || !event?.address) {
-    return NextResponse.json({ error: "INVALID" }, { status: 400 });
+    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+  }
+
+  // Verify hCaptcha token
+  const isCaptchaValid = await verifyHCaptcha(captchaToken);
+  if (!isCaptchaValid) {
+    return NextResponse.json({ error: "CAPTCHA_FAILED" }, { status: 400 });
   }
   
   if (guests < 25) {
@@ -88,7 +177,7 @@ export async function POST(req: Request) {
   let stripe = null;
   if (process.env.STRIPE_SECRET_KEY) {
     const Stripe = (await import("stripe")).default;
-    const s = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2024-06-20" });
+    const s = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2025-02-24.acacia" });
     
     const session = await s.checkout.sessions.create({
       mode: "payment",

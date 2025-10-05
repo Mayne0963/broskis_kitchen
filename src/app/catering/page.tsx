@@ -1,8 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import dynamic from "next/dynamic";
+
+const HCaptcha = dynamic(() => import("@hcaptcha/react-hcaptcha"), { ssr: false });
 import { CATERING_PACKAGES, ADDONS, MIN_GUESTS } from "@/config/catering";
 import AdminCateringCTA from "./_components/AdminCateringCTA";
 
@@ -80,6 +83,8 @@ export default function Catering() {
   const [customer, setCustomer] = useState({ name: "", email: "" });
   const [event, setEvent] = useState({ date: "", address: "" });
   const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<HCaptcha>(null);
   
   // Menu selection state
   const [menu, setMenu] = useState({
@@ -137,6 +142,7 @@ export default function Catering() {
     if (!customer.email.trim()) newErrors.email = "Email is required";
     if (!event.date) newErrors.date = "Event date is required";
     if (!event.address.trim()) newErrors.address = "Event address is required";
+    if (!captchaToken) newErrors.captcha = "Please complete the security verification";
     
     // Validate menu selections
     const menuError = validateMenu(pkg, menu);
@@ -191,11 +197,29 @@ export default function Catering() {
         packageId: pkg,
         guests,
         addons,
-        menu
+        menu,
+        captchaToken
       })
     });
     const d = await res.json();
     setLoading(false);
+    
+    if (!res.ok) {
+      // Reset captcha on error
+      setCaptchaToken(null);
+      captchaRef.current?.resetCaptcha();
+      
+      // Handle specific error messages
+      if (d.error === "RATE_LIMITED") {
+        setErrors(prev => ({ ...prev, submit: "Too many requests. Please wait a few minutes before trying again." }));
+      } else if (d.error === "CAPTCHA_FAILED") {
+        setErrors(prev => ({ ...prev, captcha: "Security verification failed. Please try again." }));
+      } else {
+        setErrors(prev => ({ ...prev, submit: d.error || "Submission failed. Please try again." }));
+      }
+      return;
+    }
+    
     if (d?.stripe?.checkoutUrl) {
       if (typeof window !== "undefined") {
         window.location.href = d.stripe.checkoutUrl;
@@ -560,13 +584,44 @@ export default function Catering() {
           </div>
           
           <div className="text-center">
+            {/* Security Verification */}
+            <div className="mb-6 flex justify-center">
+              <HCaptcha
+                ref={captchaRef}
+                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || "10000000-ffff-ffff-ffff-000000000001"}
+                onVerify={(token) => {
+                  setCaptchaToken(token);
+                  setErrors(prev => {
+                    const newErrors = { ...prev };
+                    delete newErrors.captcha;
+                    return newErrors;
+                  });
+                }}
+                onExpire={() => setCaptchaToken(null)}
+                onError={() => setCaptchaToken(null)}
+                theme="dark"
+              />
+            </div>
+            
+            {errors.captcha && (
+              <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                <p className="text-red-400 text-sm font-medium">{errors.captcha}</p>
+              </div>
+            )}
+            
+            {errors.submit && (
+              <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                <p className="text-red-400 text-sm font-medium">{errors.submit}</p>
+              </div>
+            )}
+            
             <button
               onClick={() => {
                 if (validateForm()) {
                   submit();
                 }
               }}
-              disabled={loading}
+              disabled={loading || !captchaToken}
               className="w-full max-w-md mx-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-yellow-400 to-amber-500 text-black text-xl font-bold hover:opacity-90 disabled:opacity-50 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-yellow-400/25"
             >
               {loading ? (

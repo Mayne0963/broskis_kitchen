@@ -1,33 +1,84 @@
 import { initializeApp, cert, getApps, App } from "firebase-admin/app";
-import { getFirestore } from "firebase-admin/firestore";
-import { getAuth } from "firebase-admin/auth";
+import { getFirestore, Firestore } from "firebase-admin/firestore";
+import { getAuth, Auth } from "firebase-admin/auth";
 import * as admin from "firebase-admin";
 import type { NextRequest } from 'next/server';
 import { cookies, headers } from 'next/headers';
 
+/**
+ * Get Firebase Admin service account credentials from environment variables
+ * Handles both JSON string and individual environment variables
+ */
 function getServiceAccount() {
-  const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
-  if (!raw) throw new Error("FIREBASE_SERVICE_ACCOUNT is required");
-  const parsed = JSON.parse(raw);
-  // Defensive: fix private_key newlines if needed
-  if (parsed.private_key && !parsed.private_key.includes("BEGIN PRIVATE KEY")) {
-    parsed.private_key = parsed.private_key.replace(/\\n/g, "\n");
+  // Try FIREBASE_SERVICE_ACCOUNT first (JSON string)
+  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    try {
+      const parsed = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+      // Handle private key newline replacement
+      if (parsed.private_key && !parsed.private_key.includes("BEGIN PRIVATE KEY")) {
+        parsed.private_key = parsed.private_key.replace(/\\n/g, "\n");
+      }
+      return parsed;
+    } catch (error) {
+      console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT:", error);
+      throw new Error("Invalid FIREBASE_SERVICE_ACCOUNT JSON");
+    }
   }
-  return parsed;
+
+  // Fallback to individual environment variables
+  const projectId = process.env.FIREBASE_PROJECT_ID;
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+
+  if (!projectId || !clientEmail || !privateKey) {
+    throw new Error(
+      "Firebase Admin credentials missing. Provide either FIREBASE_SERVICE_ACCOUNT or " +
+      "FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY"
+    );
+  }
+
+  return {
+    type: "service_account",
+    project_id: projectId,
+    client_email: clientEmail,
+    private_key: privateKey.replace(/\\n/g, "\n"), // Handle newline replacement
+  };
 }
 
-// Initialize Firebase Admin with simplified setup
-const svc = getServiceAccount();
-const app: App = getApps()[0] || initializeApp({ 
-  credential: cert(svc),
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-});
+// Prevent duplicate app initialization
+let adminApp: App;
+let dbAdmin: Firestore;
+let authAdmin: Auth;
 
-// Export core services
-export const db = getFirestore(app);
-export const adminApp = app;
-export const auth = getAuth(app);
+try {
+  // Check if app already exists
+  adminApp = getApps().find(app => app.name === '[DEFAULT]') || getApps()[0];
+  
+  if (!adminApp) {
+    // Initialize new app with service account credentials
+    const serviceAccount = getServiceAccount();
+    adminApp = initializeApp({
+      credential: cert(serviceAccount),
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+    });
+  }
+
+  // Initialize services
+  dbAdmin = getFirestore(adminApp);
+  authAdmin = getAuth(adminApp);
+} catch (error) {
+  console.error("Firebase Admin initialization error:", error);
+  throw new Error("Failed to initialize Firebase Admin SDK");
+}
+
+// Export Firebase Admin app and services
+export { adminApp, dbAdmin };
+
+// Legacy compatibility exports (maintain existing imports)
+export const db = dbAdmin;
+export const auth = authAdmin;
+export const app = adminApp;
 
 /**
  * ensureAdmin: verifies the caller is an authenticated admin.

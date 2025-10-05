@@ -9,8 +9,8 @@ import { Resend } from "resend";
 
 const db = getFirestore();
 
-// Initialize Resend with API key from environment
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend with API key from environment (only if available)
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 export async function POST(
   _: NextRequest,
@@ -54,8 +54,8 @@ export async function POST(
     }
 
     // Check if Resend API key is configured
-    if (!process.env.RESEND_API_KEY) {
-      return NextResponse.json({ error: "Email service not configured" }, { status: 500 });
+    if (!process.env.RESEND_API_KEY || !resend) {
+      return NextResponse.json({ error: "Email service not configured. Please set RESEND_API_KEY environment variable." }, { status: 500 });
     }
 
     // Format event date

@@ -8,7 +8,9 @@ export default function CateringDetail({ id }: { id: string }) {
   const [notes, setNotes] = useState("");
   const [status, setStatus] = useState<CateringStatus>("in_review");
   const [saving, setSaving] = useState(false);
+  const [sendingQuote, setSendingQuote] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -115,6 +117,39 @@ export default function CateringDetail({ id }: { id: string }) {
       setError(e?.message || "Failed to update");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function sendQuote() {
+    if (!item?.stripe?.checkoutUrl) return;
+    
+    setSendingQuote(true);
+    setError(null);
+    setSuccessMessage(null);
+    
+    try {
+      const res = await fetch(`/api/admin/catering/${id}/send-quote`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to send quote");
+      }
+      
+      const result = await res.json();
+      setSuccessMessage("Quote email sent successfully!");
+      
+      // Clear success message after 5 seconds
+      setTimeout(() => setSuccessMessage(null), 5000);
+      
+    } catch (e: any) {
+      setError(e.message || "Failed to send quote email");
+    } finally {
+      setSendingQuote(false);
     }
   }
 
@@ -266,6 +301,7 @@ export default function CateringDetail({ id }: { id: string }) {
       </div>
 
       {error && <p className="text-rose-300 bg-rose-500/10 border border-rose-500/20 rounded p-3" role="alert">{error}</p>}
+      {successMessage && <p className="text-green-300 bg-green-500/10 border border-green-500/20 rounded p-3" role="alert">{successMessage}</p>}
 
       {/* Actions */}
       <div className="flex flex-wrap gap-3 pt-4 border-t border-white/10">
@@ -282,6 +318,21 @@ export default function CateringDetail({ id }: { id: string }) {
         >
           {saving ? "Saving…" : "Save changes"}
         </button>
+        {item.stripe?.checkoutUrl && (
+          <button
+            onClick={sendQuote}
+            className="btn border-[1.5px]"
+            disabled={sendingQuote}
+            aria-busy={sendingQuote}
+            style={{
+              background: "linear-gradient(180deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05))",
+              borderColor: "var(--bk-gold)",
+              color: "var(--bk-gold)",
+            }}
+          >
+            {sendingQuote ? "Sending…" : "Send Quote"}
+          </button>
+        )}
         <a 
           href="/api/admin/catering/export" 
           className="bg-neutral-800 hover:bg-neutral-700 text-white border border-white/10 px-6 py-2 rounded transition-colors" 

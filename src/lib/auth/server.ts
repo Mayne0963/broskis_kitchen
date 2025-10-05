@@ -1,10 +1,11 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/options";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-/**
- * Auth wrapper for getServerSession
- * Provides consistent server-side authentication
- */
-export async function auth() {
-  return await getServerSession(authOptions);
+export async function requireUser() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) {
+    return { ok: false as const, reason: "unauthenticated", session: null };
+  }
+  // you normalize to lowercase everywhere
+  return { ok: true as const, uid: session.user.email.toLowerCase(), session };
 }

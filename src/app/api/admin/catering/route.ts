@@ -24,6 +24,8 @@ export async function GET(req: NextRequest) {
     const q = (searchParams.get("q") || "").toLowerCase().trim();
     const pageSize = Math.min(Number(searchParams.get("limit") || 20), 100); // Cap at 100
     const cursor = searchParams.get("cursor");
+    const dateStart = searchParams.get('dateStart');
+    const dateEnd = searchParams.get('dateEnd');
 
     // Build Firestore query
     let query = db.collection("cateringRequests").orderBy("createdAt", "desc");
@@ -32,6 +34,9 @@ export async function GET(req: NextRequest) {
     if (status !== "all") {
       query = query.where("status", "==", status);
     }
+    
+    // Note: Date filtering will be applied client-side after fetching
+    // to properly handle event.date vs createdAt priority
     
     // Handle pagination cursor
     if (cursor) {
@@ -45,16 +50,47 @@ export async function GET(req: NextRequest) {
     const snap = await query.limit(pageSize).get();
     
     // Transform documents using mapDoc for nested/flat compatibility
-    const items: CateringRequest[] = snap.docs.map(doc => mapDoc(doc.id, doc.data()) as CateringRequest);
+    let items: CateringRequest[] = snap.docs.map(doc => mapDoc(doc.id, doc.data()) as CateringRequest);
+
+    // Apply date filtering - prioritize event.date over createdAt
+    if (dateStart || dateEnd) {
+      const startMs = dateStart ? parseInt(dateStart) : null;
+      const endMs = dateEnd ? parseInt(dateEnd) : null;
+
+      items = items.filter(item => {
+        // Priority: event.date > eventDate (legacy) > createdAt
+        let dateToCheck: number;
+        
+        if (item.event?.date) {
+          // Convert event.date string to timestamp (handles various date formats)
+          const eventDate = new Date(item.event.date);
+          dateToCheck = isNaN(eventDate.getTime()) ? 0 : eventDate.getTime();
+        } else if (item.eventDate) {
+          // Legacy eventDate field (already a timestamp)
+          dateToCheck = item.eventDate;
+        } else {
+          // Fallback to createdAt
+          dateToCheck = item.createdAt || 0;
+        }
+
+        // Apply date range filters
+        if (startMs && dateToCheck < startMs) return false;
+        if (endMs && dateToCheck > endMs) return false;
+        return true;
+      });
+    }
 
     // Apply text search filter (client-side for flexibility)
-    const filtered = q 
-      ? items.filter((item) => 
-          (item.name || "").toLowerCase().includes(q) || 
-          (item.email || "").toLowerCase().includes(q) ||
-          (item.phone || "").toLowerCase().includes(q)
-        ) 
-      : items;
+     const filtered = q 
+       ? items.filter(item => 
+           (item.name || "").toLowerCase().includes(q) || 
+           (item.email || "").toLowerCase().includes(q) ||
+           (item.phone || "").toLowerCase().includes(q) ||
+           (item.customer?.name || "").toLowerCase().includes(q) ||
+           (item.customer?.email || "").toLowerCase().includes(q) ||
+           (item.event?.address || "").toLowerCase().includes(q)
+         ) 
+       : items;
 
     // Calculate next cursor
     const nextCursor = snap.docs.length === pageSize && snap.docs.length > 0

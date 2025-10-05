@@ -71,6 +71,9 @@ export type CateringFilters = {
   q?: string;
   limit?: number;
   cursor?: string;
+  dateStart?: string;
+  dateEnd?: string;
+  datePreset?: string;
 };
 
 export type CateringUpdateRequest = {
