@@ -1,0 +1,198 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Skip to main content" [ref=e3]:
+      - /url: "#main-content"
+    - link "Skip to navigation" [ref=e4]:
+      - /url: "#navigation"
+  - navigation "Main navigation" [ref=e5]:
+    - generic [ref=e6]:
+      - link "Broski's Kitchen" [ref=e7]:
+        - /url: /
+      - generic [ref=e8]:
+        - link "Menu" [ref=e9]:
+          - /url: /menu
+        - link "Infused Menu - Coming Soon" [ref=e10]:
+          - /url: /infused-menu
+        - link "Locations" [ref=e11]:
+          - /url: /locations
+        - link "Events" [ref=e12]:
+          - /url: /events
+        - link "Music" [ref=e13]:
+          - /url: /music
+        - link "Rewards" [ref=e14]:
+          - /url: /rewards
+        - link "Shop" [ref=e15]:
+          - /url: /shop
+        - link "Catering" [ref=e16]:
+          - /url: /catering
+        - link "Contact" [ref=e17]:
+          - /url: /contact
+        - link "OTW Logo OTW" [ref=e18]:
+          - /url: https://otw-chi.vercel.app
+          - img "OTW Logo" [ref=e19]
+          - generic [ref=e20]: OTW
+        - button "Shopping cart" [ref=e22] [cursor=pointer]:
+          - img [ref=e23] [cursor=pointer]
+        - link "Login" [ref=e25] [cursor=pointer]:
+          - /url: /auth/login
+          - img
+          - text: Login
+  - main [ref=e27]:
+    - generic [ref=e28]:
+      - generic [ref=e31]:
+        - heading "Broski's Music" [level=1] [ref=e32]
+        - paragraph [ref=e33]: Immerse yourself in our curated collection of royalty-free music, perfectly crafted to enhance your dining experience.
+      - generic [ref=e35]:
+        - generic [ref=e36]:
+          - heading "Music Player" [level=2] [ref=e37]
+          - paragraph [ref=e38]: "Choose from our curated playlists featuring local tracks: . All music is sourced locally for the best listening experience."
+        - generic [ref=e39]:
+          - generic [ref=e40]:
+            - generic [ref=e41]:
+              - generic [ref=e43]: ♪
+              - generic [ref=e44]:
+                - heading "Select a track" [level=3] [ref=e45]
+                - paragraph [ref=e46]: No artist
+              - button [ref=e47] [cursor=pointer]:
+                - img [ref=e48] [cursor=pointer]
+            - generic [ref=e51]:
+              - generic [ref=e52]: 0:00
+              - slider [ref=e54] [cursor=pointer]: "0"
+              - generic [ref=e55]: 0:00
+            - generic [ref=e56]:
+              - button [ref=e57] [cursor=pointer]:
+                - img [ref=e58] [cursor=pointer]
+              - button [ref=e64] [cursor=pointer]:
+                - img [ref=e65] [cursor=pointer]
+              - button [ref=e67] [cursor=pointer]:
+                - img [ref=e68] [cursor=pointer]
+              - button [ref=e70] [cursor=pointer]:
+                - img [ref=e71] [cursor=pointer]
+              - button [ref=e73] [cursor=pointer]:
+                - img [ref=e74] [cursor=pointer]
+            - generic [ref=e79]:
+              - button [ref=e80] [cursor=pointer]:
+                - img [ref=e81] [cursor=pointer]
+              - slider [ref=e86] [cursor=pointer]: "1"
+              - generic [ref=e87]: "100"
+            - button [ref=e89] [cursor=pointer]:
+              - img [ref=e90] [cursor=pointer]
+          - button [ref=e91] [cursor=pointer]:
+            - img [ref=e92] [cursor=pointer]
+      - generic [ref=e98]:
+        - generic [ref=e100]:
+          - generic [ref=e102]: 🎵
+          - heading "Chill Lofi" [level=3] [ref=e103]
+          - paragraph [ref=e104]: Relaxing and ambient tracks perfect for unwinding and creating a peaceful atmosphere.
+        - generic [ref=e106]:
+          - generic [ref=e108]: 🎸
+          - heading "Broski Mix" [level=3] [ref=e109]
+          - paragraph [ref=e110]: Energetic and motivating tracks to boost your mood and create an uplifting environment.
+        - generic [ref=e112]:
+          - generic [ref=e114]: 🎷
+          - heading "Acoustic Guitar" [level=3] [ref=e115]
+          - paragraph [ref=e116]: Smooth acoustic melodies for an elegant and refined dining experience.
+      - generic [ref=e118]:
+        - heading "About Our Music" [level=2] [ref=e119]
+        - generic [ref=e120]:
+          - paragraph [ref=e121]: All music featured in our player is royalty-free and carefully selected to enhance your dining experience at Broski's Kitchen. Our curated playlists are designed to complement different moods and moments throughout your visit.
+          - paragraph [ref=e122]: Whether you're looking to relax with our Chill Lofi playlist, energize with our Broski Mix, or enjoy acoustic guitar melodies, our music player offers the perfect soundtrack for your culinary journey. All tracks are served locally for optimal performance.
+          - generic [ref=e123]:
+            - generic [ref=e124]:
+              - heading "Features:" [level=4] [ref=e125]
+              - list [ref=e126]:
+                - listitem [ref=e127]: • High-quality royalty-free music
+                - listitem [ref=e128]: • Local audio file serving
+                - listitem [ref=e129]: • Auto-generated playlists
+                - listitem [ref=e130]: • Shuffle and repeat modes
+                - listitem [ref=e131]: • Volume control
+                - listitem [ref=e132]: • Favorite tracks system
+            - generic [ref=e133]:
+              - heading "Music Genres:" [level=4] [ref=e134]
+              - list [ref=e135]:
+                - listitem [ref=e136]: • Ambient & Lofi
+                - listitem [ref=e137]: • Acoustic Guitar
+                - listitem [ref=e138]: • Electronic & Corporate
+                - listitem [ref=e139]: • Chill & Relaxation
+  - contentinfo [ref=e140]:
+    - generic [ref=e141]:
+      - generic [ref=e142]:
+        - generic [ref=e143]:
+          - heading "Broski's Kitchen" [level=3] [ref=e144]
+          - paragraph [ref=e145]: Luxury Street Gourmet
+          - generic [ref=e146]:
+            - link [ref=e147]:
+              - /url: https://facebook.com
+              - img [ref=e148]
+            - link [ref=e150]:
+              - /url: https://twitter.com
+              - img [ref=e151]
+            - link [ref=e153]:
+              - /url: https://instagram.com
+              - img [ref=e154]
+            - link [ref=e156]:
+              - /url: https://youtube.com
+              - img [ref=e157]
+          - button "Play Radio" [ref=e160] [cursor=pointer]
+        - generic [ref=e161]:
+          - heading "Quick Links" [level=3] [ref=e162]
+          - list [ref=e163]:
+            - listitem [ref=e164]:
+              - link "Menu" [ref=e165]:
+                - /url: /menu
+            - listitem [ref=e166]:
+              - link "Locations" [ref=e167]:
+                - /url: /locations
+            - listitem [ref=e168]:
+              - link "Events" [ref=e169]:
+                - /url: /events
+            - listitem [ref=e170]:
+              - link "Rewards" [ref=e171]:
+                - /url: /rewards
+            - listitem [ref=e172]:
+              - link "Shop" [ref=e173]:
+                - /url: /shop
+        - generic [ref=e174]:
+          - heading "Information" [level=3] [ref=e175]
+          - list [ref=e176]:
+            - listitem [ref=e177]:
+              - link "About Us" [ref=e178]:
+                - /url: /about
+            - listitem [ref=e179]:
+              - link "Contact" [ref=e180]:
+                - /url: /contact
+            - listitem [ref=e181]:
+              - link "Gift Cards" [ref=e182]:
+                - /url: /gift-cards
+            - listitem [ref=e183]:
+              - link "Catering" [ref=e184]:
+                - /url: /catering
+            - listitem [ref=e185]:
+              - link "Volunteer" [ref=e186]:
+                - /url: /volunteer
+        - generic [ref=e187]:
+          - heading "Legal" [level=3] [ref=e188]
+          - list [ref=e189]:
+            - listitem [ref=e190]:
+              - link "Terms & Conditions" [ref=e191]:
+                - /url: /terms
+            - listitem [ref=e192]:
+              - link "Privacy Policy" [ref=e193]:
+                - /url: /privacy
+            - listitem [ref=e194]:
+              - link "Accessibility" [ref=e195]:
+                - /url: /accessibility
+            - listitem [ref=e196]:
+              - button "Rewards Policy" [ref=e197] [cursor=pointer]:
+                - text: Rewards Policy
+                - img [ref=e198] [cursor=pointer]
+      - paragraph [ref=e201]: © 2024 Broski's Kitchen. All rights reserved.
+  - button "SEO Audit" [ref=e203] [cursor=pointer]
+  - 'button "Accessibility audit: 0 errors, 0 warnings. Show details" [ref=e205] [cursor=pointer]':
+    - generic [ref=e207] [cursor=pointer]: A11y
+  - iframe [ref=e208]:
+    
+```

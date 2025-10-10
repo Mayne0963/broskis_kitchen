@@ -1,0 +1,14 @@
+<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="gradbeat_05" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+      </linearGradient>
+    </defs>
+    <rect width="400" height="400" fill="url(#gradbeat_05)" />
+    <circle cx="200" cy="200" r="80" fill="rgba(255,255,255,0.2)" />
+    <circle cx="200" cy="200" r="60" fill="rgba(255,255,255,0.1)" />
+    <circle cx="200" cy="200" r="40" fill="rgba(255,255,255,0.1)" />
+    <text x="200" y="320" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="24" font-weight="bold">Relaxing Piano</text>
+    <text x="200" y="350" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-family="Arial, sans-serif" font-size="16">Piano Collective</text>
+  </svg>

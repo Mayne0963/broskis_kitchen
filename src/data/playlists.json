@@ -1,0 +1,29 @@
+[
+  {
+    "id": "pl_acoustic-guitar",
+    "title": "Acoustic Guitar",
+    "trackIds": [
+      "instrumental-acoustic-guitar-413284",
+      "instrumental-acoustic-guitar-music-413281"
+    ]
+  },
+  {
+    "id": "pl_broski-mix",
+    "title": "Broski Mix",
+    "trackIds": [
+      "beat-01",
+      "beat-02",
+      "beat-03",
+      "beat-04",
+      "beat-05"
+    ]
+  },
+  {
+    "id": "pl_chill-lofi",
+    "title": "Chill Lofi",
+    "trackIds": [
+      "good-night-lofi-cozy-chill-music-160166",
+      "lofi-study-calm-peaceful-chill-hop-112191"
+    ]
+  }
+]

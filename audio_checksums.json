@@ -1,0 +1,59 @@
+{
+  "timestamp": "2025-10-10T21:22:49.660Z",
+  "files": [
+    {
+      "path": "public/audio/Acoustic-Guitar/instrumental-acoustic-guitar-413284.mp3",
+      "size": 5120835,
+      "sha256": "94cff16b77b0dd721b64a21d59068c34b38e7c65e915b0e5d233e05b7c45e774",
+      "lastModified": 1760128680169
+    },
+    {
+      "path": "public/audio/Acoustic-Guitar/instrumental-acoustic-guitar-music-413281.mp3",
+      "size": 3329462,
+      "sha256": "9cd853f7ff5721edea2ab65dccf41afa6eb258d3e7f4ce1888fd60e177af18e5",
+      "lastModified": 1760128672043
+    },
+    {
+      "path": "public/audio/Chill-Lofi/good-night-lofi-cozy-chill-music-160166.mp3",
+      "size": 4707892,
+      "sha256": "2a08012396128bd7fd003ebee98022966a8034f29c38965cb472269343b5e67b",
+      "lastModified": 1760128712963
+    },
+    {
+      "path": "public/audio/Chill-Lofi/lofi-study-calm-peaceful-chill-hop-112191.mp3",
+      "size": 4711235,
+      "sha256": "7e1c5715443c6fb2e4af66af3316adce4638f2f8c53680d70665aeed41d74cf5",
+      "lastModified": 1760128712921
+    },
+    {
+      "path": "public/audio/beat_01.mp3",
+      "size": 5120835,
+      "sha256": "94cff16b77b0dd721b64a21d59068c34b38e7c65e915b0e5d233e05b7c45e774",
+      "lastModified": 1760128965609
+    },
+    {
+      "path": "public/audio/beat_02.mp3",
+      "size": 3329462,
+      "sha256": "9cd853f7ff5721edea2ab65dccf41afa6eb258d3e7f4ce1888fd60e177af18e5",
+      "lastModified": 1760128965618
+    },
+    {
+      "path": "public/audio/beat_03.mp3",
+      "size": 4707892,
+      "sha256": "2a08012396128bd7fd003ebee98022966a8034f29c38965cb472269343b5e67b",
+      "lastModified": 1760128965629
+    },
+    {
+      "path": "public/audio/beat_04.mp3",
+      "size": 4711235,
+      "sha256": "7e1c5715443c6fb2e4af66af3316adce4638f2f8c53680d70665aeed41d74cf5",
+      "lastModified": 1760128965642
+    },
+    {
+      "path": "public/audio/beat_05.mp3",
+      "size": 5120835,
+      "sha256": "94cff16b77b0dd721b64a21d59068c34b38e7c65e915b0e5d233e05b7c45e774",
+      "lastModified": 1760128989981
+    }
+  ]
+}

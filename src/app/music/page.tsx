@@ -3,14 +3,58 @@
 
 "use client"
 
-import React from "react"
+import React, { useState, useEffect } from "react"
 import type { Metadata } from "next"
+import { useAudioUnlock } from "@/hooks/useAudioUnlock"
+import { AudioUnlockOverlay } from "@/components/music/AudioUnlockOverlay"
+import { EnhancedMusicPlayer } from "@/components/music/EnhancedMusicPlayer"
+import { useMusicStore } from "@/store/useMusicStore"
 
 // Note: Metadata export not needed as this is a client component
 // Metadata is handled by the layout.tsx file
-import MUSICPLERAY from "../../components/common/MUSICPLERAY"
 
 const MusicPage = () => {
+  const { unlocked, needsUnlock, unlock, setAudioRef } = useAudioUnlock()
+  const { loadTracksFromJson, loadPlaylistsFromJson, tracks, playlists, isLoading, error, clearState } = useMusicStore()
+  const [showUnlockOverlay, setShowUnlockOverlay] = useState(false)
+
+  // Clear old state on mount
+  useEffect(() => {
+    console.log('🎵 MUSIC PAGE: Clearing state and loading tracks...');
+    clearState();
+  }, []);
+
+  // Load tracks and playlists from JSON when component mounts
+  useEffect(() => {
+    const loadMusicData = async () => {
+      console.log('🎵 MUSIC PAGE: Loading tracks and playlists from JSON...');
+      await loadTracksFromJson();
+      await loadPlaylistsFromJson();
+    };
+    
+    loadMusicData();
+  }, [loadTracksFromJson, loadPlaylistsFromJson]);
+
+  // Show unlock overlay for iOS devices that need unlock
+  useEffect(() => {
+    if (needsUnlock) {
+      setShowUnlockOverlay(true)
+    }
+  }, [needsUnlock])
+
+  const handleUnlock = async () => {
+    const success = await unlock()
+    if (success) {
+      setShowUnlockOverlay(false)
+    }
+    return success
+  }
+
+  const handleRetry = async () => {
+    await loadTracksFromJson();
+    await loadPlaylistsFromJson();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800">
       {/* Hero Section */}
@@ -32,19 +76,39 @@ const MusicPage = () => {
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-white mb-4">Music Player</h2>
             <p className="text-gray-300 max-w-2xl mx-auto">
-              Choose from our three carefully curated playlists: Chill Vibes for relaxation, 
-              Upbeat Energy for motivation, and Jazz Collection for sophisticated ambiance.
+              Choose from our curated playlists featuring local tracks: {playlists.map(p => p.title).join(', ')}.
+              All music is sourced locally for the best listening experience.
             </p>
           </div>
           
           {/* Enhanced Music Player */}
-          <MUSICPLERAY 
-            variant="full" 
-            showPlaylist={true} 
-            autoPlay={false}
-            defaultPlaylist="chill"
-            className="w-full"
-          />
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-harvest-gold)] mx-auto mb-4"></div>
+              <p className="text-gray-300">Loading tracks and playlists...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <div className="text-red-400 mb-4">
+                <span className="text-4xl">⚠️</span>
+              </div>
+              <p className="text-red-400 mb-2">Failed to load music data</p>
+              <p className="text-gray-400 text-sm">{error}</p>
+              <button 
+                onClick={handleRetry}
+                className="mt-4 px-4 py-2 bg-[var(--color-harvest-gold)] text-black rounded-lg hover:bg-[var(--color-harvest-gold)]/80 transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          ) : (
+            <EnhancedMusicPlayer 
+              variant="full" 
+              showPlaylist={true}
+              onAudioRef={setAudioRef}
+              className="w-full"
+            />
+          )}
         </div>
       </div>
 
@@ -56,7 +120,7 @@ const MusicPage = () => {
               <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">&#127925;</span>
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">Chill Vibes</h3>
+              <h3 className="text-xl font-bold text-white mb-3">Chill Lofi</h3>
               <p className="text-gray-300 text-sm">
                 Relaxing and ambient tracks perfect for unwinding and creating a peaceful atmosphere.
               </p>
@@ -68,7 +132,7 @@ const MusicPage = () => {
               <div className="w-16 h-16 bg-gradient-to-r from-[var(--color-harvest-gold)] to-[var(--color-harvest-gold)] rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">&#127928;</span>
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">Upbeat Energy</h3>
+              <h3 className="text-xl font-bold text-white mb-3">Broski Mix</h3>
               <p className="text-gray-300 text-sm">
                 Energetic and motivating tracks to boost your mood and create an uplifting environment.
               </p>
@@ -80,9 +144,9 @@ const MusicPage = () => {
               <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">&#127927;</span>
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">Jazz Collection</h3>
+              <h3 className="text-xl font-bold text-white mb-3">Acoustic Guitar</h3>
               <p className="text-gray-300 text-sm">
-                Smooth jazz and sophisticated melodies for an elegant and refined dining experience.
+                Smooth acoustic melodies for an elegant and refined dining experience.
               </p>
             </div>
           </div>
@@ -100,16 +164,17 @@ const MusicPage = () => {
               different moods and moments throughout your visit.
             </p>
             <p>
-              Whether you're looking to relax with our Chill Vibes playlist, energize with Upbeat tracks, 
-              or enjoy sophisticated Jazz melodies, our music player offers the perfect soundtrack for 
-              your culinary journey.
+              Whether you're looking to relax with our Chill Lofi playlist, energize with our Broski Mix, 
+              or enjoy acoustic guitar melodies, our music player offers the perfect soundtrack for 
+              your culinary journey. All tracks are served locally for optimal performance.
             </p>
             <div className="grid md:grid-cols-2 gap-6 mt-6">
               <div>
                 <h4 className="font-semibold text-white mb-2">Features:</h4>
                 <ul className="space-y-1 text-sm">
                   <li>• High-quality royalty-free music</li>
-                  <li>• Three curated playlists</li>
+                  <li>• Local audio file serving</li>
+                  <li>• Auto-generated playlists</li>
                   <li>• Shuffle and repeat modes</li>
                   <li>• Volume control</li>
                   <li>• Favorite tracks system</li>
@@ -119,15 +184,23 @@ const MusicPage = () => {
                 <h4 className="font-semibold text-white mb-2">Music Genres:</h4>
                 <ul className="space-y-1 text-sm">
                   <li>• Ambient & Lofi</li>
-                  <li>• Jazz & Smooth Jazz</li>
+                  <li>• Acoustic Guitar</li>
                   <li>• Electronic & Corporate</li>
-                  <li>• Acoustic & Nature Sounds</li>
+                  <li>• Chill & Relaxation</li>
                 </ul>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* iOS Audio Unlock Overlay */}
+      {showUnlockOverlay && (
+        <AudioUnlockOverlay
+          onUnlock={handleUnlock}
+          onHide={() => setShowUnlockOverlay(false)}
+        />
+      )}
     </div>
   )
 }

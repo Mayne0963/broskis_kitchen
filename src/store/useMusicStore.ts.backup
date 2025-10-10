@@ -1,0 +1,374 @@
+import { create } from 'zustand';
+
+export interface Track {
+  id: string;
+  title: string;
+  artist: string;
+  provider: string;
+  license_type: string;
+  requires_attribution: boolean;
+  attribution_text: string;
+  source_url: string;
+  license_file_url: string;
+  src_m4a: string;
+  src_mp3: string;
+  cover: string;
+  duration: number; // in seconds
+  gain_db: number;
+  genre: string;
+  // Computed property for backward compatibility
+  src?: string;
+}
+
+export type RepeatMode = 'off' | 'one' | 'all';
+
+interface MusicState {
+  // Track data
+  tracks: Track[];
+  queue: string[]; // Array of track IDs
+  currentId: string | null;
+  
+  // Playback state
+  isPlaying: boolean;
+  position: number; // Current position in seconds
+  duration: number; // Current track duration in seconds
+  volume: number; // 0-1
+  
+  // Player modes
+  shuffle: boolean;
+  repeat: RepeatMode;
+  
+  // Loading states
+  isLoading: boolean;
+  error: string | null;
+}
+
+interface MusicActions {
+  // Track management
+  setTracks: (tracks: Track[]) => void;
+  setQueue: (queue: string[]) => void;
+  loadTracksFromJson: () => Promise<void>;
+  
+  // Playback controls
+  play: (trackId?: string) => void;
+  pause: () => void;
+  toggle: () => void;
+  stop: () => void;
+  
+  // Navigation
+  next: () => void;
+  prev: () => void;
+  
+  // Position and volume
+  seek: (seconds: number) => void;
+  setPosition: (seconds: number) => void;
+  setDuration: (seconds: number) => void;
+  setVolume: (volume: number) => void;
+  
+  // Player modes
+  toggleShuffle: () => void;
+  cycleRepeat: () => void;
+  
+  // State management
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
+  
+  // Persistence
+  saveState: () => void;
+  loadState: () => void;
+}
+
+type MusicStore = MusicState & MusicActions;
+
+const STORAGE_KEYS = {
+  LAST_TRACK: 'broski_last_track',
+  LAST_POSITION: 'broski_last_pos',
+  VOLUME: 'broski_volume',
+  SHUFFLE: 'broski_shuffle',
+  REPEAT: 'broski_repeat',
+};
+
+// Utility functions
+const shuffleArray = <T>(array: T[]): T[] => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
+const getNextTrackId = (
+  currentId: string | null,
+  queue: string[],
+  repeat: RepeatMode
+): string | null => {
+  if (!currentId || queue.length === 0) return queue[0] || null;
+  
+  const currentIndex = queue.indexOf(currentId);
+  if (currentIndex === -1) return queue[0] || null;
+  
+  if (repeat === 'one') {
+    return currentId;
+  }
+  
+  const nextIndex = currentIndex + 1;
+  if (nextIndex >= queue.length) {
+    return repeat === 'all' ? queue[0] : null;
+  }
+  
+  return queue[nextIndex];
+};
+
+const getPrevTrackId = (
+  currentId: string | null,
+  queue: string[],
+  repeat: RepeatMode
+): string | null => {
+  if (!currentId || queue.length === 0) return queue[queue.length - 1] || null;
+  
+  const currentIndex = queue.indexOf(currentId);
+  if (currentIndex === -1) return queue[queue.length - 1] || null;
+  
+  if (repeat === 'one') {
+    return currentId;
+  }
+  
+  const prevIndex = currentIndex - 1;
+  if (prevIndex < 0) {
+    return repeat === 'all' ? queue[queue.length - 1] : null;
+  }
+  
+  return queue[prevIndex];
+};
+
+export const useMusicStore = create<MusicStore>((set, get) => ({
+  // Initial state
+  tracks: [],
+  queue: [],
+  currentId: null,
+  isPlaying: false,
+  position: 0,
+  duration: 0,
+  volume: 0.8,
+  shuffle: false,
+  repeat: 'off',
+  isLoading: false,
+  error: null,
+
+  // Track management
+  setTracks: (tracks) => {
+    // Add computed src property for backward compatibility
+    const processedTracks = tracks.map(track => ({
+      ...track,
+      src: track.src_m4a || track.src_mp3 || track.src || ''
+    }));
+    
+    set({ tracks: processedTracks });
+    const trackIds = processedTracks.map(t => t.id);
+    if (get().queue.length === 0) {
+      set({ queue: trackIds });
+    }
+  },
+
+  setQueue: (queue) => set({ queue }),
+
+  loadTracksFromJson: async () => {
+    try {
+      set({ isLoading: true, error: null });
+      
+      // Fetch the tracks.json file from API
+      const response = await fetch("/api/tracks");
+      if (!response.ok) {
+        throw new Error(`Failed to fetch tracks: ${response.status}`);
+      }
+      
+      const tracks = await response.json();
+      
+      if (Array.isArray(tracks) && tracks.length > 0) {
+        get().setTracks(tracks);
+        console.log(`✅ Loaded ${tracks.length} tracks from API`);
+      } else {
+        throw new Error("No tracks found in API response");
+      }
+    } catch (error) {
+      console.error("Failed to load tracks:", error);
+      set({ error: `Failed to load tracks: ${error instanceof Error ? error.message : "Unknown error"}` });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  // Playback controls
+  play: (trackId) => {
+    const state = get();
+    if (trackId && trackId !== state.currentId) {
+      set({ currentId: trackId, isPlaying: true, position: 0 });
+    } else {
+      set({ isPlaying: true });
+    }
+    state.saveState();
+  },
+
+  pause: () => {
+    set({ isPlaying: false });
+    get().saveState();
+  },
+
+  toggle: () => {
+    const state = get();
+    if (state.isPlaying) {
+      state.pause();
+    } else {
+      state.play();
+    }
+  },
+
+  stop: () => {
+    set({ isPlaying: false, position: 0 });
+    get().saveState();
+  },
+
+  // Navigation
+  next: () => {
+    const state = get();
+    const nextId = getNextTrackId(state.currentId, state.queue, state.repeat);
+    if (nextId) {
+      set({ currentId: nextId, position: 0 });
+      if (state.isPlaying) {
+        // Keep playing if currently playing
+        set({ isPlaying: true });
+      }
+    }
+    state.saveState();
+  },
+
+  prev: () => {
+    const state = get();
+    // If more than 3 seconds into the track, restart current track
+    if (state.position > 3) {
+      set({ position: 0 });
+    } else {
+      const prevId = getPrevTrackId(state.currentId, state.queue, state.repeat);
+      if (prevId) {
+        set({ currentId: prevId, position: 0 });
+        if (state.isPlaying) {
+          set({ isPlaying: true });
+        }
+      }
+    }
+    state.saveState();
+  },
+
+  // Position and volume
+  seek: (seconds) => {
+    set({ position: Math.max(0, Math.min(seconds, get().duration)) });
+    get().saveState();
+  },
+
+  setPosition: (seconds) => set({ position: seconds }),
+
+  setDuration: (seconds) => set({ duration: seconds }),
+
+  setVolume: (volume) => {
+    const clampedVolume = Math.max(0, Math.min(1, volume));
+    set({ volume: clampedVolume });
+    localStorage.setItem(STORAGE_KEYS.VOLUME, clampedVolume.toString());
+  },
+
+  // Player modes
+  toggleShuffle: () => {
+    const state = get();
+    const newShuffle = !state.shuffle;
+    
+    let newQueue = [...state.queue];
+    if (newShuffle) {
+      // Shuffle the queue, but keep current track at the front
+      const currentIndex = state.currentId ? newQueue.indexOf(state.currentId) : -1;
+      if (currentIndex > -1) {
+        // Remove current track from queue
+        newQueue.splice(currentIndex, 1);
+        // Shuffle remaining tracks
+        newQueue = shuffleArray(newQueue);
+        // Put current track at the front
+        newQueue.unshift(state.currentId!);
+      } else {
+        newQueue = shuffleArray(newQueue);
+      }
+    } else {
+      // Restore original order (based on tracks array)
+      newQueue = state.tracks.map(t => t.id);
+    }
+    
+    set({ shuffle: newShuffle, queue: newQueue });
+    localStorage.setItem(STORAGE_KEYS.SHUFFLE, newShuffle.toString());
+  },
+
+  cycleRepeat: () => {
+    const state = get();
+    const modes: RepeatMode[] = ['off', 'all', 'one'];
+    const currentIndex = modes.indexOf(state.repeat);
+    const nextMode = modes[(currentIndex + 1) % modes.length];
+    
+    set({ repeat: nextMode });
+    localStorage.setItem(STORAGE_KEYS.REPEAT, nextMode);
+  },
+
+  // State management
+  setLoading: (loading) => set({ isLoading: loading }),
+
+  setError: (error) => set({ error }),
+
+  // Persistence
+  saveState: () => {
+    const state = get();
+    if (state.currentId) {
+      localStorage.setItem(STORAGE_KEYS.LAST_TRACK, state.currentId);
+      localStorage.setItem(STORAGE_KEYS.LAST_POSITION, state.position.toString());
+    }
+  },
+
+  loadState: () => {
+    try {
+      const lastTrack = localStorage.getItem(STORAGE_KEYS.LAST_TRACK);
+      const lastPosition = localStorage.getItem(STORAGE_KEYS.LAST_POSITION);
+      const volume = localStorage.getItem(STORAGE_KEYS.VOLUME);
+      const shuffle = localStorage.getItem(STORAGE_KEYS.SHUFFLE);
+      const repeat = localStorage.getItem(STORAGE_KEYS.REPEAT);
+
+      const updates: Partial<MusicState> = {};
+
+      if (lastTrack) {
+        updates.currentId = lastTrack;
+      }
+
+      if (lastPosition) {
+        const pos = parseFloat(lastPosition);
+        if (!isNaN(pos)) {
+          updates.position = pos;
+        }
+      }
+
+      if (volume) {
+        const vol = parseFloat(volume);
+        if (!isNaN(vol)) {
+          updates.volume = Math.max(0, Math.min(1, vol));
+        }
+      }
+
+      if (shuffle) {
+        updates.shuffle = shuffle === 'true';
+      }
+
+      if (repeat && ['off', 'all', 'one'].includes(repeat)) {
+        updates.repeat = repeat as RepeatMode;
+      }
+
+      if (Object.keys(updates).length > 0) {
+        set(updates);
+      }
+    } catch (error) {
+      console.warn('Failed to load music state from localStorage:', error);
+    }
+  },
+}));

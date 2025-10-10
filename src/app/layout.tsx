@@ -5,7 +5,7 @@ import "./chat-animations.css"
 import NavBar from "../components/layout/Navbar"
 import Footer from "../components/layout/Footer"
 import { Providers } from "../lib/context/Providers"
-import MusicPlayer from "../components/layout/MusicPlayer"
+
 import ErrorBoundary from "../components/common/ErrorBoundary"
 import ChunkErrorHandler from "../components/common/ChunkErrorHandler"
 import ResourceErrorBoundary from "../components/common/ResourceErrorBoundary"
@@ -142,7 +142,6 @@ export default async function RootLayout({
                 )}
                 <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
                 <Footer />
-                <MusicPlayer />
 
                 <CookieConsent />
                 <SEOAudit />

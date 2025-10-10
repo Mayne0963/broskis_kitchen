@@ -50,7 +50,10 @@
     "env:commands": "bash scripts/vercel-env-commands.sh",
     "backfill-test-orders": "tsx scripts/backfill-test-orders.ts",
     "stripe:listen": "bash scripts/stripe-listen.sh",
-    "stripe:trigger": "bash scripts/stripe-trigger-checkout.sh"
+    "stripe:trigger": "bash scripts/stripe-trigger-checkout.sh",
+    "music:scan": "tsx scripts/scanAudio.ts",
+    "music:verify": "tsx scripts/verifyAudioUnchanged.ts",
+    "music:refresh": "npm run music:verify && npm run music:scan && npm run music:verify"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^1.12.1",
@@ -86,7 +89,7 @@
     "@sentry/nextjs": "^10.10.0",
     "@stripe/react-stripe-js": "^3.7.0",
     "@stripe/stripe-js": "^7.4.0",
-    "@types/node": "^20.19.11",
+    "@types/node": "^20.19.20",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@upstash/ratelimit": "^2.0.6",
@@ -104,6 +107,7 @@
     "framer-motion": "^11.18.2",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.468.0",
+    "music-metadata": "^11.9.0",
     "next": "^15.1.3",
     "next-auth": "^4.24.11",
     "next-themes": "^0.4.6",
@@ -127,11 +131,13 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",
+    "ts-node": "^10.9.2",
     "typescript": "^5.9.2",
     "vaul": "^1.1.2",
     "web-push": "^3.6.7",
     "web-vitals": "^5.1.0",
-    "zod": "^3.24.1"
+    "zod": "^3.24.1",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@playwright/test": "^1.55.0",
