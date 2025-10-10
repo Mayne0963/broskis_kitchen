@@ -9,7 +9,7 @@ interface CacheEntry {
 }
 
 // In-memory cache with TTL
-let mem = new Map<string, CacheEntry>();
+const mem = new Map<string, CacheEntry>();
 const TTL = 60_000; // 60 seconds
 
 /**

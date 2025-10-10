@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="mt-16 border-t" style={{ borderColor: "var(--bk-border)" }}>
       <div className="container-xl py-10 grid gap-8 md:grid-cols-3">
         <div>
-          <div className="h3">Broski's Kitchen</div>
+          <div className="h3">Broski&apos;s Kitchen</div>
           <p className="mt-2 text-sm" style={{ color: "var(--bk-text-dim)" }}>
             Flavor with finesse. Delivered with love.
           </p>
@@ -29,7 +29,7 @@ export default function Footer() {
       </div>
       <div className="border-t py-4 text-center text-xs" 
            style={{ borderColor:"var(--bk-border)", color:"var(--bk-text-soft)" }}>
-        © {new Date().getFullYear()} Broski's Kitchen. All rights reserved.
+        © {new Date().getFullYear()} Broski&apos;s Kitchen. All rights reserved.
       </div>
     </footer>
   );

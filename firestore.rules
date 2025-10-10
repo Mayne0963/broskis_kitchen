@@ -30,7 +30,72 @@ service cloud.firestore {
     
     // REWARDS SYSTEM COLLECTIONS
     
-    // Loyalty profiles - users can read/write their own, admins can read/write all
+    // Rewards profiles - users can read their own, only system/admin can write
+    match /rewardsProfiles/{userId} {
+      allow read: if isSelf(userId) || isAdmin();
+      allow create: if false; // Only server-side code can create profiles
+      allow update: if false; // Only server-side code can update profiles
+      allow delete: if isAdmin();
+    }
+    
+    // Rewards transactions - users can read their own, only system/admin can write
+    match /rewardsTransactions/{transactionId} {
+      allow read: if isSignedIn() && 
+                     (resource.data.uid == request.auth.uid || isAdmin());
+      allow create: if false; // Only server-side code can create transactions
+      allow update, delete: if false; // Transactions are immutable
+    }
+    
+    // Referral codes - users can read their own, only system can write
+    match /referralCodes/{codeId} {
+      allow read: if isSignedIn() && 
+                     (resource.data.uid == request.auth.uid || isAdmin());
+      allow create: if false; // Only server-side code can create referral codes
+      allow update, delete: if false; // Referral codes are immutable
+    }
+    
+    // Referral tracking - users can read their own, only system can write
+    match /referralTracking/{trackingId} {
+      allow read: if isSignedIn() && 
+                     (resource.data.referrerId == request.auth.uid || 
+                      resource.data.refereeId == request.auth.uid || 
+                      isAdmin());
+      allow create: if false; // Only server-side code can create tracking records
+      allow update, delete: if false; // Tracking records are immutable
+    }
+    
+    // Reward offers - read-only for authenticated users, admin can write
+    match /rewardOffers/{offerId} {
+      allow read: if isSignedIn();
+      allow create, update: if isAdmin() && 
+                              request.resource.data.keys().hasAll([
+                                'name', 'description', 'pointsCost', 'category', 
+                                'isActive', 'createdAt'
+                              ]) &&
+                              request.resource.data.pointsCost is int &&
+                              request.resource.data.pointsCost > 0 &&
+                              request.resource.data.isActive is bool;
+      allow delete: if isAdmin();
+    }
+    
+    // Redemption history - users can read their own, only system can write
+    match /redemptionHistory/{redemptionId} {
+      allow read: if isSignedIn() && 
+                     (resource.data.uid == request.auth.uid || isAdmin());
+      allow create: if false; // Only server-side code can create redemptions
+      allow update: if false; // Only system can update redemption status
+      allow delete: if false; // Redemptions are immutable
+    }
+    
+    // Spin wheel history - users can read their own, only system can write
+    match /spinHistory/{spinId} {
+      allow read: if isSignedIn() && 
+                     (resource.data.uid == request.auth.uid || isAdmin());
+      allow create: if false; // Only server-side code can create spin records
+      allow update, delete: if false; // Spin history is immutable
+    }
+    
+    // Legacy loyalty collection (for backward compatibility)
     match /loyalty/{userId} {
       allow read: if isSelf(userId) || isAdmin();
       allow create: if isSelf(userId) && isValidEmail() && 
@@ -48,41 +113,6 @@ service cloud.firestore {
                        request.resource.data.totalEarned == resource.data.totalEarned &&
                        request.resource.data.totalRedeemed == resource.data.totalRedeemed) ||
                        isAdmin(); // Admins can update any field
-      allow delete: if isAdmin();
-    }
-    
-    // Points transactions - users can read their own, only system/admin can write
-    match /pointsTransactions/{transactionId} {
-      allow read: if isSignedIn() && 
-                     (resource.data.userId == request.auth.uid || isAdmin());
-      allow create: if false; // Only server-side code can create transactions
-      allow update, delete: if false; // Transactions are immutable
-    }
-    
-    // User redemptions - users can read their own, only system/admin can write
-    match /userRedemptions/{redemptionId} {
-      allow read: if isSignedIn() && 
-                     (resource.data.userId == request.auth.uid || isAdmin());
-      allow create: if false; // Only server-side code can create redemptions
-      allow update, delete: if false; // Redemptions are immutable
-    }
-    
-    // Spin history - users can read their own, only system/admin can write
-    match /spinHistory/{spinId} {
-      allow read: if isSignedIn() && 
-                     (resource.data.userId == request.auth.uid || isAdmin());
-      allow create: if false; // Only server-side code can create spin records
-      allow update, delete: if false; // Spin history is immutable
-    }
-    
-    // Reward catalog - read-only for authenticated users, admin can write
-    match /rewardCatalog/{rewardId} {
-      allow read: if isSignedIn();
-      allow create, update: if isAdmin() && 
-                              request.resource.data.keys().hasAll([
-                                'name', 'description', 'pointsCost', 'category', 
-                                'isActive', 'cogs', 'createdAt'
-                              ]);
       allow delete: if isAdmin();
     }
     

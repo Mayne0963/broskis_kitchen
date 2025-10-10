@@ -2,7 +2,7 @@ export default function ContactForm() {
   return (
     <section className="container-lg my-10">
       <div className="card shadow-luxe">
-        <h2 className="h2 mb-4">Let's Talk</h2>
+        <h2 className="h2 mb-4">Let&apos;s Talk</h2>
         <form className="space-y-4">
           <div className="form-row">
             <label className="label">

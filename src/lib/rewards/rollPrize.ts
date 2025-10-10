@@ -14,7 +14,7 @@ export const PRIZES: Prize[] = [
 ];
 
 export function rollPrize() {
-  let t = PRIZES.reduce((a, p) => a + p.weight, 0);
+  const t = PRIZES.reduce((a, p) => a + p.weight, 0);
   let r = Math.random() * t;
   for (const p of PRIZES) {
     if (r < p.weight) return p;

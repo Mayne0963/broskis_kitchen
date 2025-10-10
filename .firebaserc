@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "broskis-kitchen-44d2d"
-  }
+    "default": "broskis-kitchen-44d2d",
+    "staging": "broskis-kitchen-44d2d"
+  },
+  "targets": {},
+  "etags": {}
 }

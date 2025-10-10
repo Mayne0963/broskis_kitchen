@@ -23,7 +23,7 @@ export interface UserProfile extends DocumentData {
 export const getUserProfile = async (uid: string): Promise<UserProfile | null> => {
   try {
     // Try cache first for fast response
-    let cachedProfile = await UserCache.getProfile(uid);
+    const cachedProfile = await UserCache.getProfile(uid);
     if (cachedProfile) {
       return cachedProfile;
     }

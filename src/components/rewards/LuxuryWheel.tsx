@@ -88,7 +88,9 @@ export default function LuxuryWheel() {
     }
 
     const idx = PRIZES.findIndex(p => p.key === r.prize?.key), seg = PRIZES.length, base = 6, final = (Math.PI * 1.5) - ((idx + .5) * (2 * Math.PI / seg)), total = base * 2 * Math.PI + (final % (2 * Math.PI));
-    let t = 0, T = 3e3, start = performance.now();
+    let t = 0;
+    const T = 3e3;
+    const start = performance.now();
     const anim = (now: number) => {
       t = (now - start) / T;
       const e = 1 - Math.pow(1 - Math.min(t, 1), 3);

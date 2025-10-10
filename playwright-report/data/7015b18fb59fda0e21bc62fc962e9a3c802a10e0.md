@@ -1,0 +1,150 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Skip to main content" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - link "Skip to navigation" [ref=e4] [cursor=pointer]:
+      - /url: "#navigation"
+  - navigation "Main navigation" [ref=e5]:
+    - generic [ref=e6]:
+      - link "Broski's Kitchen" [ref=e7] [cursor=pointer]:
+        - /url: /
+      - generic [ref=e8]:
+        - link "Menu" [ref=e9] [cursor=pointer]:
+          - /url: /menu
+        - link "Infused Menu - Coming Soon" [ref=e10] [cursor=pointer]:
+          - /url: /infused-menu
+        - link "Locations" [ref=e11] [cursor=pointer]:
+          - /url: /locations
+        - link "Events" [ref=e12] [cursor=pointer]:
+          - /url: /events
+        - link "Music" [ref=e13] [cursor=pointer]:
+          - /url: /music
+        - link "Rewards" [ref=e14] [cursor=pointer]:
+          - /url: /rewards
+        - link "Shop" [ref=e15] [cursor=pointer]:
+          - /url: /shop
+        - link "Catering" [ref=e16] [cursor=pointer]:
+          - /url: /catering
+        - link "Contact" [ref=e17] [cursor=pointer]:
+          - /url: /contact
+        - link "OTW Logo OTW" [ref=e18] [cursor=pointer]:
+          - /url: https://otw-chi.vercel.app
+          - img "OTW Logo" [ref=e19] [cursor=pointer]
+          - generic [ref=e20] [cursor=pointer]: OTW
+        - button "Shopping cart" [ref=e22] [cursor=pointer]:
+          - img [ref=e23] [cursor=pointer]
+        - link "Login" [ref=e25] [cursor=pointer]:
+          - /url: /auth/login
+          - img
+          - text: Login
+  - main [ref=e26]:
+    - generic [ref=e27]:
+      - heading "Rewards" [level=1] [ref=e28]
+      - paragraph [ref=e29]:
+        - text: Please
+        - link "sign in" [ref=e30] [cursor=pointer]:
+          - /url: /login
+        - text: to view your rewards.
+  - contentinfo [ref=e31]:
+    - generic [ref=e32]:
+      - generic [ref=e33]:
+        - generic [ref=e34]:
+          - heading "Broski's Kitchen" [level=3] [ref=e35]
+          - paragraph [ref=e36]: Luxury Street Gourmet
+          - generic [ref=e37]:
+            - link [ref=e38] [cursor=pointer]:
+              - /url: https://facebook.com
+              - img [ref=e39] [cursor=pointer]
+            - link [ref=e41] [cursor=pointer]:
+              - /url: https://twitter.com
+              - img [ref=e42] [cursor=pointer]
+            - link [ref=e44] [cursor=pointer]:
+              - /url: https://instagram.com
+              - img [ref=e45] [cursor=pointer]
+            - link [ref=e47] [cursor=pointer]:
+              - /url: https://youtube.com
+              - img [ref=e48] [cursor=pointer]
+          - button "Play Radio" [ref=e51] [cursor=pointer]
+        - generic [ref=e52]:
+          - heading "Quick Links" [level=3] [ref=e53]
+          - list [ref=e54]:
+            - listitem [ref=e55]:
+              - link "Menu" [ref=e56] [cursor=pointer]:
+                - /url: /menu
+            - listitem [ref=e57]:
+              - link "Locations" [ref=e58] [cursor=pointer]:
+                - /url: /locations
+            - listitem [ref=e59]:
+              - link "Events" [ref=e60] [cursor=pointer]:
+                - /url: /events
+            - listitem [ref=e61]:
+              - link "Rewards" [ref=e62] [cursor=pointer]:
+                - /url: /rewards
+            - listitem [ref=e63]:
+              - link "Shop" [ref=e64] [cursor=pointer]:
+                - /url: /shop
+        - generic [ref=e65]:
+          - heading "Information" [level=3] [ref=e66]
+          - list [ref=e67]:
+            - listitem [ref=e68]:
+              - link "About Us" [ref=e69] [cursor=pointer]:
+                - /url: /about
+            - listitem [ref=e70]:
+              - link "Contact" [ref=e71] [cursor=pointer]:
+                - /url: /contact
+            - listitem [ref=e72]:
+              - link "Gift Cards" [ref=e73] [cursor=pointer]:
+                - /url: /gift-cards
+            - listitem [ref=e74]:
+              - link "Catering" [ref=e75] [cursor=pointer]:
+                - /url: /catering
+            - listitem [ref=e76]:
+              - link "Volunteer" [ref=e77] [cursor=pointer]:
+                - /url: /volunteer
+        - generic [ref=e78]:
+          - heading "Legal" [level=3] [ref=e79]
+          - list [ref=e80]:
+            - listitem [ref=e81]:
+              - link "Terms & Conditions" [ref=e82] [cursor=pointer]:
+                - /url: /terms
+            - listitem [ref=e83]:
+              - link "Privacy Policy" [ref=e84] [cursor=pointer]:
+                - /url: /privacy
+            - listitem [ref=e85]:
+              - link "Accessibility" [ref=e86] [cursor=pointer]:
+                - /url: /accessibility
+            - listitem [ref=e87]:
+              - button "Rewards Policy" [ref=e88] [cursor=pointer]:
+                - text: Rewards Policy
+                - img [ref=e89] [cursor=pointer]
+      - paragraph [ref=e92]: © 2025 Broski's Kitchen. All rights reserved.
+  - alert [ref=e93]
+  - generic [ref=e97]:
+    - img [ref=e99]
+    - generic [ref=e106]:
+      - heading "We use cookies to enhance your experience" [level=3] [ref=e107]
+      - paragraph [ref=e108]: We use essential cookies to make our site work. We'd also like to set optional cookies to help us improve our website and analyze how it's used. We won't set optional cookies unless you enable them.
+      - generic [ref=e109]:
+        - generic [ref=e110]:
+          - img [ref=e111]
+          - text: Essential cookies always active
+        - generic [ref=e113]:
+          - img [ref=e114]
+          - text: Analytics optional
+        - generic [ref=e119]:
+          - img [ref=e120]
+          - text: Marketing optional
+      - generic [ref=e124]:
+        - button "Accept All" [ref=e125] [cursor=pointer]
+        - button "Reject Optional" [ref=e126] [cursor=pointer]
+        - button "Customize" [ref=e127] [cursor=pointer]:
+          - img [ref=e128] [cursor=pointer]
+          - text: Customize
+        - link "Privacy Policy" [ref=e131] [cursor=pointer]:
+          - /url: /privacy
+    - button [ref=e132] [cursor=pointer]:
+      - img [ref=e133] [cursor=pointer]
+```
