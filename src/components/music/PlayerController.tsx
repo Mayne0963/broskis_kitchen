@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import { useMusicStore, Track } from '@/store/useMusicStore';
 import { useAutoplayUnlock } from '@/hooks/useAutoplayUnlock';
+import { analytics } from '@/lib/analytics';
 import { toast } from 'sonner';
 
 interface PlayerControllerProps {
@@ -30,7 +31,7 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
   const currentTrack = tracks.find(t => t.id === currentId);
   
   // Use autoplay unlock hook
-  const { isUnlocked, attemptUnlock } = useAutoplayUnlock(audioRef);
+  const { isUnlocked, showUnlockTip, hideUnlockTip, attemptUnlock } = useAutoplayUnlock(audioRef);
 
   // Setup Media Session API
   const setupMediaSession = useCallback((track: Track) => {
@@ -124,21 +125,34 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
 
   const handleError = useCallback((e: React.SyntheticEvent<HTMLAudioElement, Event>) => {
     const error = (e.target as HTMLAudioElement).error;
+    const errorCode = error?.code?.toString() || 'unknown';
     const errorMessage = error ? `Audio error: ${error.message}` : 'Track unavailable';
     
     console.error('Audio playback error:', error);
     setError(errorMessage);
     setLoading(false);
     
-    toast.error('Track unavailable', {
-      description: 'Skipping to next track...',
+    // Track analytics for error
+    if (currentTrack) {
+      analytics.trackError(
+        currentTrack.id,
+        currentTrack.title,
+        currentTrack.src_mp3,
+        errorCode,
+        errorMessage
+      );
+    }
+    
+    // Show user-friendly toast
+    toast.error('Skipping unavailable track', {
+      duration: 2000,
     });
     
-    // Auto-skip to next track after a short delay
+    // Auto-skip to next track within 500ms as requested
     setTimeout(() => {
       next();
-    }, 1000);
-  }, [setError, setLoading, next]);
+    }, 500);
+  }, [setError, setLoading, next, currentTrack]);
 
   const handleLoadStart = useCallback(() => {
     setLoading(true);
@@ -155,18 +169,31 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
       if (isPlaying) {
         const playPromise = audioRef.current.play();
         if (playPromise !== undefined) {
-          playPromise.catch((error) => {
-            console.log('🔒 Autoplay blocked, waiting for user interaction:', error.message);
-            // Try to unlock autoplay
-            attemptUnlock();
-            pause();
-          });
+          playPromise
+            .then(() => {
+              // Track successful play
+              if (currentTrack) {
+                analytics.trackPlay(
+                  currentTrack.id,
+                  currentTrack.title,
+                  currentTrack.artist,
+                  currentTrack.src_mp3,
+                  useMusicStore.getState().currentPlaylistId || undefined
+                );
+              }
+            })
+            .catch((error) => {
+              console.log('🔒 Autoplay blocked, waiting for user interaction:', error.message);
+              // Try to unlock autoplay
+              attemptUnlock();
+              pause();
+            });
         }
       } else {
         audioRef.current.pause();
       }
     }
-  }, [isPlaying, pause, attemptUnlock]);
+  }, [isPlaying, pause, attemptUnlock, currentTrack]);
 
   // Effect to handle volume changes
   useEffect(() => {
@@ -240,19 +267,31 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
   }
 
   return (
-    <audio
-      ref={audioRef}
-      src={audioSrc}
-      preload="metadata"
-      playsInline
-      crossOrigin="anonymous"
-      onTimeUpdate={handleTimeUpdate}
-      onLoadedMetadata={handleLoadedMetadata}
-      onEnded={handleEnded}
-      onError={handleError}
-      onLoadStart={handleLoadStart}
-      onCanPlay={handleCanPlay}
-      style={{ display: 'none' }}
-    />
+    <>
+      <audio
+        ref={audioRef}
+        src={audioSrc}
+        preload="metadata"
+        playsInline
+        crossOrigin="anonymous"
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
+        onEnded={handleEnded}
+        onError={handleError}
+        onLoadStart={handleLoadStart}
+        onCanPlay={handleCanPlay}
+        style={{ display: 'none' }}
+      />
+      
+      {/* Unlock tip overlay */}
+      {showUnlockTip && (
+        <div 
+          className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-4 py-2 rounded-lg text-sm z-50 cursor-pointer"
+          onClick={hideUnlockTip}
+        >
+          Tap anywhere to start audio
+        </div>
+      )}
+    </>
   );
 };

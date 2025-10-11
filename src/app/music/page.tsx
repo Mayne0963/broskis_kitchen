@@ -9,6 +9,7 @@ import { useAudioUnlock } from "@/hooks/useAudioUnlock"
 import { AudioUnlockOverlay } from "@/components/music/AudioUnlockOverlay"
 import { EnhancedMusicPlayer } from "@/components/music/EnhancedMusicPlayer"
 import { useMusicStore } from "@/store/useMusicStore"
+import { initAnalytics } from "@/lib/analytics"
 
 // Note: Metadata export not needed as this is a client component
 // Metadata is handled by the layout.tsx file
@@ -18,9 +19,10 @@ const MusicPage = () => {
   const { loadTracksFromJson, loadPlaylistsFromJson, tracks, playlists, isLoading, error, clearState } = useMusicStore()
   const [showUnlockOverlay, setShowUnlockOverlay] = useState(false)
 
-  // Clear old state on mount
+  // Initialize analytics and clear old state on mount
   useEffect(() => {
-    console.log('🎵 MUSIC PAGE: Clearing state and loading tracks...');
+    console.log('🎵 MUSIC PAGE: Initializing analytics and clearing state...');
+    initAnalytics();
     clearState();
   }, []);
 

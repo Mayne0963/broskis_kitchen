@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { analytics } from '@/lib/analytics';
 
 export interface Track {
   id: string;
@@ -136,6 +137,10 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
         if (tracks.length > 0) {
           get().setTracks(tracks);
           console.log(`✅ Loaded ${tracks.length} tracks from /data/tracks.json`);
+          
+          // Track analytics for successful music loading
+          const state = get();
+          analytics.musicLoaded(tracks.length, state.playlists.length);
         } else {
           console.warn("⚠️ No tracks found in tracks.json");
           set({ tracks: [], error: null }); // Clear error for empty but valid response

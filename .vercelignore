@@ -1,38 +1,85 @@
-# Dependencies
-node_modules
+# Vercel ignore file to reduce deployment size
 
-# Build artifacts (keep essential ones for Vercel)
-build
-dist
-.trae
-*.log
-.vercel/
-./vercel/
-
-# Next.js cache (exclude all cache files)
-.next/cache
-.next/cache/**
-.next/trace
-.next/standalone
-.next/static/chunks/webpack*
-
-# Documentation files
-*.md
-docs/
-generate_more_images.sh
-
-# Development environment files
+# Development files
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-
-# IDE and OS files
-.DS_Store
+# IDE files
 .vscode/
 .idea/
+*.swp
+*.swo
 
-# Ensure public directory files (including manifest.json) are NOT excluded
-# Public files should be deployed
-!public/**
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# Large git objects
+.git/objects/pack/

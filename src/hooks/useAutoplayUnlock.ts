@@ -1,17 +1,35 @@
-import { useEffect, useRef, RefObject } from 'react';
+import { useEffect, useRef, RefObject, useState } from 'react';
+import { analytics } from '@/lib/analytics';
 
 /**
  * Hook to handle autoplay unlock for iOS/Safari and other browsers that block autoplay
  * This hook listens for user interactions and attempts to unlock audio playback
+ * Enhanced with localStorage persistence and user-friendly tips
  */
 export const useAutoplayUnlock = (audioRef: RefObject<HTMLAudioElement>) => {
   const isUnlockedRef = useRef(false);
   const hasAttemptedRef = useRef(false);
+  const [showUnlockTip, setShowUnlockTip] = useState(false);
 
   useEffect(() => {
     if (!audioRef.current) return;
 
     const audio = audioRef.current;
+
+    // Check if audio was previously unlocked
+    const checkPreviousUnlock = () => {
+      try {
+        const wasUnlocked = localStorage.getItem('broski_audio_unlocked') === '1';
+        if (wasUnlocked) {
+          isUnlockedRef.current = true;
+          console.log('🔓 Audio autoplay previously unlocked');
+          return true;
+        }
+      } catch (error) {
+        console.warn('Failed to check localStorage for audio unlock status');
+      }
+      return false;
+    };
 
     // Function to attempt audio unlock
     const attemptUnlock = async () => {
@@ -33,13 +51,26 @@ export const useAutoplayUnlock = (audioRef: RefObject<HTMLAudioElement>) => {
           audio.pause();
           audio.currentTime = 0;
           isUnlockedRef.current = true;
+          
+          // Store unlock status in localStorage
+          try {
+            localStorage.setItem('broski_audio_unlocked', '1');
+          } catch (error) {
+            console.warn('Failed to store audio unlock status');
+          }
+          
           console.log('🔓 Audio autoplay unlocked successfully');
+          setShowUnlockTip(false); // Hide tip on successful unlock
+          
+          // Track analytics
+          analytics.unlockTap();
           
           // Remove event listeners after successful unlock
           removeEventListeners();
         }
       } catch (error) {
         console.log('🔒 Audio autoplay still blocked, waiting for user interaction');
+        setShowUnlockTip(true); // Show friendly tip
         // Don't log as error since this is expected behavior
       }
     };
@@ -77,6 +108,11 @@ export const useAutoplayUnlock = (audioRef: RefObject<HTMLAudioElement>) => {
       if (hasAttemptedRef.current) return;
       hasAttemptedRef.current = true;
 
+      // Check if previously unlocked
+      if (checkPreviousUnlock()) {
+        return; // Already unlocked, no need to attempt
+      }
+
       // Wait a bit for the audio element to be ready
       setTimeout(async () => {
         await attemptUnlock();
@@ -101,6 +137,8 @@ export const useAutoplayUnlock = (audioRef: RefObject<HTMLAudioElement>) => {
   // Return whether autoplay has been unlocked
   return {
     isUnlocked: isUnlockedRef.current,
+    showUnlockTip,
+    hideUnlockTip: () => setShowUnlockTip(false),
     attemptUnlock: async () => {
       if (!audioRef.current || isUnlockedRef.current) return;
       
@@ -109,10 +147,21 @@ export const useAutoplayUnlock = (audioRef: RefObject<HTMLAudioElement>) => {
         if (playPromise !== undefined) {
           await playPromise;
           isUnlockedRef.current = true;
+          
+          // Store unlock status
+          try {
+            localStorage.setItem('broski_audio_unlocked', '1');
+          } catch (error) {
+            console.warn('Failed to store audio unlock status');
+          }
+          
+          setShowUnlockTip(false);
+          analytics.unlockTap();
           console.log('🔓 Manual audio unlock successful');
         }
       } catch (error) {
         console.log('🔒 Manual audio unlock failed');
+        setShowUnlockTip(true);
       }
     }
   };
