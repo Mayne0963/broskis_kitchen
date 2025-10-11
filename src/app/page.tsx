@@ -25,7 +25,7 @@ function Page() {
   useImagePreloader([
     '/images/broskis-gold-logo.png',
     '/images/HomePageHeroImage.png',
-    '/brand/otw-logo.png'
+    '/otw-logo.png'
   ]);
 
 
@@ -43,7 +43,7 @@ function Page() {
             className="broski-otw-gold-button"
           >
             <OptimizedImage 
-              src="/brand/otw-logo.png" 
+              src="/otw-logo.png" 
               alt="OTW Logo" 
               width={36} 
               height={18} 

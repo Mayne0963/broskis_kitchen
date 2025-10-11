@@ -28,6 +28,7 @@ const nextConfig = {
   compress: true,
   // Enhanced image optimization
   images: {
+    unoptimized: true,
     domains: [],
     remotePatterns: [
       {
@@ -109,6 +110,7 @@ const nextConfig = {
   // Experimental settings to improve build stability
   experimental: {
     optimizePackageImports: ['lucide-react', 'sonner'],
+    optimizeCss: false,
   },
   
   // Turbopack configuration (stable)

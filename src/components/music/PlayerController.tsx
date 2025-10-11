@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { useMusicStore, Track } from '@/store/useMusicStore';
 import { useAutoplayUnlock } from '@/hooks/useAutoplayUnlock';
 import { analytics } from '@/lib/analytics';
 import { toast } from 'sonner';
+import { SilentUnlockOverlay } from './SilentUnlockOverlay';
 
 interface PlayerControllerProps {
   onAudioRef?: (audio: HTMLAudioElement | null) => void;
@@ -11,6 +12,7 @@ interface PlayerControllerProps {
 export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const hasAttemptedAutoplayRef = useRef(false);
+  const [showSilentOverlay, setShowSilentOverlay] = useState(false);
   
   const {
     tracks,
@@ -77,6 +79,34 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
     }
   }, [play, pause, next, setPosition, position]);
 
+  // Silent unlock handler for iOS autoplay
+  const handleSilentUnlock = useCallback(async () => {
+    if (audioRef.current) {
+      try {
+        await audioRef.current.play();
+        audioRef.current.pause();
+        localStorage.setItem('broski_audio_unlocked', '1');
+        setShowSilentOverlay(false);
+        try {
+          analytics.unlockTap();
+        } catch (e) {
+          console.log('Analytics error:', e);
+        }
+        console.log('🔓 Silent unlock successful');
+      } catch (error) {
+        console.log('🔒 Silent unlock failed, will retry on next interaction');
+      }
+    }
+  }, []);
+
+  // Check if silent overlay should be shown
+  useEffect(() => {
+    const unlocked = localStorage.getItem('broski_audio_unlocked');
+    if (!unlocked && !isUnlocked) {
+      setShowSilentOverlay(true);
+    }
+  }, [isUnlocked]);
+
   // Audio event handlers
   const handleTimeUpdate = useCallback(() => {
     if (audioRef.current) {
@@ -134,14 +164,18 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
     
     // Track analytics for error
     if (currentTrack) {
-      analytics.trackError({
-        id: currentTrack.id,
-        src: currentTrack.src_mp3,
-        title: currentTrack.title,
-        artist: currentTrack.artist,
-        code: errorCode,
-        message: errorMessage
-      });
+      try {
+        analytics.trackError({
+          id: currentTrack.id,
+          src: currentTrack.src_mp3,
+          title: currentTrack.title,
+          artist: currentTrack.artist,
+          code: errorCode,
+          message: errorMessage
+        });
+      } catch (e) {
+        console.log('Analytics error:', e);
+      }
     }
     
     // Show user-friendly toast
@@ -197,12 +231,16 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
             .then(() => {
               // Track successful play
               if (currentTrack) {
-                analytics.trackPlay({
-                  id: currentTrack.id,
-                  src: currentTrack.src_mp3,
-                  title: currentTrack.title,
-                  artist: currentTrack.artist
-                });
+                try {
+                  analytics.trackPlay({
+                    id: currentTrack.id,
+                    src: currentTrack.src_mp3,
+                    title: currentTrack.title,
+                    artist: currentTrack.artist
+                  });
+                } catch (e) {
+                  console.log('Analytics error:', e);
+                }
               }
             })
             .catch((error) => {
@@ -254,7 +292,13 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
   useEffect(() => {
     // Only proceed if we have tracks, a current track, and haven't attempted autoplay yet
     if (tracks.length > 0 && currentTrack && currentTrack.src_mp3 && !hasAttemptedAutoplayRef.current) {
-      console.log('🎵 Tracks loaded, waiting for audio element to be ready...');
+      console.log('🎵 MUSIC PLAYER:', { 
+        loadedTracks: tracks.length, 
+        currentTrack: currentTrack?.title, 
+        artist: currentTrack?.artist,
+        isPlaying,
+        hasAttemptedAutoplay: hasAttemptedAutoplayRef.current 
+      });
       
       // Wait for audio element to be ready and attempt autoplay on canPlay event
       // The actual autoplay attempt is now handled in handleCanPlay callback
@@ -299,6 +343,11 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
         onCanPlay={handleCanPlay}
         style={{ display: 'none' }}
       />
+      
+      {/* Silent unlock overlay for iOS */}
+      {showSilentOverlay && (
+        <SilentUnlockOverlay onUnlock={handleSilentUnlock} />
+      )}
       
       {/* Unlock tip overlay */}
       {showUnlockTip && (
