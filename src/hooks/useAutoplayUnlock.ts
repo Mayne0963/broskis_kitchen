@@ -1,10 +1,14 @@
 import { useEffect, useRef, RefObject, useState } from 'react';
 import { analytics } from '@/lib/analytics';
 
+// Global unlock state to persist across component re-renders
+let globalUnlockState = false;
+let globalEventListenersAdded = false;
+
 /**
  * Hook to handle autoplay unlock for iOS/Safari and other browsers that block autoplay
  * This hook listens for user interactions and attempts to unlock audio playback
- * Enhanced with localStorage persistence and user-friendly tips
+ * Enhanced with localStorage persistence, global listeners, and improved iOS support
  */
 export const useAutoplayUnlock = (audioRef: RefObject<HTMLAudioElement>) => {
   const isUnlockedRef = useRef(false);
@@ -20,8 +24,9 @@ export const useAutoplayUnlock = (audioRef: RefObject<HTMLAudioElement>) => {
     const checkPreviousUnlock = () => {
       try {
         const wasUnlocked = localStorage.getItem('broski_audio_unlocked') === '1';
-        if (wasUnlocked) {
+        if (wasUnlocked || globalUnlockState) {
           isUnlockedRef.current = true;
+          globalUnlockState = true;
           console.log('🔓 Audio autoplay previously unlocked');
           return true;
         }
@@ -31,7 +36,7 @@ export const useAutoplayUnlock = (audioRef: RefObject<HTMLAudioElement>) => {
       return false;
     };
 
-    // Function to attempt audio unlock
+    // Enhanced function to attempt audio unlock
     const attemptUnlock = async () => {
       if (isUnlockedRef.current || !audio) return;
 
@@ -51,6 +56,7 @@ export const useAutoplayUnlock = (audioRef: RefObject<HTMLAudioElement>) => {
           audio.pause();
           audio.currentTime = 0;
           isUnlockedRef.current = true;
+          globalUnlockState = true;
           
           // Store unlock status in localStorage
           try {
@@ -65,8 +71,8 @@ export const useAutoplayUnlock = (audioRef: RefObject<HTMLAudioElement>) => {
           // Track analytics
           analytics.unlockTap();
           
-          // Remove event listeners after successful unlock
-          removeEventListeners();
+          // Remove global event listeners after successful unlock
+          removeGlobalEventListeners();
         }
       } catch (error) {
         console.log('🔒 Audio autoplay still blocked, waiting for user interaction');
@@ -75,31 +81,101 @@ export const useAutoplayUnlock = (audioRef: RefObject<HTMLAudioElement>) => {
       }
     };
 
-    // Event handler for user interactions
-    const handleUserInteraction = async (event: Event) => {
+    // Global event handler for user interactions (persists across navigation)
+    const handleGlobalUserInteraction = async (event: Event) => {
+      if (globalUnlockState) return;
+
+      console.log(`🎵 Global user interaction detected: ${event.type}`);
+      
+      // Try to unlock with any available audio element
+      const audioElements = document.querySelectorAll('audio');
+      for (const audioEl of audioElements) {
+        try {
+          const playPromise = audioEl.play();
+          if (playPromise !== undefined) {
+            await playPromise;
+            audioEl.pause();
+            audioEl.currentTime = 0;
+            globalUnlockState = true;
+            isUnlockedRef.current = true;
+            
+            // Store unlock status
+            try {
+              localStorage.setItem('broski_audio_unlocked', '1');
+            } catch (error) {
+              console.warn('Failed to store audio unlock status');
+            }
+            
+            console.log('🔓 Global audio autoplay unlocked');
+            setShowUnlockTip(false);
+            analytics.unlockTap();
+            removeGlobalEventListeners();
+            break;
+          }
+        } catch (error) {
+          // Continue trying with other audio elements
+        }
+      }
+    };
+
+    // Enhanced list of events that can unlock autoplay (especially for iOS)
+    const events = [
+      'touchstart', 'touchend', 'touchmove',
+      'click', 'mousedown', 'mouseup',
+      'keydown', 'keyup',
+      'pointerdown', 'pointerup'
+    ];
+
+    // Add global event listeners (only once)
+    const addGlobalEventListeners = () => {
+      if (globalEventListenersAdded) return;
+      
+      events.forEach(eventType => {
+        document.addEventListener(eventType, handleGlobalUserInteraction, { 
+          once: false,
+          passive: true,
+          capture: true // Capture phase for better iOS compatibility
+        });
+      });
+      
+      globalEventListenersAdded = true;
+      console.log('🎵 Global autoplay unlock listeners added');
+    };
+
+    // Remove global event listeners
+    const removeGlobalEventListeners = () => {
+      if (!globalEventListenersAdded) return;
+      
+      events.forEach(eventType => {
+        document.removeEventListener(eventType, handleGlobalUserInteraction, { capture: true });
+      });
+      
+      globalEventListenersAdded = false;
+      console.log('🔓 Global autoplay unlock listeners removed');
+    };
+
+    // Local event handler for this specific audio element
+    const handleLocalUserInteraction = async (event: Event) => {
       if (isUnlockedRef.current) return;
 
-      console.log(`🎵 User interaction detected: ${event.type}`);
+      console.log(`🎵 Local user interaction detected: ${event.type}`);
       await attemptUnlock();
     };
 
-    // List of events that can unlock autoplay
-    const events = ['touchstart', 'touchend', 'click', 'keydown', 'mousedown'];
-
-    // Add event listeners
-    const addEventListeners = () => {
+    // Add local event listeners for this audio element
+    const addLocalEventListeners = () => {
       events.forEach(eventType => {
-        document.addEventListener(eventType, handleUserInteraction, { 
-          once: false, // Allow multiple attempts
+        document.addEventListener(eventType, handleLocalUserInteraction, { 
+          once: false,
           passive: true 
         });
       });
     };
 
-    // Remove event listeners
-    const removeEventListeners = () => {
+    // Remove local event listeners
+    const removeLocalEventListeners = () => {
       events.forEach(eventType => {
-        document.removeEventListener(eventType, handleUserInteraction);
+        document.removeEventListener(eventType, handleLocalUserInteraction);
       });
     };
 
@@ -117,9 +193,10 @@ export const useAutoplayUnlock = (audioRef: RefObject<HTMLAudioElement>) => {
       setTimeout(async () => {
         await attemptUnlock();
         
-        // If unlock failed, add event listeners for user interaction
-        if (!isUnlockedRef.current) {
-          addEventListeners();
+        // If unlock failed, add both local and global event listeners
+        if (!isUnlockedRef.current && !globalUnlockState) {
+          addLocalEventListeners();
+          addGlobalEventListeners();
           console.log('🎵 Waiting for user interaction to unlock audio playback...');
         }
       }, 100);
@@ -130,23 +207,25 @@ export const useAutoplayUnlock = (audioRef: RefObject<HTMLAudioElement>) => {
 
     // Cleanup function
     return () => {
-      removeEventListeners();
+      removeLocalEventListeners();
+      // Don't remove global listeners here - they should persist
     };
   }, [audioRef]);
 
   // Return whether autoplay has been unlocked
   return {
-    isUnlocked: isUnlockedRef.current,
+    isUnlocked: isUnlockedRef.current || globalUnlockState,
     showUnlockTip,
     hideUnlockTip: () => setShowUnlockTip(false),
     attemptUnlock: async () => {
-      if (!audioRef.current || isUnlockedRef.current) return;
+      if (!audioRef.current || isUnlockedRef.current || globalUnlockState) return;
       
       try {
         const playPromise = audioRef.current.play();
         if (playPromise !== undefined) {
           await playPromise;
           isUnlockedRef.current = true;
+          globalUnlockState = true;
           
           // Store unlock status
           try {
@@ -168,47 +247,43 @@ export const useAutoplayUnlock = (audioRef: RefObject<HTMLAudioElement>) => {
 };
 
 /**
- * Utility function to check if the current browser/device likely requires user interaction for autoplay
+ * Check if the current browser/device requires user interaction for autoplay
  */
 export const requiresUserInteraction = (): boolean => {
   const userAgent = navigator.userAgent.toLowerCase();
-  
-  // iOS Safari, Mobile Safari, and other mobile browsers typically require user interaction
-  const isMobile = /iphone|ipad|ipod|android|mobile/i.test(userAgent);
-  const isSafari = /safari/i.test(userAgent) && !/chrome/i.test(userAgent);
-  
-  return isMobile || isSafari;
+  return (
+    userAgent.includes('safari') ||
+    userAgent.includes('iphone') ||
+    userAgent.includes('ipad') ||
+    userAgent.includes('mobile')
+  );
 };
 
 /**
- * Hook to detect if autoplay is supported without user interaction
+ * Hook to detect autoplay support
  */
 export const useAutoplaySupport = () => {
-  const supportRef = useRef<boolean | null>(null);
+  const [supportsAutoplay, setSupportsAutoplay] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const detectAutoplaySupport = async () => {
+    const testAutoplay = async () => {
       try {
         const audio = new Audio();
-        audio.muted = true; // Muted autoplay is more likely to be allowed
-        
+        audio.muted = true;
         const playPromise = audio.play();
+        
         if (playPromise !== undefined) {
           await playPromise;
           audio.pause();
-          supportRef.current = true;
-          console.log('✅ Autoplay is supported');
+          setSupportsAutoplay(true);
         }
       } catch (error) {
-        supportRef.current = false;
-        console.log('❌ Autoplay is not supported');
+        setSupportsAutoplay(false);
       }
     };
 
-    if (supportRef.current === null) {
-      detectAutoplaySupport();
-    }
+    testAutoplay();
   }, []);
 
-  return supportRef.current;
+  return supportsAutoplay;
 };

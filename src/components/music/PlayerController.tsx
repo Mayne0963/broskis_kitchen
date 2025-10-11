@@ -134,13 +134,14 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
     
     // Track analytics for error
     if (currentTrack) {
-      analytics.trackError(
-        currentTrack.id,
-        currentTrack.title,
-        currentTrack.src_mp3,
-        errorCode,
-        errorMessage
-      );
+      analytics.trackError({
+        id: currentTrack.id,
+        src: currentTrack.src_mp3,
+        title: currentTrack.title,
+        artist: currentTrack.artist,
+        code: errorCode,
+        message: errorMessage
+      });
     }
     
     // Show user-friendly toast
@@ -161,7 +162,30 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
 
   const handleCanPlay = useCallback(() => {
     setLoading(false);
-  }, [setLoading]);
+    
+    // Attempt autoplay when audio is ready to play
+    if (!hasAttemptedAutoplayRef.current && currentTrack && audioRef.current) {
+      hasAttemptedAutoplayRef.current = true;
+      
+      setTimeout(async () => {
+        if (audioRef.current && !isPlaying && currentTrack) {
+          console.log('🎵 Attempting initial autoplay after canPlay...');
+          
+          try {
+            const playPromise = audioRef.current.play();
+            if (playPromise !== undefined) {
+              await playPromise;
+              play(); // Update store state
+              console.log('✅ Autoplay successful');
+            }
+          } catch (error) {
+            console.log('🔒 Initial autoplay blocked, waiting for user interaction');
+            // Don't show error toast for initial autoplay failure
+          }
+        }
+      }, 100);
+    }
+  }, [setLoading, currentTrack, isPlaying, play]);
 
   // Effect to handle play/pause state changes
   useEffect(() => {
@@ -173,13 +197,12 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
             .then(() => {
               // Track successful play
               if (currentTrack) {
-                analytics.trackPlay(
-                  currentTrack.id,
-                  currentTrack.title,
-                  currentTrack.artist,
-                  currentTrack.src_mp3,
-                  useMusicStore.getState().currentPlaylistId || undefined
-                );
+                analytics.trackPlay({
+                  id: currentTrack.id,
+                  src: currentTrack.src_mp3,
+                  title: currentTrack.title,
+                  artist: currentTrack.artist
+                });
               }
             })
             .catch((error) => {
@@ -202,13 +225,23 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
     }
   }, [volume]);
 
-  // Effect to handle track changes
+  // Effect to handle track changes with validation
   useEffect(() => {
     if (audioRef.current && currentTrack) {
+      // Validate track has required properties
+      if (!currentTrack.src_mp3) {
+        console.error('Track missing src_mp3:', currentTrack);
+        setError('Track source unavailable');
+        return;
+      }
+      
+      // Reset autoplay attempt flag when track changes
+      hasAttemptedAutoplayRef.current = false;
+      
       // Reset position when track changes
       audioRef.current.currentTime = position;
     }
-  }, [currentId, position]);
+  }, [currentId, position, currentTrack, setError]);
 
   // Provide audio ref to parent component (for unlock functionality)
   useEffect(() => {
@@ -219,30 +252,14 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
 
   // Effect to attempt autoplay when tracks are loaded and ready
   useEffect(() => {
-    if (tracks.length > 0 && currentTrack && audioRef.current && !hasAttemptedAutoplayRef.current) {
-      hasAttemptedAutoplayRef.current = true;
+    // Only proceed if we have tracks, a current track, and haven't attempted autoplay yet
+    if (tracks.length > 0 && currentTrack && currentTrack.src_mp3 && !hasAttemptedAutoplayRef.current) {
+      console.log('🎵 Tracks loaded, waiting for audio element to be ready...');
       
-      // Wait a bit for the audio element to be ready
-      setTimeout(async () => {
-        if (audioRef.current && !isPlaying) {
-          console.log('🎵 Attempting initial autoplay...');
-          
-          try {
-            // Try to play the first track automatically
-            const playPromise = audioRef.current.play();
-            if (playPromise !== undefined) {
-              await playPromise;
-              play(); // Update store state
-              console.log('✅ Autoplay successful');
-            }
-          } catch (error) {
-            console.log('🔒 Initial autoplay blocked, waiting for user interaction');
-            // Don't show error toast for initial autoplay failure
-          }
-        }
-      }, 500);
+      // Wait for audio element to be ready and attempt autoplay on canPlay event
+      // The actual autoplay attempt is now handled in handleCanPlay callback
     }
-  }, [tracks, currentTrack, isPlaying, play]);
+  }, [tracks, currentTrack]);
 
   // Cleanup on unmount
   useEffect(() => {
