@@ -131,19 +131,21 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
     try {
       set({ isLoading: true, error: null });
       
-      // Fetch the tracks.json file from API
-      const response = await fetch("/api/tracks");
+      // Fetch the tracks.json file directly from /data/
+      const response = await fetch("/data/tracks.json");
       if (!response.ok) {
         throw new Error(`Failed to fetch tracks: ${response.status}`);
       }
       
       const tracks = await response.json();
+      console.log("Loaded tracks:", tracks);
+      console.log("Loaded tracks count:", tracks.length);
       
       if (Array.isArray(tracks) && tracks.length > 0) {
         get().setTracks(tracks);
-        console.log(`✅ Loaded ${tracks.length} tracks from API`);
+        console.log(`✅ Loaded ${tracks.length} tracks from /data/tracks.json`);
       } else {
-        throw new Error("No tracks found in API response");
+        throw new Error("No tracks found in JSON response");
       }
     } catch (error) {
       console.error("Failed to load tracks:", error);
@@ -155,19 +157,21 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
 
   loadPlaylistsFromJson: async () => {
     try {
-      // Fetch the playlists.json file from API
-      const response = await fetch("/api/playlists");
+      // Fetch the playlists.json file directly from /data/
+      const response = await fetch("/data/playlists.json");
       if (!response.ok) {
         throw new Error(`Failed to fetch playlists: ${response.status}`);
       }
       
       const playlists = await response.json();
+      console.log("Loaded playlists:", playlists);
+      console.log("Loaded playlists count:", playlists.length);
       
       if (Array.isArray(playlists) && playlists.length > 0) {
         get().setPlaylists(playlists);
-        console.log(`✅ Loaded ${playlists.length} playlists from API`);
+        console.log(`✅ Loaded ${playlists.length} playlists from /data/playlists.json`);
       } else {
-        throw new Error("No playlists found in API response");
+        throw new Error("No playlists found in JSON response");
       }
     } catch (error) {
       console.error("Failed to load playlists:", error);
