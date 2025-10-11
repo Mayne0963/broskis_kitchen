@@ -4,17 +4,8 @@ export interface Track {
   id: string;
   title: string;
   artist: string;
-  provider: string;
-  license_type: string;
-  requires_attribution: boolean;
-  attribution_text: string;
-  source_url: string;
-  license_file_url: string;
-  src_m4a: string;
   src_mp3: string;
-  cover: string;
   duration: number; // in seconds
-  gain_db: number;
   genre: string;
   // Computed property for backward compatibility
   src?: string;
@@ -110,7 +101,7 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
     // Add computed src property for backward compatibility
     const tracksWithSrc = tracks.map(track => ({
       ...track,
-      src: track.src_m4a || track.src_mp3 || track.src
+      src: track.src_mp3 || track.src
     }));
     
     set({ tracks: tracksWithSrc });
@@ -134,22 +125,31 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
       // Fetch the tracks.json file directly from /data/
       const response = await fetch("/data/tracks.json");
       if (!response.ok) {
-        throw new Error(`Failed to fetch tracks: ${response.status}`);
+        throw new Error(`Failed to fetch tracks: ${response.status} ${response.statusText}`);
       }
       
       const tracks = await response.json();
       console.log("Loaded tracks:", tracks);
       console.log("Loaded tracks count:", tracks.length);
       
-      if (Array.isArray(tracks) && tracks.length > 0) {
-        get().setTracks(tracks);
-        console.log(`✅ Loaded ${tracks.length} tracks from /data/tracks.json`);
+      if (Array.isArray(tracks)) {
+        if (tracks.length > 0) {
+          get().setTracks(tracks);
+          console.log(`✅ Loaded ${tracks.length} tracks from /data/tracks.json`);
+        } else {
+          console.warn("⚠️ No tracks found in tracks.json");
+          set({ tracks: [], error: null }); // Clear error for empty but valid response
+        }
       } else {
-        throw new Error("No tracks found in JSON response");
+        throw new Error("Invalid tracks data format - expected array");
       }
     } catch (error) {
       console.error("Failed to load tracks:", error);
-      set({ error: `Failed to load tracks: ${error instanceof Error ? error.message : "Unknown error"}` });
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      set({ 
+        tracks: [], // Fallback to empty array
+        error: `Failed to load tracks: ${errorMessage}` 
+      });
     } finally {
       set({ isLoading: false });
     }
@@ -157,25 +157,36 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
 
   loadPlaylistsFromJson: async () => {
     try {
+      set({ error: null }); // Clear any previous errors
+      
       // Fetch the playlists.json file directly from /data/
       const response = await fetch("/data/playlists.json");
       if (!response.ok) {
-        throw new Error(`Failed to fetch playlists: ${response.status}`);
+        throw new Error(`Failed to fetch playlists: ${response.status} ${response.statusText}`);
       }
       
       const playlists = await response.json();
       console.log("Loaded playlists:", playlists);
       console.log("Loaded playlists count:", playlists.length);
       
-      if (Array.isArray(playlists) && playlists.length > 0) {
-        get().setPlaylists(playlists);
-        console.log(`✅ Loaded ${playlists.length} playlists from /data/playlists.json`);
+      if (Array.isArray(playlists)) {
+        if (playlists.length > 0) {
+          get().setPlaylists(playlists);
+          console.log(`✅ Loaded ${playlists.length} playlists from /data/playlists.json`);
+        } else {
+          console.warn("⚠️ No playlists found in playlists.json");
+          set({ playlists: [], error: null }); // Clear error for empty but valid response
+        }
       } else {
-        throw new Error("No playlists found in JSON response");
+        throw new Error("Invalid playlists data format - expected array");
       }
     } catch (error) {
       console.error("Failed to load playlists:", error);
-      set({ error: `Failed to load playlists: ${error instanceof Error ? error.message : "Unknown error"}` });
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      set({ 
+        playlists: [], // Fallback to empty array
+        error: `Failed to load playlists: ${errorMessage}` 
+      });
     }
   },
 

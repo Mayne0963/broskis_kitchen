@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import { useMusicStore, Track } from '@/store/useMusicStore';
+import { useAutoplayUnlock } from '@/hooks/useAutoplayUnlock';
 import { toast } from 'sonner';
 
 interface PlayerControllerProps {
@@ -8,6 +9,7 @@ interface PlayerControllerProps {
 
 export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const hasAttemptedAutoplayRef = useRef(false);
   
   const {
     tracks,
@@ -26,6 +28,9 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
   } = useMusicStore();
 
   const currentTrack = tracks.find(t => t.id === currentId);
+  
+  // Use autoplay unlock hook
+  const { isUnlocked, attemptUnlock } = useAutoplayUnlock(audioRef);
 
   // Setup Media Session API
   const setupMediaSession = useCallback((track: Track) => {
@@ -33,14 +38,8 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
       navigator.mediaSession.metadata = new MediaMetadata({
         title: track.title,
         artist: track.artist,
-        artwork: [
-          { src: track.cover, sizes: '96x96', type: 'image/png' },
-          { src: track.cover, sizes: '128x128', type: 'image/png' },
-          { src: track.cover, sizes: '192x192', type: 'image/png' },
-          { src: track.cover, sizes: '256x256', type: 'image/png' },
-          { src: track.cover, sizes: '384x384', type: 'image/png' },
-          { src: track.cover, sizes: '512x512', type: 'image/png' },
-        ],
+        album: track.genre || 'Broski\'s Music',
+        // No artwork since we removed cover images
       });
 
       // Set action handlers
@@ -157,7 +156,9 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
         const playPromise = audioRef.current.play();
         if (playPromise !== undefined) {
           playPromise.catch((error) => {
-            console.error('Play failed:', error);
+            console.log('🔒 Autoplay blocked, waiting for user interaction:', error.message);
+            // Try to unlock autoplay
+            attemptUnlock();
             pause();
           });
         }
@@ -165,7 +166,7 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
         audioRef.current.pause();
       }
     }
-  }, [isPlaying, pause]);
+  }, [isPlaying, pause, attemptUnlock]);
 
   // Effect to handle volume changes
   useEffect(() => {
@@ -189,6 +190,33 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
     }
   }, [onAudioRef]);
 
+  // Effect to attempt autoplay when tracks are loaded and ready
+  useEffect(() => {
+    if (tracks.length > 0 && currentTrack && audioRef.current && !hasAttemptedAutoplayRef.current) {
+      hasAttemptedAutoplayRef.current = true;
+      
+      // Wait a bit for the audio element to be ready
+      setTimeout(async () => {
+        if (audioRef.current && !isPlaying) {
+          console.log('🎵 Attempting initial autoplay...');
+          
+          try {
+            // Try to play the first track automatically
+            const playPromise = audioRef.current.play();
+            if (playPromise !== undefined) {
+              await playPromise;
+              play(); // Update store state
+              console.log('✅ Autoplay successful');
+            }
+          } catch (error) {
+            console.log('🔒 Initial autoplay blocked, waiting for user interaction');
+            // Don't show error toast for initial autoplay failure
+          }
+        }
+      }, 500);
+    }
+  }, [tracks, currentTrack, isPlaying, play]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -202,12 +230,12 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
     return null;
   }
 
-  // Get the audio source - only use local sources (M4A or MP3)
-  const audioSrc = currentTrack.src_m4a || currentTrack.src_mp3;
+  // Get the audio source - use MP3 source
+  const audioSrc = currentTrack.src_mp3;
 
-  // Don't render if no local source is available
+  // Don't render if no audio source is available
   if (!audioSrc) {
-    console.warn('No local audio source available for track:', currentTrack.id);
+    console.warn('No audio source available for track:', currentTrack.id);
     return null;
   }
 

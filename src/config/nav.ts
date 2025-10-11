@@ -13,7 +13,7 @@ export type NavItem = {
 
 export const NAV_ITEMS: NavItem[] = [
   { label: "Menu", href: "/menu" },
-  { label: "Infused Menu - Coming Soon", href: "/infused-menu" },
+  { label: "Infused Menu/n- Coming Soon", href: "/infused-menu" },
   { label: "Locations", href: "/locations" },
   { label: "Events", href: "/events" },
   { label: "Music", href: "/music" },

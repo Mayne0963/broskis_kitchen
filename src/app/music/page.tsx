@@ -85,20 +85,35 @@ const MusicPage = () => {
           {isLoading ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-harvest-gold)] mx-auto mb-4"></div>
-              <p className="text-gray-300">Loading tracks and playlists...</p>
+              <p className="text-gray-300 text-lg">Loading music, grab your plate...</p>
+              <p className="text-gray-400 text-sm mt-2">Preparing your perfect dining soundtrack</p>
             </div>
           ) : error ? (
             <div className="text-center py-12">
               <div className="text-red-400 mb-4">
-                <span className="text-4xl">⚠️</span>
+                <span className="text-4xl">🎵</span>
               </div>
-              <p className="text-red-400 mb-2">Failed to load music data</p>
-              <p className="text-gray-400 text-sm">{error}</p>
+              <p className="text-red-400 mb-2 text-lg">Oops! Music service is taking a break</p>
+              <p className="text-gray-400 text-sm mb-4">{error}</p>
               <button 
                 onClick={handleRetry}
-                className="mt-4 px-4 py-2 bg-[var(--color-harvest-gold)] text-black rounded-lg hover:bg-[var(--color-harvest-gold)]/80 transition-colors"
+                className="mt-4 px-6 py-3 bg-[var(--color-harvest-gold)] text-black rounded-lg hover:bg-[var(--color-harvest-gold)]/80 transition-colors font-medium"
               >
-                Retry
+                Try Again
+              </button>
+            </div>
+          ) : tracks.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-gray-400 mb-4">
+                <span className="text-4xl">🎼</span>
+              </div>
+              <p className="text-gray-300 text-lg mb-2">No tracks found</p>
+              <p className="text-gray-400 text-sm">Check your /public/audio folder for music files</p>
+              <button 
+                onClick={handleRetry}
+                className="mt-4 px-6 py-3 bg-[var(--color-harvest-gold)] text-black rounded-lg hover:bg-[var(--color-harvest-gold)]/80 transition-colors font-medium"
+              >
+                Refresh
               </button>
             </div>
           ) : (

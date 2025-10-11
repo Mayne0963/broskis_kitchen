@@ -176,16 +176,8 @@ export const EnhancedMusicPlayer: React.FC<EnhancedMusicPlayerProps> = ({
       <div className={`p-6 ${isMinimized ? 'hidden' : ''}`}>
         {/* Current Track Info */}
         <div className="flex items-center space-x-4 mb-6">
-          <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg flex items-center justify-center overflow-hidden">
-            {currentTrack?.cover ? (
-              <img 
-                src={currentTrack.cover} 
-                alt={currentTrack.title}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="text-white text-2xl">♪</div>
-            )}
+          <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg flex items-center justify-center">
+            <div className="text-white text-2xl">♪</div>
           </div>
           
           <div className="flex-1 min-w-0">
