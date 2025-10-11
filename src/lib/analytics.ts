@@ -176,8 +176,14 @@ class BroskiAnalytics {
   }
 }
 
-// Create singleton instance
+// Create and export the analytics instance
 export const analytics = new BroskiAnalytics();
 
-// Export types for use in components
+// Export initialization function for compatibility
+export const initAnalytics = () => {
+  // Analytics is already initialized when the module loads
+  // This function exists for compatibility with existing imports
+  return analytics;
+};
+
 export type { TrackData, TrackErrorData, AnalyticsEvent };
