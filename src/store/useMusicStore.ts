@@ -193,6 +193,9 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
         playlists: [], // Fallback to empty array
         error: `Failed to load playlists: ${errorMessage}` 
       });
+    } finally {
+      // Ensure loading state is cleared after playlists load
+      set({ isLoading: false });
     }
   },
 

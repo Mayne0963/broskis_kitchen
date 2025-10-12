@@ -31,8 +31,13 @@ const MusicPage = () => {
   useEffect(() => {
     const loadMusicData = async () => {
       console.log('🎵 MUSIC PAGE: Loading tracks and playlists from JSON...');
-      await loadTracksFromJson();
-      await loadPlaylistsFromJson();
+      try {
+        await loadTracksFromJson();
+        await loadPlaylistsFromJson();
+        console.log('🎵 MUSIC PAGE: Successfully loaded all music data');
+      } catch (error) {
+        console.error('🎵 MUSIC PAGE: Failed to load music data:', error);
+      }
     };
     
     loadMusicData();

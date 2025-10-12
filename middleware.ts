@@ -26,9 +26,18 @@ export async function middleware(req: NextRequest) {
     return response;
   }
 
-  // Guard /api/rewards routes
+  // Guard /api/rewards routes (but allow some public endpoints)
   if (url.pathname.startsWith("/api/rewards")) {
     console.log(`[MIDDLEWARE] Processing ${url.pathname}, NODE_ENV: ${process.env.NODE_ENV}`);
+    
+    // Allow public endpoints without authentication
+    const publicEndpoints = ['/api/rewards/status', '/api/rewards/health'];
+    const isPublicEndpoint = publicEndpoints.some(endpoint => url.pathname === endpoint);
+    
+    if (isPublicEndpoint) {
+      console.log(`[MIDDLEWARE] Public endpoint ${url.pathname} - allowing without auth`);
+      return response;
+    }
     
     if (process.env.NODE_ENV === "development") {
       // In dev: allow guests but attach fake token for testing
@@ -37,7 +46,7 @@ export async function middleware(req: NextRequest) {
       return response;
     }
 
-    // In production: require real auth
+    // In production: require real auth for protected endpoints
     const token = await getToken({ req });
     if (!token) {
       return new Response(
