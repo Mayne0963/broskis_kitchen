@@ -1,7 +1,16 @@
 "use client";
 import { useGlobalAudio } from "@/providers/GlobalAudioProvider";
+import { useEffect, useState } from "react";
 
 export default function MiniNowPlaying() {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) return null;
+
   try {
     const audioContext = useGlobalAudio();
     if (!audioContext) return null;
