@@ -74,6 +74,7 @@ interface MusicActions {
   // Persistence
   saveState: () => void;
   loadState: () => void;
+  clearState: () => void;
 }
 
 type MusicStore = MusicState & MusicActions;
@@ -123,8 +124,8 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
     try {
       set({ isLoading: true, error: null });
       
-      // Fetch the tracks.json file directly from /data/
-      const response = await fetch("/data/tracks.json");
+      // Fetch the tracks from API route
+      const response = await fetch("/api/tracks");
       if (!response.ok) {
         throw new Error(`Failed to fetch tracks: ${response.status} ${response.statusText}`);
       }
@@ -136,13 +137,13 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
       if (Array.isArray(tracks)) {
         if (tracks.length > 0) {
           get().setTracks(tracks);
-          console.log(`✅ Loaded ${tracks.length} tracks from /data/tracks.json`);
+          console.log(`✅ Loaded ${tracks.length} tracks from /api/tracks`);
           
           // Track analytics for successful music loading
           const state = get();
           analytics.musicLoaded(tracks.length, state.playlists.length);
         } else {
-          console.warn("⚠️ No tracks found in tracks.json");
+          console.warn("⚠️ No tracks found in API response");
           set({ tracks: [], error: null }); // Clear error for empty but valid response
         }
       } else {
@@ -164,8 +165,8 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
     try {
       set({ error: null }); // Clear any previous errors
       
-      // Fetch the playlists.json file directly from /data/
-      const response = await fetch("/data/playlists.json");
+      // Fetch the playlists from API route
+      const response = await fetch("/api/playlists");
       if (!response.ok) {
         throw new Error(`Failed to fetch playlists: ${response.status} ${response.statusText}`);
       }
@@ -177,9 +178,9 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
       if (Array.isArray(playlists)) {
         if (playlists.length > 0) {
           get().setPlaylists(playlists);
-          console.log(`✅ Loaded ${playlists.length} playlists from /data/playlists.json`);
+          console.log(`✅ Loaded ${playlists.length} playlists from /api/playlists`);
         } else {
-          console.warn("⚠️ No playlists found in playlists.json");
+          console.warn("⚠️ No playlists found in API response");
           set({ playlists: [], error: null }); // Clear error for empty but valid response
         }
       } else {

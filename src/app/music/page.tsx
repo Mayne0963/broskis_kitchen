@@ -8,6 +8,7 @@ import type { Metadata } from "next"
 import { useAudioUnlock } from "@/hooks/useAudioUnlock"
 import { AudioUnlockOverlay } from "@/components/music/AudioUnlockOverlay"
 import { EnhancedMusicPlayer } from "@/components/music/EnhancedMusicPlayer"
+import { MusicErrorBoundary } from "@/components/music/MusicErrorBoundary"
 import { useMusicStore } from "@/store/useMusicStore"
 import { initAnalytics } from "@/lib/analytics"
 
@@ -135,12 +136,14 @@ const MusicPage = () => {
               </button>
             </div>
           ) : (
-            <EnhancedMusicPlayer 
-              variant="full" 
-              showPlaylist={true}
-              onAudioRef={setAudioRef}
-              className="w-full"
-            />
+            <MusicErrorBoundary>
+              <EnhancedMusicPlayer 
+                variant="full" 
+                showPlaylist={true}
+                onAudioRef={setAudioRef}
+                className="w-full"
+              />
+            </MusicErrorBoundary>
           )}
         </div>
       </div>

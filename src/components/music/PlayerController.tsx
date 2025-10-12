@@ -275,17 +275,16 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
       return;
     }
 
+    // Abort any previous loading
+    el.pause();
     el.src = src;
     el.load();
 
     // Reset autoplay attempt flag when track changes
     hasAttemptedAutoplayRef.current = false;
 
-    // try autoplay; if blocked, the unlock hook will play on first tap
-    const p = el.play();
-    if (p && typeof p.catch === "function") {
-      p.catch(() => console.log("Autoplay blocked, waiting for first tap…"));
-    }
+    // Don't attempt autoplay here - let handleCanPlay handle it
+    // This prevents ERR_ABORTED errors from premature play() calls
   }, [currentTrack?.id, setError]);
 
   // Provide audio ref to parent component (for unlock functionality)
