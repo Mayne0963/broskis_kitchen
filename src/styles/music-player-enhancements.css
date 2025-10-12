@@ -1,0 +1,205 @@
+/* Music Player Progress Bar Enhancements */
+
+/* Base range input styling for all browsers */
+input[type="range"].music-progress {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: transparent;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: all 0.2s ease;
+}
+
+/* Webkit (Safari, Chrome) slider track */
+input[type="range"].music-progress::-webkit-slider-track {
+  height: 6px;
+  background: rgba(55, 65, 81, 1); /* gray-700 */
+  border-radius: 3px;
+  border: none;
+}
+
+/* Webkit (Safari, Chrome) slider thumb */
+input[type="range"].music-progress::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: #f97316; /* orange-500 */
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  margin-top: -5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+/* Webkit thumb hover/active states */
+input[type="range"].music-progress::-webkit-slider-thumb:hover {
+  background: #ea580c; /* orange-600 */
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+input[type="range"].music-progress::-webkit-slider-thumb:active {
+  background: #dc2626; /* red-600 */
+  transform: scale(1.2);
+}
+
+/* Firefox slider track */
+input[type="range"].music-progress::-moz-range-track {
+  height: 6px;
+  background: rgba(55, 65, 81, 1); /* gray-700 */
+  border-radius: 3px;
+  border: none;
+}
+
+/* Firefox slider thumb */
+input[type="range"].music-progress::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: #f97316; /* orange-500 */
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+/* Firefox thumb hover/active states */
+input[type="range"].music-progress::-moz-range-thumb:hover {
+  background: #ea580c; /* orange-600 */
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+input[type="range"].music-progress::-moz-range-thumb:active {
+  background: #dc2626; /* red-600 */
+  transform: scale(1.2);
+}
+
+/* Edge/IE slider track */
+input[type="range"].music-progress::-ms-track {
+  height: 6px;
+  background: rgba(55, 65, 81, 1); /* gray-700 */
+  border-radius: 3px;
+  border: none;
+  color: transparent;
+}
+
+/* Edge/IE slider thumb */
+input[type="range"].music-progress::-ms-thumb {
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: #f97316; /* orange-500 */
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  input[type="range"].music-progress {
+    height: 8px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  input[type="range"].music-progress::-webkit-slider-track {
+    height: 8px;
+  }
+  
+  input[type="range"].music-progress::-webkit-slider-thumb {
+    height: 20px;
+    width: 20px;
+    margin-top: -6px;
+  }
+  
+  input[type="range"].music-progress::-moz-range-track {
+    height: 8px;
+  }
+  
+  input[type="range"].music-progress::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+  }
+}
+
+/* iOS Safari specific optimizations */
+@supports (-webkit-touch-callout: none) {
+  input[type="range"].music-progress {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  input[type="range"].music-progress::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+}
+
+/* Focus states for accessibility */
+input[type="range"].music-progress:focus {
+  outline: none;
+}
+
+input[type="range"].music-progress:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.3);
+}
+
+input[type="range"].music-progress:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.3);
+}
+
+/* Time display enhancements */
+.music-time-display {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  min-width: 3rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: rgba(156, 163, 175, 1); /* gray-400 */
+  transition: color 0.2s ease;
+}
+
+.music-time-display.current-time {
+  text-align: right;
+}
+
+.music-time-display.duration-time {
+  text-align: left;
+}
+
+/* Progress bar container */
+.music-progress-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+/* Enhanced progress bar wrapper */
+.music-progress-wrapper {
+  flex: 1;
+  position: relative;
+  padding: 0.5rem 0;
+}
+
+/* Loading state for progress bar */
+.music-progress.loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Smooth transitions */
+.music-progress-container * {
+  transition: all 0.2s ease;
+}

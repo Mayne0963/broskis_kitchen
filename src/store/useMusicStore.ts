@@ -123,14 +123,12 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
 
   loadTracksFromJson: async (skipLoadingState = false) => {
     try {
-      console.log('🚨 OLD FUNCTION: loadTracksFromJson called!');
-      console.trace('🚨 Call stack for loadTracksFromJson:');
       if (!skipLoadingState) {
         set({ isLoading: true, error: null });
       }
-      console.log('Loading tracks from JSON...');
+      console.log('Loading tracks from static JSON...');
       
-      const response = await fetch('/api/tracks');
+      const response = await fetch('/data/tracks.json', { cache: 'no-store' });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -164,14 +162,12 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
 
   loadPlaylistsFromJson: async (skipLoadingState = false) => {
     try {
-      console.log('🚨 OLD FUNCTION: loadPlaylistsFromJson called!');
-      console.trace('🚨 Call stack for loadPlaylistsFromJson:');
       if (!skipLoadingState) {
         set({ isLoading: true, error: null });
       }
-      console.log('Loading playlists from JSON...');
+      console.log('Loading playlists from static JSON...');
       
-      const response = await fetch('/api/playlists');
+      const response = await fetch('/data/playlists.json', { cache: 'no-store' });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

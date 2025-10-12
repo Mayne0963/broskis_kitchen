@@ -5,6 +5,7 @@
 /* Import optimization styles */
 @import '../styles/image-optimization.css';
 @import '../styles/mobile-enhancements.css';
+@import '../styles/music-player-enhancements.css';
 
 :root {
   /* Layout Variables */

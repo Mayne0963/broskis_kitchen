@@ -7,9 +7,17 @@ import React, { useState, useEffect } from "react"
 import type { Metadata } from "next"
 import { useAudioUnlock } from "@/hooks/useAudioUnlock"
 import { AudioUnlockOverlay } from "@/components/music/AudioUnlockOverlay"
-import { EnhancedMusicPlayer } from "@/components/music/EnhancedMusicPlayer"
+import dynamic from 'next/dynamic';
+
+const GlobalMusicPlayer = dynamic(() => import('@/components/music/GlobalMusicPlayer'), {
+  ssr: false,
+  loading: () => <div className="animate-pulse bg-gray-800 rounded-lg h-96 flex items-center justify-center">
+    <div className="text-gray-400">Loading music player...</div>
+  </div>
+});
 import { MusicErrorBoundary } from "@/components/music/MusicErrorBoundary"
 import { useMusicStore } from "@/store/useMusicStore"
+import { useGlobalAudio } from "@/providers/GlobalAudioProvider"
 import { initAnalytics } from "@/lib/analytics"
 
 // Note: Metadata export not needed as this is a client component
@@ -20,6 +28,15 @@ const MusicPage = () => {
   console.log('🎵 MUSIC PAGE: Component is rendering!');
   const { unlocked, needsUnlock, unlock, setAudioRef } = useAudioUnlock()
   const { loadAllMusicData, tracks, playlists, isLoading, error, clearState } = useMusicStore()
+  
+  // Safely get global audio context
+  let globalAudio = null;
+  try {
+    globalAudio = useGlobalAudio();
+  } catch (error) {
+    console.warn('🎵 MUSIC PAGE: GlobalAudioProvider not available', error);
+  }
+  
   const [showUnlockOverlay, setShowUnlockOverlay] = useState(false)
   
   console.log('🎵 MUSIC PAGE: Current state - tracks:', tracks?.length, 'playlists:', playlists?.length, 'isLoading:', isLoading);
@@ -114,10 +131,9 @@ const MusicPage = () => {
           
           {/* Enhanced Music Player */}
           {<MusicErrorBoundary>
-              <EnhancedMusicPlayer 
+              <GlobalMusicPlayer 
                 variant="full" 
                 showPlaylist={true}
-                onAudioRef={setAudioRef}
                 className="w-full"
               />
             </MusicErrorBoundary> 

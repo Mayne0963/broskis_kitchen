@@ -5,6 +5,8 @@ import "./chat-animations.css"
 import NavBar from "../components/layout/Navbar"
 import Footer from "../components/layout/Footer"
 import { Providers } from "../lib/context/Providers"
+import GlobalAudioProvider from "../providers/GlobalAudioProvider"
+import MiniNowPlaying from "../components/MiniNowPlaying"
 
 import ErrorBoundary from "../components/common/ErrorBoundary"
 import ChunkErrorHandler from "../components/common/ChunkErrorHandler"
@@ -126,32 +128,35 @@ export default async function RootLayout({
           <ErrorBoundary>
             <ResourceErrorBoundary>
               <ChunkErrorHandler />
-              <Providers>
-                <SkipNavigation />
-                <NavBar />
-                {/* Server-rendered Admin button for zero flicker */}
-                {showAdmin && (
-                  <div className="fixed top-2 right-4 z-[70]">
-                    <Link
-                      href="/admin/catering"
-                      className="inline-flex items-center rounded-md px-3 py-2 text-sm font-medium bg-red-600 text-white border border-red-700 hover:bg-red-700 transition-colors duration-200 shadow-lg"
-                    >
-                      Admin Catering
-                    </Link>
-                  </div>
-                )}
-                <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
-                <Footer />
+              <GlobalAudioProvider>
+                <Providers>
+                  <SkipNavigation />
+                  <NavBar />
+                  {/* Server-rendered Admin button for zero flicker */}
+                  {showAdmin && (
+                    <div className="fixed top-2 right-4 z-[70]">
+                      <Link
+                        href="/admin/catering"
+                        className="inline-flex items-center rounded-md px-3 py-2 text-sm font-medium bg-red-600 text-white border border-red-700 hover:bg-red-700 transition-colors duration-200 shadow-lg"
+                      >
+                        Admin Catering
+                      </Link>
+                    </div>
+                  )}
+                  <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
+                  <Footer />
+                  <MiniNowPlaying />
 
-                <CookieConsent />
-                <SEOAudit />
-                <SchemaGenerator />
-                <NetworkStatus />
-                <ErrorMonitor />
-                <PerformanceMonitor />
-                <AccessibilityAudit />
-                <PWAManager />
-              </Providers>
+                  <CookieConsent />
+                  <SEOAudit />
+                  <SchemaGenerator />
+                  <NetworkStatus />
+                  <ErrorMonitor />
+                  <PerformanceMonitor />
+                  <AccessibilityAudit />
+                  <PWAManager />
+                </Providers>
+              </GlobalAudioProvider>
             </ResourceErrorBoundary>
           </ErrorBoundary>
         </ProductionErrorBoundary>

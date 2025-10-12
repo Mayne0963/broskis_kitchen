@@ -262,6 +262,21 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
     }
   }, [volume]);
 
+  // Effect to handle seek/position changes from store
+  useEffect(() => {
+    if (audioRef.current && currentTrack) {
+      const audioCurrentTime = audioRef.current.currentTime;
+      const timeDifference = Math.abs(audioCurrentTime - position);
+      
+      // Only update audio currentTime if there's a significant difference (>1 second)
+      // This prevents interference with normal time updates during playback
+      if (timeDifference > 1) {
+        console.log(`🎵 Seeking from ${audioCurrentTime.toFixed(2)}s to ${position.toFixed(2)}s`);
+        audioRef.current.currentTime = position;
+      }
+    }
+  }, [position, currentTrack]);
+
   // Effect to handle track changes with validation
   useEffect(() => {
     if (!currentTrack) return;
