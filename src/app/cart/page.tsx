@@ -160,7 +160,8 @@ export default function CartPage() {
                     <div className="flex items-center gap-4">
                       <div className="w-20 h-20 bg-[#222222] rounded-lg overflow-hidden relative flex-shrink-0">
                         {item.image ? (
-                          <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover" />
+                          <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover"
+            unoptimized />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <FaShoppingCart className="text-gray-500" />

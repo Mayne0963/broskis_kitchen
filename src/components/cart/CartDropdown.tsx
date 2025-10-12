@@ -73,7 +73,8 @@ const CartDropdown: React.FC = () => {
                     >
                       <div className="w-14 h-14 bg-[#1A1A1A] rounded flex-shrink-0 overflow-hidden relative">
                         {item.image ? (
-                          <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover" />
+                          <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover"
+            unoptimized />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-[#333333]">
                             <FaShoppingBag size={20} />

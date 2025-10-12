@@ -37,6 +37,22 @@ const MusicPage = () => {
     loadMusicData();
   }, [loadTracksFromJson, loadPlaylistsFromJson]);
 
+  // Validate tracks after loading
+  useEffect(() => {
+    if (!Array.isArray(tracks) || tracks.length === 0) {
+      console.warn("No tracks loaded");
+      return;
+    }
+    
+    // Validate each track has required audio source
+    const validTracks = tracks.filter(track => track.src_mp3);
+    if (validTracks.length !== tracks.length) {
+      console.warn(`${tracks.length - validTracks.length} tracks missing audio source`);
+    }
+    
+    console.log(`✅ Validated ${validTracks.length} tracks with audio sources`);
+  }, [tracks]);
+
   // Show unlock overlay for iOS devices that need unlock
   useEffect(() => {
     if (needsUnlock) {

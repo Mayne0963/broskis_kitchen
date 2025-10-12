@@ -44,6 +44,7 @@ export default function MenuPage() {
         style={{ objectFit: "cover" }}
         priority
         className="brightness-75"
+            unoptimized
       />
       <div className="absolute inset-0 flex flex-col items-center justify-center text-white z-10">
         <h1 className="text-4xl md:text-6xl font-bold mb-4">Our Menu</h1>
@@ -201,7 +202,8 @@ export default function MenuPage() {
       {/* Hero Section */}
       <section className="relative h-[40vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <Image src="/images/menu-hero.svg" alt="Broski's Kitchen Menu" fill className="object-cover" priority />
+          <Image src="/images/menu-hero.svg" alt="Broski's Kitchen Menu" fill className="object-cover" priority
+            unoptimized />
           <div className="absolute inset-0 bg-black bg-opacity-60"></div>
         </div>
         <div className="container mx-auto px-4 z-10 text-center">

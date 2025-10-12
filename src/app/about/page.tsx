@@ -37,6 +37,7 @@ const AboutPage = () => {
             fill 
             className="object-cover" 
             priority 
+            unoptimized
           />
           <div className="absolute inset-0 bg-black bg-opacity-60"></div>
         </div>
@@ -70,6 +71,7 @@ const AboutPage = () => {
                 alt="Broski's Kitchen Logo" 
                 fill 
                 className="object-contain" 
+                unoptimized
               />
             </div>
           </div>
@@ -81,6 +83,7 @@ const AboutPage = () => {
                 alt="Broski's Kitchen Food" 
                 fill 
                 className="object-cover rounded-lg" 
+                unoptimized
               />
             </div>
             <div className="order-1 lg:order-2">

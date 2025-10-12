@@ -122,6 +122,7 @@ export default function OptimizedImage({
             onError={handleError}
             className="w-full h-auto"
             {...props}
+            unoptimized
           />
         </motion.div>
       )}

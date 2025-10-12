@@ -194,6 +194,7 @@ export const RewardsGrid: React.FC<RewardsGridProps> = ({
                         alt={reward.name}
                         fill
                         className="object-cover"
+            unoptimized
                       />
                     </div>
                   ) : (

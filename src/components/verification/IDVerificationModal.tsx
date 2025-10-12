@@ -191,7 +191,8 @@ const IDVerificationModal: React.FC<IDVerificationModalProps> = ({ onClose, onSu
               >
                 {idImage ? (
                   <div className="relative">
-                    <Image src={idImage || "/placeholder.svg"} alt="ID" className="max-h-48 mx-auto rounded" width={300} height={200} />
+                    <Image src={idImage || "/placeholder.svg"} alt="ID" className="max-h-48 mx-auto rounded" width={300} height={200}
+            unoptimized />
                     <div className="absolute top-2 right-2 bg-emerald-green rounded-full p-1">
                       <FaCheck className="text-black" />
                     </div>
@@ -233,7 +234,8 @@ const IDVerificationModal: React.FC<IDVerificationModalProps> = ({ onClose, onSu
               >
                 {selfieImage ? (
                   <div className="relative">
-                    <Image src={selfieImage || "/placeholder.svg"} alt="Selfie" className="max-h-48 mx-auto rounded" width={300} height={200} />
+                    <Image src={selfieImage || "/placeholder.svg"} alt="Selfie" className="max-h-48 mx-auto rounded" width={300} height={200}
+            unoptimized />
                     <div className="absolute top-2 right-2 bg-emerald-green rounded-full p-1">
                       <FaCheck className="text-black" />
                     </div>

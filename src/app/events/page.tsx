@@ -101,7 +101,8 @@ export default function EventsPage() {
             src="https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=broskis%20kitchen%20restaurant%20events%20chef%20workshops%20exclusive%20tastings%20special%20dining%20experiences%20elegant%20atmosphere&image_size=landscape_16_9" 
             alt="Events & Experiences" 
             fill 
-            className="object-cover" 
+            className="object-cover"
+            unoptimized 
           />
         </div>
         <div className="container mx-auto px-4 z-10 text-center">

@@ -181,6 +181,7 @@ export function EnhancedImage({
             onError={handleError}
             className="w-full h-auto transition-transform duration-300 hover:scale-105"
             {...props}
+            unoptimized
           />
         </motion.div>
       )}

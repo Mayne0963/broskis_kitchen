@@ -3,7 +3,8 @@ import { useMusicStore, Track } from '@/store/useMusicStore';
 import { useAutoplayUnlock } from '@/hooks/useAutoplayUnlock';
 import { analytics } from '@/lib/analytics';
 import { toast } from 'sonner';
-import { SilentUnlockOverlay } from './SilentUnlockOverlay';
+
+
 
 interface PlayerControllerProps {
   onAudioRef?: (audio: HTMLAudioElement | null) => void;
@@ -33,7 +34,7 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
   const currentTrack = tracks.find(t => t.id === currentId);
   
   // Use autoplay unlock hook
-  const { isUnlocked, showUnlockTip, hideUnlockTip, attemptUnlock } = useAutoplayUnlock(audioRef);
+  useAutoplayUnlock(audioRef);
 
   // Setup Media Session API
   const setupMediaSession = useCallback((track: Track) => {
@@ -102,10 +103,10 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
   // Check if silent overlay should be shown
   useEffect(() => {
     const unlocked = localStorage.getItem('broski_audio_unlocked');
-    if (!unlocked && !isUnlocked) {
+    if (!unlocked) {
       setShowSilentOverlay(true);
     }
-  }, [isUnlocked]);
+  }, []);
 
   // Audio event handlers
   const handleTimeUpdate = useCallback(() => {
@@ -245,8 +246,6 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
             })
             .catch((error) => {
               console.log('🔒 Autoplay blocked, waiting for user interaction:', error.message);
-              // Try to unlock autoplay
-              attemptUnlock();
               pause();
             });
         }
@@ -254,7 +253,7 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
         audioRef.current.pause();
       }
     }
-  }, [isPlaying, pause, attemptUnlock, currentTrack]);
+  }, [isPlaying, pause, currentTrack]);
 
   // Effect to handle volume changes
   useEffect(() => {
@@ -265,21 +264,29 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
 
   // Effect to handle track changes with validation
   useEffect(() => {
-    if (audioRef.current && currentTrack) {
-      // Validate track has required properties
-      if (!currentTrack.src_mp3) {
-        console.error('Track missing src_mp3:', currentTrack);
-        setError('Track source unavailable');
-        return;
-      }
-      
-      // Reset autoplay attempt flag when track changes
-      hasAttemptedAutoplayRef.current = false;
-      
-      // Reset position when track changes
-      audioRef.current.currentTime = position;
+    if (!currentTrack) return;
+    const el = audioRef.current;
+    if (!el) return;
+
+    const src = currentTrack.src_mp3;
+    if (!src) {
+      console.error('Track missing audio source:', currentTrack);
+      setError('Track source unavailable');
+      return;
     }
-  }, [currentId, position, currentTrack, setError]);
+
+    el.src = src;
+    el.load();
+
+    // Reset autoplay attempt flag when track changes
+    hasAttemptedAutoplayRef.current = false;
+
+    // try autoplay; if blocked, the unlock hook will play on first tap
+    const p = el.play();
+    if (p && typeof p.catch === "function") {
+      p.catch(() => console.log("Autoplay blocked, waiting for first tap…"));
+    }
+  }, [currentTrack?.id, setError]);
 
   // Provide audio ref to parent component (for unlock functionality)
   useEffect(() => {
@@ -346,18 +353,19 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
       
       {/* Silent unlock overlay for iOS */}
       {showSilentOverlay && (
-        <SilentUnlockOverlay onUnlock={handleSilentUnlock} />
-      )}
-      
-      {/* Unlock tip overlay */}
-      {showUnlockTip && (
         <div 
-          className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-4 py-2 rounded-lg text-sm z-50 cursor-pointer"
-          onClick={hideUnlockTip}
+          onClick={handleSilentUnlock}
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 text-white text-xl z-50 cursor-pointer"
         >
-          Tap anywhere to start audio
+          <div className="text-center">
+            <div className="text-4xl mb-4">🎶</div>
+            <div className="text-2xl font-bold mb-2">Tap to Start Broski's Music</div>
+            <div className="text-lg opacity-75">One tap unlocks all tracks</div>
+          </div>
         </div>
       )}
+      
+
     </>
   );
 };

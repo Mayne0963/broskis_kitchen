@@ -127,6 +127,7 @@ const RedeemModal: React.FC<RedeemModalProps> = ({ reward, userPoints, onClose }
                     className="w-full h-full object-cover"
                     width={80}
                     height={80}
+            unoptimized
                   />
                 </div>
                 <div>

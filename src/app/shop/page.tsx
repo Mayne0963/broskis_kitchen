@@ -94,6 +94,7 @@ export default function ShopPage() {
             fill
             className="object-cover"
             priority
+            unoptimized
           />
           <div className="absolute inset-0 bg-black bg-opacity-60"></div>
         </div>
@@ -292,6 +293,7 @@ export default function ShopPage() {
                   alt="Broski's Kitchen Merchandise"
                   fill
                   className="object-cover"
+            unoptimized
                 />
               </div>
               <div className="aspect-square relative rounded-lg overflow-hidden">
@@ -300,6 +302,7 @@ export default function ShopPage() {
                   alt="Broski's Kitchen Merchandise"
                   fill
                   className="object-cover"
+            unoptimized
                 />
               </div>
               <div className="aspect-square relative rounded-lg overflow-hidden">
@@ -308,6 +311,7 @@ export default function ShopPage() {
                   alt="Broski's Kitchen Merchandise"
                   fill
                   className="object-cover"
+            unoptimized
                 />
               </div>
               <div className="aspect-square relative rounded-lg overflow-hidden">
@@ -316,6 +320,7 @@ export default function ShopPage() {
                   alt="Broski's Kitchen Merchandise"
                   fill
                   className="object-cover"
+            unoptimized
                 />
               </div>
             </div>

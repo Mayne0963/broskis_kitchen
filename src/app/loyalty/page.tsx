@@ -260,6 +260,7 @@ export default function LoyaltyPage() {
                       alt="Broski's Kitchen Mobile App"
                       fill
                       className="object-cover"
+                      unoptimized
                     />
                   </div>
                 </div>
@@ -612,6 +613,7 @@ export default function LoyaltyPage() {
                       alt="Broski's Kitchen Bonus Points"
                       fill
                       className="object-cover"
+                      unoptimized
                     />
                   </div>
                   <div className="p-8 flex flex-col justify-center">
@@ -791,6 +793,7 @@ export default function LoyaltyPage() {
                       alt="Broski's Kitchen Exclusive Menu"
                       fill
                       className="object-cover"
+                      unoptimized
                     />
                   </div>
                 </div>

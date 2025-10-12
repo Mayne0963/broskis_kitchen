@@ -46,6 +46,7 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({ product, onClose, o
                 alt={product.name}
                 fill
                 className="object-contain"
+            unoptimized
               />
             </div>
 
@@ -65,6 +66,7 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({ product, onClose, o
                       alt={`${product.name} - view ${index + 1}`}
                       fill
                       className="object-cover"
+            unoptimized
                     />
                   </button>
                 ))}

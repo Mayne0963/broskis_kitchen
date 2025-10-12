@@ -34,6 +34,7 @@ export default function ContactPage() {
         style={{ objectFit: "cover" }}
         priority
         className="brightness-75"
+            unoptimized
       />
       <div className="absolute inset-0 flex flex-col items-center justify-center text-white z-10">
         <h1 className="text-4xl md:text-6xl font-bold mb-4">Contact Us</h1>

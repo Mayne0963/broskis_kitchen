@@ -245,6 +245,7 @@ export function ResponsiveImage({
       className={imageClasses.trim()}
       priority={priority}
       sizes={sizes}
+            unoptimized
     />
   )
 }

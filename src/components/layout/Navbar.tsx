@@ -117,6 +117,7 @@ const Navbar: React.FC = () => {
               width={24} 
               height={12} 
               className="filter brightness-110"
+            unoptimized
             />
             <span className="text-sm font-extrabold tracking-wide">OTW</span>
           </a>

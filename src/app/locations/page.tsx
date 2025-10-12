@@ -19,6 +19,7 @@ export default function LocationsPage() {
           style={{ objectFit: "fill" }}
           priority
           className="brightness-75"
+            unoptimized
         />
       </div>
       <LocationsClientPage locations={locationData} />

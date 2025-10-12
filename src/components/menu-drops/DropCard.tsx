@@ -59,6 +59,7 @@ export default function DropCard({ drop, isActive, userId }: DropCardProps) {
           alt={drop.name}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"
+            unoptimized
         />
         {isActive && drop.endsAt && (
           <div className="absolute top-4 right-4 bg-gold-foil text-black px-2 py-1 rounded text-sm font-medium">

@@ -26,6 +26,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, onQuick
           src={isHovered && product.images.length > 1 ? product.images[1] : product.images[0]}
           alt={product.name}
           fill
+          unoptimized
           className="object-cover transition-all duration-500"
         />
 

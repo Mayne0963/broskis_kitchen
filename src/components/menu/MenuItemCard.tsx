@@ -109,6 +109,7 @@ const MenuItemCard: React.FC<MenuItemProps> = ({ item, onAddToCart }) => {
               alt={item.name}
               fill
               className="object-contain"
+            unoptimized
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-800 text-gray-500">No Image</div>
