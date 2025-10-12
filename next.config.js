@@ -22,8 +22,8 @@ const nextConfig = {
   },
   // Enhanced Vercel deployment configuration
   assetPrefix: process.env.NODE_ENV === 'production' ? undefined : undefined,
-  // Enable static optimization
-  output: 'standalone',
+  // Remove standalone output for Vercel deployment
+  // output: 'standalone',
   // Compress output for better performance
   compress: true,
   // Enhanced image optimization
@@ -46,9 +46,9 @@ const nextConfig = {
   generateEtags: true,
   // Optimize for Vercel's edge network
   poweredByHeader: false,
-  // Enhanced webpack configuration to prevent chunk loading errors
+  // Simplified webpack configuration to prevent chunk loading errors
   webpack: (config, { dev, isServer }) => {
-    // Optimize chunk splitting for better loading reliability
+    // Simplified chunk splitting for better reliability
     if (!dev && !isServer) {
       config.optimization = {
         ...config.optimization,
@@ -56,38 +56,18 @@ const nextConfig = {
           ...config.optimization.splitChunks,
           chunks: 'all',
           minSize: 20000,
-          maxSize: 244000,
+          maxSize: 500000, // Increased max size to reduce chunk fragmentation
           cacheGroups: {
             ...config.optimization.splitChunks.cacheGroups,
-            // Create a separate chunk for vendor libraries
+            // Simplified vendor chunk
             vendor: {
               test: /[\\/]node_modules[\\/]/,
               name: 'vendors',
               chunks: 'all',
               priority: 10,
-              enforce: true,
-            },
-            // Create a separate chunk for common components
-            common: {
-              name: 'common',
-              minChunks: 2,
-              chunks: 'all',
-              priority: 5,
-              reuseExistingChunk: true,
-              enforce: true,
-            },
-            // Separate chunk for layout components
-            layout: {
-              test: /[\\/]src[\\/](components[\\/]layout|app[\\/]layout)/,
-              name: 'layout',
-              chunks: 'all',
-              priority: 8,
-              enforce: true,
             },
           },
         },
-        // Add module concatenation for better performance
-        concatenateModules: true,
       };
     }
     
@@ -107,9 +87,10 @@ const nextConfig = {
   // External packages for server components
   serverExternalPackages: ['firebase-admin'],
   
-  // Experimental settings to improve build stability
+  // Minimal experimental settings for stability
   experimental: {
-    optimizePackageImports: ['lucide-react', 'sonner'],
+    // Remove package optimizations that might cause issues
+    // optimizePackageImports: ['lucide-react', 'sonner'],
     optimizeCss: false,
   },
   
