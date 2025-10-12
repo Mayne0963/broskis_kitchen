@@ -12,7 +12,8 @@ import {
   Heart,
   List,
   Minimize2,
-  Maximize2
+  Maximize2,
+  Square
 } from 'lucide-react';
 import { useMusicStore, Track } from '@/store/useMusicStore';
 import { PlayerController } from './PlayerController';
@@ -49,6 +50,7 @@ export const EnhancedMusicPlayer: React.FC<EnhancedMusicPlayerProps> = ({
     play,
     pause,
     toggle,
+    stop,
     next,
     prev,
     seek,
@@ -248,6 +250,14 @@ export const EnhancedMusicPlayer: React.FC<EnhancedMusicPlayerProps> = ({
             className="text-gray-400 hover:text-white transition-colors"
           >
             <SkipBack className="w-6 h-6" />
+          </button>
+          
+          <button
+            onClick={stop}
+            className="text-gray-400 hover:text-white transition-colors p-2 rounded-full hover:bg-gray-700/50"
+            title="Stop"
+          >
+            <Square className="w-5 h-5" />
           </button>
           
           <button
