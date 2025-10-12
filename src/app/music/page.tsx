@@ -113,13 +113,22 @@ const MusicPage = () => {
           </div>
           
           {/* Enhanced Music Player */}
-          {isLoading ? (
+          {!isLoading && (
+            <MusicErrorBoundary>
+              <EnhancedMusicPlayer 
+                variant="full" 
+                showPlaylist={true}
+                onAudioRef={setAudioRef}
+                className="w-full"
+              />
+            </MusicErrorBoundary>
+          )} : isLoading ? {(
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-harvest-gold)] mx-auto mb-4"></div>
               <p className="text-gray-300 text-lg">Loading music, grab your plate...</p>
               <p className="text-gray-400 text-sm mt-2">Preparing your perfect dining soundtrack</p>
             </div>
-          ) : error ? (
+          )} : error ? {(
             <div className="text-center py-12">
               <div className="text-red-400 mb-4">
                 <span className="text-4xl">🎵</span>
@@ -133,7 +142,7 @@ const MusicPage = () => {
                 Try Again
               </button>
             </div>
-          ) : tracks.length === 0 ? (
+          )} : tracks.length === 0 ? {(
             <div className="text-center py-12">
               <div className="text-gray-400 mb-4">
                 <span className="text-4xl">🎼</span>
@@ -147,15 +156,6 @@ const MusicPage = () => {
                 Refresh
               </button>
             </div>
-          ) : (
-            <MusicErrorBoundary>
-              <EnhancedMusicPlayer 
-                variant="full" 
-                showPlaylist={true}
-                onAudioRef={setAudioRef}
-                className="w-full"
-              />
-            </MusicErrorBoundary>
           )}
         </div>
       </div>
