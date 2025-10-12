@@ -16,9 +16,13 @@ import { initAnalytics } from "@/lib/analytics"
 // Metadata is handled by the layout.tsx file
 
 const MusicPage = () => {
+  console.log('🎵 MUSIC PAGE: Component is rendering! Timestamp:', Date.now());
+  console.log('🎵 MUSIC PAGE: Component is rendering!');
   const { unlocked, needsUnlock, unlock, setAudioRef } = useAudioUnlock()
-  const { loadTracksFromJson, loadPlaylistsFromJson, tracks, playlists, isLoading, error, clearState } = useMusicStore()
+  const { loadAllMusicData, tracks, playlists, isLoading, error, clearState } = useMusicStore()
   const [showUnlockOverlay, setShowUnlockOverlay] = useState(false)
+  
+  console.log('🎵 MUSIC PAGE: Current state - tracks:', tracks?.length, 'playlists:', playlists?.length, 'isLoading:', isLoading);
 
   // Initialize analytics and clear old state on mount
   useEffect(() => {
@@ -30,18 +34,22 @@ const MusicPage = () => {
   // Load tracks and playlists from JSON when component mounts
   useEffect(() => {
     const loadMusicData = async () => {
-      console.log('🎵 MUSIC PAGE: Loading tracks and playlists from JSON...');
+      console.log('🎵 MUSIC PAGE: About to call loadAllMusicData...');
+      console.log('🎵 MUSIC PAGE: loadAllMusicData function:', typeof loadAllMusicData);
+      console.log('🎵 MUSIC PAGE: loadAllMusicData function reference:', loadAllMusicData);
       try {
-        await loadTracksFromJson();
-        await loadPlaylistsFromJson();
+        console.log('🎵 MUSIC PAGE: Calling loadAllMusicData...');
+        await loadAllMusicData();
         console.log('🎵 MUSIC PAGE: Successfully loaded all music data');
       } catch (error) {
         console.error('🎵 MUSIC PAGE: Failed to load music data:', error);
+        console.error('🎵 MUSIC PAGE: Error stack:', error instanceof Error ? error.stack : 'No stack trace');
       }
     };
     
+    console.log('🎵 MUSIC PAGE: useEffect triggered, about to call loadMusicData');
     loadMusicData();
-  }, [loadTracksFromJson, loadPlaylistsFromJson]);
+  }, [loadAllMusicData]);
 
   // Validate tracks after loading
   useEffect(() => {
@@ -75,8 +83,7 @@ const MusicPage = () => {
   }
 
   const handleRetry = async () => {
-    await loadTracksFromJson();
-    await loadPlaylistsFromJson();
+    await loadAllMusicData();
   };
 
   return (

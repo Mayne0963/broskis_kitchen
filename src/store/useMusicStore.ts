@@ -41,8 +41,9 @@ interface MusicActions {
   setTracks: (tracks: Track[]) => void;
   setPlaylists: (playlists: Playlist[]) => void;
   setQueue: (queue: string[]) => void;
-  loadTracksFromJson: () => Promise<void>;
-  loadPlaylistsFromJson: () => Promise<void>;
+  loadTracksFromJson: (skipLoadingState?: boolean) => Promise<void>;
+  loadPlaylistsFromJson: (skipLoadingState?: boolean) => Promise<void>;
+  loadAllMusicData: () => Promise<void>;
   
   // Playlist management
   loadPlaylist: (playlistId: string) => void;
@@ -120,81 +121,112 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
 
   setQueue: (queue) => set({ queue }),
 
-  loadTracksFromJson: async () => {
+  loadTracksFromJson: async (skipLoadingState = false) => {
     try {
-      set({ isLoading: true, error: null });
+      console.log('🚨 OLD FUNCTION: loadTracksFromJson called!');
+      console.trace('🚨 Call stack for loadTracksFromJson:');
+      if (!skipLoadingState) {
+        set({ isLoading: true, error: null });
+      }
+      console.log('Loading tracks from JSON...');
       
-      // Fetch the tracks from API route
-      const response = await fetch("/api/tracks");
+      const response = await fetch('/api/tracks');
       if (!response.ok) {
-        throw new Error(`Failed to fetch tracks: ${response.status} ${response.statusText}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const tracks = await response.json();
-      console.log("Loaded tracks:", tracks);
-      console.log("Loaded tracks count:", tracks.length);
+      console.log('Loaded tracks:', tracks);
+      console.log('Loaded tracks count:', tracks.length);
       
-      if (Array.isArray(tracks)) {
-        if (tracks.length > 0) {
-          get().setTracks(tracks);
-          console.log(`✅ Loaded ${tracks.length} tracks from /api/tracks`);
-          
-          // Track analytics for successful music loading
-          const state = get();
-          analytics.musicLoaded(tracks.length, state.playlists.length);
-        } else {
-          console.warn("⚠️ No tracks found in API response");
-          set({ tracks: [], error: null }); // Clear error for empty but valid response
-        }
-      } else {
-        throw new Error("Invalid tracks data format - expected array");
+      get().setTracks(tracks);
+      console.log('✅ Loaded', tracks.length, 'tracks from /data/tracks.json');
+      
+      // Track analytics for successful track loading
+      try {
+        analytics.musicLoaded(tracks.length, 0);
+      } catch (e) {
+        console.log('Analytics error:', e);
       }
     } catch (error) {
-      console.error("Failed to load tracks:", error);
+      console.error('Failed to load tracks:', error);
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
       set({ 
-        tracks: [], // Fallback to empty array
         error: `Failed to load tracks: ${errorMessage}` 
       });
+      throw error; // Re-throw to allow coordinated error handling
     } finally {
-      set({ isLoading: false });
+      if (!skipLoadingState) {
+        set({ isLoading: false });
+      }
     }
   },
 
-  loadPlaylistsFromJson: async () => {
+  loadPlaylistsFromJson: async (skipLoadingState = false) => {
     try {
-      set({ error: null }); // Clear any previous errors
+      console.log('🚨 OLD FUNCTION: loadPlaylistsFromJson called!');
+      console.trace('🚨 Call stack for loadPlaylistsFromJson:');
+      if (!skipLoadingState) {
+        set({ isLoading: true, error: null });
+      }
+      console.log('Loading playlists from JSON...');
       
-      // Fetch the playlists from API route
-      const response = await fetch("/api/playlists");
+      const response = await fetch('/api/playlists');
       if (!response.ok) {
-        throw new Error(`Failed to fetch playlists: ${response.status} ${response.statusText}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const playlists = await response.json();
-      console.log("Loaded playlists:", playlists);
-      console.log("Loaded playlists count:", playlists.length);
+      console.log('Loaded playlists:', playlists);
+      console.log('Loaded playlists count:', playlists.length);
       
-      if (Array.isArray(playlists)) {
-        if (playlists.length > 0) {
-          get().setPlaylists(playlists);
-          console.log(`✅ Loaded ${playlists.length} playlists from /api/playlists`);
-        } else {
-          console.warn("⚠️ No playlists found in API response");
-          set({ playlists: [], error: null }); // Clear error for empty but valid response
-        }
-      } else {
-        throw new Error("Invalid playlists data format - expected array");
+      set({ playlists });
+      console.log('✅ Loaded', playlists.length, 'playlists from /data/playlists.json');
+      
+      // Track analytics for successful playlist loading
+      try {
+        analytics.musicLoaded(0, playlists.length);
+      } catch (e) {
+        console.log('Analytics error:', e);
       }
     } catch (error) {
-      console.error("Failed to load playlists:", error);
+      console.error('Failed to load playlists:', error);
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
       set({ 
-        playlists: [], // Fallback to empty array
         error: `Failed to load playlists: ${errorMessage}` 
       });
+      throw error; // Re-throw to allow coordinated error handling
     } finally {
-      // Ensure loading state is cleared after playlists load
+      if (!skipLoadingState) {
+        set({ isLoading: false });
+      }
+    }
+  },
+
+  loadAllMusicData: async () => {
+    try {
+      set({ isLoading: true, error: null });
+      console.log('🎵 STORE: Starting coordinated music data loading...');
+      console.log('🎵 STORE: About to call Promise.all with loadTracksFromJson and loadPlaylistsFromJson');
+      
+      // Load both tracks and playlists concurrently
+      await Promise.all([
+        get().loadTracksFromJson(true),
+        get().loadPlaylistsFromJson(true)
+      ]);
+      
+      // Track analytics for successful music loading
+      const state = get();
+      analytics.musicLoaded(state.tracks.length, state.playlists.length);
+      
+      console.log('🎵 STORE: Successfully loaded all music data');
+      console.log(`✅ Final state: ${state.tracks.length} tracks, ${state.playlists.length} playlists`);
+    } catch (error) {
+      console.error('🎵 STORE: Failed to load music data:', error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      set({ error: `Failed to load music data: ${errorMessage}` });
+    } finally {
+      console.log('🎵 STORE: Setting isLoading to false');
       set({ isLoading: false });
     }
   },
