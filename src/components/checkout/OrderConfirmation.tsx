@@ -263,7 +263,7 @@ export default function OrderConfirmation({
               <li>• We'll send you updates via SMS and email</li>
               <li>• You can track your order in real-time</li>
               <li>• Our chef is already preparing your meal</li>
-              <li>• {checkoutData.deliveryType === 'delivery' ? 'Our driver will contact you when nearby' : 'We'll notify you when ready for pickup'}</li>
+              <li>• {checkoutData.deliveryType === 'delivery' ? 'Our driver will contact you when nearby' : 'We\'ll notify you when ready for pickup'}</li>
             </ul>
           </div>
           
