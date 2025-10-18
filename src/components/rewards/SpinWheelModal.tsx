@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Zap, Crown, Sparkles } from 'lucide-react'
 import confetti from 'canvas-confetti'
@@ -113,7 +113,7 @@ export const SpinWheelModal: React.FC<SpinWheelModalProps> = ({
     }
   }
 
-  const drawWheel = () => {
+  const drawWheel = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return
 
@@ -192,7 +192,7 @@ export const SpinWheelModal: React.FC<SpinWheelModalProps> = ({
     ctx.strokeStyle = '#000'
     ctx.lineWidth = 2
     ctx.stroke()
-  }
+  }, [segmentAngle])
 
   useEffect(() => {
     if (isOpen) {

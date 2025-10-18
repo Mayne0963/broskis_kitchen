@@ -12,7 +12,7 @@ export const SilentUnlockOverlay: React.FC<SilentUnlockOverlayProps> = ({ onUnlo
     >
       <div className="text-center">
         <div className="text-4xl mb-4">🎶</div>
-        <div className="text-2xl font-bold mb-2">Tap to Start Broski's Music</div>
+        <div className="text-2xl font-bold mb-2">Tap to Start Broski&apos;s Music</div>
         <div className="text-lg opacity-75">One tap unlocks all tracks</div>
       </div>
     </div>

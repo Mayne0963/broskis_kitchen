@@ -17,7 +17,7 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold text-primary mb-4">Broski's Kitchen</h3>
+            <h3 className="text-xl font-bold text-primary mb-4">Broski&apos;s Kitchen</h3>
             <p className="text-gray-300 mb-4">Luxury Street Gourmet</p>
             <div className="flex space-x-4 mb-4">
               <a
@@ -133,7 +133,7 @@ const Footer = () => {
                 {isRewardsPolicyOpen && (
                   <div className="mt-4 p-4 bg-black border border-gray-700 rounded-lg text-sm">
                     <div className="space-y-3">
-                      <h4 className="text-yellow-400 font-semibold text-base">Broski's Rewards Policy</h4>
+                      <h4 className="text-yellow-400 font-semibold text-base">Broski&apos;s Rewards Policy</h4>
                       
                       <div>
                         <h5 className="text-yellow-400 font-medium mb-1">Earning Points:</h5>
@@ -172,7 +172,7 @@ const Footer = () => {
                       
                       <div>
                         <h5 className="text-yellow-400 font-medium mb-1">Rights Reserved:</h5>
-                        <p className="text-white opacity-90">Broski's may adjust, pause, or end the Rewards Program at any time.</p>
+                        <p className="text-white opacity-90">Broski&apos;s may adjust, pause, or end the Rewards Program at any time.</p>
                       </div>
                     </div>
                   </div>
@@ -183,7 +183,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; {currentYear || 2024} Broski's Kitchen. All rights reserved.</p>
+          <p>&copy; {currentYear || 2024} Broski&apos;s Kitchen. All rights reserved.</p>
         </div>
       </div>
     </footer>

@@ -101,7 +101,7 @@ const ContactForm = () => {
             <FaCheck className="text-emerald-green text-2xl" />
           </div>
           <h3 className="text-xl font-bold mb-2">Message Sent!</h3>
-          <p className="text-gray-300 mb-6">Thank you for reaching out. We'll get back to you as soon as possible.</p>
+          <p className="text-gray-300 mb-6">Thank you for reaching out. We&apos;ll get back to you as soon as possible.</p>
           <button className="btn-primary" onClick={() => setIsSubmitted(false)}>
             Send Another Message
           </button>

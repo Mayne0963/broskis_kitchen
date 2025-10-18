@@ -105,7 +105,7 @@ const RedeemModal: React.FC<RedeemModalProps> = ({ reward, userPoints, onClose }
               </div>
               <h3 className="text-xl font-bold mb-4">Reward Redeemed!</h3>
               <p className="text-gray-300 mb-6">
-                You've successfully redeemed {reward.name} for {reward.pointsRequired} points.
+                You&apos;ve successfully redeemed {reward.name} for {reward.pointsRequired} points.
               </p>
               {couponCode && (
                 <div className="bg-[#111111] p-4 rounded-md mb-6">

@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
 
 type Track = { id:string; src_mp3?:string; src_m4a?:string; title?:string; genre?:string };
 type Ctx = {
@@ -106,6 +106,11 @@ export default function GlobalAudioProvider({children}:{children:React.ReactNode
     };
   },[mounted]);
 
+  const next = useCallback(()=>{
+    console.log("🎵 GLOBAL AUDIO: Next called");
+    setIdx(i=> (i+1)%Math.max(tracks.length,1));
+  }, [tracks.length]);
+
   // events
   useEffect(()=>{
     if (!mounted) return;
@@ -116,7 +121,7 @@ export default function GlobalAudioProvider({children}:{children:React.ReactNode
     const e=()=>next();
     el.addEventListener("timeupdate",t); el.addEventListener("loadedmetadata",d); el.addEventListener("ended",e);
     return ()=>{ el.removeEventListener("timeupdate",t); el.removeEventListener("loadedmetadata",d); el.removeEventListener("ended",e); };
-  },[tracks,currentIndex,mounted]);
+  },[tracks,currentIndex,mounted,next]);
 
   const play=(i?:number)=>{ 
     console.log("🎵 GLOBAL AUDIO: Play called with index:", i);
@@ -126,10 +131,6 @@ export default function GlobalAudioProvider({children}:{children:React.ReactNode
   const pause=()=>{
     console.log("🎵 GLOBAL AUDIO: Pause called");
     audioRef.current?.pause();
-  };
-  const next =()=>{
-    console.log("🎵 GLOBAL AUDIO: Next called");
-    setIdx(i=> (i+1)%Math.max(tracks.length,1));
   };
   const prev =()=>{
     console.log("🎵 GLOBAL AUDIO: Prev called");
