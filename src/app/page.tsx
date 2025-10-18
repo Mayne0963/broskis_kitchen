@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
-import OptimizedImage from "next/Image";
 import Link from "next/link";
+import Image from "next/image";
 import { FaUtensils, FaMapMarkerAlt, FaCalendarAlt, FaGift, FaFire, FaBars, FaTimes, FaUser, FaShoppingBag, FaPlay, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useHeroContent } from "../hooks/useHeroContent";
-import OptimizedImage, { useOptimizedImagePreloader } from "../components/performance/OptimizedImageOptimizer";
 
 import MobileEnhancer, { useEnhancedResponsive, TouchButton } from "../components/responsive/MobileEnhancer";
 import { ComponentLoader } from "../components/ui/LoadingSpinner";
@@ -20,14 +19,6 @@ function Page() {
   
   // Responsive hooks
   const { isMobile, isTablet, breakpoint } = useEnhancedResponsive();
-  
-  // Preload critical OptimizedImages
-  useOptimizedImagePreloader([
-    '/OptimizedImages/broskis-gold-logo.png',
-    '/OptimizedImages/HomePageHeroOptimizedImage.png',
-    '/otw-logo.png'
-  ]);
-
 
   return (
     <MobileEnhancer enableSwipeGestures={true} enableTouchOptimizations={true}>
@@ -63,7 +54,7 @@ function Page() {
             transition={{ duration: 1, ease: "easeOut" }}
           >
             <Image
-              src="/Images/broskis-gold-logo.png"
+              src="/images/broskis-gold-logo.png"
               alt="Broski's Kitchen Official Gold Logo"
               width={400}
               height={200}
@@ -142,7 +133,7 @@ function Page() {
           >
             <div className="relative w-full max-w-6xl">
               <Image
-                src="/Images/HomePageHeroImage.png"
+                src="/images/HomePageHeroImage.png"
                 alt="Ultra-realistic Boosie Wings spread across black surface"
                 width={2400}
                 height={900}
@@ -287,7 +278,7 @@ function Page() {
               {/* First set of items */}
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/Images/1000009121.png" alt="Boosie Sweet Heat Sauce" fill className="object-cover rounded-lg" quality={85} />
+                  <Image src="/images/1000009121.png" alt="Boosie Sweet Heat Sauce" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Boosie Sweet Heat Sauce</h3>
                 <p className="text-[#FFD700] mb-4">Smooth, saucy, and slightly savage. Our signature sweet heat sauce that brings the perfect balance of flavor and fire.</p>
@@ -300,7 +291,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/Images/menu-items/BoosieGoldWings.png" alt="Boosie Gold Wings" fill className="object-cover rounded-lg" quality={85} />
+                  <Image src="/images/menu-items/BoosieGoldWings.png" alt="Boosie Gold Wings" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Boosie Gold Wings</h3>
                 <p className="text-[#FFD700] mb-4">Crispy fried wings coated in our signature honey-gold sauce with a sprinkle of sesame seeds.</p>
@@ -313,7 +304,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/Images/menu-items/SexyyRedWings.png" alt="Sexyy Red Wings" fill className="object-cover rounded-lg" quality={85} />
+                  <Image src="/images/menu-items/SexyyRedWings.png" alt="Sexyy Red Wings" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Boosie Red Wings</h3>
                 <p className="text-[#FFD700] mb-4">Crispy wings drenched in our fiery house-made red hot sauce.</p>
@@ -326,7 +317,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/Images/1000009265.png" alt="Lotus Cheesecake" fill className="object-cover rounded-lg" quality={85} />
+                  <Image src="/images/1000009265.png" alt="Lotus Cheesecake" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Lotus Cheesecake</h3>
                 <p className="text-[#FFD700] mb-4">Decadent golden brown cheesecake infused with Lotus cookie crumbles, crafted with premium ingredients.</p>
@@ -339,7 +330,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/Images/1000008496.webp" alt="Chocolate Cupcake" fill className="object-cover rounded-lg" quality={85} />
+                  <Image src="/images/1000008496.webp" alt="Chocolate Cupcake" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Chocolate Cupcake</h3>
                 <p className="text-[#FFD700] mb-4">Rich chocolate cupcake with dark chocolate drizzle, made with premium cocoa and artisanal craftsmanship.</p>
@@ -352,7 +343,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/Images/1000008447.webp" alt="Broski's Badazz Seasoning" fill className="object-cover rounded-lg" quality={85} />
+                  <Image src="/images/1000008447.webp" alt="Broski's Badazz Seasoning" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Broski's Badazz Seasoning</h3>
                 <p className="text-[#FFD700] mb-4">Our signature blend of premium spices and herbs, the secret behind Broski's legendary flavor profile.</p>
@@ -366,7 +357,7 @@ function Page() {
               {/* Duplicate set for seamless loop */}
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/Images/1000009121.png" alt="Boosie Sweet Heat Sauce" fill className="object-cover rounded-lg" quality={85} />
+                  <Image src="/images/1000009121.png" alt="Boosie Sweet Heat Sauce" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Boosie Sweet Heat Sauce</h3>
                 <p className="text-gray-300 mb-4">Smooth, saucy, and slightly savage. Our signature sweet heat sauce that brings the perfect balance of flavor and fire.</p>
@@ -379,7 +370,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/Images/menu-items/BoosieGoldWings.png" alt="Boosie Gold Wings" fill className="object-cover rounded-lg" quality={85} />
+                  <Image src="/images/menu-items/BoosieGoldWings.png" alt="Boosie Gold Wings" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Boosie Gold Wings</h3>
                 <p className="text-gray-300 mb-4">Crispy fried wings coated in our signature honey-gold sauce with a sprinkle of sesame seeds.</p>
@@ -392,7 +383,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/Images/menu-items/SexyyRedWings.png" alt="Sexyy Red Wings" fill className="object-cover rounded-lg" quality={85} />
+                  <Image src="/images/menu-items/SexyyRedWings.png" alt="Sexyy Red Wings" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Boosie Red Wings</h3>
                 <p className="text-gray-300 mb-4">Crispy wings drenched in our fiery house-made red hot sauce.</p>
@@ -405,7 +396,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/Images/1000009265.png" alt="Lotus Cheesecake" fill className="object-cover rounded-lg" quality={85} />
+                  <Image src="/images/1000009265.png" alt="Lotus Cheesecake" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Lotus Cheesecake</h3>
                 <p className="text-gray-300 mb-4">Decadent golden brown cheesecake infused with Lotus cookie crumbles, crafted with premium ingredients.</p>
@@ -431,7 +422,7 @@ function Page() {
               </div>
               <div className="specialty-card scroll-item">
                 <div className="relative h-48 mb-4">
-                  <Image src="/Images/1000008447.webp" alt="Broski's Badazz Seasoning" fill className="object-cover rounded-lg" quality={85} />
+                  <Image src="/images/1000008447.webp" alt="Broski's Badazz Seasoning" fill className="object-cover rounded-lg" quality={85} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Broski's Badazz Seasoning</h3>
                 <p className="text-gray-300 mb-4">Our signature blend of premium spices and herbs, the secret behind Broski's legendary flavor profile.</p>
