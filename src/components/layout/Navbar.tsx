@@ -5,6 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { FaBars, FaTimes, FaUser, FaShoppingBag } from "react-icons/fa"
+import { Button } from "@/components/ui/button"
 import CartDropdown from "../../components/cart/CartDropdown"
 import { useCart } from "../../lib/context/CartContext"
 import { useAuth } from "../../lib/context/AuthContext"
@@ -17,6 +18,15 @@ import {
 } from "../accessibility/AccessibilityEnhancer"
 import MobileMenu from "../navbar/MobileMenu"
 import { NAV_ITEMS, visibleNav } from "../../config/nav"
+
+const NAV = [
+  { href: "/menu", label: "Menu" },
+  { href: "/events", label: "Events" },
+  { href: "/music", label: "Music" },
+  { href: "/rewards", label: "Rewards" },
+  { href: "/catering", label: "Catering" },
+  { href: "/contact", label: "Contact" },
+]
 
 const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -73,120 +83,130 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <nav 
-        id="navigation"
-        role="navigation"
-        aria-label="Main navigation"
-        className={`fixed top-0 w-full bg-black text-white h-20 z-[60] shadow-lg border-b border-[#FFD700] transition-transform duration-300 ${
-          isVisible ? 'translate-y-0' : '-translate-y-full'
-        }`}
-      >
-      <div className="container mx-auto flex justify-between items-center h-full px-4">
-        <Link href="/" className="text-2xl font-bold graffiti-text hover:text-white transition-colors duration-300">
-          Broski&apos;s Kitchen
-        </Link>
+      <header className="sticky top-0 z-50 bg-black/70 backdrop-blur border-b border-zinc-800">
+        <div className="container mx-auto px-4">
+          <div className="flex h-16 items-center justify-between">
+            {/* LEFT: logo */}
+            <div className="min-w-[140px] flex items-center gap-3">
+              <Link href="/" className="flex items-center gap-2">
+                <Image 
+                  src="/images/broskis-gold-logo.png"
+                  alt="Broski's Kitchen" 
+                  width={36}
+                  height={36} 
+                  priority 
+                />
+                <span className="text-2xl font-bold graffiti-text hover:text-white transition-colors duration-300">Broski's Kitchen</span>
+              </Link>
+            </div>
 
-        <button
-           type="button"
-           data-testid="mobile-menu-toggle"
-           aria-label="Open menu"
-           onClick={() => setMobileMenuOpen(true)}
-           className="md:hidden inline-flex items-center justify-center rounded-lg px-3 py-2 ring-1 ring-white/20 bg-zinc-900/60 text-white"
-         >
-           <FaBars size={24} />
-         </button>
+            {/* CENTER: main nav — perfectly centered */}
+            <nav className="absolute left-1/2 -translate-x-1/2 hidden md:flex">
+              <ul className="flex items-center gap-6">
+                {NAV.map((item) => (
+                  <li key={item.href}>
+                    <Link 
+                      href={item.href} 
+                      className={`nav-link ${pathname === item.href ? "nav-link-active" : ""}`}
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
 
-        <div className="hidden md:flex items-center space-x-6">
-          {visibleNav(NAV_ITEMS, { isMobile: false, isAuthed: !!user, isAdmin: !!claims?.admin }).map((item) => (
-            <Link 
-              key={item.href}
-              href={item.href} 
-              className={`nav-link ${pathname === item.href ? "nav-link-active" : ""}`}
-              {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-            >
-              {item.label}
-            </Link>
-          ))}
-          <a 
-            href="https://otw-chi.vercel.app" 
-            className="broski-otw-gold-button"
-          >
-            <Image 
-              src="/images/otw-logo.svg" 
-              alt="OTW Logo" 
-              width={24} 
-              height={12} 
-              className="filter brightness-110"
-            unoptimized
-            />
-            <span className="text-sm font-extrabold tracking-wide">OTW</span>
-          </a>
+            {/* RIGHT: actions (OTW + Login) */}
+            <div className="min-w-[140px] flex items-center gap-2 justify-end">
+              {/* OTW button with larger image */}
+              <Button asChild variant="primary">
+                <Link href="https://otw-chi.vercel.app" className="broski-otw-gold-button">
+                  <Image 
+                    src="/images/otw-logo.png"
+                    alt="OTW" 
+                    width={28}
+                    height={28} 
+                  />
+                  <span className="text-sm font-extrabold tracking-wide">OTW</span>
+                </Link>
+              </Button>
 
-          <CartDropdown />
+              <CartDropdown />
 
-          {user ? (
-            <AccessibleDropdown
-              trigger={
-                <div className="btn-outline flex items-center gap-2">
-                  <FaUser /> {user.name.split(" ")[0]}
-                </div>
-              }
-              isOpen={userDropdownOpen}
-              onToggle={() => setUserDropdownOpen(!userDropdownOpen)}
-              onClose={() => setUserDropdownOpen(false)}
-              label={`User menu for ${user.name.split(" ")[0]}`}
-            >
-              <AccessibleMenuItem 
-                href="/dashboard"
-                onClick={() => setUserDropdownOpen(false)}
-              >
-                Dashboard
-              </AccessibleMenuItem>
-              <AccessibleMenuItem 
-                href="/profile"
-                onClick={() => setUserDropdownOpen(false)}
-              >
-                Profile
-              </AccessibleMenuItem>
-              <AccessibleMenuItem 
-                href="/orders"
-                onClick={() => setUserDropdownOpen(false)}
-              >
-                Order History
-              </AccessibleMenuItem>
-              {!loading && claims?.admin && (
-                <AccessibleMenuItem
-                  href="/admin"
-                  prefetch={false}
-                  onClick={() => setUserDropdownOpen(false)}
-                  className="text-red-600 font-medium"
+              {user ? (
+                <AccessibleDropdown
+                  trigger={
+                    <div className="btn-outline flex items-center gap-2">
+                      <FaUser /> {user.name.split(" ")[0]}
+                    </div>
+                  }
+                  isOpen={userDropdownOpen}
+                  onToggle={() => setUserDropdownOpen(!userDropdownOpen)}
+                  onClose={() => setUserDropdownOpen(false)}
+                  label={`User menu for ${user.name.split(" ")[0]}`}
                 >
-                  Admin
-                </AccessibleMenuItem>
+                  <AccessibleMenuItem 
+                    href="/dashboard"
+                    onClick={() => setUserDropdownOpen(false)}
+                  >
+                    Dashboard
+                  </AccessibleMenuItem>
+                  <AccessibleMenuItem 
+                    href="/profile"
+                    onClick={() => setUserDropdownOpen(false)}
+                  >
+                    Profile
+                  </AccessibleMenuItem>
+                  <AccessibleMenuItem 
+                    href="/orders"
+                    onClick={() => setUserDropdownOpen(false)}
+                  >
+                    Order History
+                  </AccessibleMenuItem>
+                  {!loading && claims?.admin && (
+                     <AccessibleMenuItem
+                       href="/admin"
+                       onClick={() => setUserDropdownOpen(false)}
+                       className="text-red-600 font-medium"
+                     >
+                       Admin
+                     </AccessibleMenuItem>
+                   )}
+                  <AccessibleMenuItem
+                    onClick={async () => {
+                      await logout()
+                      setUserDropdownOpen(false)
+                    }}
+                  >
+                    Logout
+                  </AccessibleMenuItem>
+                </AccessibleDropdown>
+              ) : (
+                <Button asChild variant="outline" className="border-zinc-600 hover:bg-zinc-800">
+                  <Link href="/login">Login</Link>
+                </Button>
               )}
-              <AccessibleMenuItem
-                onClick={async () => {
-                  await logout()
-                  setUserDropdownOpen(false)
-                }}
-              >
-                Logout
-              </AccessibleMenuItem>
-            </AccessibleDropdown>
-          ) : (
-            <Link href="/auth/login" className="btn-outline flex items-center gap-2">
-              <FaUser /> Login
-            </Link>
-          )}
-        </div>
-      </div>
+            </div>
 
-      <MobileMenu 
-        open={mobileMenuOpen} 
-        onOpenChange={setMobileMenuOpen}
-      />
-      </nav>
-      <EmailVerificationBanner className="fixed top-20 left-0 right-0 z-40 mx-4" />
+            {/* Mobile menu button */}
+            <button
+              type="button"
+              data-testid="mobile-menu-toggle"
+              aria-label="Open menu"
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden inline-flex items-center justify-center rounded-lg px-3 py-2 ring-1 ring-white/20 bg-zinc-900/60 text-white"
+            >
+              <FaBars size={24} />
+            </button>
+          </div>
+        </div>
+
+        <MobileMenu 
+          open={mobileMenuOpen} 
+          onOpenChange={setMobileMenuOpen}
+        />
+      </header>
+      <EmailVerificationBanner className="fixed top-16 left-0 right-0 z-40 mx-4" />
     </>
   )
 }
