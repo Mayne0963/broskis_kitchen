@@ -19,7 +19,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
             unoptimized />
         <div className="relative z-20 flex flex-col justify-center items-center w-full p-12">
           <Link href="/" className="mb-8">
-            <h1 className="text-4xl font-bold graffiti-text">Broski&apos;s Kitchen</h1>
+            <h1 className="text-4xl font-bold graffiti-text">Broski's Kitchen</h1>
           </Link>
           <div className="max-w-md text-center">
             <h2 className="text-2xl font-bold mb-4 text-white">Luxury Street Gourmet</h2>
@@ -34,7 +34,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
       <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#1A1A1A]">
         <div className="md:hidden text-center mb-10">
           <Link href="/" className="inline-block">
-            <h1 className="text-3xl font-bold graffiti-text">Broski&apos;s Kitchen</h1>
+            <h1 className="text-3xl font-bold graffiti-text">Broski's Kitchen</h1>
           </Link>
         </div>
 

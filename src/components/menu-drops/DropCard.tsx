@@ -30,7 +30,7 @@ export default function DropCard({ drop, isActive, userId }: DropCardProps) {
   const handleAddToCart = async () => {
     if (!userId) {
       // Redirect to login
-      window.location.href = '/auth/login'
+      window.location.href = '/login'
       return
     }
     

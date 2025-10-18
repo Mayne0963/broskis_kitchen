@@ -225,7 +225,7 @@ export default function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
             </>
           ) : (
             <Link 
-              href="/auth/login" 
+              href="/login" 
               onClick={closeMenu} 
               data-testid="mobile-menu-cta"
               className="btn btn-primary w-full"

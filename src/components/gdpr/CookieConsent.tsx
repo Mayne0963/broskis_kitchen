@@ -146,7 +146,7 @@ export default function CookieConsent() {
                   We use cookies to enhance your experience
                 </h3>
                 <p className="text-sm text-gray-300 mb-4">
-                  We use essential cookies to make our site work. We&apos;d also like to set optional cookies to help us improve our website and analyze how it&apos;s used. We won&apos;t set optional cookies unless you enable them.
+                  We use essential cookies to make our site work. We'd also like to set optional cookies to help us improve our website and analyze how it's used. We won't set optional cookies unless you enable them.
                 </p>
                 
                 <div className="flex flex-wrap gap-2 mb-4">
@@ -207,7 +207,7 @@ export default function CookieConsent() {
                 <div>
                   <h2 className="text-xl font-semibold">Cookie Preferences</h2>
                   <p className="text-sm text-gray-300">
-                    Choose which cookies you&apos;d like to accept
+                    Choose which cookies you'd like to accept
                   </p>
                 </div>
                 <Button

@@ -164,7 +164,7 @@ const SpinGame: React.FC<SpinGameProps> = ({ onSpin, onClose, onComplete }) => {
             {/* Spinning Wheel */}
             <div
               ref={wheelRef}
-              className="w-full h-full relative transition-transform duration-[4000] ease-out"
+              className="w-full h-full relative transition-transform duration-[4000ms] ease-out"
               style={{
                 transform: `rotate(${rotation}deg)`,
                 transformOrigin: 'center'

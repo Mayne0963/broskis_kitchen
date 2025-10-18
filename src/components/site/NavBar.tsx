@@ -11,7 +11,7 @@ export default function NavBar() {
     <header className="border-b" style={{ borderColor: "var(--bk-border)" }}>
       <nav className="container-xl h-16 flex items-center justify-between">
         <Link href="/" className="text-xl font-bold" style={{ color: "var(--bk-silver)" }}>
-          Broski&apos;s Kitchen
+          Broski's Kitchen
         </Link>
 
         <ul className="hidden md:flex items-center gap-6">

@@ -29,7 +29,7 @@ const RedeemModal: React.FC<RedeemModalProps> = ({ reward, userPoints, onClose }
   // Handle redemption
   const handleRedeem = async () => {
     if (!hasEnoughPoints) {
-      setError("You don&apos;t have enough points to redeem this reward.")
+      setError("You don't have enough points to redeem this reward.")
       return
     }
 
@@ -89,7 +89,7 @@ const RedeemModal: React.FC<RedeemModalProps> = ({ reward, userPoints, onClose }
                 You need to be logged in to redeem rewards. Sign in to unlock exclusive benefits!
               </p>
               <div className="flex gap-3">
-                <Link href="/auth/login" className="btn-outline flex-1 text-center">
+                <Link href="/login" className="btn-outline flex-1 text-center">
                   Login
                 </Link>
                 <Link href="/auth/signup" className="btn-primary flex-1 text-center flex items-center justify-center">
@@ -105,7 +105,7 @@ const RedeemModal: React.FC<RedeemModalProps> = ({ reward, userPoints, onClose }
               </div>
               <h3 className="text-xl font-bold mb-4">Reward Redeemed!</h3>
               <p className="text-gray-300 mb-6">
-                You&apos;ve successfully redeemed {reward.name} for {reward.pointsRequired} points.
+                You've successfully redeemed {reward.name} for {reward.pointsRequired} points.
               </p>
               {couponCode && (
                 <div className="bg-[#111111] p-4 rounded-md mb-6">

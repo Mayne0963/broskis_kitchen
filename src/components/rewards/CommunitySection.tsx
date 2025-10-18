@@ -268,7 +268,7 @@ export const CommunitySection: React.FC<CommunitySectionProps> = ({
             {achievements.length === 0 && (
               <div className="text-center py-8 text-gray-500">
                 <Trophy className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                <p>You haven&apos;t unlocked any achievements yet. Keep ordering to earn your first badge!</p>
+                <p>You haven't unlocked any achievements yet. Keep ordering to earn your first badge!</p>
               </div>
             )}
           </div>
@@ -291,7 +291,7 @@ export const CommunitySection: React.FC<CommunitySectionProps> = ({
                 <div className="text-4xl mb-2">{tierBadge.icon}</div>
                 <h4 className="text-xl font-bold text-white mb-1">{tierBadge.label} Member</h4>
                 <p className="text-sm opacity-90">
-                  You&apos;re part of the exclusive {tierBadge.label.toLowerCase()} tier
+                  You're part of the exclusive {tierBadge.label.toLowerCase()} tier
                 </p>
               </motion.div>
             </div>

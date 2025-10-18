@@ -18,6 +18,12 @@ export const useGlobalAudio = () => {
   return context;
 };
 
+// Safe version that doesn't throw errors - useful for optional components
+export const useSafeGlobalAudio = () => {
+  const context = useContext(AudioCtx);
+  return context; // Returns null if not within provider
+};
+
 export default function GlobalAudioProvider({children}:{children:React.ReactNode}) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [tracks,setTracks]=useState<Track[]>([]);

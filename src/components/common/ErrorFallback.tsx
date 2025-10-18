@@ -169,7 +169,7 @@ export function NotFoundFallback() {
   return (
     <ErrorFallback
       title="Page Not Found"
-      description="The page you&apos;re looking for doesn&apos;t exist or has been moved."
+      description="The page you're looking for doesn't exist or has been moved."
       showRetry={false}
       showHome={true}
       showBack={true}
@@ -181,7 +181,7 @@ export function LoadingErrorFallback({ resetError }: { resetError?: () => void }
   return (
     <ErrorFallback
       title="Loading Failed"
-      description="We couldn&apos;t load this content. This might be a temporary issue."
+      description="We couldn't load this content. This might be a temporary issue."
       resetError={resetError}
       showRetry={true}
       showHome={false}

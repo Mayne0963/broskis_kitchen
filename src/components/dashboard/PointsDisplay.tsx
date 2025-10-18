@@ -47,7 +47,7 @@ export default function PointsDisplay({ points, tier }: PointsDisplayProps) {
         </div>
         
         <p className="text-gray-400 text-sm">
-          You&apos;re a <span className={`font-semibold ${getTierColor(tier)}`}>{tier}</span> member
+          You're a <span className={`font-semibold ${getTierColor(tier)}`}>{tier}</span> member
         </p>
       </div>
       

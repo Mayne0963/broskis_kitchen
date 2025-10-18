@@ -15,7 +15,7 @@ export default function NotifyButton({ dropId, userId }: NotifyButtonProps) {
   const handleNotifyMe = async () => {
     if (!userId) {
       // Redirect to login
-      window.location.href = '/auth/login'
+      window.location.href = '/login'
       return
     }
     

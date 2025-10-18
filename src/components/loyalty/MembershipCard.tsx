@@ -86,7 +86,7 @@ const MembershipCard: React.FC<MembershipCardProps> = ({ user, points, tier }) =
         {/* Card Header */}
         <div className="flex justify-between items-start">
           <div>
-            <h3 className="text-xl font-bold">Broski&apos;s Kitchen</h3>
+            <h3 className="text-xl font-bold">Broski's Kitchen</h3>
             <p className="text-sm text-gray-400">Loyalty Member</p>
           </div>
           <div className="flex items-center">

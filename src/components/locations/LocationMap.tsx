@@ -64,7 +64,7 @@ const LocationMap: React.FC<LocationMapProps> = ({ locations, selectedLocation, 
           <FaMapMarkerAlt />
         </div>
         <h3 className="text-xl font-bold mb-2">Our Locations</h3>
-        {!mapAvailable && <p className="text-gray-400 mb-4">Find a Broski&apos;s Kitchen near you</p>}
+        {!mapAvailable && <p className="text-gray-400 mb-4">Find a Broski's Kitchen near you</p>}
       </div>
 
       <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">

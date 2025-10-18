@@ -128,7 +128,7 @@ export default function DeliveryStep({ addresses, checkoutData, onUpdate, isAuth
       {/* Header */}
       <div>
         <h2 className="text-2xl font-bold text-white mb-2">Delivery Information</h2>
-        <p className="text-gray-400">Choose how you&apos;d like to receive your order</p>
+        <p className="text-gray-400">Choose how you'd like to receive your order</p>
       </div>
       
       {/* Delivery Type Selection */}
@@ -417,7 +417,7 @@ export default function DeliveryStep({ addresses, checkoutData, onUpdate, isAuth
       {!isAuthenticated && (
         <div>
           <h3 className="text-lg font-semibold text-white mb-4">Contact Information</h3>
-          <p className="text-gray-400 mb-4">We&apos;ll use this information to send you order updates</p>
+          <p className="text-gray-400 mb-4">We'll use this information to send you order updates</p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>

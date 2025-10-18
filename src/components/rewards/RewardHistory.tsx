@@ -196,10 +196,10 @@ const RewardHistory: React.FC<RewardHistoryProps> = ({ history }) => {
           <h3 className="text-xl font-bold mb-2">No History Found</h3>
           <p className="text-gray-400">
             {filter === "all"
-              ? "You don&apos;t have any points history yet."
+              ? "You don't have any points history yet."
               : filter === "earned"
-                ? "You haven&apos;t earned any points yet."
-                : "You haven&apos;t redeemed any rewards yet."}
+                ? "You haven't earned any points yet."
+                : "You haven't redeemed any rewards yet."}
           </p>
         </div>
       )}

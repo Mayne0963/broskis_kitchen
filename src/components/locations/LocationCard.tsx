@@ -92,7 +92,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isSelected, onSel
           <div className="flex items-start">
             <FaClock className="text-gold-foil mt-1 mr-2 flex-shrink-0" />
             <div className="text-gray-300 text-sm">
-              <p className="font-medium">Today&apos;s Hours:</p>
+              <p className="font-medium">Today's Hours:</p>
               <p>{todayHours}</p>
             </div>
           </div>
