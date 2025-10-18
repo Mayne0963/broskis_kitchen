@@ -183,7 +183,7 @@ const Navbar: React.FC = () => {
                 </AccessibleDropdown>
               ) : (
                 <Button asChild variant="outline" className="border-zinc-600 hover:bg-zinc-800">
-                  <Link href="/login">Login</Link>
+                  <Link href="/auth/login">Login</Link>
                 </Button>
               )}
             </div>
