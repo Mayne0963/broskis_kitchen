@@ -23,7 +23,7 @@ const NAV = [
   { href: "/menu", label: "Menu" },
   { href: "/events", label: "Events" },
   { href: "/music", label: "Music" },
-  { href: "/rewards", label: "Rewards" },
+  { href: "/coming-soon", label: "Rewards" },
   { href: "/catering", label: "Catering" },
   { href: "/contact", label: "Contact" },
 ]
