@@ -1,44 +1,69 @@
 "use client"
 
-import type React from "react"
-import type { ReactNode } from "react"
 import { SessionProvider } from "next-auth/react"
-import { CartProvider } from "./CartContext"
+import { UserProvider } from "./UserContext"
 import { AuthProvider } from "./AuthContext"
+import { OrderProvider } from "./OrderContext"
+import { CartProvider } from "./CartContext"
 import { RewardsProvider } from "./RewardsContext"
 import { DeliveryProvider } from "./DeliveryContext"
 import { AgeVerificationProvider } from "./AgeVerificationContext"
 import { ChatProvider } from "./ChatContext"
 import { MediaPlayerProvider } from "./MediaPlayerContext"
-import { UserProvider } from "./UserContext"
-import { OrderProvider } from "./OrderContext"
 
 interface ProvidersProps {
-  children: ReactNode
+  children: React.ReactNode
 }
 
-export const Providers: React.FC<ProvidersProps> = ({ children }) => {
+// Combine core providers that are always needed
+function CoreProviders({ children }: ProvidersProps) {
   return (
-    <SessionProvider refetchOnWindowFocus refetchInterval={60} refetchWhenOffline={false} basePath="/api/auth">
-    <UserProvider>
-    <AuthProvider>
-    <OrderProvider autoLoad={false}>
-    <CartProvider>
-    <RewardsProvider>
-    <DeliveryProvider>
-    <AgeVerificationProvider>
-    <ChatProvider>
-    <MediaPlayerProvider>
-      {children}
-    </MediaPlayerProvider>
-    </ChatProvider>
-    </AgeVerificationProvider>
-    </DeliveryProvider>
-    </RewardsProvider>
-    </CartProvider>
-    </OrderProvider>
-    </AuthProvider>
-    </UserProvider>
+    <SessionProvider>
+      <AuthProvider>
+        <UserProvider>
+          {children}
+        </UserProvider>
+      </AuthProvider>
     </SessionProvider>
+  )
+}
+
+// Combine app-specific providers
+function AppProviders({ children }: ProvidersProps) {
+  return (
+    <CartProvider>
+      <OrderProvider>
+        <DeliveryProvider>
+          {children}
+        </DeliveryProvider>
+      </OrderProvider>
+    </CartProvider>
+  )
+}
+
+// Combine feature providers that may not always be needed
+function FeatureProviders({ children }: ProvidersProps) {
+  return (
+    <RewardsProvider>
+      <AgeVerificationProvider>
+        <ChatProvider>
+          <MediaPlayerProvider>
+            {children}
+          </MediaPlayerProvider>
+        </ChatProvider>
+      </AgeVerificationProvider>
+    </RewardsProvider>
+  )
+}
+
+export function Providers({ children }: ProvidersProps) {
+  return (
+    <CoreProviders>
+      <AppProviders>
+        <FeatureProviders>
+          {children}
+        </FeatureProviders>
+      </AppProviders>
+    </CoreProviders>
   )
 }
