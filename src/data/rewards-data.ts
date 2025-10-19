@@ -76,8 +76,8 @@ export const rewards: Reward[] = [
   },
   {
     id: "chefs-table",
-    name: "Chef's Table Experience",
-    description: "Redeem for an exclusive Chef's Table dining experience for you and a guest.",
+    name: "Chef&apos;s Table Experience",
+    description: "Redeem for an exclusive Chef&apos;s Table dining experience for you and a guest.",
     pointsRequired: 1000,
     category: "experience",
     categoryName: "Experience",
@@ -88,8 +88,8 @@ export const rewards: Reward[] = [
   },
   {
     id: "tshirt",
-    name: "Broski's Kitchen T-Shirt",
-    description: "Redeem for an exclusive Broski's Kitchen t-shirt. Available in various sizes.",
+    name: "Broski&apos;s Kitchen T-Shirt",
+    description: "Redeem for an exclusive Broski&apos;s Kitchen t-shirt. Available in various sizes.",
     pointsRequired: 300,
     category: "merchandise",
     categoryName: "Merchandise",
@@ -97,8 +97,8 @@ export const rewards: Reward[] = [
   },
   {
     id: "hat",
-    name: "Broski's Kitchen Hat",
-    description: "Redeem for an exclusive Broski's Kitchen hat. One size fits all.",
+    name: "Broski&apos;s Kitchen Hat",
+    description: "Redeem for an exclusive Broski&apos;s Kitchen hat. One size fits all.",
     pointsRequired: 200,
     category: "merchandise",
     categoryName: "Merchandise",

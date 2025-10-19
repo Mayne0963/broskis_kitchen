@@ -300,7 +300,7 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
 
     // Don't attempt autoplay here - let handleCanPlay handle it
     // This prevents ERR_ABORTED errors from premature play() calls
-  }, [currentTrack?.id, setError]);
+  }, [currentTrack, setError]);
 
   // Provide audio ref to parent component (for unlock functionality)
   useEffect(() => {
@@ -324,7 +324,7 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
       // Wait for audio element to be ready and attempt autoplay on canPlay event
       // The actual autoplay attempt is now handled in handleCanPlay callback
     }
-  }, [tracks, currentTrack]);
+  }, [tracks, currentTrack, isPlaying]);
 
   // Cleanup on unmount
   useEffect(() => {

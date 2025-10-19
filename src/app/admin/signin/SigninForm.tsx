@@ -91,7 +91,7 @@ export default function SigninForm() {
         </div>
         <CardTitle className="text-2xl font-bold text-white">Admin Sign In</CardTitle>
         <CardDescription className="text-slate-400">
-          Access the Broski's Kitchen admin dashboard
+          Access the Broski&apos;s Kitchen admin dashboard
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

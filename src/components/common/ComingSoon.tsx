@@ -80,7 +80,7 @@ export default function ComingSoon({
         {/* Subtitle */}
         <div className="mb-8">
           <h2 className="text-xl md:text-2xl font-semibold text-[#FFD700] mb-2">
-            Broski's Kitchen
+            Broski&apos;s Kitchen
           </h2>
           <p className="text-gray-300 max-w-2xl mx-auto leading-relaxed">
             {message}
@@ -128,7 +128,7 @@ export default function ComingSoon({
               <div className="p-4 bg-green-900/20 border border-green-500 rounded-lg">
                 <div className="flex items-center justify-center gap-2 text-green-400">
                   <span>✅</span>
-                  <span>Thanks! We'll notify you when it's ready.</span>
+                  <span>Thanks! We&apos;ll notify you when it&apos;s ready.</span>
                 </div>
               </div>
             )}

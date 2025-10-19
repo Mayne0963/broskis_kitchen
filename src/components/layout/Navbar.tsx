@@ -96,7 +96,7 @@ const Navbar: React.FC = () => {
                   height={36} 
                   priority 
                 />
-                <span className="text-2xl font-bold graffiti-text hover:text-white transition-colors duration-300">Broski's Kitchen</span>
+                <span className="text-2xl font-bold graffiti-text hover:text-white transition-colors duration-300">Broski&apos;s Kitchen</span>
               </Link>
             </div>
 

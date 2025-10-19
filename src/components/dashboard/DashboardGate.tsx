@@ -36,7 +36,7 @@ export default function DashboardGate({
   initialOrderHistory = [],
   userId = ''
 }: DashboardGateProps) {
-  const { user, isLoading, login } = useAuth()
+  const { user, isLoading, login, signOut } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -248,7 +248,7 @@ export default function DashboardGate({
             </div>
 
             <div className="mt-6 text-center text-sm text-gray-400">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link 
                 href="/auth/signup" 
                 className="text-[var(--color-harvest-gold)] hover:underline font-medium"

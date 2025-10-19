@@ -28,7 +28,14 @@ const GlobalMusicPlayer: React.FC<GlobalMusicPlayerProps> = ({
   variant = 'full',
   showPlaylist = true,
 }) => {
+  // All hooks must be called at the top level
   const globalAudio = useGlobalAudio();
+  const { playlists } = useMusicStore();
+  const [showPlaylistPanel, setShowPlaylistPanel] = useState(false);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [volume, setVolume] = useState(0.8);
+  const [shuffle, setShuffle] = useState(false);
+  const [repeat, setRepeat] = useState<'off' | 'all' | 'one'>('off');
   
   // Return loading state if global audio context is not available
   if (!globalAudio) {
@@ -56,13 +63,6 @@ const GlobalMusicPlayer: React.FC<GlobalMusicPlayerProps> = ({
     setTime: globalSetTime,
     audioRef
   } = globalAudio;
-  
-  const { playlists } = useMusicStore();
-  const [showPlaylistPanel, setShowPlaylistPanel] = useState(false);
-  const [favorites, setFavorites] = useState<string[]>([]);
-  const [volume, setVolume] = useState(0.8);
-  const [shuffle, setShuffle] = useState(false);
-  const [repeat, setRepeat] = useState<'off' | 'all' | 'one'>('off');
 
   // Enhanced format time helper
   const formatTime = (seconds: number): string => {

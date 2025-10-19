@@ -56,12 +56,12 @@ const AboutPage = () => {
             <div>
               <h2 className="text-3xl font-bold mb-6 text-[#FFD700]">The Beginning</h2>
               <p className="text-gray-300 mb-4 leading-relaxed">
-                Broski's Kitchen was born from a simple vision: to elevate street food to luxury dining standards. 
+                Broski&apos;s Kitchen was born from a simple vision: to elevate street food to luxury dining standards. 
                 What started as a single food truck in Los Angeles has grown into a culinary movement that celebrates 
                 the intersection of street culture and gourmet cuisine.
               </p>
               <p className="text-gray-300 mb-4 leading-relaxed">
-                Our founder's passion for authentic flavors and premium ingredients led to the creation of our 
+                Our founder&apos;s passion for authentic flavors and premium ingredients led to the creation of our 
                 signature Boosie Wings and other innovative dishes that have earned critical acclaim and a devoted following.
               </p>
             </div>
@@ -94,7 +94,7 @@ const AboutPage = () => {
               </p>
               <p className="text-gray-300 mb-4 leading-relaxed">
                 Every dish we serve is crafted with premium ingredients, innovative techniques, and a deep respect 
-                for the culinary traditions that inspire us. We're not just serving food – we're creating memories.
+                for the culinary traditions that inspire us. We&apos;re not just serving food – we&apos;re creating memories.
               </p>
             </div>
           </div>
@@ -118,7 +118,7 @@ const AboutPage = () => {
               <div className="text-center">
                 <h3 className="text-xl font-bold mb-4 text-white">Community</h3>
                 <p className="text-gray-300">
-                  We're committed to giving back to the communities we serve and supporting local suppliers and partners.
+                  We&apos;re committed to giving back to the communities we serve and supporting local suppliers and partners.
                 </p>
               </div>
             </div>

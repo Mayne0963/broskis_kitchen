@@ -122,7 +122,7 @@ export default function AuthPage() {
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  We've sent a verification link to your email address. 
+                  We&apos;ve sent a verification link to your email address. 
                   Please click the link to activate your account.
                 </AlertDescription>
               </Alert>

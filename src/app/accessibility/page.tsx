@@ -22,7 +22,7 @@ const AccessibilityPage = () => {
         {/* Title */}
         <header className="space-y-2 text-center">
           <h1 className="text-4xl font-bold" id="page-title">Digital Accessibility</h1>
-          <p className="text-sm text-muted" aria-describedby="page-title">Broski's Kitchen is built for everyone</p>
+          <p className="text-sm text-muted" aria-describedby="page-title">Broski&apos;s Kitchen is built for everyone</p>
         </header>
 
         {/* I. Digital Accessibility Commitment */}
@@ -30,7 +30,7 @@ const AccessibilityPage = () => {
           <h2 id="commitment-heading" className="text-2xl font-semibold">I. Our Accessibility Commitment</h2>
           <p className="leading-relaxed">
             At Broskis Kitchen, we build legacies—and we build them for all. Our digital
-            experiences adhere to the W3C's Web Content Accessibility Guidelines (WCAG). We
+            experiences adhere to the W3C&apos;s Web Content Accessibility Guidelines (WCAG). We
             continually test our sites and apps with real assistive technology (screen readers,
             switch devices, voice control) and with users who rely on these tools every day.
           </p>
@@ -81,7 +81,7 @@ const AccessibilityPage = () => {
             </li>
             <li>
               <strong>Drive-Thru Support:</strong> For speech or hearing disabilities, pull up to
-              the window and we'll assist you.
+              the window and we&apos;ll assist you.
             </li>
           </ul>
         </section>
@@ -92,7 +92,7 @@ const AccessibilityPage = () => {
           <ul className="list-disc list-inside leading-relaxed space-y-1">
             <li>Large-print menus available in-store upon request</li>
             <li>Picture-based guides for quick visual ordering</li>
-            <li>Audio menu via our app's “Listen Mode”</li>
+            <li>Audio menu via our app&apos;s &quot;Listen Mode&quot;</li>
           </ul>
         </section>
 
@@ -108,7 +108,7 @@ const AccessibilityPage = () => {
         {/* Footer */}
         <footer className="mt-12 border-t pt-6 text-center">
           <p className="leading-relaxed">
-            If you encounter barriers, we're here to decode and elevate. Reach out anytime at{' '}
+            If you encounter barriers, we&apos;re here to decode and elevate. Reach out anytime at{' '}
             <a
               href="mailto:accessibility@broskiskitchen.com"
               className="text-amber-400 hover:underline focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-black"
