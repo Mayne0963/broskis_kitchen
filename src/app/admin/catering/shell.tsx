@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import CateringFilters, { Filters } from "@/components/admin/CateringFilters";
+import CateringFilters from "@/components/admin/CateringFilters";
 import CateringTable from "@/components/admin/CateringTable";
 import CateringDetail from "@/components/admin/CateringDetail";
+import type { CateringFilters as CateringFiltersType } from "@/types/catering";
 
 export default function CateringDashboardClient({
   initialStatus = "all",
@@ -15,7 +16,7 @@ export default function CateringDashboardClient({
   initialQ?: string;
   initialId?: string;
 }) {
-  const [filters, setFilters] = useState<Filters>({
+  const [filters, setFilters] = useState<CateringFiltersType>({
     status: initialStatus,
     q: initialQ,
   });
@@ -46,7 +47,7 @@ export default function CateringDashboardClient({
 
   // reflect filter changes into URL
   const handleFilters = useCallback(
-    (f: Filters) => {
+    (f: CateringFiltersType) => {
       setFilters(f);
       pushQuery({ status: f.status, q: f.q });
     },
@@ -64,7 +65,12 @@ export default function CateringDashboardClient({
 
   return (
     <div className="space-y-4">
-      <CateringFilters initial={filters} onChange={handleFilters} />
+      <CateringFilters 
+        filters={filters} 
+        onFiltersChange={handleFilters}
+        onExport={() => {}} 
+        isExporting={false}
+      />
       
       <div className="bg-neutral-900 border border-white/10 rounded-lg p-4">
         <div className="flex items-center justify-between">
@@ -86,7 +92,13 @@ export default function CateringDashboardClient({
         </div>
       </div>
       
-      <CateringTable status={tableStatus} q={tableQ} density={density} />
+      <CateringTable 
+        status={tableStatus || "all"} 
+        q={tableQ || ""} 
+        dateStart={filters.dateStart}
+        dateEnd={filters.dateEnd}
+        density={density} 
+      />
       {activeId && (
         <div className="space-y-4">
           <div className="bg-neutral-900 border border-white/10 rounded-lg p-4">
