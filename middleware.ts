@@ -57,35 +57,35 @@ export async function middleware(req: NextRequest) {
   ].includes(url.pathname);
 
   if (isFirebaseAuthRoute || isAuthPage) {
-    // Check for Firebase session cookie with basic validation
-    const sessionCookie = req.cookies.get('__session')?.value || req.cookies.get('session')?.value;
+    // Check for Firebase session cookie
+    const sessionCookie = req.cookies.get('__session')?.value;
     let hasValidFirebaseSession = false;
 
     if (sessionCookie) {
       try {
-        // Basic JWT structure validation (without full verification to avoid Firebase Admin issues)
+        // For middleware (Edge Runtime), we'll do basic JWT structure validation
+        // The actual verification happens in the page server components using Firebase Admin
         const parts = sessionCookie.split('.');
         if (parts.length === 3) {
-          // Decode the payload to check expiration
+          // Decode the payload to check basic structure and expiration
           const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
           const now = Math.floor(Date.now() / 1000);
           
-          // Check if token is not expired
-          if (payload.exp && payload.exp > now) {
+          // Check if token has required fields and is not expired
+          if (payload.exp && payload.exp > now && payload.uid) {
             hasValidFirebaseSession = true;
             console.log(`[MIDDLEWARE] Valid session found for ${url.pathname}`);
           } else {
-            console.log(`[MIDDLEWARE] Expired session for ${url.pathname}`);
+            console.log(`[MIDDLEWARE] Expired or invalid session for ${url.pathname}`);
           }
         }
       } catch (error) {
         console.log(`[MIDDLEWARE] Invalid session format for ${url.pathname}:`, error instanceof Error ? error.message : 'Unknown error');
       }
 
-      // If session is invalid or expired, clear the cookies
+      // If session is invalid or expired, clear the cookie
       if (!hasValidFirebaseSession) {
         response.cookies.set('__session', '', { maxAge: 0, path: '/' });
-        response.cookies.set('session', '', { maxAge: 0, path: '/' });
       }
     }
 

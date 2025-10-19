@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
-import { getServerUser } from "@/lib/session";
+import { getSessionCookie } from "@/lib/auth/session";
 import { adminDb } from "@/lib/firebase/admin";
 import { orderTotalCents } from "@/lib/server/orderTotals";
 import { LuxeCard, LuxeCardHeader, LuxeCardTitle, LuxeCardContent } from "@/components/luxe/LuxeCard";
@@ -15,7 +15,7 @@ function usd(n: number) {
 }
 
 export default async function OrdersPage() {
-  const user = await getServerUser();
+  const user = await getSessionCookie();
   if (!user) {
     redirect('/login?next=/account/orders');
   }

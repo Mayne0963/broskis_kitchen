@@ -1,7 +1,7 @@
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-import { getServerUser } from "@/lib/session";
+import { getSessionCookie } from "@/lib/auth/session";
 import { getUserTotals } from "@/lib/server/orderTotals";
 import KpiCard from "@/components/kpi/KpiCard";
 import QuickActions from "@/components/QuickActions";
@@ -9,7 +9,7 @@ import { LuxeCard, LuxeCardHeader, LuxeCardTitle, LuxeCardContent } from "@/comp
 import { redirect } from 'next/navigation';
 
 export default async function DashboardPage() {
-  const user = await getServerUser();
+  const user = await getSessionCookie();
   if (!user) {
     redirect('/login?next=/dashboard');
   }

@@ -5,11 +5,11 @@ export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getServerUser } from "@/lib/session";
+import { getSessionCookie } from "@/lib/auth/session";
 import { redirect } from 'next/navigation';
 
 export default async function ProfilePage() {
-  const user = await getServerUser();
+  const user = await getSessionCookie();
 
   if (!user) {
     redirect('/login?next=/account/profile');
