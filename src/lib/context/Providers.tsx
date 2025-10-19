@@ -2,6 +2,7 @@
 
 import type React from "react"
 import type { ReactNode } from "react"
+import { SessionProvider } from "next-auth/react"
 import { CartProvider } from "./CartContext"
 import { AuthProvider } from "./AuthContext"
 import { RewardsProvider } from "./RewardsContext"
@@ -18,6 +19,7 @@ interface ProvidersProps {
 
 export const Providers: React.FC<ProvidersProps> = ({ children }) => {
   return (
+    <SessionProvider refetchOnWindowFocus refetchInterval={60} refetchWhenOffline={false} basePath="/api/auth">
     <UserProvider>
     <AuthProvider>
     <OrderProvider autoLoad={false}>
@@ -37,5 +39,6 @@ export const Providers: React.FC<ProvidersProps> = ({ children }) => {
     </OrderProvider>
     </AuthProvider>
     </UserProvider>
+    </SessionProvider>
   )
 }

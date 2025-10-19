@@ -1,12 +1,11 @@
 "use client";
 import { fbAuth } from "../../../firebase/client";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function Login() {
   const [busy, setBusy] = useState(false);
-  const router = useRouter();
 
   const handleLogin = async () => {
     try {
@@ -14,21 +13,7 @@ export default function Login() {
       const provider = new GoogleAuthProvider();
       const cred = await signInWithPopup(fbAuth, provider);
       const idToken = await cred.user.getIdToken(true); // force refresh
-      
-      // Create session cookie using Firebase Auth
-      const response = await fetch('/api/auth/session-login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ idToken }),
-      });
-
-      if (response.ok) {
-        router.push('/');
-      } else {
-        throw new Error('Failed to create session');
-      }
+      await signIn("credentials", { idToken, callbackUrl: "/", redirect: true });
     } catch (err) {
       console.error("Login failed", err);
       alert("Login failed. Check console.");

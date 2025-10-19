@@ -1,14 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { adminAuth } from "@/lib/firebase/admin";
-
-async function verifySessionCookie(sessionCookie: string) {
-  try {
-    const decodedClaims = await adminAuth.verifySessionCookie(sessionCookie, true);
-    return decodedClaims;
-  } catch (error) {
-    return null;
-  }
-}
+import { getToken } from "next-auth/jwt";
 
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl;
@@ -30,29 +21,16 @@ export async function middleware(req: NextRequest) {
     }
 
     // In production: require real auth
-    const sessionCookie = req.cookies.get("session")?.value;
-    if (!sessionCookie) {
+    const token = await getToken({ req });
+    if (!token) {
       return new Response(
         JSON.stringify({ success: false, error: "UNAUTHORIZED" }),
         { status: 401, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    const decodedClaims = await verifySessionCookie(sessionCookie);
-    if (!decodedClaims) {
-      return new Response(
-        JSON.stringify({ success: false, error: "UNAUTHORIZED" }),
-        { status: 401, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Attach user info to request for handlers
-    (req as any).user = { 
-      id: decodedClaims.uid, 
-      uid: decodedClaims.uid,
-      email: decodedClaims.email,
-      role: "customer" // Default role, can be enhanced with custom claims
-    };
+    // Attach token to request for handlers
+    (req as any).user = token;
   }
 
   return NextResponse.next();

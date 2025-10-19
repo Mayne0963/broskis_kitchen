@@ -6,7 +6,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { FaTimes } from 'react-icons/fa'
 import { lockBodyScroll, unlockBodyScroll } from '../../lib/dom/lockBodyScroll'
-import { useSession } from '../../hooks/useSession'
+import { useAuth } from '../../lib/context/AuthContext'
+import { useAuthClaims } from '../../hooks/useAuthClaims'
 import { useCart } from '../../lib/context/CartContext'
 import { MAIN_LINKS } from '../nav/links'
 
@@ -16,12 +17,13 @@ interface MobileMenuProps {
 }
 
 export default function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
-  const { user, isAuthenticated, logout } = useSession()
+  const { user } = useAuth()
+  const { claims } = useAuthClaims()
   const { itemCount } = useCart()
   const pathname = usePathname()
   
-  const isAuthed = isAuthenticated
-  const isAdmin = user?.role === 'admin'
+  const isAuthed = !!user
+  const isAdmin = !!claims?.admin
   const cartCount = itemCount
   
   const closeButtonRef = useRef<HTMLButtonElement>(null)
@@ -212,16 +214,14 @@ export default function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
                   Admin
                 </Link>
               )}
-              <button 
-                onClick={async () => {
-                  await logout()
-                  closeMenu()
-                }}
-                data-testid="mobile-menu-cta"
-                className="btn btn-ghost w-full"
-              >
-                Logout
-              </button>
+              <form action="/api/auth/signout" method="post">
+                <button 
+                  data-testid="mobile-menu-cta"
+                  className="btn btn-ghost w-full"
+                >
+                  Logout
+                </button>
+              </form>
             </>
           ) : (
             <Link 

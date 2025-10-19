@@ -3,13 +3,26 @@ import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 export const config = { 
-  matcher: ["/api/auth/:path*", "/api/admin/:path*", "/admin/:path*", "/api/rewards/:path*"] 
+  matcher: [
+    // API routes that need protection
+    "/api/auth/:path*", 
+    "/api/admin/:path*", 
+    "/api/rewards/:path*",
+    // Firebase Auth protected routes
+    "/dashboard/:path*",
+    "/profile/:path*",
+    "/orders/:path*",
+    "/loyalty/:path*",
+    "/rewards/:path*",
+    "/cart/:path*",
+    "/checkout/:path*",
+    // Auth pages that should redirect if authenticated
+    "/auth/login",
+    "/auth/signup",
+    "/login"
+  ] 
 };
 
-// NOTE: 
-// For best performance, let the server page guard handle role checks.
-// Admin routes use lightweight middleware - pages handle authentication.
-// This middleware focuses on caching and basic route protection.
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl;
   const response = NextResponse.next();
@@ -21,12 +34,77 @@ export async function middleware(req: NextRequest) {
     response.headers.set("Cache-Control", "no-store, private, max-age=0");
   }
 
-  // Lightweight admin route handling - let pages handle auth
+  // Handle NextAuth.js admin routes (existing logic)
   if (url.pathname.startsWith("/admin")) {
     return response;
   }
 
-  // Guard /api/rewards routes (but allow some public endpoints)
+  // Handle Firebase Auth routes
+  const isFirebaseAuthRoute = [
+    "/dashboard",
+    "/profile", 
+    "/orders",
+    "/loyalty",
+    "/rewards",
+    "/cart",
+    "/checkout"
+  ].some(route => url.pathname.startsWith(route));
+
+  const isAuthPage = [
+    "/auth/login",
+    "/auth/signup", 
+    "/login"
+  ].includes(url.pathname);
+
+  if (isFirebaseAuthRoute || isAuthPage) {
+    // Check for Firebase session cookie with basic validation
+    const sessionCookie = req.cookies.get('__session')?.value || req.cookies.get('session')?.value;
+    let hasValidFirebaseSession = false;
+
+    if (sessionCookie) {
+      try {
+        // Basic JWT structure validation (without full verification to avoid Firebase Admin issues)
+        const parts = sessionCookie.split('.');
+        if (parts.length === 3) {
+          // Decode the payload to check expiration
+          const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+          const now = Math.floor(Date.now() / 1000);
+          
+          // Check if token is not expired
+          if (payload.exp && payload.exp > now) {
+            hasValidFirebaseSession = true;
+            console.log(`[MIDDLEWARE] Valid session found for ${url.pathname}`);
+          } else {
+            console.log(`[MIDDLEWARE] Expired session for ${url.pathname}`);
+          }
+        }
+      } catch (error) {
+        console.log(`[MIDDLEWARE] Invalid session format for ${url.pathname}:`, error instanceof Error ? error.message : 'Unknown error');
+      }
+
+      // If session is invalid or expired, clear the cookies
+      if (!hasValidFirebaseSession) {
+        response.cookies.set('__session', '', { maxAge: 0, path: '/' });
+        response.cookies.set('session', '', { maxAge: 0, path: '/' });
+      }
+    }
+
+    if (isAuthPage && hasValidFirebaseSession) {
+      // User is authenticated but trying to access auth pages - redirect to dashboard
+      console.log(`[MIDDLEWARE] Authenticated user accessing ${url.pathname}, redirecting to dashboard`);
+      return NextResponse.redirect(new URL('/dashboard', req.url));
+    }
+
+    if (isFirebaseAuthRoute && !hasValidFirebaseSession) {
+      // User is not authenticated but trying to access protected routes - redirect to login
+      console.log(`[MIDDLEWARE] Unauthenticated user accessing ${url.pathname}, redirecting to login`);
+      const loginUrl = new URL('/auth/login', req.url);
+      loginUrl.searchParams.set('next', url.pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  // Guard /api/rewards routes (existing logic)
   if (url.pathname.startsWith("/api/rewards")) {
     console.log(`[MIDDLEWARE] Processing ${url.pathname}, NODE_ENV: ${process.env.NODE_ENV}`);
     

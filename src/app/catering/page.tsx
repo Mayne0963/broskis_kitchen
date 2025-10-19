@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useSession } from "../../hooks/useSession";
+import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 
 const HCaptcha = dynamic(() => import("@hcaptcha/react-hcaptcha"), { ssr: false });
@@ -63,10 +63,11 @@ function OptionGrid({ title, items, selected, max, onToggle }: {
 }
 
 export default function Catering() {
-  const { user, isLoading } = useSession();
+  const { data, status } = useSession(); // ← no destructure of user yet
+  const session = data ?? null;
 
   // Show loading state while session is loading
-  if (isLoading) {
+  if (status === "loading") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
         <div className="animate-pulse opacity-70 text-yellow-300 text-xl">Loading catering...</div>
