@@ -3,15 +3,13 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
-import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth/options";
 
-// NextAuth session endpoint is disabled - return empty session to stop client retries
-export async function GET(request: NextRequest) {
-  // Return an empty session response to stop NextAuth client from retrying
-  return NextResponse.json({ user: null, expires: null }, { status: 200 });
-}
-
-export async function POST(request: NextRequest) {
-  // Return an empty session response to stop NextAuth client from retrying
-  return NextResponse.json({ user: null, expires: null }, { status: 200 });
+export async function GET() {
+  const s = await getServerSession(authOptions as any);
+  return new Response(JSON.stringify({ ok: !!s, user: s?.user ?? null, role: (s?.user as any)?.role ?? null }), {
+    status: 200,
+    headers: { "content-type": "application/json", "cache-control": "no-store, private, max-age=0" },
+  });
 }

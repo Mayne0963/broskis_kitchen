@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/firebase/admin";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { getFirestore } from "firebase-admin/firestore";
 import { isAdmin, normalizeRole } from "@/lib/roles";
 import { mapDoc } from "@/lib/catering/transform";
 import type { CateringRequest, CateringUpdateRequest } from "@/types/catering";
-import { getServerUser } from "@/lib/session";
+
+const db = getFirestore();
 
 export async function GET(
   _: NextRequest, 
@@ -41,13 +44,10 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Check admin authentication using custom session system
-    const user = await getServerUser();
-    if (!user) {
-      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
-    }
+    // Check admin authentication using our global role system
+    const session = await getServerSession(authOptions);
+    const userRole = normalizeRole((session?.user as any)?.role);
     
-    const userRole = normalizeRole(user.roles?.[0] || 'user');
     if (!isAdmin(userRole)) {
       return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
     }

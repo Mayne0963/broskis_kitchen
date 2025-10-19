@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getSessionCookieForMiddleware } from "@/lib/auth/middlewareSession";
+import { getToken } from "next-auth/jwt";
 
 export const config = { 
   matcher: ["/api/auth/:path*", "/api/admin/:path*", "/admin/:path*", "/api/rewards/:path*"] 
@@ -47,16 +47,16 @@ export async function middleware(req: NextRequest) {
     }
 
     // In production: require real auth for protected endpoints
-    const user = await getSessionCookieForMiddleware();
-    if (!user) {
+    const token = await getToken({ req });
+    if (!token) {
       return new Response(
         JSON.stringify({ success: false, error: "UNAUTHORIZED" }),
         { status: 401, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    // Attach user to request for handlers
-    response.headers.set('x-user-token', JSON.stringify(user));
+    // Attach token to request for handlers
+    response.headers.set('x-user-token', JSON.stringify(token));
     return response;
   }
 

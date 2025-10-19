@@ -1,20 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, normalizeRole } from "@/lib/roles";
-import { db } from "@/lib/firebase/admin";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { isAdmin } from "@/lib/roles";
+import { getFirestore } from "firebase-admin/firestore";
 import { mapDoc } from "@/lib/catering/transform";
-import { getServerUser } from "@/lib/session";
+
+const db = getFirestore();
 
 export async function GET(req: NextRequest) {
   try {
-    // Check admin authentication using custom session system
-    const user = await getServerUser();
-    if (!user) {
-      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
-    }
-    
-    const userRole = normalizeRole(user.roles?.[0] || 'user');
-    if (!isAdmin(userRole)) {
-      return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
+    // Check admin authentication
+    const session = await getServerSession(authOptions);
+    if (!isAdmin(session?.user)) {
+      return NextResponse.json({ error: "forbidden" }, { status: 403 });
     }
 
     // Fetch all catering requests

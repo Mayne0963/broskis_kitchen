@@ -1,19 +1,54 @@
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth/options";
 import { cookies, headers } from "next/headers";
 import { adminAuth } from "./firebase/admin";
 import { getUserByUID } from "./user";
 import { UserCache } from "./cache";
 
 /**
- * Get authenticated user from Firebase session cookie (zero extra fetches)
- * Uses role from custom claims for instant admin checks
+ * Get authenticated user from NextAuth session (zero extra fetches)
+ * Uses role computed in JWT callback for instant admin checks
  */
 export async function getServerUser() {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("__session")?.value || cookieStore.get("session")?.value;
+  const session = await getServerSession(authOptions);
   
-  if (!sessionCookie) {
+  if (!session?.user) {
     return null;
   }
+  
+  return {
+    uid: (session.user as any).uid,
+    email: session.user.email,
+    role: (session.user as any).role || "user",
+    name: session.user.name,
+  };
+}
+
+/**
+ * Check if current user is admin (zero extra fetches)
+ * Uses role from NextAuth session computed in JWT
+ */
+export async function isServerAdmin(): Promise<boolean> {
+  const user = await getServerUser();
+  return user?.role === "admin";
+}
+
+/**
+ * Require admin access or redirect
+ * For use in server components and API routes
+ */
+export async function requireServerAdmin() {
+  const isAdmin = await isServerAdmin();
+  if (!isAdmin) {
+    throw new Error("Admin access required");
+  }
+}
+
+// Legacy Firebase session cookie support (fallback)
+export async function getServerUserLegacy() {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get("__session")?.value || cookieStore.get("session")?.value;
+  if (!sessionCookie) return null;
 
   try {
     const decoded = await adminAuth.verifySessionCookie(sessionCookie, true);
@@ -36,16 +71,14 @@ export async function getServerUser() {
       return {
         uid: userData.uid,
         email: userData.email,
-        role: userData.role,
-        name: userData.name || userData.email?.split('@')[0]
+        role: userData.role
       };
     } else {
       // Fallback to token data if user document doesn't exist
       return {
         uid: decoded.uid,
         email: decoded.email || null,
-        role: (decoded as any).role || "user",
-        name: (decoded as any).name || decoded.email?.split('@')[0]
+        role: (decoded as any).role || "user"
       };
     }
   } catch (error) {
@@ -55,21 +88,16 @@ export async function getServerUser() {
 }
 
 /**
- * Check if current user is admin (zero extra fetches)
- * Uses role from Firebase session cookie
+ * Get server user with enhanced error handling and caching
+ * @returns User data or null if not authenticated
  */
-export async function isServerAdmin(): Promise<boolean> {
-  const user = await getServerUser();
-  return user?.role === "admin";
-}
-
-/**
- * Require admin access or redirect
- * For use in server components and API routes
- */
-export async function requireServerAdmin() {
-  const isAdmin = await isServerAdmin();
-  if (!isAdmin) {
-    throw new Error("Admin access required");
+export async function getServerUserOptimized() {
+  // Try NextAuth session first (preferred)
+  const nextAuthUser = await getServerUser();
+  if (nextAuthUser) {
+    return nextAuthUser;
   }
+  
+  // Fallback to legacy Firebase session cookie
+  return await getServerUserLegacy();
 }
