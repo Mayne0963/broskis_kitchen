@@ -1,239 +1,214 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { useAuth } from "@/lib/context/AuthContext"
-import { useCart } from "@/lib/context/CartContext"
-import { useSession } from "next-auth/react"
+import { FaBars, FaTimes, FaUser, FaShoppingBag } from "react-icons/fa"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { ShoppingCart, User, ChevronDown, Menu, X } from "lucide-react"
-import CartDropdown from "@/components/cart/CartDropdown"
-import { cn } from "@/lib/utils"
-import { NAV_ITEMS, type NavItem } from "@/config/nav"
+import CartDropdown from "../../components/cart/CartDropdown"
+import { useCart } from "../../lib/context/CartContext"
+import { useAuth } from "../../lib/context/AuthContext"
+import { useAuthClaims } from "../../hooks/useAuthClaims"
+import { EmailVerificationBanner } from "../auth/EmailVerificationBanner"
+import { 
+  AccessibleDropdown, 
+  AccessibleMenuItem, 
+  AccessibleButton 
+} from "../accessibility/AccessibilityEnhancer"
+import MobileMenu from "../navbar/MobileMenu"
+import { NAV_ITEMS, visibleNav } from "../../config/nav"
 
-export default function Navbar() {
+const NAV = [
+  { href: "/menu", label: "Menu" },
+  { href: "/events", label: "Events" },
+  { href: "/music", label: "Music" },
+  { href: "/coming-soon", label: "Rewards" },
+  { href: "/catering", label: "Catering" },
+  { href: "/contact", label: "Contact" },
+]
+
+const Navbar: React.FC = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false)
+  const { itemCount } = useCart()
   const pathname = usePathname()
-  const { user, isLoading: authLoading, isAuthenticated } = useAuth()
-  const { data: session, status: sessionStatus } = useSession()
-  const { items, itemCount } = useCart()
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false)
-  const userDropdownRef = useRef<HTMLDivElement>(null)
-
-  // Optimize loading state - show UI immediately if we have any auth info
-  const isLoading = authLoading && sessionStatus === "loading"
-  const hasUser = user || session?.user
-  const userRole = user?.role || (session?.user as any)?.role || 'customer'
-
-  // Close dropdowns when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target as Node)) {
-        setIsUserDropdownOpen(false)
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+  const { user, logout } = useAuth()
+  const { claims, loading } = useAuthClaims()
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const [isScrolled, setIsScrolled] = useState(false)
+  const lastScrollYRef = useRef(0)
+  const [isVisible, setIsVisible] = useState(true)
 
   // Close mobile menu when route changes
   useEffect(() => {
-    setIsMenuOpen(false)
+    setMobileMenuOpen(false)
   }, [pathname])
 
-  const isActive = (href: string) => {
-    if (href === "/" || !pathname) {
-      return pathname === "/"
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setUserDropdownOpen(false)
+      }
     }
-    return pathname.startsWith(href)
-  }
 
-  const handleUserDropdownToggle = () => {
-    setIsUserDropdownOpen(!isUserDropdownOpen)
-  }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
-  // Filter nav items for main navigation
-  const mainNavItems = NAV_ITEMS.filter(item => 
-    !item.requiresAuth && !item.requiresAdmin && !item.mobileOnly
-  ).slice(0, 6) // Limit to first 6 items for main nav
+  // Handle scroll behavior - optimized to prevent re-renders
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      
+      // Set scrolled state
+      setIsScrolled(currentScrollY > 10)
+      
+      // Hide/show navbar based on scroll direction
+      if (currentScrollY > lastScrollYRef.current && currentScrollY > 100) {
+        setIsVisible(false)
+      } else {
+        setIsVisible(true)
+      }
+      
+      lastScrollYRef.current = currentScrollY
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, []) // Remove lastScrollY dependency to prevent re-renders
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center">
-        {/* Logo */}
-        <div className="mr-4 hidden md:flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
-            <span className="hidden font-bold sm:inline-block text-xl">
-              Broski&apos;s Kitchen
-            </span>
-          </Link>
-        </div>
-
-        {/* Mobile menu button */}
-        <button
-          className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          <span className="sr-only">Toggle Menu</span>
-        </button>
-
-        {/* Mobile logo */}
-        <div className="flex md:hidden">
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="font-bold text-lg">Broski&apos;s Kitchen</span>
-          </Link>
-        </div>
-
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex md:flex-1">
-          <nav className="flex items-center space-x-6 text-sm font-medium">
-            {mainNavItems.map((item: NavItem) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "transition-colors hover:text-foreground/80",
-                  isActive(item.href) ? "text-foreground" : "text-foreground/60"
-                )}
-              >
-                {item.label}
+    <>
+      <header className="sticky top-0 z-50 bg-black/70 backdrop-blur border-b border-zinc-800">
+        <div className="container mx-auto px-4">
+          <div className="flex h-16 items-center justify-between">
+            {/* LEFT: logo */}
+            <div className="min-w-[140px] flex items-center gap-3">
+              <Link href="/" className="flex items-center gap-2">
+                <Image 
+                  src="/images/broskis-gold-logo.png"
+                  alt="Broski's Kitchen" 
+                  width={36}
+                  height={36} 
+                  priority 
+                />
+                <span className="text-2xl font-bold graffiti-text hover:text-white transition-colors duration-300">Broski&apos;s Kitchen</span>
               </Link>
-            ))}
-          </nav>
-        </div>
+            </div>
 
-        {/* Right side actions */}
-        <div className="flex flex-1 items-center justify-end space-x-2">
-          {/* Order To-Go Button */}
-          <Button asChild variant="default" size="sm" className="hidden sm:flex">
-            <Link href="/order">Order To-Go</Link>
-          </Button>
+            {/* CENTER: main nav — perfectly centered */}
+            <nav className="absolute left-1/2 -translate-x-1/2 hidden md:flex">
+              <ul className="flex items-center gap-6">
+                {NAV.map((item) => (
+                  <li key={item.href}>
+                    <Link 
+                      href={item.href} 
+                      className={`nav-link ${pathname === item.href ? "nav-link-active" : ""}`}
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
 
-          {/* Cart Dropdown - Use existing component */}
-          <CartDropdown />
+            {/* RIGHT: actions (OTW + Login) */}
+            <div className="min-w-[140px] flex items-center gap-2 justify-end">
+              {/* OTW button with larger image */}
+              <Button asChild variant="primary">
+                <Link href="https://otw-chi.vercel.app" className="broski-otw-gold-button">
+                  <Image 
+                    src="/images/otw-logo.png"
+                    alt="OTW" 
+                    width={28}
+                    height={28} 
+                  />
+                  <span className="text-sm font-extrabold tracking-wide">OTW</span>
+                </Link>
+              </Button>
 
-          {/* User Authentication */}
-          {!isLoading && (
-            <>
-              {hasUser ? (
-                <div className="relative" ref={userDropdownRef}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center space-x-2"
-                    onClick={handleUserDropdownToggle}
-                  >
-                    <User className="h-4 w-4" />
-                    <span className="hidden sm:inline">
-                      {user?.name || session?.user?.name || "Account"}
-                    </span>
-                    <ChevronDown className="h-3 w-3" />
-                  </Button>
+              <CartDropdown />
 
-                  {/* User Dropdown Menu */}
-                  {isUserDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 rounded-md border bg-popover p-1 shadow-md">
-                      <Link
-                        href="/dashboard"
-                        className="flex w-full items-center rounded-sm px-2 py-1.5 text-sm hover:bg-accent"
-                        onClick={() => setIsUserDropdownOpen(false)}
-                      >
-                        Dashboard
-                      </Link>
-                      <Link
-                        href="/profile"
-                        className="flex w-full items-center rounded-sm px-2 py-1.5 text-sm hover:bg-accent"
-                        onClick={() => setIsUserDropdownOpen(false)}
-                      >
-                        Profile
-                      </Link>
-                      <Link
-                        href="/orders"
-                        className="flex w-full items-center rounded-sm px-2 py-1.5 text-sm hover:bg-accent"
-                        onClick={() => setIsUserDropdownOpen(false)}
-                      >
-                        Order History
-                      </Link>
-                      {userRole === 'admin' && (
-                        <Link
-                          href="/admin"
-                          className="flex w-full items-center rounded-sm px-2 py-1.5 text-sm hover:bg-accent"
-                          onClick={() => setIsUserDropdownOpen(false)}
-                        >
-                          Admin
-                        </Link>
-                      )}
-                      <hr className="my-1" />
-                      <Link
-                        href="/auth/logout"
-                        className="flex w-full items-center rounded-sm px-2 py-1.5 text-sm hover:bg-accent"
-                        onClick={() => setIsUserDropdownOpen(false)}
-                      >
-                        Sign Out
-                      </Link>
+              {user ? (
+                <AccessibleDropdown
+                  trigger={
+                    <div className="btn-outline flex items-center gap-2">
+                      <FaUser /> {user.name.split(" ")[0]}
                     </div>
-                  )}
-                </div>
+                  }
+                  isOpen={userDropdownOpen}
+                  onToggle={() => setUserDropdownOpen(!userDropdownOpen)}
+                  onClose={() => setUserDropdownOpen(false)}
+                  label={`User menu for ${user.name.split(" ")[0]}`}
+                >
+                  <AccessibleMenuItem 
+                    href="/dashboard"
+                    onClick={() => setUserDropdownOpen(false)}
+                  >
+                    Dashboard
+                  </AccessibleMenuItem>
+                  <AccessibleMenuItem 
+                    href="/profile"
+                    onClick={() => setUserDropdownOpen(false)}
+                  >
+                    Profile
+                  </AccessibleMenuItem>
+                  <AccessibleMenuItem 
+                    href="/orders"
+                    onClick={() => setUserDropdownOpen(false)}
+                  >
+                    Order History
+                  </AccessibleMenuItem>
+                  {!loading && claims?.admin && (
+                     <AccessibleMenuItem
+                       href="/admin"
+                       onClick={() => setUserDropdownOpen(false)}
+                       className="text-red-600 font-medium"
+                     >
+                       Admin
+                     </AccessibleMenuItem>
+                   )}
+                  <AccessibleMenuItem
+                    onClick={async () => {
+                      await logout()
+                      setUserDropdownOpen(false)
+                    }}
+                  >
+                    Logout
+                  </AccessibleMenuItem>
+                </AccessibleDropdown>
               ) : (
-                <Button asChild variant="ghost" size="sm">
+                <Button asChild variant="outline" className="border-zinc-600 hover:bg-zinc-800">
                   <Link href="/auth/login">Login</Link>
                 </Button>
               )}
-            </>
-          )}
-
-          {/* Loading state - show minimal UI */}
-          {isLoading && (
-            <div className="flex items-center space-x-2">
-              <div className="h-8 w-16 animate-pulse rounded bg-muted"></div>
             </div>
-          )}
-        </div>
-      </div>
 
-      {/* Mobile Navigation Menu */}
-      {isMenuOpen && (
-        <div className="border-t md:hidden">
-          <div className="container py-4">
-            <nav className="flex flex-col space-y-3">
-              {NAV_ITEMS.map((item: NavItem) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "text-sm font-medium transition-colors hover:text-foreground/80",
-                    isActive(item.href) ? "text-foreground" : "text-foreground/60"
-                  )}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <hr className="my-2" />
-              <Link
-                href="/order"
-                className="text-sm font-medium text-foreground/60 hover:text-foreground/80"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Order To-Go
-              </Link>
-              {!isLoading && !hasUser && (
-                <Link
-                  href="/auth/login"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground/80"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Login
-                </Link>
-              )}
-            </nav>
+            {/* Mobile menu button */}
+            <button
+              type="button"
+              data-testid="mobile-menu-toggle"
+              aria-label="Open menu"
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden inline-flex items-center justify-center rounded-lg px-3 py-2 ring-1 ring-white/20 bg-zinc-900/60 text-white"
+            >
+              <FaBars size={24} />
+            </button>
           </div>
         </div>
-      )}
-    </nav>
+
+        <MobileMenu 
+          open={mobileMenuOpen} 
+          onOpenChange={setMobileMenuOpen}
+        />
+      </header>
+      <EmailVerificationBanner className="fixed top-16 left-0 right-0 z-40 mx-4" />
+    </>
   )
 }
+
+export default Navbar
