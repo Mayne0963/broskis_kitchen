@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getFirestore } from "firebase-admin/firestore";
+import { db } from "@/lib/firebase/admin";
 import { isAdmin, normalizeRole } from "@/lib/roles";
 import { mapDoc } from "@/lib/catering/transform";
 import type { CateringRequest } from "@/types/catering";
 import { Resend } from "resend";
 import { getServerUser } from "@/lib/session";
-
-const db = getFirestore();
 
 // Initialize Resend with API key from environment (only if available)
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;

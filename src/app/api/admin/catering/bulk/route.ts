@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getFirestore } from "firebase-admin/firestore";
+import { db } from "@/lib/firebase/admin";
 import { isAdmin, normalizeRole } from "@/lib/roles";
 import { getServerUser } from "@/lib/session";
 import type { CateringStatus } from "@/types/catering";
-
-const db = getFirestore();
 
 // Valid status values for validation
 const VALID_STATUSES: CateringStatus[] = [

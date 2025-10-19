@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, normalizeRole } from "@/lib/roles";
-import { getFirestore } from "firebase-admin/firestore";
+import { db } from "@/lib/firebase/admin";
 import { mapDoc } from "@/lib/catering/transform";
 import { getServerUser } from "@/lib/session";
-
-const db = getFirestore();
 
 export async function GET(req: NextRequest) {
   try {

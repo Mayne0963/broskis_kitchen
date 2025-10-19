@@ -9,16 +9,12 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Get project root directory
 const projectRoot = path.resolve(__dirname, '..');
-
-// Load environment variables from .env.local
-dotenv.config({ path: path.join(projectRoot, '.env.local') });
 
 // ANSI color codes for console output
 const colors = {
