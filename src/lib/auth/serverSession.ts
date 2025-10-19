@@ -1,7 +1,6 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/options";
+import { getServerUser } from "@/lib/session";
 
 export async function getUserIdOrNull() {
-  const s = await getServerSession(authOptions as any);
-  return s?.user?.id ?? null;
+  const user = await getServerUser();
+  return user?.uid ?? null;
 }

@@ -8,8 +8,7 @@ import { FaBars, FaTimes, FaUser, FaShoppingBag } from "react-icons/fa"
 import { Button } from "@/components/ui/button"
 import CartDropdown from "../../components/cart/CartDropdown"
 import { useCart } from "../../lib/context/CartContext"
-import { useAuth } from "../../lib/context/AuthContext"
-import { useAuthClaims } from "../../hooks/useAuthClaims"
+import { useSession } from "../../hooks/useSession"
 import { EmailVerificationBanner } from "../auth/EmailVerificationBanner"
 import { 
   AccessibleDropdown, 
@@ -33,8 +32,7 @@ const Navbar: React.FC = () => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false)
   const { itemCount } = useCart()
   const pathname = usePathname()
-  const { user, logout } = useAuth()
-  const { claims, loading } = useAuthClaims()
+  const { user, isAuthenticated, logout } = useSession()
   const dropdownRef = useRef<HTMLDivElement>(null)
   const [isScrolled, setIsScrolled] = useState(false)
   const lastScrollYRef = useRef(0)
@@ -163,7 +161,7 @@ const Navbar: React.FC = () => {
                   >
                     Order History
                   </AccessibleMenuItem>
-                  {!loading && claims?.admin && (
+                  {user?.role === 'admin' && (
                      <AccessibleMenuItem
                        href="/admin"
                        onClick={() => setUserDropdownOpen(false)}

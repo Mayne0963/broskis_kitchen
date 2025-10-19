@@ -4,36 +4,49 @@ export const revalidate = 0;
 
 /**
  * Server-only authentication gate for admin access
- * Uses NextAuth sessions with zero extra fetches
+ * Uses Firebase session cookies with zero extra fetches
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/options";
+import { cookies } from 'next/headers';
+import { adminAuth } from '@/lib/firebase/admin';
 
 /**
- * Require admin access using NextAuth session (zero extra fetches)
+ * Require admin access using Firebase session cookie (zero extra fetches)
  * @param request - Next.js request object
  * @returns User data if admin, throws error if not
  */
 export async function requireAdmin(request: NextRequest) {
-  const session = await getServerSession(authOptions);
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get("__session")?.value || cookieStore.get("session")?.value;
   
-  if (!session?.user) {
+  if (!sessionCookie) {
     throw new Error('Authentication required');
   }
-  
-  const userRole = (session.user as any).role;
-  if (userRole !== 'admin') {
-    throw new Error('Admin access required');
+
+  try {
+    const decoded = await adminAuth.verifySessionCookie(sessionCookie, true);
+    
+    // Check if user is admin from custom claims or role
+    const userRole = (decoded as any).role || 'user';
+    const isAdmin = userRole === 'admin' || (decoded as any).admin === true;
+    
+    if (!isAdmin) {
+      throw new Error('Admin access required');
+    }
+    
+    return {
+      uid: decoded.uid,
+      email: decoded.email,
+      role: userRole,
+      name: (decoded as any).name || decoded.email?.split('@')[0],
+    };
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Admin access required')) {
+      throw error;
+    }
+    throw new Error('Authentication required');
   }
-  
-  return {
-    uid: (session.user as any).uid,
-    email: session.user.email,
-    role: userRole,
-    name: session.user.name,
-  };
 }
 
 /**

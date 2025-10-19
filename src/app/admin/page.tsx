@@ -4,32 +4,30 @@ export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
 import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/options";
+import { getServerUser } from "@/lib/authServer";
 import AdminDashboardClient from "./AdminDashboardClient";
 
 /**
  * Server-side admin dashboard with zero extra fetches
- * Uses NextAuth session with role computed in JWT
+ * Uses Firebase session cookie with role from custom claims
  */
 export default async function AdminPage() {
-  const session = await getServerSession(authOptions);
+  const user = await getServerUser();
   
   // Redirect to sign in if not authenticated
-  if (!session?.user) {
-    redirect("/api/auth/signin?callbackUrl=/admin");
+  if (!user) {
+    redirect("/auth/login?next=/admin");
   }
   
-  // Check admin role from NextAuth session (computed in JWT)
-  const userRole = (session.user as any).role;
-  if (userRole !== "admin") {
+  // Check admin role from Firebase session
+  if (user.role !== "admin") {
     redirect("/unauthorized");
   }
   
   return (
     <AdminDashboardClient 
-      adminEmail={session.user.email || ""} 
-      adminName={session.user.name || ""} 
+      adminEmail={user.email || ""} 
+      adminName={user.name || ""} 
     />
   );
 }

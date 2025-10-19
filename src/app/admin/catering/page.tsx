@@ -1,25 +1,25 @@
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth/options";
 import CateringDashboardClient from "./shell";
+import { getServerUser } from "@/lib/session";
+import { normalizeRole, isAdmin } from "@/lib/roles";
 
 export default async function AdminCateringPage({
   searchParams,
 }: {
   searchParams: { id?: string; status?: string; q?: string };
 }) {
-  // Get session with proper error handling
-  const session = await getServerSession(authOptions);
+  // Get user with custom session system
+  const user = await getServerUser();
   
   // Strict authentication check
-  if (!session?.user) {
-    redirect("/api/auth/signin?callbackUrl=" + encodeURIComponent("/admin/catering"));
+  if (!user) {
+    redirect("/auth/login?next=" + encodeURIComponent("/admin/catering"));
   }
 
   // Strict role validation with explicit admin check
-  const userRole = (session.user as any)?.role;
-  if (userRole !== "admin") {
-    console.warn(`Unauthorized admin access attempt: ${session.user.email}, role: ${userRole}`);
+  const userRole = normalizeRole(user.roles?.[0] || 'user');
+  if (!isAdmin(userRole)) {
+    console.warn(`Unauthorized admin access attempt: ${user.email}, role: ${userRole}`);
     redirect("/unauthorized");
   }
 
@@ -36,7 +36,7 @@ export default async function AdminCateringPage({
       <div className="rounded-xl border px-5 py-4 bk-gradient" style={{ borderColor: "var(--bk-border)" }}>
         <h1 className="text-3xl font-bold text-white">Admin Catering</h1>
         <p className="text-sm" style={{ color: "var(--bk-text-dim)" }}>
-          Welcome, {session.user?.name}. Secure admin access verified.
+          Welcome, {user.name || user.email}. Secure admin access verified.
         </p>
       </div>
       <CateringDashboardClient 

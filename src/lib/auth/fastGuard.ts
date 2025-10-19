@@ -1,18 +1,19 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/options";
+import { cookies } from "next/headers";
+import { adminAuth } from "@/lib/firebase/admin";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
  * Fast 401/403 guard for admin API routes
- * Uses getServerSession for zero-fetch authentication
+ * Uses Firebase session cookie for zero-fetch authentication
  * Returns Response object for immediate short-circuit on auth failure
  */
 export async function fastAdminGuard(request?: NextRequest): Promise<Response | null> {
   try {
-    const session = await getServerSession(authOptions as any);
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get("__session")?.value || cookieStore.get("session")?.value;
     
     // Check if user is authenticated
-    if (!session?.user) {
+    if (!sessionCookie) {
       return new Response(
         JSON.stringify({ error: "Authentication required" }), 
         { 
@@ -22,9 +23,13 @@ export async function fastAdminGuard(request?: NextRequest): Promise<Response | 
       );
     }
     
+    const decoded = await adminAuth.verifySessionCookie(sessionCookie, true);
+    
     // Check if user has admin role
-    const userRole = (session.user as any).role;
-    if (userRole !== "admin") {
+    const userRole = (decoded as any).role || 'user';
+    const isAdmin = userRole === 'admin' || (decoded as any).admin === true;
+    
+    if (!isAdmin) {
       return new Response(
         JSON.stringify({ error: "Admin access required" }), 
         { 
@@ -54,9 +59,10 @@ export async function fastAdminGuard(request?: NextRequest): Promise<Response | 
  */
 export async function fastUserGuard(request?: NextRequest): Promise<{ user: any } | Response> {
   try {
-    const session = await getServerSession(authOptions as any);
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get("__session")?.value || cookieStore.get("session")?.value;
     
-    if (!session?.user) {
+    if (!sessionCookie) {
       return new Response(
         JSON.stringify({ error: "Authentication required" }), 
         { 
@@ -66,7 +72,16 @@ export async function fastUserGuard(request?: NextRequest): Promise<{ user: any 
       );
     }
     
-    return { user: session.user };
+    const decoded = await adminAuth.verifySessionCookie(sessionCookie, true);
+    
+    return { 
+      user: {
+        uid: decoded.uid,
+        email: decoded.email,
+        role: (decoded as any).role || 'user',
+        name: (decoded as any).name || decoded.email?.split('@')[0]
+      }
+    };
   } catch (error) {
     console.error("Fast user guard error:", error);
     return new Response(

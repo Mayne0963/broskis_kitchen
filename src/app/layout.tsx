@@ -19,10 +19,9 @@ import SEOAudit from "../components/seo/SEOAudit"
 import SchemaGenerator from "../components/seo/SchemaGenerator"
 import { NetworkStatus } from "../components/common/EnhancedLoadingStates"
 import ServiceWorkerCleanup from "../components/common/ServiceWorkerCleanup"
-import { getServerSession } from "next-auth"
-import { authOptions } from "./api/auth/[...nextauth]/route"
 import Link from "next/link"
 import { isAdmin } from "../lib/roles"
+import { getServerUser } from "../lib/session"
 
 import { playfair, montserrat } from "./fonts"
 import StructuredData, { OrganizationStructuredData } from "../components/seo/StructuredData"
@@ -97,8 +96,8 @@ export default async function RootLayout({
   const fontClasses = `${playfair?.variable || ''} ${montserrat?.variable || ''} font-sans`;
   
   // Server-side session check for admin button
-  const session = await getServerSession(authOptions);
-  const showAdmin = isAdmin((session?.user as any)?.role);
+  const user = await getServerUser();
+  const showAdmin = isAdmin(user?.role);
   
   return (
     <html lang="en" suppressHydrationWarning>

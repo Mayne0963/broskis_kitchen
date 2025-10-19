@@ -2,16 +2,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession, signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Shield, Eye, EyeOff } from "lucide-react";
+import { useAuth } from "@/lib/context/AuthContext";
+import { useSession } from "@/hooks/useSession";
+import { isAdmin } from "@/lib/roles";
 
 export default function SigninForm() {
-  const { data: session, status } = useSession();
+  const { user, isLoading: sessionLoading } = useSession();
+  const { login, loginWithGoogle } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || searchParams.get("next") || "/admin/catering";
@@ -23,22 +26,21 @@ export default function SigninForm() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (status === "authenticated" && session?.user) {
+    if (!sessionLoading && user) {
       // Check if user has admin role
-      const userRole = (session.user as any).role;
-      if (userRole === "admin") {
+      if (isAdmin(user.role)) {
         router.replace(callbackUrl);
       } else {
         setError("Admin access required");
       }
     }
-  }, [status, session, callbackUrl, router]);
+  }, [sessionLoading, user, callbackUrl, router]);
 
-  if (status === "loading") {
+  if (sessionLoading) {
     return <div className="text-center text-sm opacity-70">Checking session…</div>;
   }
 
-  if (status === "authenticated" && session?.user && (session.user as any).role === "admin") {
+  if (user && isAdmin(user.role)) {
     return <div className="text-center text-sm opacity-70">Redirecting…</div>;
   }
 
@@ -48,19 +50,15 @@ export default function SigninForm() {
     setError("");
 
     try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (result?.error) {
+      const success = await login(email, password);
+      if (success) {
+        // The useEffect will handle the redirect after successful signin
+        router.replace(callbackUrl);
+      } else {
         setError("Invalid credentials");
-        return;
       }
-
-      // The useEffect will handle the redirect after successful signin
     } catch (error) {
+      console.error("Admin sign in error:", error);
       setError("Sign in failed");
     } finally {
       setIsLoading(false);
@@ -72,10 +70,14 @@ export default function SigninForm() {
     setError("");
 
     try {
-      await signIn("google", {
-        callbackUrl: callbackUrl,
-      });
+      const success = await loginWithGoogle();
+      if (success) {
+        router.replace(callbackUrl);
+      } else {
+        setError("Google sign in failed");
+      }
     } catch (error) {
+      console.error("Google sign in error:", error);
       setError("Google sign in failed");
       setIsLoading(false);
     }

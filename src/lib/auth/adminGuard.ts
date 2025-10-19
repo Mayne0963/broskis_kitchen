@@ -1,18 +1,13 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/options";
-
-const ALLOW = (process.env.ALLOWED_ADMIN_EMAILS || "")
-  .split(",")
-  .map(s => s.trim())
-  .filter(Boolean);
+import { getServerUser } from "@/lib/session";
+import { isAdmin } from "@/lib/roles";
 
 export async function assertAdmin() {
-  const s = await getServerSession(authOptions as any);
-  const isAdmin = (s as any)?.user?.isAdmin || (ALLOW.includes((s as any)?.user?.email));
+  const user = await getServerUser();
+  const userIsAdmin = isAdmin(user?.roles?.[0]);
   
-  if (!s || !isAdmin) {
+  if (!user || !userIsAdmin) {
     throw new Error("FORBIDDEN");
   }
   
-  return (s as any).user;
+  return user;
 }

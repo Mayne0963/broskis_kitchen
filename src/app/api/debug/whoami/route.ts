@@ -1,17 +1,16 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getFirestore } from "firebase-admin/firestore";
+import { getServerUser } from "@/lib/session";
 
 const db = getFirestore();
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
+  const user = await getServerUser();
   
   // Enhanced debug: show both session and Firestore data
   let firestoreData = null;
-  if (session?.user?.id) {
+  if (user?.uid) {
     try {
-      const ref = db.collection("users").doc(session.user.id);
+      const ref = db.collection("users").doc(user.uid);
       const snap = await ref.get();
       if (snap.exists) {
         const data = snap.data() || {};
@@ -35,7 +34,7 @@ export async function GET() {
   }
   
   return new Response(JSON.stringify({
-    session: session ?? { user: null },
+    user: user ?? { user: null },
     firestore: firestoreData
   }), {
     headers: { "Content-Type": "application/json" },
