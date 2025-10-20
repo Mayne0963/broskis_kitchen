@@ -74,8 +74,9 @@ export default function GlobalAudioProvider({children}:{children:React.ReactNode
       return;
     }
     console.log("🎵 GLOBAL AUDIO: Attempting to play:", src);
-    if(el.src!==location.origin+src){ 
-      el.src=src; 
+    const fullSrc = location.origin + src;
+    if(el.src !== fullSrc){ 
+      el.src = fullSrc; 
       el.load(); 
       console.log("🎵 GLOBAL AUDIO: Audio src set to:", el.src);
     }

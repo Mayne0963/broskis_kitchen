@@ -20,7 +20,7 @@ import SchemaGenerator from "../components/seo/SchemaGenerator"
 import { NetworkStatus } from "../components/common/EnhancedLoadingStates"
 import ServiceWorkerCleanup from "../components/common/ServiceWorkerCleanup"
 import { getServerSession } from "next-auth"
-import { authOptions } from "./api/auth/[...nextauth]/route"
+import { authOptions } from "@/lib/auth/options"
 import Link from "next/link"
 import { isAdmin } from "../lib/roles"
 
