@@ -3,10 +3,13 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
+import { requireRole } from '@/lib/auth/session';
 import OrdersManager from '@/components/admin/OrdersManager';
 
 export default async function AdminDashboardPage() {
-  // Authentication is handled by middleware
+  // Require admin role with email verification
+  const user = await requireRole(["admin"]);
+  
   return (
     <main className="mx-auto max-w-7xl px-4 pb-20 pt-10 space-y-10">
       <header className="space-y-1">

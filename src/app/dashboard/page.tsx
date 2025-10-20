@@ -1,20 +1,15 @@
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-import { getSessionCookie } from "@/lib/auth/session";
+import { withAuthGuard } from "@/lib/auth/session";
 import { getUserTotals } from "@/lib/server/orderTotals";
 import KpiCard from "@/components/kpi/KpiCard";
 import QuickActions from "@/components/QuickActions";
 import { LuxeCard, LuxeCardHeader, LuxeCardTitle, LuxeCardContent } from "@/components/luxe/LuxeCard";
-import { redirect } from 'next/navigation';
 
 export default async function DashboardPage() {
-  const user = await getSessionCookie();
-  if (!user) {
-    redirect('/login?next=/dashboard');
-  }
-
-  const totals = await getUserTotals(user.uid);
+  return await withAuthGuard(async (user) => {
+    const totals = await getUserTotals(user.uid);
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -30,5 +25,6 @@ export default async function DashboardPage() {
         <QuickActions />
       </div>
     </div>
-  );
+    );
+  }, { requireEmailVerification: true });
 }

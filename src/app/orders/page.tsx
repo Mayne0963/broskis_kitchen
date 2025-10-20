@@ -1,26 +1,19 @@
 "use client"
 
-import { useRouter } from "next/navigation"
 import { useAuth } from "../../lib/context/AuthContext"
 import { useOrders, OrderProvider } from "../../lib/context/OrderContext"
 import { FaArrowLeft, FaShoppingBag, FaHistory } from "react-icons/fa"
 import Link from "next/link"
 import { useEffect } from "react"
 import OrderTracking from "../../components/orders/OrderTracking"
+import { AuthGuard } from "../../components/auth/AuthGuard"
 
 // Force dynamic rendering to prevent prerendering issues
 export const dynamic = 'force-dynamic'
 
 function OrderHistoryPageContent() {
-  const router = useRouter()
-  const { user, isLoading } = useAuth()
+  const { user } = useAuth()
   const { orders, loading: ordersLoading, refresh } = useOrders()
-
-  // Redirect to login if not authenticated
-  if (!isLoading && !user) {
-    router.push("/auth/login")
-    return null
-  }
 
   // Fetch user orders on component mount
   useEffect(() => {
@@ -28,17 +21,6 @@ function OrderHistoryPageContent() {
       refresh()
     }
   }, [user, refresh])
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-[var(--color-rich-black)] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-foil mx-auto mb-4"></div>
-          <p className="text-white">Loading your orders...</p>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="min-h-screen bg-[var(--color-rich-black)] text-white">
@@ -67,8 +49,10 @@ function OrderHistoryPageContent() {
 
 export default function OrderHistoryPage() {
   return (
-    <OrderProvider autoLoad={true}>
-      <OrderHistoryPageContent />
-    </OrderProvider>
+    <AuthGuard requireEmailVerification={true}>
+      <OrderProvider autoLoad={true}>
+        <OrderHistoryPageContent />
+      </OrderProvider>
+    </AuthGuard>
   )
 }

@@ -1,34 +1,26 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState, useMemo } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { useCart } from "../../lib/context/CartContext"
-import { useAuth } from "../../lib/context/AuthContext"
-import { OrderItem } from "../../types/order"
-import { FaShoppingCart, FaTrash, FaPlus, FaMinus, FaArrowLeft, FaCreditCard, FaCog, FaLock, FaUserPlus } from "react-icons/fa"
-import { safeFetch } from "../../lib/utils/safeFetch"
+import { useState, useMemo } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { useCart } from "../../lib/context/CartContext";
+import { useAuth } from "../../lib/context/AuthContext";
+import { OrderItem } from "../../types/order";
+import { FaShoppingCart, FaTrash, FaPlus, FaMinus, FaArrowLeft, FaCreditCard, FaCog, FaLock } from "react-icons/fa";
+import { safeFetch } from "../../lib/utils/safeFetch";
+import { ClientAuthGuard } from "../../components/auth/ClientAuthGuard";
 
 function normalizePrice(p: unknown): number {
-  const n = typeof p === "string" ? parseFloat((p as string).replace(/[^0-9.]/g, "")) : Number(p);
+  const n = typeof p === "string" ? parseFloat(p.replace(/[^0-9.]/g, "")) : Number(p);
   return isFinite(n) ? n : 0;
 }
 
-export default function CartPage() {
-  const { items, removeItem, updateQuantity, subtotal, tax, total, clearCart } = useCart()
-  const { user } = useAuth()
-  const [promoCode, setPromoCode] = useState("")
-  const [promoError, setPromoError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-
-  const isAuthenticated = !!user
-
-  // Stripe minimum charge validation
-  const MIN_USD_CENTS = 50;
-  const totalCents = Math.round(total * 100);
-  const isUnderMinimum = totalCents < MIN_USD_CENTS;
+function CartContent() {
+  const { items, removeItem, updateQuantity, clearCart } = useCart();
+  const { isAuthenticated } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoError, setPromoError] = useState<string | null>(null);
 
   const payloadItems = useMemo(() => {
     return (items || []).map((it: any) => ({
@@ -38,15 +30,17 @@ export default function CartPage() {
     })).filter(x => x.qty > 0 && x.price >= 0);
   }, [items]);
 
-  async function proceedToCheckout() {
-    // Check minimum charge before proceeding
-    if (isUnderMinimum) {
-      alert("Stripe requires a minimum charge of $0.50.");
-      return;
-    }
+  const subtotal = useMemo(() => {
+    return items.reduce((sum, item) => sum + getItemTotal(item), 0);
+  }, [items]);
 
+  const tax = useMemo(() => subtotal * 0.0825, [subtotal]);
+  const total = useMemo(() => subtotal + tax, [subtotal, tax]);
+  const isUnderMinimum = total < 0.5;
+
+  async function proceedToCheckout() {
+    setLoading(true);
     try {
-      setLoading(true);
       const res = await safeFetch("/api/checkout/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -57,7 +51,6 @@ export default function CartPage() {
         window.location.href = j.url;
       } else {
         console.error("Checkout error:", j);
-        // Handle specific minimum charge error from server
         if (j?.error?.includes("Minimum charge is $0.50")) {
           alert("Stripe requires a minimum charge of $0.50. Please add more items.");
         } else {
@@ -73,56 +66,50 @@ export default function CartPage() {
   }
 
   const handleQuantityChange = (id: string, currentQuantity: number, change: number) => {
-    const newQuantity = currentQuantity + change
+    const newQuantity = currentQuantity + change;
     if (newQuantity > 0) {
-      updateQuantity(id, newQuantity)
+      updateQuantity(id, newQuantity);
     }
-  }
+  };
 
   const handlePromoCode = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (promoCode.trim() === "") {
-      setPromoError("Please enter a promo code")
-      return
+      setPromoError("Please enter a promo code");
+      return;
     }
+    setPromoError("Invalid promo code");
+  };
 
-    // In a real app, you would validate the promo code with an API
-    setPromoError("Invalid promo code")
-  }
-
-  // Check if an item has customizations
   const hasCustomizations = (item: OrderItem) => {
-    return item.customizations && Object.keys(item.customizations).length > 0
-  }
+    return item.customizations && Object.keys(item.customizations).length > 0;
+  };
 
-  // Calculate item total including customizations
   const getItemTotal = (item: OrderItem) => {
-    let total = item.price
+    let total = item.price;
     if (item.customizations) {
       Object.values(item.customizations).flat().forEach(option => {
-        total += option.price || 0
-      })
+        total += option.price || 0;
+      });
     }
-    return total * item.quantity
-  }
+    return total * item.quantity;
+  };
 
-  // Calculate item base price including customizations
   const getItemPrice = (item: OrderItem) => {
-    let price = item.price
+    let price = item.price;
     if (item.customizations) {
       Object.values(item.customizations).flat().forEach(option => {
-        price += option.price || 0
-      })
+        price += option.price || 0;
+      });
     }
-    return price
-  }
+    return price;
+  };
 
   if (items.length === 0) {
     return (
       <div className="min-h-screen py-20">
         <div className="container mx-auto px-4 max-w-4xl">
           <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
-
           <div className="bg-black rounded-lg p-12 text-center border border-[#FFD700]">
             <div className="w-20 h-20 bg-[#222222] rounded-full flex items-center justify-center mx-auto mb-6">
               <FaShoppingCart className="text-gray-500 text-3xl" />
@@ -135,7 +122,7 @@ export default function CartPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -160,8 +147,7 @@ export default function CartPage() {
                     <div className="flex items-center gap-4">
                       <div className="w-20 h-20 bg-[#222222] rounded-lg overflow-hidden relative flex-shrink-0">
                         {item.image ? (
-                          <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover"
-            unoptimized />
+                          <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover" unoptimized />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <FaShoppingCart className="text-gray-500" />
@@ -180,21 +166,19 @@ export default function CartPage() {
                         </div>
                         <div className="text-gold-foil font-bold mt-1">${getItemPrice(item).toFixed(2)}</div>
 
-                        {/* Display customizations if any */}
                         {hasCustomizations(item) && (
                           <div className="mt-2 text-sm text-gray-400">
-                            {Object.entries(item.customizations ?? {})
-                              .map(([category, options]) => (
-                                <div key={category} className="mb-1">
-                                  <span className="text-xs text-gray-500 uppercase">{category}:</span>
-                                  {options.map((option, index) => (
-                                    <div key={index} className="flex justify-between ml-2">
-                                      <span>{option.name}</span>
-                                      {option.price > 0 && <span className="text-gold-foil">+${option.price.toFixed(2)}</span>}
-                                    </div>
-                                  ))}
-                                </div>
-                              ))}
+                            {Object.entries(item.customizations ?? {}).map(([category, options]) => (
+                              <div key={category} className="mb-1">
+                                <span className="text-xs text-gray-500 uppercase">{category}:</span>
+                                {options.map((option, index) => (
+                                  <div key={index} className="flex justify-between ml-2">
+                                    <span>{option.name}</span>
+                                    {option.price > 0 && <span className="text-gold-foil">+${option.price.toFixed(2)}</span>}
+                                  </div>
+                                ))}
+                              </div>
+                            ))}
                           </div>
                         )}
                       </div>
@@ -281,8 +265,8 @@ export default function CartPage() {
                         className="input flex-grow"
                         value={promoCode}
                         onChange={(e) => {
-                          setPromoCode(e.target.value)
-                          setPromoError(null)
+                          setPromoCode(e.target.value);
+                          setPromoError(null);
                         }}
                         placeholder="Enter code"
                       />
@@ -322,5 +306,13 @@ export default function CartPage() {
         </div>
       </div>
     </div>
-  )
+  );
+}
+
+export default function CartPage() {
+  return (
+    <ClientAuthGuard requireEmailVerification={false}>
+      <CartContent />
+    </ClientAuthGuard>
+  );
 }

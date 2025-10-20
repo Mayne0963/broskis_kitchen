@@ -5,6 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRewards } from "../../lib/context/RewardsContext"
 import { useAuth } from "../../lib/context/AuthContext"
+import { AuthGuard } from "../../components/auth/AuthGuard"
 import {
   FaCrown,
   FaGift,
@@ -54,7 +55,8 @@ export default function LoyaltyPage() {
   const progressPercentage = getProgressPercentage()
 
   return (
-    <div className="min-h-screen pb-20">
+    <ClientAuthGuard requireEmailVerification={false}>
+      <div className="min-h-screen pb-20">
       {/* Hero Section */}
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0 bg-black">
@@ -893,6 +895,7 @@ export default function LoyaltyPage() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </AuthGuard>
   )
 }

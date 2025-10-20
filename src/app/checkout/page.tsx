@@ -2,6 +2,7 @@
 import { useState, useMemo } from "react";
 import { useCart } from "../../lib/context/CartContext";
 import { safeFetch } from "@/lib/utils/safeFetch";
+import { AuthGuard } from "../../components/auth/AuthGuard";
 
 type OutItem = { name: string; price: number; qty: number };
 
@@ -10,7 +11,7 @@ function normalizePrice(p: unknown): number {
   return isFinite(n) ? n : 0;
 }
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const [loading, setLoading] = useState(false);
   const { items = [] } = useCart();
 
@@ -53,5 +54,13 @@ export default function CheckoutPage() {
         {disabled ? "No items in cart" : (loading ? "Starting…" : "Proceed to Payment")}
       </button>
     </main>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <AuthGuard requireEmailVerification={true}>
+      <CheckoutContent />
+    </AuthGuard>
   );
 }

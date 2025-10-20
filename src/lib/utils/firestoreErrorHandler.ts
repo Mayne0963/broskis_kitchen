@@ -133,3 +133,6 @@ export function createRobustListener<T>(
     if (unsubscribe) {
       unsubscribe();
       unsubscribe = null;
+    }
+  };
+}
