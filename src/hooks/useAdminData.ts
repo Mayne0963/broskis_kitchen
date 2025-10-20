@@ -15,6 +15,7 @@ import { Order } from '@/types/order'
 import { getRewardsAnalytics } from '@/lib/services/rewardsService'
 import { getUserAnalytics, getUserActivity } from '@/lib/services/userAnalyticsService'
 import { useRole } from '@/context/RoleContext'
+import { createFirestoreErrorHandler } from '@/lib/utils/firestoreErrorHandler'
 
 interface AdminStats {
   totalOrders: number
@@ -297,31 +298,49 @@ export const useAdminData = () => {
       //   limit(20)
       // )
 
+    // Create error handlers for each listener
+    const ordersErrorHandler = createFirestoreErrorHandler('Orders Listener', {
+      onMaxRetriesReached: () => setError('Failed to maintain real-time order updates')
+    });
+
+    const menuDropsErrorHandler = createFirestoreErrorHandler('Menu Drops Listener');
+    const rewardsErrorHandler = createFirestoreErrorHandler('Rewards Listener');
+    const usersErrorHandler = createFirestoreErrorHandler('Users Listener');
+
     const ordersUnsubscribe = onSnapshot(
       ordersQuery,
-      () => fetchAdminData(),
-      error => {
-        console.error('Error listening to orders:', error)
-        setError('Failed to listen to real-time order updates')
-      }
+      () => {
+        ordersErrorHandler.reset();
+        fetchAdminData();
+      },
+      error => ordersErrorHandler.handleListenerError(error, () => {
+        // Retry logic is handled by the error handler
+        fetchAdminData();
+      })
     )
     unsubscribers.push(ordersUnsubscribe)
 
     const menuDropsUnsubscribe = onSnapshot(
       menuDropsQuery,
-      () => fetchAdminData(),
-      error => {
-        console.error('Error listening to menu drops:', error)
-      }
+      () => {
+        menuDropsErrorHandler.reset();
+        fetchAdminData();
+      },
+      error => menuDropsErrorHandler.handleListenerError(error, () => {
+        fetchAdminData();
+      })
     )
     unsubscribers.push(menuDropsUnsubscribe)
 
     const rewardsUnsubscribe = onSnapshot(
       rewardsQuery,
-      () => fetchAdminData(),
-      error => {
-        console.error('Error listening to rewards:', error)
-      }
+      () => {
+        rewardsErrorHandler.reset();
+        fetchAdminData();
+      },
+      error => rewardsErrorHandler.handleListenerError(error, () => {
+        fetchAdminData();
+      })
     )
     unsubscribers.push(rewardsUnsubscribe)
 
@@ -334,10 +353,13 @@ export const useAdminData = () => {
 
     const usersUnsubscribe = onSnapshot(
       usersQuery,
-      () => fetchAdminData(),
-      error => {
-        console.error('Error listening to users:', error)
-      }
+      () => {
+        usersErrorHandler.reset();
+        fetchAdminData();
+      },
+      error => usersErrorHandler.handleListenerError(error, () => {
+        fetchAdminData();
+      })
     )
     unsubscribers.push(usersUnsubscribe)
 

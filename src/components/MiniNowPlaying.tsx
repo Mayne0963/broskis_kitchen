@@ -1,20 +1,23 @@
 "use client";
-import { useGlobalAudio } from "@/providers/GlobalAudioProvider";
+import { useSafeGlobalAudio } from "@/providers/GlobalAudioProvider";
 import { useEffect, useState } from "react";
 
 export default function MiniNowPlaying() {
   const [isClient, setIsClient] = useState(false);
+  
+  // Always call hooks at the top level - never conditionally
+  // Use safe version that returns null instead of throwing
+  const audioContext = useSafeGlobalAudio();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
+  // Early returns after all hooks are called
   if (!isClient) return null;
-
+  if (!audioContext) return null;
+  
   try {
-    const audioContext = useGlobalAudio();
-    if (!audioContext) return null;
-    
     const { current, time, duration, setTime, play, pause, next, prev } = audioContext;
     if (!current) return null;
   

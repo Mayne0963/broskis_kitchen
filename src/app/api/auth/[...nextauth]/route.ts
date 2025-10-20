@@ -1,9 +1,6 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { adminAuth } from "../../../../../firebase/admin";
-import { getFirestore } from "firebase-admin/firestore";
-
-const db = getFirestore();
+import { adminAuth, db } from "@/lib/firebase/admin";
 
 export const authOptions: NextAuthOptions = {
   providers: [

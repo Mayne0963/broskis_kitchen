@@ -151,7 +151,7 @@ export default async function RootLayout({
                   <SchemaGenerator />
                   <NetworkStatus />
                   <ErrorMonitor />
-                  <PerformanceMonitor />
+                  {/* <PerformanceMonitor /> */}
                   <AccessibilityAudit />
                   <PWAManager />
                 </Providers>

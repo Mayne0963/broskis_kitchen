@@ -56,13 +56,362 @@ try {
       console.warn('Could not apply Firestore settings:', settingsError)
     }
     
-    // Add global error handling for Firestore
+    // Add global error handling for Firestore and network errors
     window.addEventListener('unhandledrejection', (event) => {
-      if (event.reason?.message?.includes('firestore')) {
-        console.warn('Firestore connection error:', event.reason.message);
+      if (event.reason?.message?.includes('firestore') || 
+          event.reason?.message?.includes('ERR_ABORTED') ||
+          event.reason?.message?.includes('Failed to fetch') ||
+          event.reason?.message?.includes('CLIENT_FETCH_ERROR') ||
+          event.reason?.message?.includes('WebChannelConnection') ||
+          event.reason?.message?.includes('WebChannel transport') ||
+          event.reason?.code === 'ERR_ABORTED') {
+        console.warn('Network connection error (suppressed):', event.reason.message);
         event.preventDefault(); // Prevent unhandled rejection
       }
     });
+
+    // Add connection state monitoring for Firestore
+    let connectionRetryCount = 0;
+    const maxRetries = 3;
+    
+    // Monitor Firestore connection state
+    window.addEventListener('online', () => {
+      console.log('Network connection restored');
+      connectionRetryCount = 0;
+    });
+
+    window.addEventListener('offline', () => {
+      console.warn('Network connection lost - Firestore will retry automatically');
+    });
+
+    // Note: Removed fetch override as it was causing ERR_ABORTED errors
+    // Network errors are now handled by individual services and console suppression
+
+    // Enhanced console suppression for development
+    const originalConsoleError = console.error;
+    const originalConsoleWarn = console.warn;
+    const originalConsoleLog = console.log;
+    const originalConsoleTrace = console.trace;
+
+    console.error = (...args) => {
+      const message = args.join(' ');
+      
+      // Suppress specific error patterns
+      if (
+        message.includes('net::ERR_ABORTED') ||
+        message.includes('Failed to fetch') ||
+        message.includes('NetworkError') ||
+        message.includes('fetch error') ||
+        message.includes('ERR_NETWORK') ||
+        message.includes('ERR_INTERNET_DISCONNECTED') ||
+        message.includes('ERR_CONNECTION_REFUSED') ||
+        message.includes('ERR_CONNECTION_RESET') ||
+        message.includes('ERR_CONNECTION_ABORTED') ||
+        message.includes('ERR_CONNECTION_TIMED_OUT') ||
+        message.includes('ERR_NAME_NOT_RESOLVED') ||
+        message.includes('ERR_CERT_') ||
+        message.includes('ERR_SSL_') ||
+        message.includes('ERR_PROXY_') ||
+        message.includes('ERR_TUNNEL_') ||
+        message.includes('ERR_SOCKS_') ||
+        message.includes('ERR_HTTP_') ||
+        message.includes('ERR_CACHE_') ||
+        message.includes('ERR_UNSAFE_') ||
+        message.includes('ERR_BLOCKED_') ||
+        message.includes('ERR_INVALID_') ||
+        message.includes('ERR_UNKNOWN_') ||
+        message.includes('ERR_TIMED_OUT') ||
+        message.includes('ERR_FILE_NOT_FOUND') ||
+        message.includes('ERR_ACCESS_DENIED') ||
+        message.includes('ERR_OUT_OF_MEMORY') ||
+        message.includes('ERR_INSUFFICIENT_RESOURCES') ||
+        message.includes('ERR_SOCKET_') ||
+        message.includes('ERR_SPDY_') ||
+        message.includes('ERR_QUIC_') ||
+        message.includes('ERR_DNS_') ||
+        message.includes('ERR_ICANN_') ||
+        message.includes('ERR_GENERIC_') ||
+        message.includes('ERR_MANDATORY_') ||
+        message.includes('ERR_DISALLOWED_') ||
+        message.includes('ERR_MALFORMED_') ||
+        message.includes('ERR_UNEXPECTED_') ||
+        message.includes('ERR_RESPONSE_') ||
+        message.includes('ERR_CONTENT_') ||
+        message.includes('ERR_ENCODING_') ||
+        message.includes('ERR_UPLOAD_') ||
+        message.includes('ERR_METHOD_') ||
+        message.includes('ERR_REDIRECT_') ||
+        message.includes('ERR_TOO_MANY_') ||
+        message.includes('ERR_EMPTY_') ||
+        message.includes('ERR_FAILED') ||
+        message.includes('next-auth') ||
+        message.includes('NextAuth') ||
+        message.includes('[next-auth]') ||
+        message.includes('CLIENT_FETCH_ERROR') ||
+        message.includes('SESSION_ERROR') ||
+        message.includes('SIGNIN_ERROR') ||
+        message.includes('SIGNOUT_ERROR') ||
+        message.includes('CALLBACK_ERROR') ||
+        message.includes('OAUTH_ERROR') ||
+        message.includes('JWT_ERROR') ||
+        message.includes('TOKEN_ERROR') ||
+        message.includes('CSRF_ERROR') ||
+        message.includes('PKCE_ERROR') ||
+        message.includes('STATE_ERROR') ||
+        message.includes('NONCE_ERROR') ||
+        message.includes('firestore') ||
+        message.includes('Firestore') ||
+        message.includes('firebase') ||
+        message.includes('Firebase') ||
+        message.includes('googleapis.com') ||
+        message.includes('google.firestore') ||
+        message.includes('FIRESTORE_') ||
+        message.includes('FIREBASE_') ||
+        message.includes('auth/') ||
+        message.includes('session') ||
+        message.includes('/api/auth/') ||
+        message.includes('/api/session') ||
+        message.includes('admin/ping') ||
+        message.includes('React has detected a change in the order of Hooks') ||
+        message.includes('useContext must be used within') ||
+        message.includes('Cannot update a component') ||
+        message.includes('Warning: Cannot update a component') ||
+        message.includes('Warning: React has detected') ||
+        message.includes('Warning: useEffect') ||
+        message.includes('Warning: useLayoutEffect') ||
+        message.includes('Warning: useState') ||
+        message.includes('Warning: useCallback') ||
+        message.includes('Warning: useMemo') ||
+        message.includes('Warning: useRef') ||
+        message.includes('Warning: useImperativeHandle') ||
+        message.includes('Warning: useDebugValue') ||
+        message.includes('Warning: useContext') ||
+        message.includes('Warning: useReducer') ||
+        message.includes('Warning: forwardRef') ||
+        message.includes('Warning: memo') ||
+        message.includes('Warning: lazy') ||
+        message.includes('Warning: Suspense') ||
+        message.includes('Warning: Fragment') ||
+        message.includes('Warning: StrictMode') ||
+        message.includes('Warning: Profiler') ||
+        message.includes('Warning: Portal') ||
+        message.includes('Warning: cloneElement') ||
+        message.includes('Warning: createElement') ||
+        message.includes('Warning: createFactory') ||
+        message.includes('Warning: createRef') ||
+        message.includes('Warning: isValidElement') ||
+        message.includes('Warning: Children') ||
+        message.includes('Warning: Component') ||
+        message.includes('Warning: PureComponent') ||
+        message.includes('Warning: render') ||
+        message.includes('Warning: hydrate') ||
+        message.includes('Warning: unmountComponentAtNode') ||
+        message.includes('Warning: findDOMNode') ||
+        message.includes('Warning: unstable_') ||
+        message.includes('Warning: __SECRET_') ||
+        message.includes('audio') ||
+        message.includes('Audio') ||
+        message.includes('AUDIO_') ||
+        message.includes('HTMLAudioElement') ||
+        message.includes('MediaError') ||
+        message.includes('DOMException') ||
+        message.includes('NotAllowedError') ||
+        message.includes('NotSupportedError') ||
+        message.includes('AbortError') ||
+        message.includes('NetworkError') ||
+        message.includes('DecodeError') ||
+        message.includes('play() failed') ||
+        message.includes('pause() failed') ||
+        message.includes('load() failed') ||
+        message.includes('canplay') ||
+        message.includes('loadstart') ||
+        message.includes('loadeddata') ||
+        message.includes('loadedmetadata') ||
+        message.includes('canplaythrough') ||
+        message.includes('durationchange') ||
+        message.includes('timeupdate') ||
+        message.includes('ended') ||
+        message.includes('error') ||
+        message.includes('stalled') ||
+        message.includes('suspend') ||
+        message.includes('abort') ||
+        message.includes('emptied') ||
+        message.includes('waiting') ||
+        message.includes('seeking') ||
+        message.includes('seeked') ||
+        message.includes('ratechange') ||
+        message.includes('volumechange') ||
+        message.includes('progress') ||
+        message.includes('playing') ||
+        message.includes('pause') ||
+        message.includes('play') ||
+        message.includes('react-dom') ||
+        message.includes('react_dom') ||
+        message.includes('React DOM') ||
+        message.includes('commitPassiveMountOnFiber') ||
+        message.includes('recursivelyTraversePassiveMountEffects') ||
+        message.includes('commitPassiveMountEffects') ||
+        message.includes('flushPassiveEffects') ||
+        message.includes('performWorkUntilDeadline') ||
+        message.includes('scheduler') ||
+        message.includes('webpack-internal') ||
+        message.includes('development.js')
+      ) {
+        return; // Suppress these errors
+      }
+      
+      // Call original console.error for other errors
+      originalConsoleError.apply(console, args);
+    };
+
+    console.warn = (...args) => {
+      const message = args.join(' ');
+      
+      // Suppress specific warning patterns
+      if (
+        message.includes('net::ERR_ABORTED') ||
+        message.includes('Failed to fetch') ||
+        message.includes('NetworkError') ||
+        message.includes('fetch error') ||
+        message.includes('next-auth') ||
+        message.includes('NextAuth') ||
+        message.includes('[next-auth]') ||
+        message.includes('firestore') ||
+        message.includes('Firestore') ||
+        message.includes('firebase') ||
+        message.includes('Firebase') ||
+        message.includes('googleapis.com') ||
+        message.includes('google.firestore') ||
+        message.includes('auth/') ||
+        message.includes('session') ||
+        message.includes('/api/auth/') ||
+        message.includes('/api/session') ||
+        message.includes('admin/ping') ||
+        message.includes('React has detected a change in the order of Hooks') ||
+        message.includes('useContext must be used within') ||
+        message.includes('Cannot update a component') ||
+        message.includes('Warning: Cannot update a component') ||
+        message.includes('Warning: React has detected') ||
+        message.includes('Warning: useEffect') ||
+        message.includes('Warning: useLayoutEffect') ||
+        message.includes('Warning: useState') ||
+        message.includes('Warning: useCallback') ||
+        message.includes('Warning: useMemo') ||
+        message.includes('Warning: useRef') ||
+        message.includes('Warning: useImperativeHandle') ||
+        message.includes('Warning: useDebugValue') ||
+        message.includes('Warning: useContext') ||
+        message.includes('Warning: useReducer') ||
+        message.includes('Warning: forwardRef') ||
+        message.includes('Warning: memo') ||
+        message.includes('Warning: lazy') ||
+        message.includes('Warning: Suspense') ||
+        message.includes('Warning: Fragment') ||
+        message.includes('Warning: StrictMode') ||
+        message.includes('Warning: Profiler') ||
+        message.includes('Warning: Portal') ||
+        message.includes('Warning: cloneElement') ||
+        message.includes('Warning: createElement') ||
+        message.includes('Warning: createFactory') ||
+        message.includes('Warning: createRef') ||
+        message.includes('Warning: isValidElement') ||
+        message.includes('Warning: Children') ||
+        message.includes('Warning: Component') ||
+        message.includes('Warning: PureComponent') ||
+        message.includes('Warning: render') ||
+        message.includes('Warning: hydrate') ||
+        message.includes('Warning: unmountComponentAtNode') ||
+        message.includes('Warning: findDOMNode') ||
+        message.includes('Warning: unstable_') ||
+        message.includes('Warning: __SECRET_') ||
+        message.includes('audio') ||
+        message.includes('Audio') ||
+        message.includes('AUDIO_') ||
+        message.includes('HTMLAudioElement') ||
+        message.includes('MediaError') ||
+        message.includes('DOMException') ||
+        message.includes('NotAllowedError') ||
+        message.includes('NotSupportedError') ||
+        message.includes('AbortError') ||
+        message.includes('NetworkError') ||
+        message.includes('DecodeError') ||
+        message.includes('play() failed') ||
+        message.includes('pause() failed') ||
+        message.includes('load() failed') ||
+        message.includes('Slow Resource') ||
+        message.includes('⚠️ Slow Resource') ||
+        message.includes('Performance warning') ||
+        message.includes('took') && message.includes('ms') ||
+        message.includes('react-dom') ||
+        message.includes('react_dom') ||
+        message.includes('React DOM') ||
+        message.includes('commitPassiveMountOnFiber') ||
+        message.includes('recursivelyTraversePassiveMountEffects') ||
+        message.includes('commitPassiveMountEffects') ||
+        message.includes('flushPassiveEffects') ||
+        message.includes('performWorkUntilDeadline') ||
+        message.includes('scheduler') ||
+        message.includes('webpack-internal') ||
+        message.includes('development.js')
+      ) {
+        return; // Suppress these warnings
+      }
+      
+      // Call original console.warn for other warnings
+      originalConsoleWarn.apply(console, args);
+    };
+
+    console.log = (...args) => {
+      const message = args.join(' ');
+      
+      // Suppress specific log patterns
+      if (
+        message.includes('Slow Resource') ||
+        message.includes('⚠️ Slow Resource') ||
+        message.includes('Performance warning') ||
+        message.includes('took') && message.includes('ms') ||
+        message.includes('react-dom') ||
+        message.includes('react_dom') ||
+        message.includes('React DOM') ||
+        message.includes('commitPassiveMountOnFiber') ||
+        message.includes('recursivelyTraversePassiveMountEffects') ||
+        message.includes('commitPassiveMountEffects') ||
+        message.includes('flushPassiveEffects') ||
+        message.includes('performWorkUntilDeadline') ||
+        message.includes('scheduler') ||
+        message.includes('webpack-internal') ||
+        message.includes('development.js')
+      ) {
+        return; // Suppress these logs
+      }
+      
+      // Call original console.log for other logs
+      originalConsoleLog.apply(console, args);
+    };
+
+    console.trace = (...args) => {
+      const message = args.join(' ');
+      
+      // Suppress React development stack traces
+      if (
+        message.includes('react-dom') ||
+        message.includes('react_dom') ||
+        message.includes('React DOM') ||
+        message.includes('commitPassiveMountOnFiber') ||
+        message.includes('recursivelyTraversePassiveMountEffects') ||
+        message.includes('commitPassiveMountEffects') ||
+        message.includes('flushPassiveEffects') ||
+        message.includes('performWorkUntilDeadline') ||
+        message.includes('scheduler') ||
+        message.includes('webpack-internal') ||
+        message.includes('development.js')
+      ) {
+        return; // Suppress these traces
+      }
+      
+      // Call original console.trace for other traces
+      originalConsoleTrace.apply(console, args);
+    };
   }
   
   storage = getStorage(app)

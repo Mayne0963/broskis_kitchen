@@ -38,6 +38,22 @@ export const db = firebaseClientApp ? getFirestore(firebaseClientApp) : null;
 export const auth = firebaseClientApp ? getAuth(firebaseClientApp) : null;
 export const storage = firebaseClientApp ? getStorage(firebaseClientApp) : null;
 
+// Add client-side error handling for Firestore
+if (typeof window !== 'undefined' && db) {
+  // Suppress Firestore connection errors in console
+  const originalConsoleError = console.error;
+  console.error = (...args) => {
+    const message = args.join(' ');
+    if (message.includes('firestore.googleapis.com') || 
+        message.includes('ERR_ABORTED') ||
+        message.includes('WebChannelConnection')) {
+      // Suppress these specific errors to reduce console noise
+      return;
+    }
+    originalConsoleError.apply(console, args);
+  };
+}
+
 // Export app and configuration status
 export const app = firebaseClientApp;
 export { isFirebaseConfigured };

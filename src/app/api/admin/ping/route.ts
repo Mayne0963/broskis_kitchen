@@ -4,7 +4,7 @@ export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
 export async function GET() {
-  return new Response("ok", { 
+  return new Response(null, { 
     status: 204, 
     headers: { 
       "cache-control": "no-store" 

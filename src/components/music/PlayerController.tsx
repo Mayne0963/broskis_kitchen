@@ -159,7 +159,16 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
     const errorCode = error?.code?.toString() || 'unknown';
     const errorMessage = error ? `Audio error: ${error.message}` : 'Track unavailable';
     
-    console.error('Audio playback error:', error);
+    // Only log audio errors in development to reduce console noise in production
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Audio playback error (auto-skipping):', {
+        track: currentTrack?.title,
+        error: errorMessage,
+        code: errorCode,
+        src: currentTrack?.src_mp3
+      });
+    }
+    
     setError(errorMessage);
     setLoading(false);
     
@@ -175,13 +184,18 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
           message: errorMessage
         });
       } catch (e) {
-        console.log('Analytics error:', e);
+        // Suppress analytics errors to prevent console noise
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Analytics error:', e);
+        }
       }
     }
     
-    // Show user-friendly toast
-    toast.error('Skipping unavailable track', {
-      duration: 2000,
+    // Show user-friendly toast with track name
+    const trackName = currentTrack?.title || 'track';
+    toast.error(`Skipping "${trackName}" - file not available`, {
+      duration: 3000,
+      description: 'Moving to next track...'
     });
     
     // Auto-skip to next track within 500ms as requested
@@ -287,6 +301,20 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
     if (!src) {
       console.error('Track missing audio source:', currentTrack);
       setError('Track source unavailable');
+      // Auto-skip to next track if current track has no source
+      setTimeout(() => {
+        next();
+      }, 1000);
+      return;
+    }
+
+    // Validate that the source is a local file (starts with /audio/)
+    if (!src.startsWith('/audio/')) {
+      console.warn('Non-local audio source detected:', src);
+      setError('Invalid audio source');
+      setTimeout(() => {
+        next();
+      }, 1000);
       return;
     }
 
@@ -300,7 +328,7 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
 
     // Don't attempt autoplay here - let handleCanPlay handle it
     // This prevents ERR_ABORTED errors from premature play() calls
-  }, [currentTrack, setError]);
+  }, [currentTrack, setError, next]);
 
   // Provide audio ref to parent component (for unlock functionality)
   useEffect(() => {
