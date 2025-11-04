@@ -59,16 +59,34 @@ export const RewardsProvider: React.FC<RewardsProviderProps> = ({ children }) =>
   const [error, setError] = useState<string | null>(null)
 
   // Load rewards status from API
-  const refreshStatus = useCallback(async () => {
+  // Refresh rewards status with retry logic
+  const refreshStatus = useCallback(async (retryCount = 0) => {
     if (!user) return
     
     setLoading(true)
     setError(null)
     
     try {
-      const response = await fetch('/api/rewards/status')
+      const response = await fetch('/api/rewards/status', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // Add timeout to prevent hanging requests
+        signal: AbortSignal.timeout(10000), // 10 second timeout
+      })
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch rewards status')
+        // Handle specific HTTP errors
+        if (response.status === 401) {
+          throw new Error('Authentication required')
+        } else if (response.status === 403) {
+          throw new Error('Access denied')
+        } else if (response.status >= 500) {
+          throw new Error('Server error - please try again later')
+        } else {
+          throw new Error(`Failed to fetch rewards status (${response.status})`)
+        }
       }
       
       const data = await response.json()
@@ -79,7 +97,23 @@ export const RewardsProvider: React.FC<RewardsProviderProps> = ({ children }) =>
       }
     } catch (err) {
       console.error('Error fetching rewards status:', err)
-      setError(err instanceof Error ? err.message : 'Failed to load rewards')
+      
+      // Retry logic for network errors
+      if (retryCount < 2 && (
+        err instanceof TypeError || // Network errors
+        (err instanceof Error && err.message.includes('fetch')) ||
+        (err instanceof Error && err.message.includes('timeout'))
+      )) {
+        console.log(`Retrying rewards status fetch (attempt ${retryCount + 1}/3)`)
+        setTimeout(() => {
+          refreshStatus(retryCount + 1)
+        }, Math.pow(2, retryCount) * 1000) // Exponential backoff: 1s, 2s, 4s
+        return
+      }
+      
+      // Set user-friendly error message
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load rewards'
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }

@@ -6,6 +6,7 @@ import Link from "next/link"
 import { useRewards } from "../../lib/context/RewardsContext"
 import { useAuth } from "../../lib/context/AuthContext"
 import { AuthGuard } from "../../components/auth/AuthGuard"
+import { ClientAuthGuard } from "../../components/auth/ClientAuthGuard"
 import {
   FaCrown,
   FaGift,
@@ -896,6 +897,6 @@ export default function LoyaltyPage() {
         </div>
       )}
       </div>
-    </AuthGuard>
+    </ClientAuthGuard>
   )
 }

@@ -8,17 +8,18 @@ import { getSpinStatus } from "@/lib/rewards-firebase";
 export async function GET() {
   const uid = await getUserIdOrNull();
   if (!uid) {
-    return NextResponse.json({
-      canSpin: false,
-      spinsToday: 0,
-      availableTokens: 0,
-      unauthenticated: true,
-    });
+    // Standardize shape expected by client
+    return NextResponse.json(
+      { success: false, error: "UNAUTHENTICATED" },
+      { status: 401 }
+    );
   }
 
   try {
-    return NextResponse.json(await getSpinStatus(uid));
+    const status = await getSpinStatus(uid);
+    // Return shape that RewardsContext expects
+    return NextResponse.json({ success: true, status });
   } catch (e) {
-    return NextResponse.json({ error: "SERVER_ERROR" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "SERVER_ERROR" }, { status: 500 });
   }
 }
