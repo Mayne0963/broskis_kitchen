@@ -1,4 +1,3 @@
-/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
@@ -54,6 +53,9 @@ module.exports = {
       },
       boxShadow: {
         gold: "0 0 10px rgba(212, 175, 55, 0.5)",
+      },
+      transitionDuration: {
+        4000: "4000ms",
       },
     },
   },
