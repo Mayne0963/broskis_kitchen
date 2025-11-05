@@ -8,7 +8,7 @@ import { useAuth } from "../../lib/context/AuthContext";
 import { OrderItem } from "../../types/order";
 import { FaShoppingCart, FaTrash, FaPlus, FaMinus, FaArrowLeft, FaCreditCard, FaCog, FaLock } from "react-icons/fa";
 import { safeFetch } from "../../lib/utils/safeFetch";
-import { ClientAuthGuard } from "../../components/auth/ClientAuthGuard";
+import { AuthGuard } from "../../components/auth/AuthGuard";
 
 function normalizePrice(p: unknown): number {
   const n = typeof p === "string" ? parseFloat(p.replace(/[^0-9.]/g, "")) : Number(p);
@@ -311,8 +311,8 @@ function CartContent() {
 
 export default function CartPage() {
   return (
-    <ClientAuthGuard requireEmailVerification={false}>
+    <AuthGuard requireEmailVerification={false}>
       <CartContent />
-    </ClientAuthGuard>
+    </AuthGuard>
   );
 }
