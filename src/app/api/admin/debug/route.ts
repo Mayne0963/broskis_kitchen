@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 
 import { headers } from "next/headers";
 import { getServerSession } from "next-auth";
-import authOptions from "@/lib/auth/options";
+import { authOptions } from "@/lib/auth/options";
 import { ENV } from "@/lib/env";
 
 function j(d:any, s=200){return new Response(JSON.stringify(d,null,2),{status:s,headers:{"content-type":"application/json"}})}

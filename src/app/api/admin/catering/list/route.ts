@@ -2,7 +2,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 import { getServerSession } from "next-auth";
-import authOptions from "@/lib/auth/options";
+import { authOptions } from "@/lib/auth/options";
 import { db } from "@/lib/firebase/admin";
 
 function j(d:any, s=200){return new Response(JSON.stringify(d),{status:s,headers:{"content-type":"application/json"}})}
