@@ -1,3 +1,8 @@
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+export const fetchCache = 'force-no-store'
+
 import { requireRole } from "@/lib/auth/session";
 import CateringDashboardClient from "./shell";
 
@@ -22,7 +27,7 @@ export default async function AdminCateringPage({
       <div className="rounded-xl border px-5 py-4 bk-gradient" style={{ borderColor: "var(--bk-border)" }}>
         <h1 className="text-3xl font-bold text-white">Admin Catering</h1>
         <p className="text-sm" style={{ color: "var(--bk-text-dim)" }}>
-          Welcome, {user?.name}. Secure admin access verified.
+          Welcome, {(user?.displayName || user?.email)}. Secure admin access verified.
         </p>
       </div>
       <CateringDashboardClient 
