@@ -33,8 +33,7 @@ const AUTH_ROUTES = [
   '/auth/login',
   '/auth/signup',
   '/login',
-  '/signup',
-  '/auth/signin'
+  '/signup'
 ];
 
 // Routes that require email verification
@@ -127,8 +126,8 @@ function handleProtectedRoute(req: NextRequest, response: NextResponse, authResu
     }
     
     // Redirect to login with return URL
-    const loginUrl = new URL('/auth/signin', req.url);
-    loginUrl.searchParams.set('callbackUrl', url.pathname + url.search);
+    const loginUrl = new URL('/auth/login', req.url);
+    loginUrl.searchParams.set('next', url.pathname + url.search);
     loginUrl.searchParams.set('error', 'authentication_required');
     return NextResponse.redirect(loginUrl);
   }
@@ -155,7 +154,7 @@ function handleAuthRoute(req: NextRequest, response: NextResponse, authResult: A
   
   // If user is already authenticated, redirect to dashboard
   if (authResult.isAuthenticated && authResult.user) {
-    const nextParam = url.searchParams.get('next') || url.searchParams.get('callbackUrl');
+    const nextParam = url.searchParams.get('next');
     const redirectUrl = nextParam && nextParam.startsWith('/') ? nextParam : '/dashboard';
     return NextResponse.redirect(new URL(redirectUrl, req.url));
   }
@@ -166,31 +165,6 @@ function handleAuthRoute(req: NextRequest, response: NextResponse, authResult: A
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl;
   const response = NextResponse.next();
-  
-  // Allow auth and static routes
-  if (
-    url.pathname.startsWith('/api/auth') ||
-    url.pathname.startsWith('/_next') ||
-    url.pathname.startsWith('/public') ||
-    url.pathname === '/' ||
-    url.pathname === '/auth/signin'
-  ) {
-    return NextResponse.next();
-  }
-
-  // Protect admin routes via NextAuth JWT
-  if (url.pathname.startsWith('/admin')) {
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-    if (!token) {
-      const loginUrl = new URL('/auth/signin', req.url);
-      loginUrl.searchParams.set('callbackUrl', url.pathname + url.search);
-      return NextResponse.redirect(loginUrl);
-    }
-    if ((token as any).role !== 'admin') {
-      return NextResponse.redirect(new URL('/403', req.url));
-    }
-    return response;
-  }
   
   // 1. First: Handle www → apex domain redirect
   const host = req.headers.get("host") || "";
@@ -244,8 +218,6 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    // Include admin routes explicitly
-    "/admin/:path*",
     // Match all routes except static files and API routes (except /api/rewards)
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
     // Include specific API routes that need auth
