@@ -18,7 +18,7 @@ export function withAdmin<P extends { [key: string]: any } = { [key: string]: an
         console.log('No session cookie found, redirecting to login');
         return {
           redirect: {
-            destination: '/login?redirect=/admin',
+            destination: '/auth/login?next=/admin',
             permanent: false,
           },
         };
@@ -31,7 +31,7 @@ export function withAdmin<P extends { [key: string]: any } = { [key: string]: an
         console.log('Invalid session token, redirecting to login');
         return {
           redirect: {
-            destination: '/login?redirect=/admin',
+            destination: '/auth/login?next=/admin',
             permanent: false,
           },
         };
@@ -95,7 +95,7 @@ export function withAdmin<P extends { [key: string]: any } = { [key: string]: an
       // On any error, redirect to login
       return {
         redirect: {
-          destination: '/login?error=auth_error&redirect=/admin',
+          destination: '/auth/login?error=auth_error&next=/admin',
           permanent: false,
         },
       };
@@ -118,7 +118,7 @@ export async function checkAdminAccess(request: Request): Promise<{
     if (!cookieHeader) {
       return {
         isAdmin: false,
-        redirectUrl: '/login?redirect=/admin',
+        redirectUrl: '/auth/login?next=/admin',
       };
     }
 
@@ -129,7 +129,7 @@ export async function checkAdminAccess(request: Request): Promise<{
     if (!sessionCookie) {
       return {
         isAdmin: false,
-        redirectUrl: '/login?redirect=/admin',
+        redirectUrl: '/auth/login?next=/admin',
       };
     }
 
@@ -139,7 +139,7 @@ export async function checkAdminAccess(request: Request): Promise<{
     if (!decodedToken) {
       return {
         isAdmin: false,
-        redirectUrl: '/login?redirect=/admin',
+        redirectUrl: '/auth/login?next=/admin',
       };
     }
 
@@ -167,7 +167,7 @@ export async function checkAdminAccess(request: Request): Promise<{
     console.error('Error checking admin access:', error);
     return {
       isAdmin: false,
-      redirectUrl: '/login?error=auth_error&redirect=/admin',
+      redirectUrl: '/auth/login?error=auth_error&next=/admin',
     };
   }
 }

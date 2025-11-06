@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -29,6 +29,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const { login } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const afterSignIn = useAfterSignIn()
 
   const form = useForm<LoginFormValues>({
@@ -45,7 +46,9 @@ export default function LoginPage() {
     try {
       const success = await login(values.email, values.password)
       if (success) {
-        await afterSignIn('/dashboard')
+        const nextParam = searchParams.get('next')
+        const dest = nextParam && nextParam.startsWith('/') ? nextParam : '/dashboard'
+        await afterSignIn(dest)
       }
     } catch (error) {
       console.error('Login error:', error)

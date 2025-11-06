@@ -88,19 +88,23 @@ async function verifyAuthentication(req: NextRequest): Promise<AuthResult> {
     // Edge-compatible JWT validation
     const payload = await validateJWTStructure(sessionCookie);
     const now = Math.floor(Date.now() / 1000);
+
+    const uid = payload.uid || payload.sub;
     
-    if (!payload.exp || payload.exp <= now || !payload.uid) {
+    if (!payload.exp || payload.exp <= now || !uid) {
       return { isAuthenticated: false, sessionValid: false, emailVerified: false };
     }
+
+    const emailVerified = (payload.email_verified ?? payload.emailVerified) || false;
     
     return {
       isAuthenticated: true,
       sessionValid: true,
-      emailVerified: payload.email_verified || false,
+      emailVerified,
       user: {
-        uid: payload.uid,
+        uid,
         email: payload.email,
-        emailVerified: payload.email_verified || false,
+        emailVerified,
         name: payload.name,
         role: payload.role || 'customer',
         permissions: payload.permissions || []
@@ -123,7 +127,7 @@ function handleProtectedRoute(req: NextRequest, response: NextResponse, authResu
     
     // Redirect to login with return URL
     const loginUrl = new URL('/auth/login', req.url);
-    loginUrl.searchParams.set('returnUrl', url.pathname + url.search);
+    loginUrl.searchParams.set('next', url.pathname + url.search);
     loginUrl.searchParams.set('error', 'authentication_required');
     return NextResponse.redirect(loginUrl);
   }
@@ -131,7 +135,7 @@ function handleProtectedRoute(req: NextRequest, response: NextResponse, authResu
   // Check email verification requirement
   if (requiresEmailVerification(url.pathname) && !authResult.emailVerified) {
     const verifyUrl = new URL('/auth/verify-email', req.url);
-    verifyUrl.searchParams.set('returnUrl', url.pathname + url.search);
+    verifyUrl.searchParams.set('next', url.pathname + url.search);
     verifyUrl.searchParams.set('error', 'email_verification_required');
     return NextResponse.redirect(verifyUrl);
   }
@@ -150,8 +154,8 @@ function handleAuthRoute(req: NextRequest, response: NextResponse, authResult: A
   
   // If user is already authenticated, redirect to dashboard
   if (authResult.isAuthenticated && authResult.user) {
-    const returnUrl = url.searchParams.get('returnUrl');
-    const redirectUrl = returnUrl && returnUrl.startsWith('/') ? returnUrl : '/dashboard';
+    const nextParam = url.searchParams.get('next');
+    const redirectUrl = nextParam && nextParam.startsWith('/') ? nextParam : '/dashboard';
     return NextResponse.redirect(new URL(redirectUrl, req.url));
   }
   

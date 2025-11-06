@@ -32,13 +32,13 @@ export function ClientAuthGuard({
 
     if (!isAuthenticated || !user) {
       const currentPath = window.location.pathname + window.location.search;
-      router.push(`${redirectTo}?returnUrl=${encodeURIComponent(currentPath)}&error=authentication_required`);
+      router.push(`${redirectTo}?next=${encodeURIComponent(currentPath)}&error=authentication_required`);
       return;
     }
 
     if (requireEmailVerification && !user.emailVerified) {
       const currentPath = window.location.pathname + window.location.search;
-      router.push(`/auth/verify-email?returnUrl=${encodeURIComponent(currentPath)}&error=email_verification_required`);
+      router.push(`/auth/verify-email?next=${encodeURIComponent(currentPath)}&error=email_verification_required`);
       return;
     }
 

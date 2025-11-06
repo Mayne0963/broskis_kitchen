@@ -22,7 +22,7 @@ export default function AdminGate({ children }: { children: React.ReactNode }) {
       <div className="p-6 text-slate-200">
         <p>Admin access required.</p>
         <button 
-          onClick={() => router.push("/login?redirect=/admin/catering")} 
+          onClick={() => router.push("/auth/login?next=/admin/catering")} 
           className="bg-yellow-500 px-4 py-2 rounded mt-2 text-black"
         >
           Sign in

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/lib/context/AuthContext'
 import { useAfterSignIn } from '@/lib/auth/afterSignIn'
@@ -20,6 +20,7 @@ export default function GoogleSignInButton({
   const [isLoading, setIsLoading] = useState(false)
   const { signInWithGoogle } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const afterSignIn = useAfterSignIn()
 
   const handleGoogleSignIn = async () => {
@@ -27,7 +28,9 @@ export default function GoogleSignInButton({
     try {
       const success = await signInWithGoogle()
       if (success) {
-        await afterSignIn(redirectTo)
+        const nextParam = searchParams.get('next')
+        const dest = nextParam && nextParam.startsWith('/') ? nextParam : redirectTo
+        await afterSignIn(dest)
       }
     } catch (error) {
       console.error('Google sign-in error:', error)

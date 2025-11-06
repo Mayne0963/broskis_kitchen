@@ -30,7 +30,7 @@ export default async function KitchenPage() {
   const verification = await verifyKitchenAccess()
   
   if (!verification.success) {
-    redirect('/auth/login?redirect=/kitchen')
+    redirect('/auth/login?next=/kitchen')
   }
 
   const initialOrders = await getKitchenOrders()

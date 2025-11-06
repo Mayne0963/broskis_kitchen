@@ -45,7 +45,8 @@ export async function POST(request: NextRequest) {
 
     // Check if email is verified (skip for Google OAuth users as they are pre-verified)
     const isGoogleUser = decodedToken.firebase?.sign_in_provider === 'google.com';
-    if (!decodedToken.email_verified && !isGoogleUser) {
+    const emailVerified = decodedToken.email_verified ?? decodedToken.emailVerified ?? false;
+    if (!emailVerified && !isGoogleUser) {
       return NextResponse.json(
         { error: 'Email not verified' },
         { status: 403 }
@@ -53,13 +54,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Create session cookie (expires in 5 days)
-    const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
-    const sessionCookie = await auth.createSessionCookie(idToken, { expiresIn });
+    const expiresInMs = 60 * 60 * 24 * 5 * 1000; // 5 days in ms
+    const sessionCookie = await auth.createSessionCookie(idToken, { expiresIn: expiresInMs });
 
     // Set the session cookie
     const response = NextResponse.json({ success: true }, { status: 200 });
     response.cookies.set('__session', sessionCookie, {
-      maxAge: expiresIn,
+      // maxAge expects seconds per Next.js cookies API
+      maxAge: Math.floor(expiresInMs / 1000),
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
@@ -83,8 +85,8 @@ export async function POST(request: NextRequest) {
       } else if (error.message.includes('Token expired') || (error as any).code === 'auth/id-token-expired') {
         errorMessage = 'Authentication token expired';
         statusCode = 401;
-      } else if ('code' in error && typeof error.code === 'string' && error.code.startsWith('auth/')) {
-        errorMessage = error.message;
+      } else if ('code' in error && typeof (error as any).code === 'string' && (error as any).code.startsWith('auth/')) {
+        errorMessage = (error as any).message;
         statusCode = 401;
       }
     }
