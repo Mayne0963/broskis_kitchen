@@ -11,7 +11,7 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith("/_next") ||
     pathname.startsWith("/public") ||
     pathname === "/" ||
-    pathname === "/auth/login"
+    pathname === "/auth/signin"
   ) {
     return NextResponse.next();
   }
@@ -21,8 +21,8 @@ export async function middleware(req: NextRequest) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
     if (!token) {
-      const loginUrl = new URL("/auth/login", req.url);
-      loginUrl.searchParams.set("next", pathname);
+      const loginUrl = new URL("/auth/signin", req.url);
+      loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
     }
 
