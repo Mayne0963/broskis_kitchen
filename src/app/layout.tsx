@@ -29,6 +29,8 @@ import StructuredData, { OrganizationStructuredData } from "../components/seo/St
 import { SkipNavigation } from "../components/accessibility/AccessibilityEnhancer"
 import AccessibilityAudit from "../components/accessibility/AccessibilityAudit"
 import PWAManager from "../components/pwa/PWAManager"
+import { PageLoadingWrapper } from "../components/auth/PageLoadingWrapper"
+import { BrandedLoading } from "../components/ui/LoadingStates"
 
 export const metadata: Metadata = {
   title: {
@@ -143,7 +145,13 @@ export default async function RootLayout({
                       </Link>
                     </div>
                   )}
-                  <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
+                  <PageLoadingWrapper 
+                    fallback={<BrandedLoading />}
+                    minLoadingTime={800}
+                    showProgressBar={true}
+                  >
+                    <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
+                  </PageLoadingWrapper>
                   <Footer />
 
                   <CookieConsent />

@@ -1,6 +1,6 @@
 "use client";
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getFirestore, initializeFirestore, setLogLevel } from "firebase/firestore";
+import { getFirestore, setLogLevel } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 
@@ -33,18 +33,8 @@ export const firebaseClientApp = isFirebaseConfigured
   ? (getApps().length ? getApp() : initializeApp(config))
   : null;
 
-// Initialize Firebase services
-// Use initializeFirestore with long polling to avoid WebChannel/CORS issues
-export const db = firebaseClientApp
-  ? initializeFirestore(firebaseClientApp, {
-      // Force long polling to work reliably behind proxies, firewalls, and in Safari/iOS
-      experimentalForceLongPolling: true,
-      // Auto-detect long polling when appropriate
-      experimentalAutoDetectLongPolling: true as any, // type-safe for SDK variations
-      // Disable fetch streams to avoid CORS preflight/stream issues
-      useFetchStreams: false,
-    })
-  : null;
+// Initialize Firebase services (use a single Firestore instance across app)
+export const db = firebaseClientApp ? getFirestore(firebaseClientApp) : null;
 export const auth = firebaseClientApp ? getAuth(firebaseClientApp) : null;
 export const storage = firebaseClientApp ? getStorage(firebaseClientApp) : null;
 

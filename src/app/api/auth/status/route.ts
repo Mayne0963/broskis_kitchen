@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Set CSRF token for authenticated users
-    if (sessionResult.success) {
+    if (sessionUser) {
       setCSRFToken(response);
     }
 

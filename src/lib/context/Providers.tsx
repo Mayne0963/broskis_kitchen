@@ -3,6 +3,7 @@
 import { SessionProvider } from "next-auth/react"
 import { UserProvider } from "./UserContext"
 import { AuthProvider } from "./AuthContext"
+import { AuthLoadingProvider } from "./AuthLoadingContext"
 import { OrderProvider } from "./OrderContext"
 import { CartProvider } from "./CartContext"
 import { RewardsProvider } from "./RewardsContext"
@@ -20,9 +21,11 @@ function CoreProviders({ children }: ProvidersProps) {
   return (
     <SessionProvider>
       <AuthProvider>
-        <UserProvider>
-          {children}
-        </UserProvider>
+        <AuthLoadingProvider>
+          <UserProvider>
+            {children}
+          </UserProvider>
+        </AuthLoadingProvider>
       </AuthProvider>
     </SessionProvider>
   )

@@ -309,8 +309,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Force ID token refresh to get latest custom claims
       const idToken = await getIdToken(result.user, true)
       
-      // Create session cookie
-      const response = await safeFetch('/api/session', {
+      // Create session cookie using unified auth route
+      const response = await authFetch('/api/auth/session-login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

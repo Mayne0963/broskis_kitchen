@@ -1,6 +1,6 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app"
 import { getAuth, onAuthStateChanged, Auth, User, GoogleAuthProvider, getIdToken } from "firebase/auth"
-import { getFirestore, doc, setDoc, getDoc, Timestamp, Firestore, connectFirestoreEmulator, initializeFirestore } from "firebase/firestore"
+import { getFirestore, doc, setDoc, getDoc, Timestamp, Firestore, connectFirestoreEmulator } from "firebase/firestore"
 import { getStorage, FirebaseStorage } from "firebase/storage"
 import { toast } from 'sonner'
 
@@ -42,20 +42,9 @@ try {
   app = !getApps().length ? initializeApp(firebaseConfig as Record<string, string>) : getApp()
   auth = getAuth(app)
   
-  // Initialize Firestore; prefer long polling on the client to avoid WebChannel issues
-  if (typeof window !== 'undefined') {
-    try {
-      db = initializeFirestore(app, {
-        experimentalForceLongPolling: true,
-        useFetchStreams: false,
-      })
-    } catch (initErr) {
-      console.warn('initializeFirestore failed, falling back:', initErr)
-      db = getFirestore(app)
-    }
-  } else {
-    db = getFirestore(app)
-  }
+  // Initialize Firestore with a single, consistent instance
+  // Avoid calling initializeFirestore here to prevent option conflicts
+  db = getFirestore(app)
 
   // Optionally connect to emulator in development if configured
   if (typeof window === 'undefined') {

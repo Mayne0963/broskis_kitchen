@@ -7,8 +7,10 @@ import { FaUtensils, FaMapMarkerAlt, FaCalendarAlt, FaGift, FaFire, FaBars, FaTi
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useHeroContent } from "../hooks/useHeroContent";
-
-import MobileEnhancer, { useEnhancedResponsive, TouchButton } from "../components/responsive/MobileEnhancer";
+import dynamic from "next/dynamic";
+// Dynamically import MobileEnhancer and TouchButton to avoid SSR issues
+const MobileEnhancer = dynamic(() => import("../components/responsive/MobileEnhancer"), { ssr: false });
+const TouchButton = dynamic(() => import("../components/responsive/MobileEnhancer").then(m => m.TouchButton), { ssr: false, loading: () => null });
 import { ComponentLoader } from "../components/ui/LoadingSpinner";
 
 
@@ -16,9 +18,28 @@ function Page() {
   const [showSaucePopup, setShowSaucePopup] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  
-  // Responsive hooks
-  const { isMobile, isTablet, breakpoint } = useEnhancedResponsive();
+
+  // Local client-only responsive detection to avoid importing shared hook on SSR
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const update = () => {
+      const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+      const small = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+      const hasTouch = typeof window !== 'undefined' && ('ontouchstart' in window || (navigator as any)?.maxTouchPoints > 0);
+      setIsMobile(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) || (small && hasTouch));
+    };
+    update();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', update);
+      window.addEventListener('orientationchange', update);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', update);
+        window.removeEventListener('orientationchange', update);
+      }
+    };
+  }, []);
 
   return (
     <MobileEnhancer enableSwipeGestures={true} enableTouchOptimizations={true}>
