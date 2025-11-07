@@ -20,6 +20,7 @@ import type { User, AuthContextType } from "@/types"
 import type { Claims } from "@/types/auth"
 import { performBackgroundRefresh } from "../session/exp"
 import { authFetch } from "../utils/authFetch"
+import { safeFetch } from "../utils/safeFetch"
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
