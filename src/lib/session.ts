@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import { auth as adminAuth } from 'firebase-admin';
+import { adminAuth } from '@/lib/firebase/admin';
 
 export type AppUser = {
   uid: string;
@@ -10,11 +10,13 @@ export type AppUser = {
 
 export async function getServerUser(): Promise<AppUser | null> {
   const c = await cookies();
-  const token = c.get('session')?.value; // Firebase ID token/JWT set at login
-  if (!token) return null;
-  
+  // Normalize to Firebase default session cookie name
+  const sessionCookie = c.get('__session')?.value || c.get('session')?.value;
+  if (!sessionCookie) return null;
+
   try {
-    const decoded = await adminAuth().verifyIdToken(token, true);
+    // Verify Firebase Session Cookie (not ID token)
+    const decoded = await adminAuth.verifySessionCookie(sessionCookie, true);
     return {
       uid: decoded.uid,
       email: decoded.email ?? null,

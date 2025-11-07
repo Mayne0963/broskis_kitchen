@@ -11,20 +11,18 @@ export async function GET(request: NextRequest) {
     }
 
     // Check session
-    const sessionResult = await getSessionCookie(request);
+    const sessionUser = await getSessionCookie();
     
     const response = NextResponse.json({
-      authenticated: sessionResult.success,
-      user: sessionResult.success ? {
-        uid: sessionResult.user!.uid,
-        email: sessionResult.user!.email,
-        emailVerified: sessionResult.user!.emailVerified,
-        displayName: sessionResult.user!.displayName,
-        photoURL: sessionResult.user!.photoURL,
-        role: sessionResult.user!.role
+      authenticated: !!sessionUser,
+      user: sessionUser ? {
+        uid: sessionUser.uid,
+        email: sessionUser.email,
+        emailVerified: sessionUser.emailVerified,
+        role: sessionUser.role
       } : null,
-      sessionExpiry: sessionResult.success ? sessionResult.user!.exp : null,
-      error: sessionResult.success ? null : sessionResult.error
+      sessionExpiry: sessionUser?.sessionExpiry || null,
+      error: sessionUser ? null : 'NO_SESSION'
     });
 
     // Set CSRF token for authenticated users

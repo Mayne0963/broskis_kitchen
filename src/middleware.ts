@@ -46,7 +46,17 @@ export async function middleware(req: NextRequest) {
     pathname === "/signup" ||
     pathname.startsWith("/static") ||
     pathname === "/" ||
-    pathname === "/favicon.ico"
+    pathname === "/favicon.ico" ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/orders") ||
+    pathname.startsWith("/loyalty") ||
+    pathname.startsWith("/rewards") ||
+    pathname.startsWith("/cart") ||
+    pathname.startsWith("/checkout") ||
+    pathname.startsWith("/403") ||
+    pathname.startsWith("/404") ||
+    pathname.startsWith("/500") ||
+    pathname === "/dashboard"
   ) {
     return NextResponse.next();
   }

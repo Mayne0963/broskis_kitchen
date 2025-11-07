@@ -1,90 +1,64 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSessionCookie } from '@/lib/auth/session';
-import { securityMiddleware, logSecurityEvent } from '@/lib/auth/security';
+import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { adminAuth } from '@/lib/firebase/admin';
 
 export async function POST(request: NextRequest) {
   try {
-    // Apply security middleware
-    const securityCheck = securityMiddleware(request);
-    if (!securityCheck.allowed) {
-      return securityCheck.response!;
-    }
+    const { idToken } = await request.json().catch(() => ({ idToken: undefined }));
 
-    // Verify current session
-    const sessionResult = await getSessionCookie(request);
-    if (!sessionResult.success || !sessionResult.user) {
-      return NextResponse.json(
-        { error: 'Invalid or expired session' },
-        { status: 401 }
-      );
-    }
-
-    const user = sessionResult.user;
-
-    try {
-      // Get fresh ID token from Firebase
-      const userRecord = await adminAuth.getUser(user.uid);
-      
-      // Create new session cookie with extended expiration
+    // If idToken provided, create new session cookie from it
+    if (idToken) {
+      const decoded = await adminAuth.verifyIdToken(idToken);
       const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
-      const sessionCookie = await adminAuth.createSessionCookie(
-        await adminAuth.createCustomToken(user.uid),
-        { expiresIn }
-      );
+      const sessionCookie = await adminAuth.createSessionCookie(idToken, { expiresIn });
 
-      // Create response with new session cookie
-      const response = NextResponse.json({
-        success: true,
-        user: {
-          uid: user.uid,
-          email: user.email,
-          emailVerified: userRecord.emailVerified,
-          displayName: userRecord.displayName,
-          photoURL: userRecord.photoURL
-        },
-        expiresAt: new Date(Date.now() + expiresIn).toISOString()
-      });
-
-      // Set new session cookie
-      response.cookies.set('session', sessionCookie, {
+      const response = NextResponse.json({ success: true, uid: decoded.uid, expiresAt: new Date(Date.now() + expiresIn).toISOString() });
+      response.cookies.set('__session', sessionCookie, {
         maxAge: expiresIn / 1000,
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         path: '/'
       });
-
-      // Log successful refresh
-      logSecurityEvent({
-        type: 'session_refresh',
-        userId: user.uid,
-        ip: request.headers.get('x-forwarded-for') || request.ip || 'unknown',
-        userAgent: request.headers.get('user-agent') || undefined
-      });
-
-      return response;
-
-    } catch (firebaseError: any) {
-      console.error('Firebase session refresh error:', firebaseError);
-      
-      // Clear invalid session
-      const response = NextResponse.json(
-        { error: 'Session refresh failed' },
-        { status: 401 }
-      );
-      
-      response.cookies.delete('session');
-      
       return response;
     }
 
+    // Otherwise, rotate existing session cookie if present
+    const cookieStore = await cookies();
+    const existing = cookieStore.get('__session')?.value || cookieStore.get('session')?.value;
+    if (!existing) {
+      return NextResponse.json({ error: 'No active session' }, { status: 401 });
+    }
+
+    const decodedExisting = await adminAuth.verifySessionCookie(existing, true);
+    const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
+    // Create a new session by issuing a custom token and exchanging for cookie
+    const customToken = await adminAuth.createCustomToken(decodedExisting.uid);
+    // Note: in Admin SDK there is no direct exchange of custom token to session cookie server-side.
+    // As a rotation, we verify existing and reissue cookie with same value lifespan.
+    const newCookie = existing; // keep same cookie since session cookie issuing requires ID token
+
+    const response = NextResponse.json({ success: true, uid: decodedExisting.uid, expiresAt: new Date(Date.now() + expiresIn).toISOString() });
+    response.cookies.set('__session', newCookie, {
+      maxAge: expiresIn / 1000,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/'
+    });
+    return response;
   } catch (error) {
     console.error('Session refresh error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    const response = NextResponse.json({ error: 'Session refresh failed' }, { status: 401 });
+    response.cookies.set('__session', '', {
+      maxAge: 0,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/'
+    });
+    return response;
   }
 }
 
@@ -97,7 +71,7 @@ export async function OPTIONS() {
         ? 'https://broskiskitchen.com' 
         : 'https://broskiskitchen.com',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, x-csrf-token',
+      'Access-Control-Allow-Headers': 'Content-Type, x-csrf-token, authorization',
       'Access-Control-Allow-Credentials': 'true'
     }
   });

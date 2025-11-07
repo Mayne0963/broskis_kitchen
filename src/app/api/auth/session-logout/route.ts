@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   try {
     await ensureAdmin(request);
     const cookieStore = await cookies()
-    const sessionCookie = cookieStore.get('__session')?.value
+    const sessionCookie = cookieStore.get('__session')?.value || cookieStore.get('session')?.value
 
     if (sessionCookie) {
       try {
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       status: 200
     })
     
-    response.cookies.set('session', '', {
+    response.cookies.set('__session', '', {
       maxAge: 0,
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

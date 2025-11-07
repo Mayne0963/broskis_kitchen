@@ -19,7 +19,7 @@ import { toast } from "sonner"
 import type { User, AuthContextType } from "@/types"
 import type { Claims } from "@/types/auth"
 import { performBackgroundRefresh } from "../session/exp"
-import { safeFetch } from "../utils/safeFetch"
+import { authFetch } from "../utils/authFetch"
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
@@ -151,7 +151,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const idToken = await getIdToken(userCredential.user, true)
       
       // Create session cookie
-      const response = await safeFetch('/api/session', {
+      const response = await authFetch('/api/auth/session-login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -161,8 +161,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       })
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to create session')
+        const errorText = await response.text().catch(() => '')
+        throw new Error(errorText || 'Failed to create session')
       }
       
       toast.success("Welcome back to Broski's Kitchen!")
@@ -368,8 +368,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
     try {
       // Clear session cookie first
-      await safeFetch('/api/session', {
-        method: 'DELETE',
+      await authFetch('/api/auth/session-logout', {
+        method: 'POST',
         credentials: 'include',
       })
       

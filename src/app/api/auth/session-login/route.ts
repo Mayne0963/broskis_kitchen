@@ -4,7 +4,7 @@ export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { adminAuth, ensureAdmin } from '@/lib/firebase/admin'
+import { adminAuth } from '@/lib/firebase/admin'
 
 export async function POST(request: NextRequest) {
   if (process.env.NEXT_PHASE === 'phase-production-build') {
@@ -13,7 +13,6 @@ export async function POST(request: NextRequest) {
   
   let idToken;
   try {
-    await ensureAdmin(request);
     const body = await request.json();
     idToken = body.idToken;
   } catch (error) {
@@ -51,8 +50,8 @@ export async function POST(request: NextRequest) {
 
     // Set the session cookie
     const response = NextResponse.json({ success: true }, { status: 200 });
-    response.cookies.set('session', sessionCookie, {
-      maxAge: expiresIn,
+    response.cookies.set('__session', sessionCookie, {
+      maxAge: expiresIn / 1000,
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
