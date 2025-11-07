@@ -2,11 +2,14 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { getUserIdOrNull } from "@/lib/auth/serverSession";
+import { getSessionCookie } from "@/lib/auth/session";
 import { getSpinStatus } from "@/lib/rewards-firebase";
 
 export async function GET() {
-  const uid = await getUserIdOrNull();
+  // Prefer cookie-based auth to avoid NextAuth-only dependency
+  const sessionUser = await getSessionCookie();
+  const uid = sessionUser?.uid;
+
   if (!uid) {
     // Standardize shape expected by client
     return NextResponse.json(

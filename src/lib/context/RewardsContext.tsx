@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import type { Reward, RewardHistory } from "@/types"
 import { rewards as rewardsData } from "@/data/rewards-data"
 import { useAuth } from "./AuthContext"
+import { authFetch } from "@/lib/utils/authFetch"
 
 interface RewardsStatus {
   currentPoints: number
@@ -67,13 +68,14 @@ export const RewardsProvider: React.FC<RewardsProviderProps> = ({ children }) =>
     setError(null)
     
     try {
-      const response = await fetch('/api/rewards/status', {
+      const response = await authFetch('/api/rewards/status', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
         // Add timeout to prevent hanging requests
         signal: AbortSignal.timeout(10000), // 10 second timeout
+        retryOn401: true
       })
       
       if (!response.ok) {
@@ -142,14 +144,15 @@ export const RewardsProvider: React.FC<RewardsProviderProps> = ({ children }) =>
     setError(null)
     
     try {
-      const response = await fetch('/api/rewards/spin', {
+      const response = await authFetch('/api/rewards/spin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           idempotencyKey: `spin-${Date.now()}-${Math.random()}`
-        })
+        }),
+        retryOn401: true
       })
       
       const data = await response.json()
@@ -193,7 +196,7 @@ export const RewardsProvider: React.FC<RewardsProviderProps> = ({ children }) =>
     setError(null)
     
     try {
-      const response = await fetch('/api/rewards/redeem', {
+      const response = await authFetch('/api/rewards/redeem', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -206,7 +209,8 @@ export const RewardsProvider: React.FC<RewardsProviderProps> = ({ children }) =>
           rewardValue,
           pointsCost,
           idempotencyKey: `redeem-${Date.now()}-${Math.random()}`
-        })
+        }),
+        retryOn401: true
       })
       
       const data = await response.json()

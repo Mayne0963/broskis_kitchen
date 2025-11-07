@@ -1,5 +1,6 @@
 import useSWR from 'swr';
 import { toast } from 'sonner';
+import { authFetch } from '@/lib/utils/authFetch';
 
 // Types
 interface RewardsProfile {
@@ -30,7 +31,7 @@ interface RewardsData {
 
 // Fetcher function
 const fetcher = async (url: string): Promise<RewardsData> => {
-  const response = await fetch(url, { cache: 'no-store' });
+  const response = await authFetch(url, { cache: 'no-store', retryOn401: true });
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
