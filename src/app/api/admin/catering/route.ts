@@ -1,18 +1,36 @@
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
+
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/options";
+import { getFirestore } from "firebase-admin/firestore";
+import { mapDoc } from "@/lib/catering/transform";
+
+const db = getFirestore();
 
 export async function GET() {
-  const session = await getServerSession(authOptions as any);
-  if (!session || (session.user as any)?.role !== "admin") {
-    return new NextResponse("Unauthorized", { status: 401 });
-  }
+  try {
+    const session = await getServerSession(authOptions as any);
+    const role = (session?.user as any)?.role;
 
-  // Return mock data until Prisma or Firestore integration is ready
-  const mock = [
-    { id: "1", clientName: "Acme Corp", date: "2025-11-05", status: "pending" },
-    { id: "2", clientName: "Tech Bros LLC", date: "2025-11-06", status: "confirmed" },
-    { id: "3", clientName: "Broskis Kitchen", date: "2025-11-07", status: "archived" },
-  ];
-  return NextResponse.json(mock);
+    if (!session || role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const snap = await db
+      .collection("cateringRequests")
+      .orderBy("createdAt", "desc")
+      .limit(50)
+      .get();
+
+    const items = snap.docs.map((doc) => mapDoc(doc.id, doc.data()));
+
+    return NextResponse.json(items);
+  } catch (error: any) {
+    console.error("Admin catering list error:", error?.message || error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
