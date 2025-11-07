@@ -46,7 +46,7 @@ NEXT_PUBLIC_FIREBASE_APP_ID=1:885632684914:web:d6e94734810ec531b983eb
 ## Verification Results
 
 ### Local Testing ✅
-- Application loads successfully at http://localhost:3000
+- Application loads successfully at https://broskiskitchen.com
 - No black screen issue
 - Firebase configuration working properly
 - No syntax errors in console

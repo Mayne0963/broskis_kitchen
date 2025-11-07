@@ -493,7 +493,7 @@
 	"variable": [
 		{
 			"key": "base",
-			"value": "http://localhost:3000",
+			"value": "https://broskiskitchen.com",
 			"description": "Base URL for the API (change to your deployment URL)"
 		},
 		{

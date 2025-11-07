@@ -39,7 +39,7 @@ BroskisBot is the AI-powered virtual assistant for Broski's Kitchen. It helps cu
 ### 2. Testing BroskisBot
 
 1. **Open the Application:**
-   - Navigate to `http://localhost:3000`
+   - Navigate to `https://broskiskitchen.com`
    - Look for the floating chat button (robot icon) in the bottom-right corner
 
 2. **Test Basic Functionality:**
@@ -115,7 +115,7 @@ To enable debug logging:
 
 3. **Test API Endpoint Directly:**
    ```bash
-   curl -X POST http://localhost:3000/api/chat \
+   curl -X POST https://broskiskitchen.com/api/chat \
      -H "Content-Type: application/json" \
      -d '{"messages":[{"role":"user","text":"Hello"}],"userId":"test"}'
    ```
