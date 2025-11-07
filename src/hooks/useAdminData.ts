@@ -95,6 +95,9 @@ export const useAdminData = () => {
   const [error, setError] = useState<string | null>(null)
   const role = useRole()
   const unsubRef = useRef<() => void>(() => {})
+  const pollingTimerRef = useRef<number | null>(null)
+  const USE_POLLING = typeof window !== 'undefined' &&
+    (process.env.NEXT_PUBLIC_FIRESTORE_USE_POLLING === 'true')
 
   // Calculate stats from orders and user analytics
   const calculateStats = useCallback((orders: Order[], userAnalytics: any, userActivity: any): AdminStats => {
@@ -307,18 +310,27 @@ export const useAdminData = () => {
     const rewardsErrorHandler = createFirestoreErrorHandler('Rewards Listener');
     const usersErrorHandler = createFirestoreErrorHandler('Users Listener');
 
-    const ordersUnsubscribe = onSnapshot(
-      ordersQuery,
-      () => {
-        ordersErrorHandler.reset();
-        fetchAdminData();
-      },
-      error => ordersErrorHandler.handleListenerError(error, () => {
-        // Retry logic is handled by the error handler
-        fetchAdminData();
-      })
-    )
-    unsubscribers.push(ordersUnsubscribe)
+    if (USE_POLLING) {
+      // Fallback polling when listeners are blocked by CORS/network
+      fetchAdminData()
+      const timer = window.setInterval(() => {
+        fetchAdminData()
+      }, 5000)
+      pollingTimerRef.current = timer
+    } else {
+      const ordersUnsubscribe = onSnapshot(
+        ordersQuery,
+        () => {
+          ordersErrorHandler.reset();
+          fetchAdminData();
+        },
+        error => ordersErrorHandler.handleListenerError(error, () => {
+          // Retry logic is handled by the error handler
+          fetchAdminData();
+        })
+      )
+      unsubscribers.push(ordersUnsubscribe)
+    }
 
     const menuDropsUnsubscribe = onSnapshot(
       menuDropsQuery,
@@ -351,17 +363,19 @@ export const useAdminData = () => {
       limit(10)
     )
 
-    const usersUnsubscribe = onSnapshot(
-      usersQuery,
-      () => {
-        usersErrorHandler.reset();
-        fetchAdminData();
-      },
-      error => usersErrorHandler.handleListenerError(error, () => {
-        fetchAdminData();
-      })
-    )
-    unsubscribers.push(usersUnsubscribe)
+    if (!USE_POLLING) {
+      const usersUnsubscribe = onSnapshot(
+        usersQuery,
+        () => {
+          usersErrorHandler.reset();
+          fetchAdminData();
+        },
+        error => usersErrorHandler.handleListenerError(error, () => {
+          fetchAdminData();
+        })
+      )
+      unsubscribers.push(usersUnsubscribe)
+    }
 
     // Initial data fetch
     fetchAdminData()
@@ -369,6 +383,10 @@ export const useAdminData = () => {
     // Cleanup function
     const cleanup = () => {
       unsubscribers.forEach(unsubscribe => unsubscribe())
+      if (pollingTimerRef.current) {
+        window.clearInterval(pollingTimerRef.current)
+        pollingTimerRef.current = null
+      }
     }
     unsubRef.current = cleanup
     return cleanup

@@ -1,6 +1,6 @@
 "use client";
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, initializeFirestore, setLogLevel } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 
@@ -34,24 +34,25 @@ export const firebaseClientApp = isFirebaseConfigured
   : null;
 
 // Initialize Firebase services
-export const db = firebaseClientApp ? getFirestore(firebaseClientApp) : null;
+// Use initializeFirestore with long polling to avoid WebChannel/CORS issues
+export const db = firebaseClientApp
+  ? initializeFirestore(firebaseClientApp, {
+      // Force long polling to work reliably behind proxies, firewalls, and in Safari/iOS
+      experimentalForceLongPolling: true,
+      // Auto-detect long polling when appropriate
+      experimentalAutoDetectLongPolling: true as any, // type-safe for SDK variations
+      // Disable fetch streams to avoid CORS preflight/stream issues
+      useFetchStreams: false,
+    })
+  : null;
 export const auth = firebaseClientApp ? getAuth(firebaseClientApp) : null;
 export const storage = firebaseClientApp ? getStorage(firebaseClientApp) : null;
 
-// Add client-side error handling for Firestore
-if (typeof window !== 'undefined' && db) {
-  // Suppress Firestore connection errors in console
-  const originalConsoleError = console.error;
-  console.error = (...args) => {
-    const message = args.join(' ');
-    if (message.includes('firestore.googleapis.com') || 
-        message.includes('ERR_ABORTED') ||
-        message.includes('WebChannelConnection')) {
-      // Suppress these specific errors to reduce console noise
-      return;
-    }
-    originalConsoleError.apply(console, args);
-  };
+// Reduce Firestore log noise but keep errors visible
+if (typeof window !== 'undefined') {
+  try {
+    setLogLevel('error');
+  } catch {}
 }
 
 // Export app and configuration status
