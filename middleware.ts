@@ -1,39 +1,92 @@
+import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+
+const PROTECTED_ROUTES = [
+  "/dashboard",
+  "/profile",
+  "/orders",
+  "/loyalty",
+  "/rewards",
+  "/cart",
+  "/checkout",
+  "/admin",
+];
+const ADMIN_PREFIX = "/admin";
+
+function decodeFirebaseSession(cookieValue?: string) {
+  if (!cookieValue) return null;
+  try {
+    const parts = cookieValue.split(".");
+    if (parts.length !== 3) return null;
+    const payload = JSON.parse(
+      Buffer.from(parts[1].replace(/-/g, "+").replace(/_/g, "/"), "base64").toString()
+    );
+    return payload as {
+      uid?: string;
+      email?: string;
+      email_verified?: boolean;
+      role?: string;
+      permissions?: string[];
+    };
+  } catch {
+    return null;
+  }
+}
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Allow auth and static routes
+  // 100% bypass for auth pages and next internals
   if (
-    pathname.startsWith("/api/auth") ||
     pathname.startsWith("/_next") ||
-    pathname.startsWith("/public") ||
+    pathname.startsWith("/api/auth") ||
+    pathname.startsWith("/auth/") ||
+    pathname === "/login" ||
+    pathname === "/signup" ||
+    pathname.startsWith("/static") ||
     pathname === "/" ||
-    pathname === "/auth/signin"
+    pathname === "/favicon.ico"
   ) {
     return NextResponse.next();
   }
 
-  // Protect admin routes
-  if (pathname.startsWith("/admin")) {
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const nextAuthToken = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const firebaseCookie = req.cookies.get("__session")?.value;
+  const firebaseUser = !nextAuthToken ? decodeFirebaseSession(firebaseCookie) : null;
 
-    if (!token) {
-      const loginUrl = new URL("/auth/signin", req.url);
+  const isProtected = PROTECTED_ROUTES.some((r) => pathname.startsWith(r));
+  const isSignedIn = Boolean(nextAuthToken || firebaseUser);
+
+  if (isProtected && !isSignedIn) {
+    const loginUrl = new URL("/auth/login", req.url);
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  if (pathname.startsWith(ADMIN_PREFIX)) {
+    const role = (nextAuthToken as any)?.role || firebaseUser?.role;
+    if (!isSignedIn) {
+      const loginUrl = new URL("/auth/login", req.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
     }
-
-    if ((token as any).role !== "admin") {
-      return NextResponse.redirect(new URL("/403", req.url));
-    }
+    if (role !== "admin") return NextResponse.redirect(new URL("/403", req.url));
   }
 
-  return NextResponse.next();
+  const res = NextResponse.next();
+  if (nextAuthToken) {
+    res.headers.set("x-user-id", nextAuthToken.sub || "");
+    if ((nextAuthToken as any).role) res.headers.set("x-user-role", (nextAuthToken as any).role);
+  } else if (firebaseUser) {
+    if (firebaseUser.uid) res.headers.set("x-user-id", firebaseUser.uid);
+    if (firebaseUser.email) res.headers.set("x-user-email", firebaseUser.email);
+    if (firebaseUser.email_verified !== undefined)
+      res.headers.set("x-email-verified", String(firebaseUser.email_verified));
+    if (firebaseUser.role) res.headers.set("x-user-role", firebaseUser.role);
+  }
+  return res;
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/((?!_next|static|favicon.ico).*)"],
 };
