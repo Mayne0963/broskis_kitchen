@@ -225,7 +225,7 @@ function buildRedirectUrl(
   errorCode?: string,
   options: ServerGuardOptions = {}
 ): string {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://broskiskitchen.com";
   
   switch (errorCode) {
     case "NO_SESSION":
@@ -313,7 +313,7 @@ export async function requireCurrentUser(
   const user = await getCurrentUser();
   
   if (!user) {
-    const loginUrl = new URL("/auth/login", process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000");
+    const loginUrl = new URL("/auth/login", process.env.NEXT_PUBLIC_BASE_URL || "https://broskiskitchen.com");
     if (returnUrl) {
       loginUrl.searchParams.set("next", returnUrl);
     }

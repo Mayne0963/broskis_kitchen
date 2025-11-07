@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     // If confirm is true, confirm the payment immediately
     if (confirm) {
       paymentIntentOptions.confirm = true
-      paymentIntentOptions.return_url = `${process.env.BASE_URL || 'http://localhost:3000'}/checkout/success`
+      paymentIntentOptions.return_url = `${process.env.BASE_URL || 'https://broskiskitchen.com'}/checkout/success`
     }
 
     const paymentIntent = await stripe.paymentIntents.create(paymentIntentOptions)

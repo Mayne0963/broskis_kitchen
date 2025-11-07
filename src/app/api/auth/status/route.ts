@@ -54,7 +54,7 @@ export async function OPTIONS() {
     headers: {
       'Access-Control-Allow-Origin': process.env.NODE_ENV === 'production' 
         ? 'https://broskiskitchen.com' 
-        : 'http://localhost:3000',
+        : 'https://broskiskitchen.com',
       'Access-Control-Allow-Methods': 'GET, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
       'Access-Control-Allow-Credentials': 'true'

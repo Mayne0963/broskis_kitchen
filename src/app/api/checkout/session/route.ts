@@ -5,7 +5,7 @@ import { getServerUser } from "@/lib/session";
 export const dynamic = 'force-dynamic';
 
 function baseUrl() {
-  return process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  return process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://broskiskitchen.com";
 }
 
 type InItem = { id?: unknown; name?: unknown; price?: unknown; qty?: unknown };

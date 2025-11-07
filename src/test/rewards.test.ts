@@ -1,5 +1,5 @@
 describe("Rewards API", () => {
-  const baseUrl = "http://localhost:3000";
+  const baseUrl = "https://broskiskitchen.com";
 
   it("should spin and return valid JSON response", async () => {
     const res = await fetch(`${baseUrl}/api/rewards/spin`, {

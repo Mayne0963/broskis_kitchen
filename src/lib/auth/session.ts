@@ -176,7 +176,7 @@ export async function withAuthGuard<T>(
     // Handle different error types with appropriate redirects
     switch (authResult.errorCode) {
       case "NO_SESSION":
-        const loginUrl = new URL(options.redirectTo || "/auth/login", process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000");
+        const loginUrl = new URL(options.redirectTo || "/auth/login", process.env.NEXT_PUBLIC_BASE_URL || "https://broskiskitchen.com");
         if (options.returnUrl) {
           loginUrl.searchParams.set("next", options.returnUrl);
         }
@@ -185,7 +185,7 @@ export async function withAuthGuard<T>(
         break;
         
       case "EMAIL_NOT_VERIFIED":
-        const verifyUrl = new URL("/auth/verify-email", process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000");
+        const verifyUrl = new URL("/auth/verify-email", process.env.NEXT_PUBLIC_BASE_URL || "https://broskiskitchen.com");
         if (options.returnUrl) {
           verifyUrl.searchParams.set("next", options.returnUrl);
         }
@@ -212,7 +212,7 @@ export async function requireAuth(returnUrl?: string): Promise<SessionUser> {
   const authResult = await verifyAuthentication();
   
   if (!authResult.success) {
-    const loginUrl = new URL("/auth/login", process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000");
+    const loginUrl = new URL("/auth/login", process.env.NEXT_PUBLIC_BASE_URL || "https://broskiskitchen.com");
     if (returnUrl) {
       loginUrl.searchParams.set("next", returnUrl);
     }
@@ -231,14 +231,14 @@ export async function requireEmailVerification(returnUrl?: string): Promise<Sess
   
   if (!authResult.success) {
     if (authResult.errorCode === "EMAIL_NOT_VERIFIED") {
-      const verifyUrl = new URL("/auth/verify-email", process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000");
+      const verifyUrl = new URL("/auth/verify-email", process.env.NEXT_PUBLIC_BASE_URL || "https://broskiskitchen.com");
       if (returnUrl) {
         verifyUrl.searchParams.set("next", returnUrl);
       }
       verifyUrl.searchParams.set("error", "email_verification_required");
       redirect(verifyUrl.toString());
     } else {
-      const loginUrl = new URL("/auth/login", process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000");
+      const loginUrl = new URL("/auth/login", process.env.NEXT_PUBLIC_BASE_URL || "https://broskiskitchen.com");
       if (returnUrl) {
         loginUrl.searchParams.set("next", returnUrl);
       }
@@ -262,7 +262,7 @@ export async function requireRole(allowedRoles: string[], returnUrl?: string): P
   if (!authResult.success) {
     switch (authResult.errorCode) {
       case "NO_SESSION":
-        const loginUrl = new URL("/auth/login", process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000");
+        const loginUrl = new URL("/auth/login", process.env.NEXT_PUBLIC_BASE_URL || "https://broskiskitchen.com");
         if (returnUrl) {
           loginUrl.searchParams.set("next", returnUrl);
         }
@@ -271,7 +271,7 @@ export async function requireRole(allowedRoles: string[], returnUrl?: string): P
         break;
         
       case "EMAIL_NOT_VERIFIED":
-        const verifyUrl = new URL("/auth/verify-email", process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000");
+        const verifyUrl = new URL("/auth/verify-email", process.env.NEXT_PUBLIC_BASE_URL || "https://broskiskitchen.com");
         if (returnUrl) {
           verifyUrl.searchParams.set("next", returnUrl);
         }
