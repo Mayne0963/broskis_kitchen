@@ -77,7 +77,7 @@ export const RewardsProvider: React.FC<RewardsProviderProps> = ({ children }) =>
         signal: AbortSignal.timeout(10000), // 10 second timeout
         retryOn401: true
       })
-      
+
       if (!response.ok) {
         // Handle specific HTTP errors
         if (response.status === 401) {
@@ -85,6 +85,13 @@ export const RewardsProvider: React.FC<RewardsProviderProps> = ({ children }) =>
         } else if (response.status === 403) {
           throw new Error('Access denied')
         } else if (response.status >= 500) {
+          // Retry on transient server errors with capped exponential backoff
+          if (retryCount < 2) {
+            const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s
+            console.warn(`Rewards status 5xx (${response.status}). Retrying in ${delay}ms...`)
+            setTimeout(() => refreshStatus(retryCount + 1), delay)
+            return
+          }
           throw new Error('Server error - please try again later')
         } else {
           throw new Error(`Failed to fetch rewards status (${response.status})`)
