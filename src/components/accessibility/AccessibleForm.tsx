@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useId } from 'react'
 import { AccessibleColors } from './ColorContrast'
 
 // Accessible form field wrapper
@@ -112,7 +112,8 @@ export function AccessibleInput({
   className = '',
   ...props
 }: AccessibleInputProps) {
-  const inputId = props.id || `input-${Math.random().toString(36).substr(2, 9)}`
+  const uid = useId()
+  const inputId = props.id ?? `input-${uid}`
   
   const inputElement = (
     <input
@@ -162,7 +163,8 @@ export function AccessibleTextarea({
   className = '',
   ...props
 }: AccessibleTextareaProps) {
-  const textareaId = props.id || `textarea-${Math.random().toString(36).substr(2, 9)}`
+  const uid = useId()
+  const textareaId = props.id ?? `textarea-${uid}`
   
   const textareaElement = (
     <textarea
@@ -216,7 +218,8 @@ export function AccessibleSelect({
   className = '',
   ...props
 }: AccessibleSelectProps) {
-  const selectId = props.id || `select-${Math.random().toString(36).substr(2, 9)}`
+  const uid = useId()
+  const selectId = props.id ?? `select-${uid}`
   
   const selectElement = (
     <select
@@ -279,7 +282,8 @@ export function AccessibleCheckbox({
   className = '',
   ...props
 }: AccessibleCheckboxProps) {
-  const checkboxId = props.id || `checkbox-${Math.random().toString(36).substr(2, 9)}`
+  const uid = useId()
+  const checkboxId = props.id ?? `checkbox-${uid}`
   const descriptionId = description ? `${checkboxId}-description` : undefined
   const errorId = error ? `${checkboxId}-error` : undefined
 
@@ -375,7 +379,8 @@ export function AccessibleRadioGroup({
   required = false,
   className = ''
 }: AccessibleRadioGroupProps) {
-  const groupId = `radio-group-${Math.random().toString(36).substr(2, 9)}`
+  const uid = useId()
+  const groupId = `radio-group-${uid}`
   const descriptionId = description ? `${groupId}-description` : undefined
   const errorId = error ? `${groupId}-error` : undefined
 

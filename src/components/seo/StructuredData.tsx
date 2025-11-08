@@ -80,6 +80,7 @@ export default function StructuredData({ type = 'website', data = {} }: Structur
         }
         
       case 'article':
+        // Avoid non-deterministic dates during SSR to prevent hydration mismatches
         return {
           '@context': 'https://schema.org',
           '@type': 'Article',
@@ -98,8 +99,9 @@ export default function StructuredData({ type = 'website', data = {} }: Structur
               url: `${baseUrl}/images/logo.svg`
             }
           },
-          datePublished: data.datePublished || new Date().toISOString(),
-          dateModified: data.dateModified || new Date().toISOString(),
+          // Only include dates if explicitly provided to keep SSR deterministic
+          ...(data.datePublished ? { datePublished: data.datePublished } : {}),
+          ...(data.dateModified ? { dateModified: data.dateModified } : {}),
           ...data
         }
         

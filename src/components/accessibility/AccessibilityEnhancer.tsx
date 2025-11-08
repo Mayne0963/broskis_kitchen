@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useId } from 'react'
 import { useRouter } from 'next/navigation'
 
 // Enhanced Skip Navigation Component
@@ -83,7 +83,8 @@ export function AccessibleDropdown({
 }: AccessibleDropdownProps) {
   const dropdownRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
-  const menuId = `dropdown-menu-${Math.random().toString(36).substr(2, 9)}`
+  const uid = useId()
+  const menuId = `dropdown-menu-${uid}`
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

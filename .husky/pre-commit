@@ -1,6 +1,3 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
 # Block committing .env and secrets
 if git diff --cached --name-only | grep -E '^\.env|\.env\..*|vercel\.env|\bsecrets?\b'; then
   echo "Error: Attempt to commit environment or secrets files."
