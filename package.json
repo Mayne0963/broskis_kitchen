@@ -53,7 +53,9 @@
     "stripe:trigger": "bash scripts/stripe-trigger-checkout.sh",
     "music:scan": "tsx scripts/scanAudio.ts",
     "music:verify": "tsx scripts/verifyAudioUnchanged.ts",
-    "music:refresh": "npm run music:verify && npm run music:scan && npm run music:verify"
+    "music:refresh": "npm run music:verify && npm run music:scan && npm run music:verify",
+    "secret:generate": "tsx scripts/generate-admin-secret.ts",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^1.12.1",

@@ -1,0 +1,15 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Block committing .env and secrets
+if git diff --cached --name-only | grep -E '^\.env|\.env\..*|vercel\.env|\bsecrets?\b'; then
+  echo "Error: Attempt to commit environment or secrets files."
+  echo "Please remove sensitive files from staging."
+  exit 1
+fi
+
+# Basic grep to detect ADMIN_SETUP_SECRET or ADMIN_EMAIL_ALLOWLIST literals
+if git diff --cached | grep -E 'ADMIN_SETUP_SECRET|ADMIN_EMAIL_ALLOWLIST'; then
+  echo "Warning: Sensitive identifiers detected in staged changes."
+  echo "Ensure values are loaded from environment and not hardcoded."
+fi
