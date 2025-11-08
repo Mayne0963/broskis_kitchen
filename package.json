@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@10.9.0",
   "engines": {
     "node": ">=20 <23"
   },
@@ -55,7 +56,7 @@
     "music:verify": "tsx scripts/verifyAudioUnchanged.ts",
     "music:refresh": "npm run music:verify && npm run music:scan && npm run music:verify",
     "secret:generate": "tsx scripts/generate-admin-secret.ts",
-    "prepare": "husky install"
+    "prepare": "bash -c 'if [ -d node_modules/husky ]; then npx --no-install husky install; else echo \"husky not installed; skipping prepare\"; fi'"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^1.12.1",
@@ -156,6 +157,7 @@
     "jsdom": "^27.0.0",
     "supertest": "^7.1.4",
     "tsx": "^4.19.2",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "husky": "^9.1.0"
   }
 }

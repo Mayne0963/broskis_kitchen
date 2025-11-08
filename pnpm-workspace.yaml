@@ -1,2 +1,10 @@
-packages:
-  - "."
+onlyBuiltDependencies:
+  - sharp
+  - esbuild
+  - @swc/core
+  - protobufjs
+  - @sentry/cli
+  - unrs-resolver
+ignoredBuiltDependencies:
+  - @firebase/util
+strictDepBuilds: false
