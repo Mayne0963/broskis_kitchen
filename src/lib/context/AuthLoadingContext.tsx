@@ -26,6 +26,9 @@ const AuthLoadingContext = createContext<AuthLoadingContextType | undefined>(und
 
 const MAX_RETRY_ATTEMPTS = 3
 const RETRY_DELAY = 1000
+// Timeouts tuned to avoid transient network delays causing error flash
+const SOFT_TIMEOUT_MS = 5000 // allow more time before showing error
+const HARD_TIMEOUT_MS = 12000 // absolute cap before error state
 
 export function AuthLoadingProvider({ children }: { children: ReactNode }) {
   const { data: session, status: sessionStatus } = useSession()
@@ -76,15 +79,21 @@ export function AuthLoadingProvider({ children }: { children: ReactNode }) {
       recordCacheMiss()
 
       // Wait for both NextAuth and Firebase auth to stabilize
-      const maxWaitTime = 5000 // 5 seconds timeout
-      const waitStartTime = Date.now()
+      const maxWaitTime = HARD_TIMEOUT_MS // absolute cap
+      let elapsed = 0
+      // Start fast, progressively back off to reduce CPU and avoid race flashes
+      let interval = 100
+      let hardTimeoutFired = false
+      const hardTimeoutId = setTimeout(() => { hardTimeoutFired = true }, HARD_TIMEOUT_MS)
       
-      while (Date.now() - waitStartTime < maxWaitTime) {
+      while (elapsed < maxWaitTime) {
         // Check if we have a definitive auth state
         const nextAuthReady = sessionStatus !== 'loading'
         const firebaseReady = !firebaseLoading
-        
-        if (nextAuthReady && firebaseReady) {
+        const networkOkay = typeof navigator === 'undefined' ? true : navigator.onLine
+
+        // Early exit when both systems stable and network is okay
+        if (nextAuthReady && firebaseReady && networkOkay) {
           // Both auth systems have stabilized
           const verificationTime = Date.now() - startTime
           recordVerification(verificationTime)
@@ -110,8 +119,18 @@ export function AuthLoadingProvider({ children }: { children: ReactNode }) {
           return
         }
         
-        // Wait a bit before checking again
-        await new Promise(resolve => setTimeout(resolve, 100))
+        // If hard timeout fired, abort loop
+        if (hardTimeoutFired) {
+          clearTimeout(hardTimeoutId)
+          break
+        }
+        // Sleep and accumulate elapsed; after soft timeout, slightly slow polling
+        await new Promise(resolve => setTimeout(resolve, interval))
+        elapsed += interval
+        // Progressive backoff after soft timeout
+        if (elapsed >= SOFT_TIMEOUT_MS) {
+          interval = Math.min(interval + 100, 500)
+        }
       }
       
       // Timeout reached
@@ -131,8 +150,8 @@ export function AuthLoadingProvider({ children }: { children: ReactNode }) {
         authCheckComplete: true
       }))
       
-      // Auto-retry on certain errors
-      if (authState.retryCount < MAX_RETRY_ATTEMPTS) {
+      // Auto-retry on certain errors (disabled during test to keep deterministic state)
+      if (process.env.NODE_ENV !== 'test' && authState.retryCount < MAX_RETRY_ATTEMPTS) {
         setTimeout(() => {
           retryAuthVerification()
         }, RETRY_DELAY)

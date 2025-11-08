@@ -28,9 +28,14 @@ export function PageLoadingWrapper({
     authCheckComplete,
     retryAuthVerification 
   } = useAuthLoading()
+  const isOnline = typeof navigator === 'undefined' ? true : navigator.onLine
+  
+  // Prevent transient error flash by gating until hard timeout elapses
+  const suppressErrorFlash = isVerifying || (!isAuthReady && !authCheckComplete) || !isOnline
   
   const [showContent, setShowContent] = useState(false)
   const [minTimeElapsed, setMinTimeElapsed] = useState(false)
+  const [errorReady, setErrorReady] = useState(false)
 
   // Ensure minimum loading time for smooth UX
   useEffect(() => {
@@ -48,8 +53,19 @@ export function PageLoadingWrapper({
     }
   }, [isAuthReady, minTimeElapsed, isVerifying])
 
+  // Delay error display slightly to allow late stabilization / network recovery
+  useEffect(() => {
+    if (hasError && authCheckComplete) {
+      setErrorReady(false)
+      const t = setTimeout(() => setErrorReady(true), 1500)
+      return () => clearTimeout(t)
+    } else {
+      setErrorReady(false)
+    }
+  }, [hasError, authCheckComplete])
+
   // Handle error state
-  if (hasError && authCheckComplete) {
+  if (hasError && authCheckComplete && !suppressErrorFlash && errorReady && isOnline) {
     return (
       <div className={cn("min-h-screen flex items-center justify-center bg-black", className)}>
         <div className="text-center space-y-4 max-w-md mx-auto px-4">
@@ -74,6 +90,23 @@ export function PageLoadingWrapper({
             >
               Reload Page
             </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // If offline, show an offline-specific loading message
+  if (!isOnline) {
+    return (
+      <div className={cn("min-h-screen flex items-center justify-center bg-black", className)}>
+        <div className="text-center space-y-6">
+          <div className="flex justify-center">
+            <Loader2 className="h-12 w-12 text-blue-500 animate-spin" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold text-white">Waiting for connection…</h2>
+            <p className="text-gray-400">You appear to be offline. Restoring network…</p>
           </div>
         </div>
       </div>

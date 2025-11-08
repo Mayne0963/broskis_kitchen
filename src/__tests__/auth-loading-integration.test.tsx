@@ -161,8 +161,9 @@ describe('Integration with Existing Page Loading States', () => {
       </AuthLoadingProvider>
     )
 
-    // Should show global auth loading
+    // Should show global auth loading without error flash
     expect(screen.getByText('Loading Broski\'s Kitchen')).toBeInTheDocument()
+    expect(screen.queryByText('Authentication Error')).not.toBeInTheDocument()
 
     // Then order loading
     await waitFor(() => {

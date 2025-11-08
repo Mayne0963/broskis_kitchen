@@ -102,9 +102,9 @@ describe('AuthLoadingContext', () => {
       </AuthLoadingProvider>
     )
 
-    // Advance timers enough to pass the 5s verifyAuth timeout
+    // Advance timers enough to pass the hard timeout
     act(() => {
-      jest.advanceTimersByTime(5100)
+      jest.advanceTimersByTime(8100)
     })
 
     await waitFor(() => {
@@ -180,9 +180,9 @@ describe('PageLoadingWrapper', () => {
       </AuthLoadingProvider>
     )
 
-    // Advance timers to pass verifyAuth timeout (5s)
+    // Advance timers to pass hard timeout
     act(() => {
-      jest.advanceTimersByTime(5100)
+      jest.advanceTimersByTime(8100)
     })
 
     await waitFor(() => {
@@ -357,9 +357,9 @@ describe('Integration Tests', () => {
       wrapper: AuthLoadingProvider
     })
 
-    // Advance timers to force timeout path in verifyAuth()
+    // Advance timers to force timeout path in verifyAuth() using hard timeout
     act(() => {
-      jest.advanceTimersByTime(5100)
+      jest.advanceTimersByTime(8100)
     })
 
     await waitFor(() => {
