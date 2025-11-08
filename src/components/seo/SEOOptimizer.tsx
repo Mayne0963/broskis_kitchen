@@ -148,6 +148,7 @@ export default function SEOOptimizer({
       />
       
       {/* Preconnect to external domains */}
+      {/* Note: preconnect does not fetch; avoid noisy logs */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link rel="dns-prefetch" href="https://www.google-analytics.com" />

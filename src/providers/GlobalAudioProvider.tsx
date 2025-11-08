@@ -61,27 +61,35 @@ export default function GlobalAudioProvider({children}:{children:React.ReactNode
   useEffect(()=>{
     if (!mounted) return;
     
-    console.log("🎵 GLOBAL AUDIO: Autoplay effect triggered, tracks:", tracks.length, "currentIndex:", currentIndex);
+    console.debug("[audio] autoplay-init", { tracks: tracks.length, currentIndex });
     const el=audioRef.current; 
     if(!el || tracks.length===0) {
-      console.log("🎵 GLOBAL AUDIO: No audio element or no tracks");
+      if (process.env.NODE_ENV !== 'production') {
+        console.debug("[audio] autoplay-skip", { reason: !el ? 'no-element' : 'no-tracks' });
+      }
       return;
     }
     const tr=tracks[currentIndex]; 
     const src=tr?.src_m4a||tr?.src_mp3; 
     if(!src) {
-      console.log("🎵 GLOBAL AUDIO: No src for track", tr);
+      console.warn("[audio] no-src", { trackId: tr?.id, title: tr?.title });
       return;
     }
-    console.log("🎵 GLOBAL AUDIO: Attempting to play:", src);
-    const fullSrc = location.origin + src;
+    const fullSrc = src.startsWith('http') ? src : location.origin + src;
+    console.debug("[audio] set-src", { fullSrc });
     if(el.src !== fullSrc){ 
       el.src = fullSrc; 
       el.load(); 
-      console.log("🎵 GLOBAL AUDIO: Audio src set to:", el.src);
+      if (process.env.NODE_ENV !== 'production') {
+        console.debug("[audio] loaded", { src: el.src });
+      }
     }
     const p=el.play(); 
-    if(p) p.catch((err)=>console.log("🎵 GLOBAL AUDIO: Autoplay blocked—waiting for gesture", err));
+    if(p) p.catch((err)=>{
+      if (process.env.NODE_ENV !== 'production') {
+        console.info("[audio] autoplay-blocked", { error: String(err) });
+      }
+    });
   },[tracks,currentIndex,mounted]);
 
   // iOS unlock: one time
@@ -89,10 +97,10 @@ export default function GlobalAudioProvider({children}:{children:React.ReactNode
     if (!mounted) return;
     
     const unlocked=localStorage.getItem("broski_audio_unlocked");
-    console.log("🎵 GLOBAL AUDIO: iOS unlock check, unlocked:", unlocked);
+    console.debug("[audio] ios-unlock-check", { unlocked });
     if(unlocked) return;
     const handler=()=>{ 
-      console.log("🎵 GLOBAL AUDIO: User gesture detected, unlocking audio");
+      console.debug("[audio] ios-unlock-gesture");
       const el=audioRef.current; 
       if(el) el.play().catch(()=>{}); 
       localStorage.setItem("broski_audio_unlocked","1");
@@ -108,7 +116,7 @@ export default function GlobalAudioProvider({children}:{children:React.ReactNode
   },[mounted]);
 
   const next = useCallback(()=>{
-    console.log("🎵 GLOBAL AUDIO: Next called");
+    console.debug("[audio] next");
     setIdx(i=> (i+1)%Math.max(tracks.length,1));
   }, [tracks.length]);
 
@@ -119,22 +127,39 @@ export default function GlobalAudioProvider({children}:{children:React.ReactNode
     const el=audioRef.current; if(!el) return;
     const t=()=>setTime(el.currentTime||0);
     const d=()=>setDuration(isFinite(el.duration)?el.duration:0);
-    const e=()=>next();
+    const e=()=>{
+      // Auto-advance on end
+      next();
+    };
+    const err=(ev: Event)=>{
+      console.error('[audio] element-error', {
+        message: (ev as any)?.message,
+        src: el.src
+      });
+      // Attempt to skip to next track on error
+      next();
+    };
     el.addEventListener("timeupdate",t); el.addEventListener("loadedmetadata",d); el.addEventListener("ended",e);
-    return ()=>{ el.removeEventListener("timeupdate",t); el.removeEventListener("loadedmetadata",d); el.removeEventListener("ended",e); };
+    el.addEventListener("error", err as any);
+    return ()=>{ 
+      el.removeEventListener("timeupdate",t); 
+      el.removeEventListener("loadedmetadata",d); 
+      el.removeEventListener("ended",e);
+      el.removeEventListener("error", err as any);
+    };
   },[tracks,currentIndex,mounted,next]);
 
   const play=(i?:number)=>{ 
-    console.log("🎵 GLOBAL AUDIO: Play called with index:", i);
+    console.debug("[audio] play", { index: i });
     if(typeof i==="number") setIdx(Math.max(0,Math.min(i,tracks.length-1))); 
     else audioRef.current?.play().catch(()=>{}); 
   };
   const pause=()=>{
-    console.log("🎵 GLOBAL AUDIO: Pause called");
+    console.debug("[audio] pause");
     audioRef.current?.pause();
   };
   const prev =()=>{
-    console.log("🎵 GLOBAL AUDIO: Prev called");
+    console.debug("[audio] prev");
     setIdx(i=> (i-1+Math.max(tracks.length,1))%Math.max(tracks.length,1));
   };
   const current=tracks[currentIndex];

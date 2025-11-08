@@ -4,7 +4,11 @@ export type AuthFetchOptions = RequestInit & {
 
 // Centralized fetch that sends credentials and handles 401 by refreshing once
 export async function authFetch(input: RequestInfo, init: AuthFetchOptions = {}) {
-  const opts: RequestInit = { credentials: 'include', ...init };
+  const opts: RequestInit = {
+    credentials: 'include',
+    cache: init.cache ?? 'no-store',
+    ...init,
+  };
   let res = await fetch(input, opts);
 
   if (res.status === 401 && (init.retryOn401 ?? true)) {
@@ -31,6 +35,7 @@ export async function authFetch(input: RequestInfo, init: AuthFetchOptions = {})
       });
 
       if (refreshRes.ok) {
+        // One retry after refresh
         res = await fetch(input, { ...opts, cache: 'no-store' });
       }
     } catch (e) {

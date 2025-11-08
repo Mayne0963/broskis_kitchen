@@ -101,5 +101,6 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next|static|favicon.ico).*)"],
+  // Exclude static assets including audio files from middleware
+  matcher: ["/((?!_next|static|favicon.ico|audio).*)"],
 };

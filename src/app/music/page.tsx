@@ -24,8 +24,9 @@ import { initAnalytics } from "@/lib/analytics"
 // Metadata is handled by the layout.tsx file
 
 const MusicPage = () => {
-  console.log('🎵 MUSIC PAGE: Component is rendering! Timestamp:', Date.now());
-  console.log('🎵 MUSIC PAGE: Component is rendering!');
+  if (process.env.NODE_ENV !== 'production') {
+    console.debug('[music-page] render', { ts: Date.now() });
+  }
   const { unlocked, needsUnlock, unlock, setAudioRef } = useAudioUnlock()
   const { loadAllMusicData, tracks, playlists, isLoading, error, clearState } = useMusicStore()
   
@@ -39,11 +40,15 @@ const MusicPage = () => {
   
   const [showUnlockOverlay, setShowUnlockOverlay] = useState(false)
   
-  console.log('🎵 MUSIC PAGE: Current state - tracks:', tracks?.length, 'playlists:', playlists?.length, 'isLoading:', isLoading);
+  if (process.env.NODE_ENV !== 'production') {
+    console.debug('[music-page] state', { tracks: tracks?.length, playlists: playlists?.length, isLoading });
+  }
 
   // Initialize analytics and clear old state on mount
   useEffect(() => {
-    console.log('🎵 MUSIC PAGE: Initializing analytics and clearing state...');
+    if (process.env.NODE_ENV !== 'production') {
+      console.debug('[music-page] init-analytics');
+    }
     initAnalytics();
     clearState();
   }, []);
@@ -51,37 +56,43 @@ const MusicPage = () => {
   // Load tracks and playlists from JSON when component mounts
   useEffect(() => {
     const loadMusicData = async () => {
-      console.log('🎵 MUSIC PAGE: About to call loadAllMusicData...');
-      console.log('🎵 MUSIC PAGE: loadAllMusicData function:', typeof loadAllMusicData);
-      console.log('🎵 MUSIC PAGE: loadAllMusicData function reference:', loadAllMusicData);
+      if (process.env.NODE_ENV !== 'production') {
+        console.debug('[music-page] load-data-start', { typeofLoadAll: typeof loadAllMusicData });
+      }
       try {
-        console.log('🎵 MUSIC PAGE: Calling loadAllMusicData...');
+        if (process.env.NODE_ENV !== 'production') {
+          console.debug('[music-page] loading');
+        }
         await loadAllMusicData();
-        console.log('🎵 MUSIC PAGE: Successfully loaded all music data');
+        if (process.env.NODE_ENV !== 'production') {
+          console.debug('[music-page] load-success');
+        }
       } catch (error) {
-        console.error('🎵 MUSIC PAGE: Failed to load music data:', error);
-        console.error('🎵 MUSIC PAGE: Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+        console.error('[music-page] load-failed', { error, stack: error instanceof Error ? error.stack : undefined });
       }
     };
     
-    console.log('🎵 MUSIC PAGE: useEffect triggered, about to call loadMusicData');
+    if (process.env.NODE_ENV !== 'production') {
+      console.debug('[music-page] useEffect-load');
+    }
     loadMusicData();
   }, [loadAllMusicData]);
 
   // Validate tracks after loading
   useEffect(() => {
     if (!Array.isArray(tracks) || tracks.length === 0) {
-      console.warn("No tracks loaded");
+      console.warn('[music-page] no-tracks');
       return;
     }
     
     // Validate each track has required audio source
     const validTracks = tracks.filter(track => track.src_mp3);
     if (validTracks.length !== tracks.length) {
-      console.warn(`${tracks.length - validTracks.length} tracks missing audio source`);
+      console.warn('[music-page] missing-audio-src', { missing: tracks.length - validTracks.length });
     }
-    
-    console.log(`✅ Validated ${validTracks.length} tracks with audio sources`);
+    if (process.env.NODE_ENV !== 'production') {
+      console.debug('[music-page] validated-audio-src', { count: validTracks.length });
+    }
   }, [tracks]);
 
   // Show unlock overlay for iOS devices that need unlock

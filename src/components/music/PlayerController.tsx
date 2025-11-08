@@ -218,17 +218,23 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
       
       setTimeout(async () => {
         if (audioRef.current && !isPlaying && currentTrack) {
-          console.log('🎵 Attempting initial autoplay after canPlay...');
+          if (process.env.NODE_ENV !== 'production') {
+            console.debug('[audio] canplay-autoplay');
+          }
           
           try {
             const playPromise = audioRef.current.play();
             if (playPromise !== undefined) {
               await playPromise;
               play(); // Update store state
-              console.log('✅ Autoplay successful');
+              if (process.env.NODE_ENV !== 'production') {
+                console.debug('[audio] autoplay-success');
+              }
             }
           } catch (error) {
-            console.log('🔒 Initial autoplay blocked, waiting for user interaction');
+            if (process.env.NODE_ENV !== 'production') {
+              console.info('[audio] autoplay-blocked-initial');
+            }
             // Don't show error toast for initial autoplay failure
           }
         }
@@ -254,12 +260,16 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
                     artist: currentTrack.artist
                   });
                 } catch (e) {
-                  console.log('Analytics error:', e);
+              if (process.env.NODE_ENV !== 'production') {
+                console.debug('[analytics] error', e);
+              }
                 }
               }
             })
             .catch((error) => {
-              console.log('🔒 Autoplay blocked, waiting for user interaction:', error.message);
+              if (process.env.NODE_ENV !== 'production') {
+                console.info('[audio] autoplay-blocked', { error: error.message });
+              }
               pause();
             });
         }
@@ -285,7 +295,9 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
       // Only update audio currentTime if there's a significant difference (>1 second)
       // This prevents interference with normal time updates during playback
       if (timeDifference > 1) {
-        console.log(`🎵 Seeking from ${audioCurrentTime.toFixed(2)}s to ${position.toFixed(2)}s`);
+        if (process.env.NODE_ENV !== 'production') {
+          console.debug('[audio] seek', { from: audioCurrentTime, to: position });
+        }
         audioRef.current.currentTime = position;
       }
     }
@@ -308,9 +320,24 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
       return;
     }
 
-    // Validate that the source is a local file (starts with /audio/)
-    if (!src.startsWith('/audio/')) {
-      console.warn('Non-local audio source detected:', src);
+    // Validate that the source is local or trusted
+    const isTrusted = (() => {
+      try {
+        if (src.startsWith('/audio/')) return true;
+        if (src.startsWith('http')) {
+          const parsed = new URL(src, window.location.origin);
+          const sameOrigin = parsed.origin === window.location.origin;
+          const isBroskis = parsed.hostname.endsWith('broskiskitchen.com');
+          return sameOrigin || isBroskis;
+        }
+        return false;
+      } catch {
+        return false;
+      }
+    })();
+
+    if (!isTrusted) {
+      console.warn('[audio] untrusted-src', { src });
       setError('Invalid audio source');
       setTimeout(() => {
         next();
@@ -341,13 +368,15 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
   useEffect(() => {
     // Only proceed if we have tracks, a current track, and haven't attempted autoplay yet
     if (tracks.length > 0 && currentTrack && currentTrack.src_mp3 && !hasAttemptedAutoplayRef.current) {
-      console.log('🎵 MUSIC PLAYER:', { 
-        loadedTracks: tracks.length, 
-        currentTrack: currentTrack?.title, 
-        artist: currentTrack?.artist,
-        isPlaying,
-        hasAttemptedAutoplay: hasAttemptedAutoplayRef.current 
-      });
+      if (process.env.NODE_ENV !== 'production') {
+        console.debug('[audio] player-state', {
+          loadedTracks: tracks.length,
+          currentTrack: currentTrack?.title,
+          artist: currentTrack?.artist,
+          isPlaying,
+          hasAttemptedAutoplay: hasAttemptedAutoplayRef.current
+        });
+      }
       
       // Wait for audio element to be ready and attempt autoplay on canPlay event
       // The actual autoplay attempt is now handled in handleCanPlay callback
@@ -372,7 +401,7 @@ export const PlayerController: React.FC<PlayerControllerProps> = ({ onAudioRef }
 
   // Don't render if no audio source is available
   if (!audioSrc) {
-    console.warn('No audio source available for track:', currentTrack.id);
+    console.warn('[audio] no-source', { trackId: currentTrack.id });
     return null;
   }
 

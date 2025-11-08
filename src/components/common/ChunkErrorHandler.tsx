@@ -13,7 +13,9 @@ export default function ChunkErrorHandler() {
     setupChunkErrorHandler();
     
     // Log that the handler is active
-    console.log('Chunk error handler initialized');
+    if (process.env.NODE_ENV !== 'production') {
+      console.info('[chunk] handler-initialized');
+    }
   }, []);
 
   // This component doesn't render anything
