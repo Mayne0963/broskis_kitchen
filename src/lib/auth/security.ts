@@ -183,7 +183,8 @@ export function setSecurityHeaders(response: NextResponse): NextResponse {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
     "font-src 'self' https://fonts.gstatic.com; " +
     "img-src 'self' data: https: blob:; " +
-    "connect-src 'self' https://api.stripe.com https://*.firebaseapp.com https://*.googleapis.com; " +
+    // Expanded connect-src to include site domains and Firebase endpoints
+    "connect-src 'self' https://broskiskitchen.com https://brooksdb.com https://api.stripe.com https://firestore.googleapis.com https://securetoken.googleapis.com https://*.firebaseapp.com https://*.firebaseio.com https://*.googleapis.com wss: https:; " +
     "frame-src 'self' https://js.stripe.com https://hooks.stripe.com;"
   );
   

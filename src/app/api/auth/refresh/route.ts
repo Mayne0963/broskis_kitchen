@@ -2,6 +2,24 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { adminAuth } from '@/lib/firebase/admin';
 
+const ALLOWED_ORIGINS = new Set([
+  'https://broskiskitchen.com',
+  'https://www.broskiskitchen.com',
+  'https://brooksdb.com',
+  'https://www.brooksdb.com',
+  'http://localhost:3000'
+]);
+
+function corsHeadersForOrigin(origin?: string | null) {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.has(origin) ? origin : 'https://broskiskitchen.com';
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, x-csrf-token, authorization',
+    'Access-Control-Allow-Credentials': 'true'
+  } as Record<string, string>;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { idToken } = await request.json().catch(() => ({ idToken: undefined }));
@@ -13,6 +31,9 @@ export async function POST(request: NextRequest) {
       const sessionCookie = await adminAuth.createSessionCookie(idToken, { expiresIn });
 
       const response = NextResponse.json({ success: true, uid: decoded.uid, expiresAt: new Date(Date.now() + expiresIn).toISOString() });
+      const origin = request.headers.get('origin');
+      const headers = corsHeadersForOrigin(origin);
+      Object.entries(headers).forEach(([k, v]) => response.headers.set(k, v));
       response.cookies.set('__session', sessionCookie, {
         maxAge: expiresIn / 1000,
         httpOnly: true,
@@ -39,6 +60,9 @@ export async function POST(request: NextRequest) {
     const newCookie = existing; // keep same cookie since session cookie issuing requires ID token
 
     const response = NextResponse.json({ success: true, uid: decodedExisting.uid, expiresAt: new Date(Date.now() + expiresIn).toISOString() });
+    const origin = request.headers.get('origin');
+    const headers = corsHeadersForOrigin(origin);
+    Object.entries(headers).forEach(([k, v]) => response.headers.set(k, v));
     response.cookies.set('__session', newCookie, {
       maxAge: expiresIn / 1000,
       httpOnly: true,
@@ -50,6 +74,9 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Session refresh error:', error);
     const response = NextResponse.json({ error: 'Session refresh failed' }, { status: 401 });
+    const origin = request.headers.get('origin');
+    const headers = corsHeadersForOrigin(origin);
+    Object.entries(headers).forEach(([k, v]) => response.headers.set(k, v));
     response.cookies.set('__session', '', {
       maxAge: 0,
       httpOnly: true,
@@ -62,16 +89,8 @@ export async function POST(request: NextRequest) {
 }
 
 // OPTIONS handler for CORS
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': process.env.NODE_ENV === 'production' 
-        ? 'https://broskiskitchen.com' 
-        : 'https://broskiskitchen.com',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, x-csrf-token, authorization',
-      'Access-Control-Allow-Credentials': 'true'
-    }
-  });
+export async function OPTIONS(request: NextRequest) {
+  const origin = request.headers.get('origin');
+  const headers = corsHeadersForOrigin(origin);
+  return new NextResponse(null, { status: 200, headers });
 }

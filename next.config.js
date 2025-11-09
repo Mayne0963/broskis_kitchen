@@ -48,26 +48,19 @@ const nextConfig = {
   poweredByHeader: false,
   // Simplified webpack configuration to prevent chunk loading errors
   webpack: (config, { dev, isServer }) => {
-    // Simplified chunk splitting for better reliability
+    // Remove custom vendor cacheGroup to avoid ambiguous vendors-*.js bundles
     if (!dev && !isServer) {
       config.optimization = {
         ...config.optimization,
         splitChunks: {
-          ...config.optimization.splitChunks,
           chunks: 'all',
-          minSize: 20000,
-          maxSize: 500000, // Increased max size to reduce chunk fragmentation
-          cacheGroups: {
-            ...config.optimization.splitChunks.cacheGroups,
-            // Simplified vendor chunk
-            vendor: {
-              test: /[\\/]node_modules[\\/]/,
-              name: 'vendors',
-              chunks: 'all',
-              priority: 10,
-            },
-          },
+          minSize: 30000,
+          maxAsyncRequests: 30,
+          maxInitialRequests: 30,
+          automaticNameDelimiter: '-',
+          // Let Next.js default cacheGroups manage vendors to prevent chunk cycles
         },
+        runtimeChunk: 'single',
       };
     }
     

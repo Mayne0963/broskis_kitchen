@@ -25,7 +25,8 @@ export const securityHeaders = {
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: blob: https: http:",
     "media-src 'self' blob:",
-    "connect-src 'self' https://api.stripe.com https://maps.googleapis.com wss: https:",
+    // Allow essential API origins (site + Firebase/Google)
+    "connect-src 'self' https://api.stripe.com https://maps.googleapis.com https://broskiskitchen.com https://brooksdb.com https://firestore.googleapis.com https://securetoken.googleapis.com https://*.firebaseio.com https://*.googleapis.com wss: https:",
     "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
     "worker-src 'self' blob:",
     "object-src 'none'",
