@@ -75,7 +75,7 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
   const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active')
   const [notificationsEnabled, setNotificationsEnabled] = useState(false)
   const [isOnline, setIsOnline] = useState(true)
-  const [lastRefresh, setLastRefresh] = useState<Date>(new Date())
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [estimatedTimes, setEstimatedTimes] = useState<Record<string, number>>({});
@@ -97,37 +97,67 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
     { id: '5', name: 'Soft Drink', price: 2.99, category: 'Beverages' }
   ]);
 
+  // Initialize lastRefresh after mount to avoid SSR/client date mismatch
+  useEffect(() => {
+    setLastRefresh(new Date())
+  }, [])
+
+  // Fetch orders from API as fallback (must be defined before effects that depend on it)
+  const fetchOrdersFromAPI = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      const response = await safeFetch(`/api/orders?userId=${userId}`)
+      if (response.ok) {
+        const data = await response.json()
+        if (data.orders) {
+          setOrders(data.orders)
+          setError(null)
+        }
+      } else {
+        throw new Error('Failed to fetch orders')
+      }
+    } catch (error) {
+      console.error('Error fetching orders from API:', error)
+      setError('Failed to load orders')
+      setOrders(initialOrders)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [userId, initialOrders])
+
   // Load saved filter preferences and presets
    useEffect(() => {
-     const savedPrefs = localStorage.getItem(`orderFilters_${userId}`)
-     if (savedPrefs) {
-       try {
-         const prefs = JSON.parse(savedPrefs)
-         setSavedFilters(prefs)
-         setStatusFilter(prefs.statusFilter || 'all')
-         setOrderTypeFilter(prefs.orderTypeFilter || 'all')
-         setDateFilter(prefs.dateFilter || 'all')
-         setSortBy(prefs.sortBy || 'newest')
-         setActiveTab(prefs.activeTab || 'active')
-       } catch (error) {
-         console.error('Error loading saved filters:', error)
+     if (typeof window !== 'undefined') {
+       const savedPrefs = localStorage.getItem(`orderFilters_${userId}`)
+       if (savedPrefs) {
+         try {
+           const prefs = JSON.parse(savedPrefs)
+           setSavedFilters(prefs)
+           setStatusFilter(prefs.statusFilter || 'all')
+           setOrderTypeFilter(prefs.orderTypeFilter || 'all')
+           setDateFilter(prefs.dateFilter || 'all')
+           setSortBy(prefs.sortBy || 'newest')
+           setActiveTab(prefs.activeTab || 'active')
+         } catch (error) {
+           console.error('Error loading saved filters:', error)
+         }
        }
-     }
 
-     // Load filter presets
-     const savedPresets = localStorage.getItem(`orderFilterPresets_${userId}`)
-     if (savedPresets) {
-       try {
-         setFilterPresets(JSON.parse(savedPresets))
-       } catch (error) {
-         console.error('Error loading filter presets:', error)
+       // Load filter presets
+       const savedPresets = localStorage.getItem(`orderFilterPresets_${userId}`)
+       if (savedPresets) {
+         try {
+           setFilterPresets(JSON.parse(savedPresets))
+         } catch (error) {
+           console.error('Error loading filter presets:', error)
+         }
        }
      }
    }, [userId])
 
   // Save filter preferences when they change
   useEffect(() => {
-    if (userId) {
+    if (userId && typeof window !== 'undefined') {
       const prefs = {
         statusFilter,
         orderTypeFilter,
@@ -232,13 +262,17 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
       toast.error('Connection lost')
     }
 
-    window.addEventListener('online', handleOnline)
-    window.addEventListener('offline', handleOffline)
+    if (typeof window !== 'undefined') {
+      window.addEventListener('online', handleOnline)
+      window.addEventListener('offline', handleOffline)
 
-    return () => {
-      window.removeEventListener('online', handleOnline)
-      window.removeEventListener('offline', handleOffline)
+      return () => {
+        window.removeEventListener('online', handleOnline)
+        window.removeEventListener('offline', handleOffline)
+      }
     }
+
+    return undefined
   }, [])
 
   // Auto-refresh functionality
@@ -276,28 +310,7 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
     return () => clearInterval(interval)
   }, [orders])
 
-  // Fetch orders from API as fallback
-  const fetchOrdersFromAPI = useCallback(async () => {
-    try {
-      setIsLoading(true)
-      const response = await safeFetch(`/api/orders?userId=${userId}`)
-      if (response.ok) {
-        const data = await response.json()
-        if (data.orders) {
-          setOrders(data.orders)
-          setError(null)
-        }
-      } else {
-        throw new Error('Failed to fetch orders')
-      }
-    } catch (error) {
-      console.error('Error fetching orders from API:', error)
-      setError('Failed to load orders')
-      setOrders(initialOrders)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [userId, initialOrders])
+  // (moved above) Fetch orders from API as fallback
 
   // Manual refresh function
   const handleManualRefresh = useCallback(async () => {
