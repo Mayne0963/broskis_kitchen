@@ -1,6 +1,5 @@
 import { httpsCallable } from 'firebase/functions';
-import { auth } from '@/lib/firebase';
-import { functions } from '@/lib/firebase';
+import { auth, functions } from '@/lib/firebase';
 
 export async function elevateUserToAdmin(targetUid: string): Promise<{ success: boolean; message?: string }>{
   if (!auth.currentUser) {

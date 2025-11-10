@@ -3,6 +3,8 @@ import { authOptions } from "@/lib/auth/options";
 import { redirect } from "next/navigation";
 import ElevateUserForm from "@/components/admin/ElevateUserForm";
 import { adminDb } from "@/lib/firebase/admin";
+import { logAuthDiscrepancy } from "@/lib/auth/firebaseAuth";
+import { getAuthHealthStats } from "@/lib/auth/authMonitoring";
 
 type AdminLog = {
   id: string;
@@ -15,11 +17,40 @@ type AdminLog = {
 
 async function getAdminSession() {
   const session = await getServerSession(authOptions as any);
-  const isAdmin = (session as any)?.user?.role === "admin";
-  if (!session || !isAdmin) {
+  
+  if (!session) {
     redirect("/login");
   }
-  return session!;
+  
+  const user = (session as any).user || {};
+  const nextAuthRole = user.role || "user";
+  const email = user.email || "";
+  const uid = user.uid;
+  
+  // Check for authentication discrepancies
+  let discrepancy = null;
+  if (uid && email) {
+    const firebaseClaims = (session as any).user?.firebaseClaims;
+    const firebaseAdmin = firebaseClaims?.admin;
+    
+    if (firebaseAdmin !== undefined && firebaseAdmin !== (nextAuthRole === "admin")) {
+      discrepancy = { firebaseAdmin, nextAuthRole };
+      logAuthDiscrepancy("admin-dashboard", { admin: firebaseAdmin }, nextAuthRole);
+      console.warn(`Auth discrepancy detected: Firebase claims admin=${firebaseAdmin}, NextAuth role=${nextAuthRole}`);
+    }
+  }
+  
+  // Use role from session (which should now be synchronized with Firebase)
+  const isAdmin = nextAuthRole === "admin";
+  
+  if (!isAdmin) {
+    redirect("/login");
+  }
+  
+  return {
+    session: session!,
+    discrepancy,
+  };
 }
 
 async function getRecentAdminLogs(): Promise<AdminLog[]> {
@@ -37,8 +68,9 @@ async function getRecentAdminLogs(): Promise<AdminLog[]> {
 }
 
 export default async function AdminDashboardPage() {
-  const session = await getAdminSession();
+  const { session, discrepancy } = await getAdminSession();
   const logs = await getRecentAdminLogs();
+  const authHealthStats = await getAuthHealthStats();
 
   const user = (session as any).user || {};
   const role = user.role || "user";
@@ -92,6 +124,39 @@ export default async function AdminDashboardPage() {
             </ul>
           )}
         </div>
+      </section>
+
+      {/* Authentication Health Monitoring */}
+      <section style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: 16, marginTop: 24 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 12 }}>Authentication Health</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 16 }}>
+          <div style={{ background: "#fef2f2", padding: 12, borderRadius: 8 }}>
+            <div style={{ fontSize: 24, fontWeight: 700, color: "#dc2626" }}>{authHealthStats.totalDiscrepancies}</div>
+            <div style={{ fontSize: 12, color: "#991b1b" }}>Total Discrepancies</div>
+          </div>
+          <div style={{ background: "#fff7ed", padding: 12, borderRadius: 8 }}>
+            <div style={{ fontSize: 24, fontWeight: 700, color: "#ea580c" }}>{authHealthStats.recentDiscrepancies}</div>
+            <div style={{ fontSize: 12, color: "#9a3412" }}>Recent (24h)</div>
+          </div>
+          <div style={{ background: "#f0fdf4", padding: 12, borderRadius: 8 }}>
+            <div style={{ fontSize: 24, fontWeight: 700, color: "#16a34a" }}>{authHealthStats.resolutionRate.toFixed(1)}%</div>
+            <div style={{ fontSize: 12, color: "#166534" }}>Resolution Rate</div>
+          </div>
+          <div style={{ background: "#eff6ff", padding: 12, borderRadius: 8 }}>
+            <div style={{ fontSize: 12, fontWeight: 500, color: "#2563eb" }}>{authHealthStats.mostCommonType}</div>
+            <div style={{ fontSize: 10, color: "#1e40af" }}>Most Common Type</div>
+          </div>
+        </div>
+        
+        {discrepancy && (
+          <div style={{ marginTop: 16, padding: 12, background: "#fefce8", border: "1px solid #facc15", borderRadius: 8 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 500, color: "#854d0e", marginBottom: 4 }}>Current Session Discrepancy</h3>
+            <div style={{ fontSize: 12, color: "#a16207" }}>
+              <p>Firebase Claims: {discrepancy.firebaseAdmin ? 'Admin' : 'User'}</p>
+              <p>NextAuth Role: {discrepancy.nextAuthRole}</p>
+            </div>
+          </div>
+        )}
       </section>
     </div>
   );
