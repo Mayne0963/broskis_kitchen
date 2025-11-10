@@ -106,13 +106,12 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
   const fetchOrdersFromAPI = useCallback(async () => {
     try {
       setIsLoading(true)
-      const response = await safeFetch(`/api/orders?userId=${userId}`)
+      const response = await safeFetch(`/api/my-orders`)
       if (response.ok) {
         const data = await response.json()
-        if (data.orders) {
-          setOrders(data.orders)
-          setError(null)
-        }
+        const arr = Array.isArray(data) ? data : Array.isArray(data?.orders) ? data.orders : []
+        setOrders(arr)
+        setError(null)
       } else {
         throw new Error('Failed to fetch orders')
       }

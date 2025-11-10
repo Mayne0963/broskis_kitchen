@@ -15,12 +15,16 @@ const OrdersCtx = React.createContext<OrdersState | null>(null);
 
 async function fetchOrders(): Promise<Order[]> {
   try {
-    const res = await fetch("/api/orders", { credentials: "include", cache: "no-store" });
+    // Prefer user-specific orders to avoid admin requirement
+    const res = await fetch("/api/my-orders", { credentials: "include", cache: "no-store" });
     if (!res.ok) {
       console.warn("orders fetch failed:", res.status);
       return [];
     }
-    return await res.json();
+    const json = await res.json();
+    // Support both { orders: [...] } and raw array shapes
+    const arr = Array.isArray(json) ? json : Array.isArray(json?.orders) ? json.orders : [];
+    return arr;
   } catch (e) {
     console.warn("orders fetch error:", e);
     return [];

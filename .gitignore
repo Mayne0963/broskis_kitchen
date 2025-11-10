@@ -30,3 +30,6 @@ firebase/serviceAccount.json
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# test artifacts
+test-results/

@@ -48,6 +48,16 @@ const nextConfig = {
   poweredByHeader: false,
   // Simplified webpack configuration to prevent chunk loading errors
   webpack: (config, { dev, isServer }) => {
+    // Ensure SVGs can be imported as React components using SVGR in webpack
+    // Turbopack config below is removed to avoid loader mismatch
+    config.module = config.module || {}
+    config.module.rules = config.module.rules || []
+    config.module.rules.push({
+      test: /\.svg$/,
+      issuer: /\.[jt]sx?$/,
+      use: ['@svgr/webpack']
+    })
+
     // Remove custom vendor cacheGroup to avoid ambiguous vendors-*.js bundles
     if (!dev && !isServer) {
       config.optimization = {
@@ -82,19 +92,7 @@ const nextConfig = {
   
   // Minimal experimental settings for stability
   experimental: {
-    // Remove package optimizations that might cause issues
-    // optimizePackageImports: ['lucide-react', 'sonner'],
     optimizeCss: false,
-  },
-  
-  // Turbopack configuration (stable)
-  turbopack: {
-    rules: {
-      '*.svg': {
-        loaders: ['@svgr/webpack'],
-        as: '*.js',
-      },
-    },
   },
   
   // Enhanced build ID generation for cache busting

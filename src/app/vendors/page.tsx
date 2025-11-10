@@ -10,9 +10,9 @@ type ApiState<T> = {
 };
 
 type UserProfile = {
-  id?: string;
+  uid?: string;
   email?: string;
-  name?: string;
+  displayName?: string;
   role?: string;
 };
 
@@ -44,7 +44,7 @@ export default function VendorsPage() {
 
     const abort = new AbortController();
 
-    // Load vendor profile (using /api/me as a safe baseline)
+    // Load vendor profile (using /api/me which returns { user: {...} })
     (async () => {
       try {
         const res = await safeFetch("/api/me", { method: "GET", signal: abort.signal });
@@ -52,25 +52,27 @@ export default function VendorsPage() {
           const txt = await res.text().catch(() => "");
           throw new Error(`Profile request failed (${res.status}): ${txt}`);
         }
-        const json = (await res.json()) as UserProfile;
-        setProfile({ data: json, loading: false, error: null });
+        const json = (await res.json()) as { user?: UserProfile };
+        const user = json?.user || null;
+        setProfile({ data: user, loading: false, error: null });
       } catch (err: any) {
         setProfile({ data: null, loading: false, error: err?.message || "Failed to load profile" });
         console.error("[vendors] profile load error", err);
       }
     })();
 
-    // Load vendor orders (gracefully handle missing route or auth)
+    // Load vendor orders (prefer user-specific route, gracefully handle missing route or auth)
     (async () => {
       try {
-        const res = await safeFetch("/api/orders", { method: "GET", signal: abort.signal });
+        const res = await safeFetch("/api/my-orders", { method: "GET", signal: abort.signal });
         if (!res.ok) {
           // Do not crash; show friendly error
           const txt = await res.text().catch(() => "");
           throw new Error(`Orders request failed (${res.status}): ${txt}`);
         }
-        const json = (await res.json()) as OrderSummary[];
-        setOrders({ data: json, loading: false, error: null });
+        const json = (await res.json()) as { orders?: OrderSummary[] } | OrderSummary[];
+        const arr = Array.isArray(json) ? json : (json?.orders || []);
+        setOrders({ data: arr, loading: false, error: null });
       } catch (err: any) {
         setOrders({ data: [], loading: false, error: err?.message || "Failed to load orders" });
         console.warn("[vendors] orders load warning", err);
@@ -93,7 +95,7 @@ export default function VendorsPage() {
         )}
         {!profile.loading && !profile.error && (
           <div>
-            <p><strong>Name:</strong> {profile.data?.name || "—"}</p>
+            <p><strong>Name:</strong> {profile.data?.displayName || "—"}</p>
             <p><strong>Email:</strong> {profile.data?.email || "—"}</p>
             <p><strong>Role:</strong> {role}</p>
             {role !== "vendor" && (

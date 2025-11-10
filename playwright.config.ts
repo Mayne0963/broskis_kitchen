@@ -1,5 +1,16 @@
 import { defineConfig, devices } from '@playwright/test'
 
+// Align baseURL and web server port dynamically to avoid port mismatches
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3000'
+let PORT = 3000
+try {
+  const u = new URL(BASE_URL)
+  PORT = Number(u.port || (u.protocol === 'http:' ? 80 : 443)) || 3000
+} catch {
+  // fallback
+  PORT = 3000
+}
+
 /**
  * Comprehensive Playwright configuration for BroskisKitchen.com E2E testing
  * Includes multiple devices, browsers, and testing scenarios
@@ -22,7 +33,7 @@ export default defineConfig({
     ['list']
   ],
   use: {
-    baseURL: process.env.BASE_URL || 'http://localhost:3000',
+    baseURL: BASE_URL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -80,7 +91,7 @@ export default defineConfig({
   webServer: [
     {
       command: 'npm run dev',
-      port: 3000,
+      port: PORT,
       reuseExistingServer: !process.env.CI,
       timeout: 120000
     }

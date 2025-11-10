@@ -11,6 +11,8 @@ export { adminAdjustPoints } from './rewards/adminAdjustPoints';
 export { birthdayCron } from './rewards/birthdayCron';
 export { markCouponUsed, validateRedemptionCode } from './rewards/markCouponUsed';
 export { processReferralBonus, getReferralCode } from './rewards/processReferralBonus';
+// Admin functions
+export { elevateUserToAdmin } from './admin/elevateUser';
 
 // Health check function
 export const healthCheck = functions.https.onRequest((req, res) => {

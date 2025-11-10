@@ -1,0 +1,68 @@
+[
+  {
+    "api": "/api/auth/status",
+    "status": 200,
+    "timeMs": 2525,
+    "timestamp": "2025-11-09T23:40:27.964Z"
+  },
+  {
+    "api": "/api/auth/refresh",
+    "status": 405,
+    "timeMs": 2397,
+    "timestamp": "2025-11-09T23:40:27.988Z"
+  },
+  {
+    "api": "/api/auth/refresh",
+    "status": 405,
+    "timeMs": 3549,
+    "timestamp": "2025-11-09T23:40:44.071Z"
+  },
+  {
+    "api": "/api/auth/status",
+    "status": 200,
+    "timeMs": 3843,
+    "timestamp": "2025-11-09T23:40:44.362Z"
+  },
+  {
+    "api": "/api/auth/refresh",
+    "status": 405,
+    "timeMs": 302,
+    "timestamp": "2025-11-09T23:40:45.870Z"
+  },
+  {
+    "api": "/api/auth/status",
+    "status": 200,
+    "timeMs": 300,
+    "timestamp": "2025-11-09T23:40:46.203Z"
+  },
+  {
+    "api": "/api/auth/status",
+    "status": 200,
+    "timeMs": 236,
+    "timestamp": "2025-11-10T00:03:36.303Z"
+  },
+  {
+    "api": "/api/auth/refresh",
+    "status": 405,
+    "timeMs": 82,
+    "timestamp": "2025-11-10T00:03:37.093Z"
+  },
+  {
+    "api": "/api/auth/refresh",
+    "status": 405,
+    "timeMs": 575,
+    "timestamp": "2025-11-10T00:03:39.173Z"
+  },
+  {
+    "api": "/api/auth/refresh",
+    "status": 405,
+    "timeMs": 7725,
+    "timestamp": "2025-11-10T00:12:29.342Z"
+  },
+  {
+    "api": "/api/auth/status",
+    "status": 200,
+    "timeMs": 8260,
+    "timestamp": "2025-11-10T00:12:29.875Z"
+  }
+]

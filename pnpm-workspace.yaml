@@ -1,10 +1,16 @@
+packages:
+  - .
+
+# Build controls used by our tooling and CI docs
 onlyBuiltDependencies:
-  - sharp
-  - esbuild
-  - @swc/core
-  - protobufjs
-  - @sentry/cli
-  - unrs-resolver
+  - "sharp"
+  - "esbuild"
+  - "@swc/core"
+  - "protobufjs"
+  - "@sentry/cli"
+  - "unrs-resolver"
+
 ignoredBuiltDependencies:
-  - @firebase/util
+  - "@firebase/util"
+
 strictDepBuilds: false

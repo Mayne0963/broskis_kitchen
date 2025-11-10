@@ -1,4 +1,68 @@
 #!/usr/bin/env node
+/**
+ * Generate a consolidated test report for Playwright (and optionally Vitest).
+ * - Reads Playwright JSON results from test-results/playwright-results.json
+ * - Produces a markdown summary at test-results/summary.md
+ */
+import fs from 'fs'
+import path from 'path'
+
+const root = process.cwd()
+const resultsDir = path.join(root, 'test-results')
+const playwrightJson = path.join(resultsDir, 'playwright-results.json')
+const outMd = path.join(resultsDir, 'summary.md')
+
+function ensureDir(p) {
+  fs.mkdirSync(p, { recursive: true })
+}
+
+function readJson(p) {
+  try {
+    const s = fs.readFileSync(p, 'utf8')
+    return JSON.parse(s)
+  } catch (e) {
+    return null
+  }
+}
+
+function formatPlaywrightSummary(json) {
+  if (!json) return 'Playwright results not found.'
+
+  const tests = json.suites?.flatMap(s => s.specs?.flatMap(sp => sp.tests) || []) || []
+  const total = tests.length
+  const passed = tests.filter(t => t.status === 'passed').length
+  const failed = tests.filter(t => t.status === 'failed').length
+  const skipped = tests.filter(t => t.status === 'skipped').length
+
+  let md = ''
+  md += `# Test Summary\n\n`
+  md += `## Playwright\n`
+  md += `- Total: ${total}\n`
+  md += `- Passed: ${passed}\n`
+  md += `- Failed: ${failed}\n`
+  md += `- Skipped: ${skipped}\n\n`
+
+  if (failed > 0) {
+    md += `### Failed Tests\n`
+    for (const t of tests.filter(t => t.status === 'failed')) {
+      const title = t.titlePath?.join(' › ') || t.title || 'Unknown test'
+      const err = t.error?.message || t.error || 'Unknown error'
+      md += `- ${title}: ${err}\n`
+    }
+    md += '\n'
+  }
+  return md
+}
+
+function main() {
+  ensureDir(resultsDir)
+  const pw = readJson(playwrightJson)
+  const md = formatPlaywrightSummary(pw)
+  fs.writeFileSync(outMd, md, 'utf8')
+  console.log(`Wrote ${outMd}`)
+}
+
+main()
 
 /**
  * Test Report Generator
