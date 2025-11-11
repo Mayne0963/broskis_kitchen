@@ -25,6 +25,7 @@ export interface AuthContextType {
   resendEmailVerification: () => Promise<boolean>
   sendVerificationEmail: () => Promise<void>
   refreshUserToken: () => Promise<void>
+  refreshSession: () => Promise<boolean>
 }
 
 // Cart types

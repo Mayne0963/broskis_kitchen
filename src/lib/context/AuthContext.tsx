@@ -39,7 +39,9 @@ export const useAuth = () => {
       signInWithGoogle: async () => false,
       resetPassword: async () => false,
       sendVerificationEmail: async () => false,
-      resendEmailVerification: async () => false
+      resendEmailVerification: async () => false,
+      refreshUserToken: async () => {},
+      refreshSession: async () => false
     }
   }
   return context
@@ -473,6 +475,45 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
+  const refreshSession = async (): Promise<boolean> => {
+    if (!auth) return false
+    try {
+      const currentUser = auth.currentUser
+      if (!currentUser) return false
+
+      // Get fresh ID token with latest claims
+      const idToken = await getIdToken(currentUser, true)
+
+      // Update session cookie via refresh endpoint
+      const response = await authFetch('/api/auth/refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ idToken }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to refresh session')
+      }
+
+      // Ensure local claims reflect refreshed session
+      await refreshUserToken()
+      toast.success('Session refreshed successfully')
+      return true
+    } catch (error) {
+      console.error('[AUTH] Session refresh error:', error)
+      toast.error('Failed to refresh session. Please log out and log back in.')
+      return false
+    }
+  }
+
+  // Auto-refresh session when admin claims are detected
+  useEffect(() => {
+    if (claimsLoaded && claims?.admin === true && user) {
+      refreshSession().catch(console.error)
+    }
+  }, [claimsLoaded, claims?.admin, user])
+
   // Computed values
   const isAdmin = (claims?.role === 'admin') || (claims?.admin === true)
   
@@ -495,6 +536,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     resendEmailVerification,
     sendVerificationEmail: resendEmailVerification,
     refreshUserToken,
+    refreshSession,
   }
 
   return (

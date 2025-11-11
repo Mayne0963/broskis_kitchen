@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Bell, Mail, MessageSquare, Smartphone, Settings, Check, X } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/lib/context/AuthContext';
 import { pushNotificationService } from '@/lib/services/push-notification-service';
 import { toast } from 'sonner';
 
