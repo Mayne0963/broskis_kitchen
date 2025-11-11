@@ -158,12 +158,11 @@ export const useAdminData = () => {
         orderBy('createdAt', 'desc'),
         limit(50)
       )
-
-      // Note: menuDrops collection not defined in COLLECTIONS - removing for now
-        // const menuDropsQuery = query(
-        //   collection(db, 'menuDrops'),
-        //   orderBy('startTime', 'desc')
-        // )
+      // Define menu drops query (uses COLLECTIONS.MENU_DROPS)
+      const menuDropsQuery = query(
+        collection(db, COLLECTIONS.MENU_DROPS),
+        orderBy('startTime', 'desc')
+      )
 
       const [
         ordersSnapshot,
@@ -290,16 +289,16 @@ export const useAdminData = () => {
       orderBy('createdAt', 'desc'),
       limit(50)
     )
-    // Note: menuDrops and userRedemptions collections not defined in COLLECTIONS - removing for now
-      // const menuDropsQuery = query(
-      //   collection(db, 'menuDrops'),
-      //   orderBy('startTime', 'desc')
-      // )
-      // const rewardsQuery = query(
-      //   collection(db, 'userRedemptions'),
-      //   orderBy('redeemedAt', 'desc'),
-      //   limit(20)
-      // )
+    // Define queries for menuDrops and rewards (userRedemptions not in COLLECTIONS)
+    const menuDropsQuery = query(
+      collection(db, COLLECTIONS.MENU_DROPS),
+      orderBy('startTime', 'desc')
+    )
+    const rewardsQuery = query(
+      collection(db, 'userRedemptions'),
+      orderBy('redeemedAt', 'desc'),
+      limit(20)
+    )
 
     // Create error handlers for each listener
     const ordersErrorHandler = createFirestoreErrorHandler('Orders Listener', {
@@ -332,29 +331,31 @@ export const useAdminData = () => {
       unsubscribers.push(ordersUnsubscribe)
     }
 
-    const menuDropsUnsubscribe = onSnapshot(
-      menuDropsQuery,
-      () => {
-        menuDropsErrorHandler.reset();
-        fetchAdminData();
-      },
-      error => menuDropsErrorHandler.handleListenerError(error, () => {
-        fetchAdminData();
-      })
-    )
-    unsubscribers.push(menuDropsUnsubscribe)
+    if (!USE_POLLING) {
+      const menuDropsUnsubscribe = onSnapshot(
+        menuDropsQuery,
+        () => {
+          menuDropsErrorHandler.reset();
+          fetchAdminData();
+        },
+        error => menuDropsErrorHandler.handleListenerError(error, () => {
+          fetchAdminData();
+        })
+      )
+      unsubscribers.push(menuDropsUnsubscribe)
 
-    const rewardsUnsubscribe = onSnapshot(
-      rewardsQuery,
-      () => {
-        rewardsErrorHandler.reset();
-        fetchAdminData();
-      },
-      error => rewardsErrorHandler.handleListenerError(error, () => {
-        fetchAdminData();
-      })
-    )
-    unsubscribers.push(rewardsUnsubscribe)
+      const rewardsUnsubscribe = onSnapshot(
+        rewardsQuery,
+        () => {
+          rewardsErrorHandler.reset();
+          fetchAdminData();
+        },
+        error => rewardsErrorHandler.handleListenerError(error, () => {
+          fetchAdminData();
+        })
+      )
+      unsubscribers.push(rewardsUnsubscribe)
+    }
 
     // Users listener
     const usersQuery = query(

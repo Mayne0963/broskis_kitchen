@@ -64,7 +64,8 @@ export async function getSessionCookie(): Promise<SessionUser | null> {
       uid: decodedToken.uid,
       email: decodedToken.email,
       emailVerified: decodedToken.email_verified || false,
-      role: decodedToken.role || "customer",
+      // Prefer custom claim `admin` for authoritative role; fallback to `role` claim
+      role: (decodedToken as any).admin === true ? "admin" : (decodedToken as any).role || "customer",
       displayName: decodedToken.name,
       customClaims: decodedToken,
       lastSignIn: decodedToken.auth_time ? new Date(decodedToken.auth_time * 1000).toISOString() : undefined,

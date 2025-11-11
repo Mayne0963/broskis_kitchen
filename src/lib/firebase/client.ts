@@ -3,6 +3,7 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore, setLogLevel } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
+import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 
 function getEnv(name: string, fallback?: string) {
   return process.env[name] || fallback || "";
@@ -34,15 +35,51 @@ export const firebaseClientApp = isFirebaseConfigured
   : null;
 
 // Initialize Firebase services (use a single Firestore instance across app)
-export const db = firebaseClientApp ? getFirestore(firebaseClientApp) : null;
-export const auth = firebaseClientApp ? getAuth(firebaseClientApp) : null;
-export const storage = firebaseClientApp ? getStorage(firebaseClientApp) : null;
+// Guard against initialization errors in test/mocked environments
+export const db = (() => {
+  try {
+    return firebaseClientApp ? getFirestore(firebaseClientApp) : null;
+  } catch {
+    return null;
+  }
+})();
+
+export const auth = (() => {
+  try {
+    return firebaseClientApp ? getAuth(firebaseClientApp) : null;
+  } catch {
+    return null;
+  }
+})();
+
+export const storage = (() => {
+  try {
+    return firebaseClientApp ? getStorage(firebaseClientApp) : null;
+  } catch {
+    return null;
+  }
+})();
 
 // Reduce Firestore log noise but keep errors visible
 if (typeof window !== 'undefined') {
   try {
     setLogLevel('error');
   } catch {}
+}
+
+// Initialize App Check when configured
+if (typeof window !== 'undefined' && firebaseClientApp) {
+  const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY || process.env.RECAPTCHA_V3_SITE_KEY;
+  if (siteKey) {
+    try {
+      initializeAppCheck(firebaseClientApp, {
+        provider: new ReCaptchaV3Provider(siteKey),
+        isTokenAutoRefreshEnabled: true,
+      });
+    } catch (err) {
+      console.warn('[AppCheck] init failed:', err);
+    }
+  }
 }
 
 // Export app and configuration status

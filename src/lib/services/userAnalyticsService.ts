@@ -1,6 +1,7 @@
 'use client'
 
-import { db, isFirebaseConfigured } from '@/lib/firebase/admin'
+// Use client-side Firebase for analytics fetched in hooks/components
+import { db, isFirebaseConfigured } from '@/lib/firebase/client'
 import {
   collection,
   query,

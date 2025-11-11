@@ -12,6 +12,7 @@ export interface AuthContextType {
   user: User | null
   currentUser: User | null
   claims: import('@/types/auth').Claims
+  claimsLoaded?: boolean
   isLoading: boolean
   loading: boolean
   isAuthenticated: boolean
@@ -23,7 +24,7 @@ export interface AuthContextType {
   resetPassword: (email: string) => Promise<boolean>
   resendEmailVerification: () => Promise<boolean>
   sendVerificationEmail: () => Promise<void>
-  refreshUserToken: () => Promise<boolean>
+  refreshUserToken: () => Promise<void>
 }
 
 // Cart types

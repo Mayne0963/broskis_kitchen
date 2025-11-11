@@ -21,8 +21,8 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Set custom claims
-    await adminAuth.setCustomUserClaims(uid, { role });
+    // Set custom claims: standardize on { role, admin }
+    await adminAuth.setCustomUserClaims(uid, { role, admin: role === 'admin' });
     
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -92,7 +92,8 @@ export async function PUT(request: NextRequest) {
     const results = await Promise.all(
       assignments.map(async ({ uid, role }: { uid: string; role: UserRole }) => {
         try {
-          await adminAuth.setCustomUserClaims(uid, { role });
+          // Standardize claims to include both role and admin boolean
+          await adminAuth.setCustomUserClaims(uid, { role, admin: role === 'admin' });
           return { uid, success: true };
         } catch (error) {
           console.error(`Error setting role for user ${uid}:`, error);

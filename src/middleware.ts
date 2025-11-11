@@ -1,106 +1,177 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { createCombinedSessionMiddleware } from "@/lib/session/middleware";
+import { withMonitoring } from "@/lib/session/sessionMonitoring";
 
-const PROTECTED_ROUTES = [
-  "/dashboard",
-  "/profile",
-  "/orders",
-  "/loyalty",
-  "/rewards",
-  "/cart",
-  "/checkout",
-  "/admin",
-];
-const AUTH_ROUTES = ["/auth/login", "/auth/signup", "/login", "/signup"];
-const ADMIN_PREFIX = "/admin";
+// Configure session middleware with comprehensive settings
+const sessionMiddleware = createCombinedSessionMiddleware({
+  validation: {
+    enabled: true,
+    requireAuth: false, // Will be determined per route
+    requireEmailVerification: false,
+    allowedRoles: [],
+    refreshOnValidation: true,
+    sessionTimeout: 8 * 60 * 60 * 1000, // 8 hours
+  },
+  timeout: {
+    enabled: true,
+    idleTimeout: 30 * 60 * 1000, // 30 minutes
+    absoluteTimeout: 8 * 60 * 60 * 1000, // 8 hours
+    warningTime: 5 * 60 * 1000, // 5 minutes warning
+    refreshOnActivity: true,
+  },
+  errorHandling: {
+    enabled: true,
+    enableRateLimiting: true,
+    rateLimitWindow: 15 * 60 * 1000, // 15 minutes
+    maxRetries: 3,
+    enableLogging: true,
+  },
+  browser: {
+    enabled: true,
+    enableCors: true,
+    allowedOrigins: process.env.ALLOWED_ORIGINS?.split(",") || ["http://localhost:3000"],
+    enableStorageFallback: true,
+  },
+  monitoring: {
+    enabled: true,
+    trackMetrics: true,
+    trackEvents: true,
+    healthCheckInterval: 5 * 60 * 1000, // 5 minutes
+  },
+});
 
-function decodeFirebaseSession(cookieValue?: string) {
-  if (!cookieValue) return null;
-  try {
-    const parts = cookieValue.split(".");
-    if (parts.length !== 3) return null;
-    const payload = JSON.parse(
-      Buffer.from(parts[1].replace(/-/g, "+").replace(/_/g, "/"), "base64").toString()
-    );
-    return payload as {
-      uid?: string;
-      email?: string;
-      email_verified?: boolean;
-      role?: string;
-      permissions?: string[];
-    };
-  } catch {
-    return null;
+// Route-specific configurations
+const routeConfigs = {
+  // Public routes - no authentication required
+  public: {
+    paths: ["/", "/menu", "/about", "/contact", "/api/public"],
+    config: { validation: { requireAuth: false } },
+  },
+  // Authentication routes
+  auth: {
+    paths: ["/auth/login", "/auth/signup", "/login", "/signup", "/api/auth"],
+    config: { validation: { requireAuth: false } },
+  },
+  // Protected user routes
+  protected: {
+    paths: ["/dashboard", "/profile", "/orders", "/loyalty", "/rewards", "/cart", "/checkout"],
+    config: { validation: { requireAuth: true, requireEmailVerification: true } },
+  },
+  // Admin routes
+  admin: {
+    paths: ["/admin"],
+    config: { 
+      validation: { 
+        requireAuth: true, 
+        requireEmailVerification: true, 
+        allowedRoles: ["admin", "superadmin"] 
+      } 
+    },
+  },
+  // API routes
+  api: {
+    paths: ["/api"],
+    config: { 
+      validation: { requireAuth: false }, // Individual API endpoints handle auth
+      errorHandling: { enableRateLimiting: true },
+    },
+  },
+};
+
+// Helper function to get route configuration
+function getRouteConfig(pathname: string) {
+  // Check for exact matches first
+  for (const [category, config] of Object.entries(routeConfigs)) {
+    if (config.paths.includes(pathname)) {
+      return config.config;
+    }
   }
+
+  // Check for prefix matches
+  for (const [category, config] of Object.entries(routeConfigs)) {
+    if (config.paths.some(path => pathname.startsWith(path))) {
+      return config.config;
+    }
+  }
+
+  // Default configuration
+  return { validation: { requireAuth: false } };
 }
 
+// Main middleware function with monitoring
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-
-  // 100% bypass for auth pages and next internals
+  
+  // Skip middleware for static assets and Next.js internals
   if (
     pathname.startsWith("/_next") ||
-    pathname.startsWith("/api/auth") ||
-    pathname.startsWith("/auth/") ||
-    pathname === "/login" ||
-    pathname === "/signup" ||
     pathname.startsWith("/static") ||
-    pathname === "/" ||
     pathname === "/favicon.ico" ||
-    pathname.startsWith("/admin") ||
-    pathname.startsWith("/orders") ||
-    pathname.startsWith("/loyalty") ||
-    pathname.startsWith("/rewards") ||
-    pathname.startsWith("/cart") ||
-    pathname.startsWith("/checkout") ||
-    pathname.startsWith("/403") ||
-    pathname.startsWith("/404") ||
-    pathname.startsWith("/500") ||
-    pathname === "/dashboard"
+    pathname === "/robots.txt" ||
+    pathname.endsWith(".js") ||
+    pathname.endsWith(".css") ||
+    pathname.endsWith(".png") ||
+    pathname.endsWith(".jpg") ||
+    pathname.endsWith(".svg") ||
+    pathname.endsWith(".ico")
   ) {
     return NextResponse.next();
   }
 
-  const nextAuthToken = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-  const firebaseCookie = req.cookies.get("__session")?.value;
-  const firebaseUser = !nextAuthToken ? decodeFirebaseSession(firebaseCookie) : null;
+  // Get route-specific configuration
+  const routeConfig = getRouteConfig(pathname);
+  
+  // Apply session middleware with monitoring
+  const monitoredMiddleware = withMonitoring(sessionMiddleware, {
+    requestId: crypto.randomUUID(),
+    userAgent: req.headers.get("user-agent") || "unknown",
+    ip: req.ip || req.headers.get("x-forwarded-for") || "unknown",
+    pathname,
+  });
 
-  const isProtected = PROTECTED_ROUTES.some((r) => pathname.startsWith(r));
-  const isSignedIn = Boolean(nextAuthToken || firebaseUser);
+  try {
+    // Execute session middleware with route configuration
+    const response = await monitoredMiddleware(req, routeConfig);
+    
+    // Add security headers
+    const secureResponse = NextResponse.next();
+    
+    // Copy headers from session middleware response
+    response.headers.forEach((value, key) => {
+      secureResponse.headers.set(key, value);
+    });
 
-  // protected pages need auth
-  if (isProtected && !isSignedIn) {
-    const loginUrl = new URL("/auth/login", req.url);
-    loginUrl.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  // admin needs role
-  if (pathname.startsWith(ADMIN_PREFIX)) {
-    const role = (nextAuthToken as any)?.role || firebaseUser?.role;
-    if (!isSignedIn) {
-      const loginUrl = new URL("/auth/login", req.url);
-      loginUrl.searchParams.set("callbackUrl", pathname);
-      return NextResponse.redirect(loginUrl);
+    // Add additional security headers
+    secureResponse.headers.set("X-Frame-Options", "DENY");
+    secureResponse.headers.set("X-Content-Type-Options", "nosniff");
+    secureResponse.headers.set("X-XSS-Protection", "1; mode=block");
+    secureResponse.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+    
+    return secureResponse;
+  } catch (error) {
+    console.error("Middleware error:", error);
+    
+    // Handle specific error cases
+    if (error instanceof Error) {
+      if (error.message.includes("RATE_LIMITED")) {
+        return NextResponse.redirect(new URL("/429", req.url));
+      }
+      if (error.message.includes("SESSION_EXPIRED")) {
+        return NextResponse.redirect(new URL("/auth/login?error=session_expired", req.url));
+      }
+      if (error.message.includes("INSUFFICIENT_ROLE")) {
+        return NextResponse.redirect(new URL("/403", req.url));
+      }
     }
-    if (role !== "admin") return NextResponse.redirect(new URL("/403", req.url));
+    
+    // Generic error redirect
+    return NextResponse.redirect(new URL("/500", req.url));
   }
-
-  const res = NextResponse.next();
-  if (nextAuthToken) {
-    res.headers.set("x-user-id", nextAuthToken.sub || "");
-    if ((nextAuthToken as any).role) res.headers.set("x-user-role", (nextAuthToken as any).role);
-  } else if (firebaseUser) {
-    if (firebaseUser.uid) res.headers.set("x-user-id", firebaseUser.uid);
-    if (firebaseUser.email) res.headers.set("x-user-email", firebaseUser.email);
-    if (firebaseUser.email_verified !== undefined)
-      res.headers.set("x-email-verified", String(firebaseUser.email_verified));
-    if (firebaseUser.role) res.headers.set("x-user-role", firebaseUser.role);
-  }
-  return res;
 }
 
 export const config = {
-  // Exclude static assets including audio files from middleware
-  matcher: ["/((?!_next|static|favicon.ico|audio).*)"],
+  // Matcher configuration to exclude static assets
+  matcher: [
+    "/((?!_next|static|.*\\.(?:js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|mp3|wav|ogg)$).*)",
+  ],
 };

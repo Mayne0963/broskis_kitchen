@@ -41,7 +41,8 @@ async function getAdminSession() {
   }
   
   // Use role from session (which should now be synchronized with Firebase)
-  const isAdmin = nextAuthRole === "admin";
+  // Prefer Firebase admin claim when present; fallback to NextAuth role
+  const isAdmin = ((session as any).user?.firebaseClaims?.admin === true) || nextAuthRole === "admin";
   
   if (!isAdmin) {
     redirect("/login");

@@ -31,6 +31,7 @@ import AccessibilityAudit from "../components/accessibility/AccessibilityAudit"
 import PWAManager from "../components/pwa/PWAManager"
 import { PageLoadingWrapper } from "../components/auth/PageLoadingWrapper"
 import { BrandedLoading } from "../components/ui/LoadingStates"
+import RemoteConfigInit from "@/components/system/RemoteConfigInit"
 
 export const metadata: Metadata = {
   title: {
@@ -125,6 +126,8 @@ export default async function RootLayout({
         <OrganizationStructuredData />
       </head>
       <body className={`${fontClasses} bg-black text-white min-h-screen flex flex-col antialiased`}>
+        {/* Initialize Remote Config on client post-hydration */}
+        <script dangerouslySetInnerHTML={{ __html: "window.__initRC__=true;" }} />
         <ServiceWorkerCleanup />
         <ProductionErrorBoundary>
           <ErrorBoundary>
@@ -157,6 +160,7 @@ export default async function RootLayout({
                   <CookieConsent />
                   <SEOAudit />
                   <SchemaGenerator />
+                  <RemoteConfigInit />
                   <NetworkStatus />
                   <ErrorMonitor />
                   {/* <PerformanceMonitor /> */}
@@ -168,6 +172,8 @@ export default async function RootLayout({
             </ResourceErrorBoundary>
           </ErrorBoundary>
         </ProductionErrorBoundary>
+        {/* Non-blocking Remote Config activation via client component */}
+        {/* Note: loadRemoteConfig is triggered by RemoteConfigInit component mounted elsewhere */}
       </body>
     </html>
   )

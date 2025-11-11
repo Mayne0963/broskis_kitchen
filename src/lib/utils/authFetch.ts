@@ -44,10 +44,25 @@ async function performRefresh(): Promise<boolean> {
 
 // Centralized fetch that sends credentials and handles 401 by refreshing once (deduped)
 export async function authFetch(input: RequestInfo, init: AuthFetchOptions = {}) {
+  // Prepare headers and attach App Check token when available
+  const baseHeaders = new Headers(init.headers || {});
+  try {
+    if (typeof window !== 'undefined') {
+      const { getAppCheck, getToken } = await import('firebase/app-check');
+      const appCheck = getAppCheck();
+      const tokenResult = await getToken(appCheck, false);
+      const token = tokenResult?.token;
+      if (token) baseHeaders.set('X-Firebase-AppCheck', token);
+    }
+  } catch (e) {
+    // Non-fatal; continue without App Check header
+  }
+
   const opts: RequestInit = {
     credentials: 'include',
     cache: init.cache ?? 'no-store',
     ...init,
+    headers: baseHeaders,
   };
 
   const id = authLogger.nextRequestId();
@@ -76,7 +91,19 @@ export async function authFetch(input: RequestInfo, init: AuthFetchOptions = {})
       const retryStart = Date.now();
       const retryId = authLogger.nextRequestId();
       authLogger.requestStart(retryId, url, (opts as any).method);
-      res = await fetch(input, { ...opts, cache: 'no-store' });
+      // Refresh App Check token for retry attempt
+      const retryHeaders = new Headers(baseHeaders);
+      try {
+        if (typeof window !== 'undefined') {
+          const { getAppCheck, getToken } = await import('firebase/app-check');
+          const appCheck = getAppCheck();
+          const tokenResult = await getToken(appCheck, true);
+          const token = tokenResult?.token;
+          if (token) retryHeaders.set('X-Firebase-AppCheck', token);
+        }
+      } catch {}
+
+      res = await fetch(input, { ...opts, cache: 'no-store', headers: retryHeaders });
       authLogger.requestEnd(retryId, url, res.status, retryStart);
     }
   }

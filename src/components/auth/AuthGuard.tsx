@@ -41,7 +41,7 @@ export function AuthGuard({
   onAuthError,
   onAuthSuccess
 }: AuthGuardProps) {
-  const { user, isLoading, isAuthenticated, claims } = useAuth();
+  const { user, isLoading, isAuthenticated, claims, claimsLoaded, refreshUserToken } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -107,7 +107,12 @@ export function AuthGuard({
 
         // Check role-based access
         if (allowedRoles.length > 0) {
-          const userRole = claims?.role || user.role || 'customer';
+          // Prefer claims-first; if claims not yet loaded, try refreshing once
+          if (!claimsLoaded) {
+            await refreshUserToken().catch(() => {});
+          }
+          // Prefer admin flag in claims; fallback to role from claims/user
+          const userRole = (claims?.admin === true || user.role === 'admin' || claims?.role === 'admin') ? 'admin' : (claims?.role || user.role || 'customer');
           if (!allowedRoles.includes(userRole)) {
             handleAuthError(`Access denied. Required roles: ${allowedRoles.join(', ')}`);
             handleRedirect('/unauthorized', 'insufficient_permissions');
@@ -182,6 +187,8 @@ export function AuthGuard({
   // Fallback - should not reach here
   return <AuthLoadingSpinner message="Checking authorization..." />;
 }
+
+export default AuthGuard;
 
 /**
  * Higher-order component for page protection

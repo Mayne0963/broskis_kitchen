@@ -27,7 +27,7 @@ export default async function ProfilePage() {
           </div>
           <div>
             <span className="text-white/70">Role:</span>
-            <span className="ml-2">{(user as any).role ?? "customer"}</span>
+            <span className="ml-2">{(((user as any).customClaims?.admin === true) || ((user as any).customClaims?.role === 'admin')) ? 'admin' : ((user as any).role ?? 'customer')}</span>
           </div>
         </CardContent>
       </Card>

@@ -21,7 +21,7 @@ export function ClientAuthGuard({
   redirectTo = "/auth/login",
   fallback
 }: ClientAuthGuardProps) {
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { user, isLoading, isAuthenticated, claims, refreshUserToken } = useAuth();
   const router = useRouter();
   const [isChecking, setIsChecking] = useState(true);
 
@@ -42,11 +42,30 @@ export function ClientAuthGuard({
       return;
     }
 
-    if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-      router.push("/403?error=insufficient_permissions");
-      return;
+    if (allowedRoles.length > 0) {
+      // Prefer claims-first; if claims missing, refresh token asynchronously
+      const ensureClaimsThenCheck = async () => {
+        try {
+          if (!claims || (!claims.role && claims.admin !== true)) {
+            await refreshUserToken();
+          }
+        } catch {
+          // swallow refresh errors; we'll still evaluate with what we have
+        }
+
+        const userRole = claims
+          ? (claims.admin === true || claims.role === 'admin' ? 'admin' : (claims.role || 'customer'))
+          : (user.role || 'customer');
+
+        if (!allowedRoles.includes(userRole)) {
+          router.push("/403?error=insufficient_permissions");
+        }
+      };
+
+      // Fire and forget; navigation will occur inside
+      void ensureClaimsThenCheck();
     }
-  }, [user, isLoading, isAuthenticated, requireEmailVerification, allowedRoles, redirectTo, router]);
+  }, [user, isLoading, isAuthenticated, claims, requireEmailVerification, allowedRoles, redirectTo, router]);
 
   if (isLoading || isChecking) {
     return fallback || <AuthLoadingState message="Verifying authentication..." />;
@@ -60,8 +79,13 @@ export function ClientAuthGuard({
     return fallback || <AuthLoadingState message="Email verification required..." />;
   }
 
-  if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-    return fallback || <AuthLoadingState message="Insufficient permissions..." />;
+  if (allowedRoles.length > 0) {
+    const userRole = claims
+      ? (claims.admin === true || claims.role === 'admin' ? 'admin' : (claims.role || 'customer'))
+      : (user.role || 'customer');
+    if (!allowedRoles.includes(userRole)) {
+      return fallback || <AuthLoadingState message="Insufficient permissions..." />;
+    }
   }
 
   return (

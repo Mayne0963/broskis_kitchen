@@ -52,6 +52,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
   const [claims, setClaims] = useState<Claims>({})
+  const [claimsLoaded, setClaimsLoaded] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
 
@@ -81,6 +82,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const tokenResult = await firebaseUser.getIdTokenResult(false) // Use cached token first
           const userClaims = (tokenResult.claims ?? {}) as Claims
           setClaims(userClaims)
+          setClaimsLoaded(true)
           
           // Update user role if different from claims
           if (userClaims.role && userClaims.role !== basicUser.role) {
@@ -120,6 +122,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       } else {
         setUser(null)
         setClaims({})
+        setClaimsLoaded(false)
         setIsAuthenticated(false)
         setIsLoading(false)
       }
@@ -459,6 +462,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const tokenResult = await auth.currentUser.getIdTokenResult(true)
       const userClaims = (tokenResult.claims ?? {}) as Claims
       setClaims(userClaims)
+      setClaimsLoaded(true)
       
       // Update user role if it changed
       if (userClaims.role && user && userClaims.role !== user.role) {
@@ -470,7 +474,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }
 
   // Computed values
-  const isAdmin = claims.role === 'admin'
+  const isAdmin = (claims?.role === 'admin') || (claims?.admin === true)
   
 
 
@@ -478,6 +482,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     currentUser: user, // Explicitly add currentUser to the value object
     claims,
+    claimsLoaded,
     isLoading,
     loading: isLoading, // Add loading alias for consistency
     isAuthenticated,

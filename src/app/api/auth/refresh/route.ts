@@ -15,7 +15,7 @@ function corsHeadersForOrigin(origin?: string | null) {
   return {
     'Access-Control-Allow-Origin': allowedOrigin,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, x-csrf-token, authorization',
+    'Access-Control-Allow-Headers': 'Content-Type, x-csrf-token, authorization, x-firebase-appcheck',
     'Access-Control-Allow-Credentials': 'true'
   } as Record<string, string>;
 }

@@ -120,6 +120,20 @@ const nextConfig = {
         ],
       },
       {
+        // Ensure API responses allow App Check header in preflight and requests
+        source: '/api/:path*',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Content-Type, x-csrf-token, authorization, x-firebase-appcheck',
+          },
+          {
+            key: 'Access-Control-Allow-Credentials',
+            value: 'true',
+          },
+        ],
+      },
+      {
         source: '/_next/static/(.*)',
         headers: [
           {

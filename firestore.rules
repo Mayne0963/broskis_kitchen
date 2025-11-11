@@ -125,6 +125,18 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
     
+    // Menu drops - readable by authenticated users, writable by admins
+    match /menuDrops/{dropId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // Public offers - readable by authenticated users, writable by admins
+    match /offers/{offerId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
+    
     // Idempotency keys - system use only
     match /idempotencyKeys/{keyId} {
       allow read, write: if false; // Only server-side code

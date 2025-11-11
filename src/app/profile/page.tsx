@@ -13,6 +13,11 @@ export const revalidate = 0
 export default async function ProfilePage() {
   return await withAuthGuard(async (user) => {
 
+  // Prefer claims-first for role determination
+  const claims = (user as any).customClaims || {}
+  const isAdmin = claims.admin === true || claims.role === 'admin' || user.role === 'admin'
+  const displayRole = isAdmin ? 'admin' : (claims.role || user.role || 'customer')
+
   return (
     <div className="min-h-screen bg-gray-900 py-12">
       <div className="max-w-4xl mx-auto px-4">
@@ -31,7 +36,7 @@ export default async function ProfilePage() {
                 <CardDescription className="text-yellow-100">
                   {user.email}
                 </CardDescription>
-                {user.role === 'admin' && (
+                {isAdmin && (
                   <Badge className="mt-2 bg-red-500 text-white">
                     <Shield className="w-4 h-4 mr-1" />
                     Admin
@@ -64,7 +69,7 @@ export default async function ProfilePage() {
                   <Shield className="w-4 h-4 mr-2" />
                   <span className="font-medium">Role:</span>
                 </div>
-                <p className="text-white ml-6 capitalize">{user.role}</p>
+                <p className="text-white ml-6 capitalize">{displayRole}</p>
               </div>
               
               <div className="space-y-2">
