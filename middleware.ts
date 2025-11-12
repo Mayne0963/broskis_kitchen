@@ -26,6 +26,7 @@ function decodeFirebaseSession(cookieValue?: string) {
       email?: string;
       email_verified?: boolean;
       role?: string;
+      admin?: boolean;
       permissions?: string[];
     };
   } catch {
@@ -65,24 +66,35 @@ export async function middleware(req: NextRequest) {
 
   if (pathname.startsWith(ADMIN_PREFIX)) {
     const role = (nextAuthToken as any)?.role || firebaseUser?.role;
+    const adminFlag = (nextAuthToken as any)?.admin === true || firebaseUser?.admin === true;
     if (!isSignedIn) {
       const loginUrl = new URL("/auth/login", req.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
     }
-    if (role !== "admin") return NextResponse.redirect(new URL("/403", req.url));
+    if (!(role === "admin" || adminFlag)) return NextResponse.redirect(new URL("/403", req.url));
   }
 
   const res = NextResponse.next();
   if (nextAuthToken) {
     res.headers.set("x-user-id", nextAuthToken.sub || "");
-    if ((nextAuthToken as any).role) res.headers.set("x-user-role", (nextAuthToken as any).role);
+    const nextAuthIsAdmin = (nextAuthToken as any).role === "admin" || (nextAuthToken as any).admin === true;
+    if (nextAuthIsAdmin) {
+      res.headers.set("x-user-role", "admin");
+    } else if ((nextAuthToken as any).role) {
+      res.headers.set("x-user-role", (nextAuthToken as any).role);
+    }
   } else if (firebaseUser) {
     if (firebaseUser.uid) res.headers.set("x-user-id", firebaseUser.uid);
     if (firebaseUser.email) res.headers.set("x-user-email", firebaseUser.email);
     if (firebaseUser.email_verified !== undefined)
       res.headers.set("x-email-verified", String(firebaseUser.email_verified));
-    if (firebaseUser.role) res.headers.set("x-user-role", firebaseUser.role);
+    const firebaseIsAdmin = firebaseUser.role === "admin" || firebaseUser.admin === true;
+    if (firebaseIsAdmin) {
+      res.headers.set("x-user-role", "admin");
+    } else if (firebaseUser.role) {
+      res.headers.set("x-user-role", firebaseUser.role);
+    }
   }
   return res;
 }
