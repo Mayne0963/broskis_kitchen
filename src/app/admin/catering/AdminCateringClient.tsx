@@ -106,9 +106,14 @@ export default function AdminCateringClient() {
       }
 
       const exportUrl = `/api/admin/catering/export?${params.toString()}`;
+      const res = await fetch(exportUrl, { method: 'GET', cache: 'no-store' });
+      if (!res.ok) {
+        alert(res.status === 403 ? 'Admin access required' : 'Failed to export CSV');
+        return;
+      }
       window.open(exportUrl, '_blank');
     } catch (error) {
-      console.error('Export failed:', error);
+      alert('Failed to export CSV');
     } finally {
       setIsExporting(false);
     }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { isAdmin } from "@/lib/roles";
+import { ensureAdmin } from "@/lib/firebase/admin";
 import { getFirestore } from "firebase-admin/firestore";
 import { mapDoc } from "@/lib/catering/transform";
 
@@ -9,10 +10,16 @@ const db = getFirestore();
 
 export async function GET(req: NextRequest) {
   try {
-    // Check admin authentication
-    const session = await getServerSession(authOptions);
-    if (!isAdmin(session?.user)) {
-      return NextResponse.json({ error: "forbidden" }, { status: 403 });
+    // Primary admin authentication via Firebase Admin
+    try {
+      await ensureAdmin(req);
+    } catch (e) {
+      // Fallback to NextAuth session role if Firebase check not available
+      const session = await getServerSession(authOptions);
+      const role = (session?.user as any)?.role;
+      if (!isAdmin(role)) {
+        return NextResponse.json({ error: "forbidden" }, { status: 403 });
+      }
     }
 
     // Fetch all catering requests
