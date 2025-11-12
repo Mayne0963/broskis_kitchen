@@ -171,9 +171,8 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
   // Real-time Firebase listener for user's orders
   useEffect(() => {
     if (!userId) return
-    
-    if (!isFirebaseConfigured()) {
-      console.log('Firebase not configured, using initial orders')
+
+    if (!isFirebaseConfigured() || !db) {
       setOrders(initialOrders)
       setIsLoading(false)
       return
@@ -204,14 +203,10 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
           setIsLoading(false)
         },
         (error) => {
-          console.error('Error fetching user orders:', error)
           setError('Failed to load orders. Please try again.')
           setIsLoading(false)
           setOrders(initialOrders)
-          
-          // If it's a permission error, try using API fallback
           if (error.code === 'permission-denied') {
-            console.log('Permission denied, falling back to API')
             fetchOrdersFromAPI()
           }
         }
@@ -219,7 +214,6 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
 
       return () => unsubscribe()
     } catch (error) {
-      console.error('Error setting up real-time listener:', error)
       setError('Failed to connect to real-time updates')
       setIsLoading(false)
       setOrders(initialOrders)

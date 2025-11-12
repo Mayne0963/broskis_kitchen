@@ -42,15 +42,23 @@ export function logError(error: Error, additionalInfo?: Record<string, any>) {
     console.groupEnd();
   }
 
-  // In production, you might want to send to an error monitoring service
-  if (process.env.NODE_ENV === 'production') {
-    // Example: Send to Sentry, LogRocket, or custom endpoint
-    // sendToErrorService(errorDetails);
-    console.error('Production Error:', {
-      message: errorDetails.message,
-      digest: errorDetails.digest,
-      timestamp: errorDetails.timestamp
-    });
+  if (process.env.NODE_ENV === 'production' && typeof window !== 'undefined') {
+    try {
+      fetch('/api/error-logs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: error.name,
+          message: errorDetails.message,
+          stack: errorDetails.stack,
+          digest: errorDetails.digest,
+          url: errorDetails.url,
+          userAgent: errorDetails.userAgent,
+          timestamp: errorDetails.timestamp,
+          ...additionalInfo
+        })
+      }).catch(() => {})
+    } catch {}
   }
 
   return errorDetails;

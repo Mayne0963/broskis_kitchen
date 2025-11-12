@@ -1,6 +1,7 @@
 "use client";
 
 import React, { Component, ReactNode } from 'react';
+import { logError } from '@/lib/utils/errorLogger'
 
 interface Props {
   children: ReactNode;
@@ -24,15 +25,16 @@ class ResourceErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Log resource loading errors
     if (error.message.includes('Resource failed to load')) {
-      console.warn('Resource loading error caught:', error.message);
-      // Don't crash the app for resource errors
       this.setState({ hasError: false });
       return;
     }
-    
-    console.error('ResourceErrorBoundary caught an error:', error, errorInfo);
+    try {
+      logError(error, {
+        boundary: 'ResourceErrorBoundary',
+        componentStack: errorInfo.componentStack
+      })
+    } catch {}
   }
 
   componentDidMount() {

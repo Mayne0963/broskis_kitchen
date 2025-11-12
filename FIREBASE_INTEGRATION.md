@@ -245,3 +245,8 @@ For issues with the Firebase integration:
 - Advanced analytics with Firebase Analytics
 - Customer authentication with Firebase Auth
 - Image storage with Firebase Storage
+# Firebase Integration
+## Error Logging
+- Client errors are captured via `ErrorMonitor` and posted to `/api/error-logs` in production.
+- Logged fields include name, message, stack, digest, URL, userAgent, and timestamp.
+- Backend route persists logs to the `error_logs` collection.

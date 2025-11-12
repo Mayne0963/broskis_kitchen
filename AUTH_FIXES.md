@@ -35,6 +35,15 @@ This change set resolves 401 errors and failed refreshes seen on the dashboard w
 - Session expiry helpers:
   - `src/lib/session/exp.ts`: reads `__session` and background-calls `/api/auth/refresh`.
 
+### Admin Status Alignment
+- Client admin checks now rely on `user.role === 'admin'` or `user.admin === true`.
+- Removed client env-based allowlist to avoid mismatches; server keeps allowlist fallback.
+- Catering admin CTA uses the session role consistently with the server-rendered button in layout.
+
+### Order History Stability
+- OrderTracking guards Firestore usage when the client is not fully ready and falls back to `/api/my-orders` without throwing.
+- Unauthorized or error responses render error UI instead of triggering the global error boundary.
+
 ## Security Improvements
 - All auth cookies use `HttpOnly`, `Secure` in production, `SameSite=lax`, and `path=/`.
 - CSRF support remains available via `lib/auth/security.ts` and `/api/auth/status` sets a token for authenticated users.
