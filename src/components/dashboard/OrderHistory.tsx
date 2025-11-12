@@ -28,8 +28,7 @@ export function OrderHistory({ orders }: { orders: Order[] }) {
   };
 
   const viewOrderDetails = (id: string) => {
-    // Redirect to order details page
-    router.push(`/orders`);
+    router.push(`/account/orders`);
   };
 
   return (

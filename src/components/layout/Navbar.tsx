@@ -158,7 +158,7 @@ const Navbar: React.FC = () => {
                     Profile
                   </AccessibleMenuItem>
                   <AccessibleMenuItem 
-                    href="/orders"
+                    href="/account/orders"
                     onClick={() => setUserDropdownOpen(false)}
                   >
                     Order History
