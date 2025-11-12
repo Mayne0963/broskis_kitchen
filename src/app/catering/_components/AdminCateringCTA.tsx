@@ -1,14 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useSession } from "next-auth/react";
-import { isUserAdmin } from '@/lib/auth/roleUtils';
+import { useAuth } from '@/lib/context/AuthContext';
 
 export default function AdminCateringCTA() {
-  const { data, status } = useSession();
-  const isAdmin = isUserAdmin(data?.user);
+  const { user, loading, isAdmin } = useAuth();
 
-  if (status === "loading") return null; // no flicker / no crash
+  if (loading) return null; // no flicker / no crash
   if (!isAdmin) return null;
 
   return (
