@@ -18,11 +18,10 @@ export async function getServerUser() {
   
   // Fallback to NextAuth session (if configured)
   const session = await getServerSession(authOptions);
-  
   if (!session?.user) {
     return null;
   }
-  
+
   return {
     uid: (session.user as any).uid,
     email: session.user.email,
