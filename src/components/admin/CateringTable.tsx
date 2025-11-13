@@ -128,10 +128,15 @@ export default function CateringTable({
       const res = await fetch(`/api/admin/catering?${params.toString()}`, {
         cache: "no-store",
       });
-      if (!res.ok) throw new Error(await res.text());
+      if (!res.ok) {
+        if (res.status === 403) {
+          throw new Error("Admin access required");
+        }
+        throw new Error(await res.text());
+      }
       const data = await res.json();
-      setRows((prev) => (reset ? data.items : [...prev, ...data.items]));
-      setCursor(data.nextCursor);
+      setRows((prev) => (reset ? data.items || [] : [...prev, ...(data.items || [])]));
+      setCursor(data.nextCursor || null);
     } catch (e: any) {
       setError(e?.message || "Failed to load requests");
     } finally {

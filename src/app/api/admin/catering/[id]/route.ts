@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getFirestore } from "firebase-admin/firestore";
-import { isAdmin, normalizeRole } from "@/lib/roles";
+import { ensureAdmin } from "@/lib/firebase/admin";
 import { mapDoc } from "@/lib/catering/transform";
 import type { CateringRequest, CateringUpdateRequest } from "@/types/catering";
 
@@ -44,13 +44,7 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Check admin authentication using our global role system
-    const session = await getServerSession(authOptions);
-    const userRole = normalizeRole((session?.user as any)?.role);
-    
-    if (!isAdmin(userRole)) {
-      return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
-    }
+    await ensureAdmin(req);
 
     // Validate ID parameter
     if (!params.id || typeof params.id !== "string") {

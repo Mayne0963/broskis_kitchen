@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { ensureAdmin } from "@/lib/firebase/admin";
 import { getFirestore } from "firebase-admin/firestore";
 import { isAdmin, normalizeRole } from "@/lib/roles";
 import type { CateringStatus } from "@/types/catering";
@@ -14,13 +13,7 @@ const VALID_STATUSES: CateringStatus[] = [
 
 export async function PATCH(req: NextRequest) {
   try {
-    // Check admin authentication
-    const session = await getServerSession(authOptions);
-    const userRole = normalizeRole((session?.user as any)?.role);
-    
-    if (!isAdmin(userRole)) {
-      return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
-    }
+    await ensureAdmin(req);
 
     // Parse request body
     const body = await req.json();
@@ -82,7 +75,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     // Log the bulk action for audit purposes
-    console.log(`[BULK UPDATE] Admin ${session.user?.email} updated ${updateCount} catering requests to status: ${status}`);
+    console.log(`[BULK UPDATE] Updated ${updateCount} catering requests to status: ${status}`);
 
     return NextResponse.json({
       success: true,
