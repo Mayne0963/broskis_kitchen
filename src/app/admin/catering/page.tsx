@@ -1,13 +1,16 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/options";
 import { redirect } from "next/navigation";
+import { getSessionCookie } from "@/lib/auth/session";
 import AdminCateringClient from "./AdminCateringClient";
 
 export default async function CateringAdminPage() {
-  const session = await getServerSession(authOptions as any);
-  const role = (session?.user as any)?.role;
-  const isAdmin = role === "admin" || (session as any)?.user?.firebaseClaims?.admin === true;
-
+  const sessionUser = await getSessionCookie();
+  
+  if (!sessionUser) {
+    redirect("/auth/login?error=admin_required&next=/admin/catering");
+  }
+  
+  const isAdmin = sessionUser.role === "admin" || (sessionUser as any).admin === true;
+  
   if (!isAdmin) {
     redirect("/auth/login?error=admin_required&next=/admin/catering");
   }

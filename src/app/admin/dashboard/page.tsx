@@ -1,9 +1,7 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/options";
 import { redirect } from "next/navigation";
+import { getSessionCookie } from "@/lib/auth/session";
 import ElevateUserForm from "@/components/admin/ElevateUserForm";
 import { adminDb } from "@/lib/firebase/admin";
-import { logAuthDiscrepancy } from "@/lib/auth/firebaseAuth";
 import { getAuthHealthStats } from "@/lib/auth/authMonitoring";
 
 type AdminLog = {
@@ -16,41 +14,20 @@ type AdminLog = {
 };
 
 async function getAdminSession() {
-  const session = await getServerSession(authOptions as any);
+  const sessionUser = await getSessionCookie();
   
-  if (!session) {
+  if (!sessionUser) {
     redirect("/login");
   }
   
-  const user = (session as any).user || {};
-  const nextAuthRole = user.role || "user";
-  const email = user.email || "";
-  const uid = user.uid;
-  
-  // Check for authentication discrepancies
-  let discrepancy = null;
-  if (uid && email) {
-    const firebaseClaims = (session as any).user?.firebaseClaims;
-    const firebaseAdmin = firebaseClaims?.admin;
-    
-    if (firebaseAdmin !== undefined && firebaseAdmin !== (nextAuthRole === "admin")) {
-      discrepancy = { firebaseAdmin, nextAuthRole };
-      logAuthDiscrepancy("admin-dashboard", { admin: firebaseAdmin }, nextAuthRole);
-      console.warn(`Auth discrepancy detected: Firebase claims admin=${firebaseAdmin}, NextAuth role=${nextAuthRole}`);
-    }
-  }
-  
-  // Use role from session (which should now be synchronized with Firebase)
-  // Prefer Firebase admin claim when present; fallback to NextAuth role
-  const isAdmin = ((session as any).user?.firebaseClaims?.admin === true) || nextAuthRole === "admin";
+  const isAdmin = sessionUser.role === "admin" || (sessionUser as any).admin === true;
   
   if (!isAdmin) {
     redirect("/login");
   }
   
   return {
-    session: session!,
-    discrepancy,
+    sessionUser,
   };
 }
 
@@ -69,13 +46,9 @@ async function getRecentAdminLogs(): Promise<AdminLog[]> {
 }
 
 export default async function AdminDashboardPage() {
-  const { session, discrepancy } = await getAdminSession();
+  const { sessionUser } = await getAdminSession();
   const logs = await getRecentAdminLogs();
   const authHealthStats = await getAuthHealthStats();
-
-  const user = (session as any).user || {};
-  const role = user.role || "user";
-  const email = user.email || "";
 
   return (
     <div style={{ padding: 24, maxWidth: 1000, margin: "0 auto" }}>
@@ -88,8 +61,9 @@ export default async function AdminDashboardPage() {
         <div style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: 16 }}>
           <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 12 }}>Current Admin</h2>
           <div>
-            <p><strong>Email:</strong> {email}</p>
-            <p><strong>Role:</strong> {role}</p>
+            <p><strong>Email:</strong> {sessionUser.email}</p>
+            <p><strong>Role:</strong> {sessionUser.role}</p>
+            <p><strong>UID:</strong> {sessionUser.uid}</p>
           </div>
         </div>
 
@@ -149,15 +123,13 @@ export default async function AdminDashboardPage() {
           </div>
         </div>
         
-        {discrepancy && (
-          <div style={{ marginTop: 16, padding: 12, background: "#fefce8", border: "1px solid #facc15", borderRadius: 8 }}>
-            <h3 style={{ fontSize: 14, fontWeight: 500, color: "#854d0e", marginBottom: 4 }}>Current Session Discrepancy</h3>
-            <div style={{ fontSize: 12, color: "#a16207" }}>
-              <p>Firebase Claims: {discrepancy.firebaseAdmin ? 'Admin' : 'User'}</p>
-              <p>NextAuth Role: {discrepancy.nextAuthRole}</p>
-            </div>
+        <div style={{ marginTop: 16, padding: 12, background: "#f0fdf4", border: "1px solid #16a34a", borderRadius: 8 }}>
+          <h3 style={{ fontSize: 14, fontWeight: 500, color: "#166534", marginBottom: 4 }}>Using Firebase Authentication</h3>
+          <div style={{ fontSize: 12, color: "#15803d" }}>
+            <p>All authentication now unified through Firebase session cookies</p>
+            <p>Admin status: {sessionUser.role === "admin" ? "Verified via role" : "Verified via admin claim"}</p>
           </div>
-        )}
+        </div>
       </section>
     </div>
   );
