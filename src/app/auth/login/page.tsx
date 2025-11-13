@@ -65,6 +65,12 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         
         <CardContent>
+          {searchParams.get('error') === 'admin_required' && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>Admin access required. Please sign in with an authorized admin account.</AlertDescription>
+            </Alert>
+          )}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               {form.formState.errors.root && (
