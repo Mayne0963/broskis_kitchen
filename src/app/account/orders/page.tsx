@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic'
 
 function OrderHistoryPageContent() {
   const { user, isLoading: authLoading } = useAuth()
-  const { orders, loading: ordersLoading, refresh } = useOrders()
+  const { orders, loading: ordersLoading, refresh, error } = useOrders()
 
   // Fetch user orders on component mount
   useEffect(() => {
@@ -64,13 +64,27 @@ function OrderHistoryPageContent() {
           </Link>
         </div>
         
+        {/* Error banner */}
+        {error && (
+          <div className="mb-4 p-3 rounded border border-red-500/40 bg-red-500/10 text-red-200">
+            {error}
+          </div>
+        )}
+
         {ordersLoading ? (
           <div className="text-center p-8">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-foil mx-auto mb-4"></div>
             <p className="text-muted-foreground">Loading your orders...</p>
           </div>
-        ) : (
+        ) : orders && orders.length > 0 ? (
           <OrderTracking userId={user.uid} initialOrders={orders} />
+        ) : (
+          <div className="text-center p-16 border border-[var(--color-ash-gray)]/20 rounded-lg">
+            <FaShoppingBag className="text-5xl text-gold-foil mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2">No orders yet</h3>
+            <p className="text-muted-foreground">When you place orders, they’ll show up here for tracking.</p>
+            <Link href="/" className="inline-block mt-6 bg-gold-foil text-black px-5 py-2 rounded-md font-semibold hover:bg-gold-foil/90">Explore Menu</Link>
+          </div>
         )}
       </div>
     </div>
@@ -80,7 +94,7 @@ function OrderHistoryPageContent() {
 export default function OrderHistoryPage() {
   return (
     <AuthGuard requireAuth={true} requireEmailVerification={false}>
-      <OrderProvider autoLoad={true}>
+      <OrderProvider autoLoad={false}>
         <OrderHistoryPageContent />
       </OrderProvider>
     </AuthGuard>
