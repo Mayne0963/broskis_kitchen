@@ -86,8 +86,7 @@ export async function getSessionCookie(): Promise<SessionUser | null> {
       console.error("[SESSION] Session verification failed:", error.message || error);
     }
     
-    // Clear invalid session cookie
-    await clearSessionCookie();
+    
     return null;
   }
 }
