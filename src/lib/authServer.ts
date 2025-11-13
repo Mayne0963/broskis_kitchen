@@ -6,10 +6,17 @@ import { getUserByUID } from "./user";
 import { UserCache } from "./cache";
 
 /**
- * Get authenticated user from NextAuth session (zero extra fetches)
- * Uses role computed in JWT callback for instant admin checks
+ * Get authenticated user - prioritizes Firebase session cookie over NextAuth
+ * This ensures compatibility with Firebase Authentication used throughout the app
  */
 export async function getServerUser() {
+  // Try Firebase session cookie first (primary auth method)
+  const firebaseUser = await getServerUserLegacy();
+  if (firebaseUser) {
+    return firebaseUser;
+  }
+  
+  // Fallback to NextAuth session (if configured)
   const session = await getServerSession(authOptions);
   
   if (!session?.user) {
