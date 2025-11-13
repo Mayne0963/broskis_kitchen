@@ -48,6 +48,7 @@ function getServiceAccount() {
 // Prevent duplicate app initialization
 let adminApp: App;
 let dbAdmin: Firestore;
+let dbAdminNamed: Firestore;
 let authAdmin: Auth;
 
 try {
@@ -66,6 +67,7 @@ try {
 
   // Initialize services
   dbAdmin = getFirestore(adminApp);
+  dbAdminNamed = getFirestore(adminApp, 'admin');
   authAdmin = getAuth(adminApp);
 } catch (error) {
   console.error("Firebase Admin initialization error:", error);
@@ -74,6 +76,7 @@ try {
 
 // Export Firebase Admin app and services
 export { adminApp, dbAdmin };
+export const adminDbAdmin = dbAdminNamed;
 
 // Legacy compatibility exports (maintain existing imports)
 export const db = dbAdmin;
@@ -147,7 +150,7 @@ export const FieldValue = admin.firestore.FieldValue;
 export const adminDb = db; // some files import { adminDb }
 export const adminAuth = auth; // some files import { adminAuth }
 export const adb = db; // some files import { adb }
-export const getAdminDb = () => db;
+export const getAdminDb = (target?: 'public' | 'admin') => (target === 'admin' ? dbAdminNamed : db);
 
 // Export the admin namespace
 export { admin };

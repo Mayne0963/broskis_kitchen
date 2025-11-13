@@ -2,7 +2,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-import { adminDb } from '@/lib/firebase/admin';
+import { getAdminDb } from '@/lib/firebase/admin';
 
 interface PerformanceMetric {
   id?: string;
@@ -129,6 +129,7 @@ class PerformanceMonitor {
     if (this.metrics.length === 0) return;
 
     try {
+      const adminDb = getAdminDb('admin');
       const batch = adminDb.batch();
       const metricsToFlush = [...this.metrics];
       this.metrics = [];
@@ -180,6 +181,7 @@ class PerformanceMonitor {
         }
       }
 
+      const adminDb = getAdminDb('admin');
       await adminDb.collection('system_health').add(healthMetric);
     } catch (error) {
       console.error('Error collecting system health:', error);

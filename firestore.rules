@@ -18,6 +18,10 @@ service cloud.firestore {
       );
     }
     
+    function isStaff() {
+      return isSignedIn() && request.auth.token.role == "staff";
+    }
+    
     function isValidEmail() {
       return isSignedIn() && request.auth.token.email_verified == true;
     }
@@ -29,7 +33,21 @@ service cloud.firestore {
     }
     
     match /orders/{orderId} {
-      allow read, write: if isSignedIn();
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin() || isStaff());
+      allow create: if isSignedIn() &&
+        request.resource.data.keys().hasAll([
+          'userId', 'status', 'createdAt'
+        ]) &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.status is string &&
+        request.resource.data.createdAt is timestamp;
+      allow update: if (
+        isSignedIn() && resource.data.userId == request.auth.uid &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']) &&
+        request.resource.data.status is string &&
+        request.resource.data.updatedAt is timestamp
+      ) || isAdmin() || isStaff();
+      allow delete: if isAdmin();
     }
     
     // REWARDS SYSTEM COLLECTIONS

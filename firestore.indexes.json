@@ -36,6 +36,14 @@
       "collectionGroup": "cateringRequests",
       "queryScope": "COLLECTION",
       "fields": [
+        { "fieldPath": "customerEmail", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "cateringRequests",
+      "queryScope": "COLLECTION",
+      "fields": [
         { "fieldPath": "packageId", "order": "ASCENDING" },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
