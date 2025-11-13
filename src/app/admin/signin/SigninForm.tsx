@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession, signIn } from "next-auth/react";
+import { useAuth } from "@/lib/context/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Shield, Eye, EyeOff } from "lucide-react";
 
 export default function SigninForm() {
-  const { data: session, status } = useSession();
+  const { isAuthenticated, isAdmin, login, signInWithGoogle } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || searchParams.get("next") || "/admin/catering";
@@ -23,22 +23,17 @@ export default function SigninForm() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (status === "authenticated" && session?.user) {
-      // Check if user has admin role
-      const userRole = (session.user as any).role;
-      if (userRole === "admin") {
+    if (isAuthenticated) {
+      if (isAdmin) {
         router.replace(callbackUrl);
       } else {
         setError("Admin access required");
       }
     }
-  }, [status, session, callbackUrl, router]);
+  }, [isAuthenticated, isAdmin, callbackUrl, router]);
 
-  if (status === "loading") {
-    return <div className="text-center text-sm opacity-70">Checking session…</div>;
-  }
-
-  if (status === "authenticated" && session?.user && (session.user as any).role === "admin") {
+  // Lightweight UI states
+  if (isAuthenticated && isAdmin) {
     return <div className="text-center text-sm opacity-70">Redirecting…</div>;
   }
 
@@ -48,18 +43,12 @@ export default function SigninForm() {
     setError("");
 
     try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        setError("Invalid credentials");
+      const ok = await login(email, password);
+      if (!ok) {
+        setError("Invalid credentials or email not verified");
         return;
       }
-
-      // The useEffect will handle the redirect after successful signin
+      // Redirect is handled by useEffect when isAdmin flips true
     } catch (error) {
       setError("Sign in failed");
     } finally {
@@ -72,9 +61,10 @@ export default function SigninForm() {
     setError("");
 
     try {
-      await signIn("google", {
-        callbackUrl: callbackUrl,
-      });
+      const ok = await signInWithGoogle();
+      if (!ok) {
+        setError("Google sign in failed");
+      }
     } catch (error) {
       setError("Google sign in failed");
       setIsLoading(false);
