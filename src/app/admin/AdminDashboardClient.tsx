@@ -8,7 +8,7 @@ import { safeFetch } from '@/lib/utils/safeFetch';
 
 interface Order {
   id: string;
-  userId: string;
+  userId?: string | null;
   status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
   items: Array<{
     id: string;
@@ -160,7 +160,7 @@ export default function AdminDashboardClient({ adminEmail, adminName }: AdminDas
                         {order.id.slice(-8)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {order.customer?.name || order.customer?.email || order.userId.slice(-8)}
+                        {order.customer?.name || order.customer?.email || (order.userId ? order.userId.slice(-8) : 'Anonymous Order')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {order.items?.length || 0} item(s)
