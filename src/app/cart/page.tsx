@@ -24,6 +24,37 @@ function CartContent() {
   const [promoError, setPromoError] = useState<string | null>(null);
   const { shouldPrompt, summary, accept, decline } = useOrderResumePrompt();
 
+  function getItemTotal(item: OrderItem) {
+    let total = Number(item?.price ?? 0);
+    if (item?.customizations) {
+      const values = Object.values(item.customizations);
+      const flatOptions = ([] as any[]).concat(
+        ...values.map(v => Array.isArray(v) ? v : [v].filter(Boolean))
+      );
+      flatOptions.forEach((option: any) => {
+        const extra = Number(option?.price ?? 0);
+        if (!isNaN(extra)) total += extra;
+      });
+    }
+    const qty = Math.max(1, Number(item?.quantity ?? 1));
+    return total * qty;
+  }
+
+  function getItemPrice(item: OrderItem) {
+    let price = Number(item?.price ?? 0);
+    if (item?.customizations) {
+      const values = Object.values(item.customizations);
+      const flatOptions = ([] as any[]).concat(
+        ...values.map(v => Array.isArray(v) ? v : [v].filter(Boolean))
+      );
+      flatOptions.forEach((option: any) => {
+        const extra = Number(option?.price ?? 0);
+        if (!isNaN(extra)) price += extra;
+      });
+    }
+    return price;
+  }
+
   const payloadItems = useMemo(() => {
     return (items || []).map((it: any) => ({
       name: String(it?.name ?? it?.title ?? "Item"),
@@ -87,32 +118,6 @@ function CartContent() {
     return item.customizations && Object.keys(item.customizations).length > 0;
   };
 
-  const getItemTotal = (item: OrderItem) => {
-    let total = Number(item?.price ?? 0);
-    if (item?.customizations) {
-      const values = Object.values(item.customizations);
-      const flatOptions = ([] as any[]).concat(...values.map(v => Array.isArray(v) ? v : [v].filter(Boolean)));
-      flatOptions.forEach((option: any) => {
-        const extra = Number(option?.price ?? 0);
-        if (!isNaN(extra)) total += extra;
-      });
-    }
-    const qty = Math.max(1, Number(item?.quantity ?? 1));
-    return total * qty;
-  };
-
-  const getItemPrice = (item: OrderItem) => {
-    let price = Number(item?.price ?? 0);
-    if (item?.customizations) {
-      const values = Object.values(item.customizations);
-      const flatOptions = ([] as any[]).concat(...values.map(v => Array.isArray(v) ? v : [v].filter(Boolean)));
-      flatOptions.forEach((option: any) => {
-        const extra = Number(option?.price ?? 0);
-        if (!isNaN(extra)) price += extra;
-      });
-    }
-    return price;
-  };
 
   if (items.length === 0) {
     return (
