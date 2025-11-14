@@ -23,6 +23,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Add item to cart
   const addItem = (newItem: CartItem) => {
     setItems((currentItems) => {
+      try { console.log('[CART] addItem', { id: newItem.id, name: newItem.name, qty: newItem.quantity, price: newItem.price }); } catch {}
       // For customized items, we don't want to combine them
       if (newItem.customizations && Object.keys(newItem.customizations).length > 0) {
         toast.success("Customized item added to cart", {
@@ -40,6 +41,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         // Update quantity if item exists
         const updatedItems = [...currentItems]
         updatedItems[existingItemIndex].quantity += newItem.quantity
+        try { console.log('[CART] updated qty', { id: newItem.id, qty: updatedItems[existingItemIndex].quantity }); } catch {}
 
         toast.success("Item updated in cart", {
           description: `${newItem.name} quantity increased to ${updatedItems[existingItemIndex].quantity}`,
@@ -51,6 +53,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         toast.success("Item added to cart", {
           description: `${newItem.name} added to your cart`,
         })
+        try { console.log('[CART] item added, count ->', currentItems.length + 1); } catch {}
 
         return [...currentItems, newItem]
       }
@@ -94,11 +97,13 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const sessionOrder = loadSessionOrder()
       if (sessionOrder && Array.isArray(sessionOrder.items) && sessionOrder.items.length > 0) {
         setItems(sessionOrder.items as any)
+        try { console.log('[CART] loaded from session', sessionOrder.items.length); } catch {}
         return
       }
       const savedCart = localStorage.getItem("cart")
       if (savedCart) {
         setItems(JSON.parse(savedCart))
+        try { console.log('[CART] loaded from local', JSON.parse(savedCart)?.length ?? 0); } catch {}
       }
     } catch (err) {
       console.error("Failed to load cart:", err)
@@ -107,6 +112,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     try {
+      try { console.log('[CART] items changed', items.length); } catch {}
       localStorage.setItem("cart", JSON.stringify(items))
       if ((items?.length ?? 0) > 0) {
         const payload = makeOrderPayload(items as any)

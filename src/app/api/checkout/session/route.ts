@@ -1,131 +1,78 @@
-import { NextResponse } from "next/server";
-import Stripe from "stripe";
-import { getServerUser } from "@/lib/session";
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-export const dynamic = 'force-dynamic';
+import { NextRequest, NextResponse } from "next/server";
 
-function baseUrl() {
-  return process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://broskiskitchen.com";
+type InItem = { name?: any; price?: any; qty?: any };
+type NormItem = { name: string; price: number; qty: number };
+
+function normalizeItem(it: InItem): NormItem | null {
+  const name = typeof it?.name === "string" ? it.name : String(it?.name ?? "Item");
+  const price = typeof it?.price === "string"
+    ? parseFloat(it.price.replace(/[^0-9.]/g, ""))
+    : Number(it?.price ?? 0);
+  const qty = Math.max(1, Number(it?.qty ?? 1));
+  if (!name || !Number.isFinite(price) || price < 0 || !Number.isFinite(qty) || qty < 1) return null;
+  return { name, price, qty };
 }
 
-type InItem = { id?: unknown; name?: unknown; price?: unknown; qty?: unknown };
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json().catch(() => ({}));
+    const rawItems: InItem[] = Array.isArray(body?.items) ? body.items : [];
 
-function toCents(priceDollars: unknown) {
-  const n = typeof priceDollars === "string"
-    ? parseFloat((priceDollars as string).replace(/[^0-9.]/g, ""))
-    : Number(priceDollars);
-  const safe = isFinite(n) ? n : 0;
-  return Math.max(0, Math.round(safe * 100));
-}
+    const items: NormItem[] = rawItems.map(normalizeItem).filter(Boolean) as NormItem[];
+    console.log("[CHECKOUT] incoming items:", rawItems);
+    console.log("[CHECKOUT] normalized items:", items);
 
-export async function POST(req: Request) {
-  const secret = process.env.STRIPE_SECRET_KEY;
-  if (!secret) {
-    return NextResponse.json({ error: "missing_stripe_secret_key" }, { status: 500 });
-  }
-  const stripe = new Stripe(secret, { apiVersion: "2025-02-24.acacia" });
+    if (items.length === 0) {
+      return NextResponse.json(
+        { error: "No valid items provided" },
+        { status: 400 }
+      );
+    }
 
-  // Get user authentication context
-  const user = await getServerUser();
+    const total = items.reduce((sum, it) => sum + it.price * it.qty, 0);
+    console.log("[CHECKOUT] computed total:", total);
 
-  const body = await req.json().catch(() => ({}));
-  const items: InItem[] = Array.isArray(body?.items) ? body.items : [];
-  const clean = items.map((it) => ({
-    id: String(it?.id ?? ""),
-    name: String(it?.name ?? "Item"),
-    qty: Math.max(1, Number(it?.qty ?? 1)),
-    amount: toCents(it?.price),
-  })).filter(x => x.qty > 0 && x.amount >= 0);
+    let url: string | null = null;
+    let sessionId: string | null = null;
 
-  if (clean.length === 0) {
-    return NextResponse.json({ error: "empty_cart" }, { status: 400 });
-  }
+    if (process.env.STRIPE_SECRET_KEY) {
+      const Stripe = (await import("stripe")).default;
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2025-02-24.acacia" });
 
-  // Calculate subtotal and tax
-  const TAX_RATE = 0.0825; // 8.25% sales tax
-  const subtotalCents = clean.reduce((sum, item) => sum + (item.amount * item.qty), 0);
-  const taxCents = Math.round(subtotalCents * TAX_RATE);
-  const totalCents = subtotalCents + taxCents;
+      const line_items = items.map((it) => ({
+        price_data: {
+          currency: "usd",
+          product_data: { name: it.name },
+          unit_amount: Math.round(it.price * 100),
+        },
+        quantity: it.qty,
+      }));
 
-  // Stripe minimum charge validation
-  const MIN_USD_CENTS = 50;
-  if (totalCents < MIN_USD_CENTS) {
+      const successBase = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://broskiskitchen.com";
+      const session = await stripe.checkout.sessions.create({
+        mode: "payment",
+        line_items,
+        success_url: `${successBase}/checkout?success=1`,
+        cancel_url: `${successBase}/checkout?canceled=1`,
+      });
+      url = session.url ?? null;
+      sessionId = session.id ?? null;
+      console.log("[CHECKOUT] stripe session created:", { sessionId, hasUrl: !!url });
+    } else {
+      console.warn("[CHECKOUT] STRIPE_SECRET_KEY not configured; returning mock URL");
+      url = "/mock/checkout";
+    }
+
+    return NextResponse.json({ url, sessionId, count: items.length, total });
+  } catch (error: any) {
+    console.error("[CHECKOUT] error:", error);
     return NextResponse.json(
-      { error: 'Minimum charge is $0.50 USD. Please add more items.' },
-      { status: 400 }
+      { error: error?.message ?? "Failed to create checkout session" },
+      { status: 500 }
     );
   }
-
-  const successUrl = `${baseUrl()}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
-  const cancelUrl = `${baseUrl()}/checkout/cancel`;
-
-  // Create line items array with products and tax
-  const lineItems = [
-    ...clean.map(li => ({
-      price_data: {
-        currency: "usd",
-        product_data: { name: li.name },
-        unit_amount: li.amount,
-      },
-      quantity: li.qty,
-      adjustable_quantity: { enabled: true, minimum: 1, maximum: 99 },
-    })),
-    // Add tax as a separate line item
-    {
-      price_data: {
-        currency: "usd",
-        product_data: { 
-          name: `Sales Tax (${(TAX_RATE * 100).toFixed(2)}%)`,
-          description: "State and local taxes"
-        },
-        unit_amount: taxCents,
-      },
-      quantity: 1,
-    }
-  ];
-
-  // Prepare cart items for metadata (with id, name, qty, priceCents)
-  const cartItems = clean.map(item => ({
-    id: item.id,
-    name: item.name,
-    qty: item.qty,
-    priceCents: item.amount
-  }));
-
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ['card'],
-    line_items: lineItems,
-    mode: 'payment',
-    success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cart`,
-    client_reference_id: user?.uid || '',
-    metadata: {
-      userId: user?.uid || '',
-      cartId: `cart_${Date.now()}_${user?.uid || 'anonymous'}`,
-      uid: user?.uid || '',
-      email: user?.email || '',
-      cart: JSON.stringify(cartItems),
-      subtotalCents: subtotalCents.toString(),
-      taxCents: taxCents.toString(),
-      totalCents: totalCents.toString(),
-    },
-    automatic_tax: {
-      enabled: true,
-    },
-  });
-
-  const headers = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' };
-  return new NextResponse(JSON.stringify({ 
-    url: session.url, 
-    mode: "stripe", 
-    itemsSent: clean.length,
-    subtotal: subtotalCents / 100,
-    tax: taxCents / 100,
-    total: totalCents / 100,
-    sessionId: session.id
-  }), { status: 200, headers });
-}
-
-export async function GET() {
-  return NextResponse.json({ success: false, error: "method_not_allowed" }, { status: 405 });
 }

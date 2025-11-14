@@ -3,6 +3,7 @@ import { useState, useMemo } from "react";
 import { useCart } from "../../lib/context/CartContext";
 import { safeFetch } from "@/lib/utils/safeFetch";
 import { AuthGuard } from "../../components/auth/AuthGuard";
+import { loadSessionOrder } from "@/lib/utils/orderPersistence";
 
 type OutItem = { name: string; price: number; qty: number };
 
@@ -14,24 +15,33 @@ function normalizePrice(p: unknown): number {
 function CheckoutContent() {
   const [loading, setLoading] = useState(false);
   const { items = [] } = useCart();
+  const effectiveItems = useMemo(() => {
+    if ((items?.length ?? 0) > 0) return items;
+    const sessionOrder = loadSessionOrder();
+    return sessionOrder?.items ?? [];
+  }, [items]);
 
   const payloadItems: OutItem[] = useMemo(() => {
-    return (items || []).map((it: any) => ({
+    return (effectiveItems || []).map((it: any) => ({
       name: String(it?.name ?? it?.title ?? "Item"),
       price: normalizePrice(it?.price ?? it?.unitPrice ?? it?.amount),
       qty: Math.max(1, Number(it?.qty ?? it?.quantity ?? 1)),
     })).filter(x => x.qty > 0 && x.price >= 0);
-  }, [items]);
+  }, [effectiveItems]);
 
   async function startPayment() {
     setLoading(true);
     try {
+      console.log("[CHECKOUT] items count:", effectiveItems.length);
+      console.log("[CHECKOUT] payload:", payloadItems);
       const res = await safeFetch("/api/checkout/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ items: payloadItems }),
       });
+      console.log("[CHECKOUT] API status:", res.status);
       const j = await res.json();
+      console.log("[CHECKOUT] API response:", j);
       if (j?.url) window.location.href = j.url;
       else alert(j?.error || "Checkout failed");
     } catch {
