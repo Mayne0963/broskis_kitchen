@@ -311,7 +311,7 @@ export default function ShopPage() {
                 From comfortable tees to stylish accessories, our merch lets you take a piece of the Broski's
                 experience home with you.
               </Typography>
-            </div>
+            </Stack>
             
             <Grid cols={2} gap="md">
               <div className="aspect-square relative rounded-lg overflow-hidden">
