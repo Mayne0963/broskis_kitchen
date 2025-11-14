@@ -31,7 +31,7 @@ function CartContent() {
   }, [items]);
 
   const subtotal = useMemo(() => {
-    return items.reduce((sum, item) => sum + getItemTotal(item), 0);
+    return (items || []).reduce((sum, item) => sum + getItemTotal(item), 0);
   }, [items]);
 
   const tax = useMemo(() => subtotal * 0.0825, [subtotal]);
@@ -86,20 +86,27 @@ function CartContent() {
   };
 
   const getItemTotal = (item: OrderItem) => {
-    let total = item.price;
-    if (item.customizations) {
-      Object.values(item.customizations).flat().forEach(option => {
-        total += option.price || 0;
+    let total = Number(item?.price ?? 0);
+    if (item?.customizations) {
+      const values = Object.values(item.customizations);
+      const flatOptions = ([] as any[]).concat(...values.map(v => Array.isArray(v) ? v : [v].filter(Boolean)));
+      flatOptions.forEach((option: any) => {
+        const extra = Number(option?.price ?? 0);
+        if (!isNaN(extra)) total += extra;
       });
     }
-    return total * item.quantity;
+    const qty = Math.max(1, Number(item?.quantity ?? 1));
+    return total * qty;
   };
 
   const getItemPrice = (item: OrderItem) => {
-    let price = item.price;
-    if (item.customizations) {
-      Object.values(item.customizations).flat().forEach(option => {
-        price += option.price || 0;
+    let price = Number(item?.price ?? 0);
+    if (item?.customizations) {
+      const values = Object.values(item.customizations);
+      const flatOptions = ([] as any[]).concat(...values.map(v => Array.isArray(v) ? v : [v].filter(Boolean)));
+      flatOptions.forEach((option: any) => {
+        const extra = Number(option?.price ?? 0);
+        if (!isNaN(extra)) price += extra;
       });
     }
     return price;
@@ -142,13 +149,13 @@ function CartContent() {
               </div>
 
               <ul className="divide-y divide-[#333333]">
-                {items.map((item) => (
-                  <li key={item.id} className="p-4 flex flex-col">
+                {items.map((item, idx) => (
+                  <li key={String(item?.id ?? idx)} className="p-4 flex flex-col">
                     <div className="flex items-center gap-4">
                       <div className="w-20 h-20 bg-[#222222] rounded-lg overflow-hidden relative flex-shrink-0">
                         {item.image ? (
-                          <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover" unoptimized />
-                        ) : (
+                          <Image src={item.image || "/placeholder.svg"} alt={String(item?.name || 'Item')} fill className="object-cover" unoptimized />
+                          ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <FaShoppingCart className="text-gray-500" />
                           </div>
@@ -157,7 +164,7 @@ function CartContent() {
 
                       <div className="flex-grow">
                         <div className="flex items-center gap-2">
-                          <h3 className="font-bold">{item.name.split(" (")[0]}</h3>
+                          <h3 className="font-bold">{(typeof item?.name === 'string' ? item.name.split(" (")[0] : String(item?.name || 'Item'))}</h3>
                           {hasCustomizations(item) && (
                             <span className="bg-gold-foil bg-opacity-20 text-gold-foil text-xs px-2 py-1 rounded-full flex items-center gap-1">
                               <FaCog size={10} /> Customized
@@ -171,10 +178,10 @@ function CartContent() {
                             {Object.entries(item.customizations ?? {}).map(([category, options]) => (
                               <div key={category} className="mb-1">
                                 <span className="text-xs text-gray-500 uppercase">{category}:</span>
-                                {options.map((option, index) => (
+                                {(Array.isArray(options) ? options : [options].filter(Boolean)).map((option: any, index: number) => (
                                   <div key={index} className="flex justify-between ml-2">
                                     <span>{option.name}</span>
-                                    {option.price > 0 && <span className="text-gold-foil">+${option.price.toFixed(2)}</span>}
+                                    {Number(option?.price ?? 0) > 0 && <span className="text-gold-foil">+${Number(option.price).toFixed(2)}</span>}
                                   </div>
                                 ))}
                               </div>
