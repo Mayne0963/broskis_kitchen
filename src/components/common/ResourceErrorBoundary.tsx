@@ -11,6 +11,7 @@ interface Props {
 interface State {
   hasError: boolean;
   error?: Error;
+  digest?: string;
 }
 
 class ResourceErrorBoundary extends Component<Props, State> {
@@ -21,7 +22,7 @@ class ResourceErrorBoundary extends Component<Props, State> {
 
   static getDerivedStateFromError(error: Error): State {
     // Update state so the next render will show the fallback UI
-    return { hasError: true, error };
+    return { hasError: true, error, digest: (error as any)?.digest };
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
@@ -60,9 +61,35 @@ class ResourceErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
+      const message = this.state.error?.message || 'An unexpected error occurred.'
+      const digest = this.state.digest || 'N/A'
       return this.props.fallback || (
-        <div className="p-4 text-center text-gray-500">
-          <p>Something went wrong. Please refresh the page.</p>
+        <div className="min-h-screen flex items-center justify-center bg-black">
+          <div className="text-center space-y-4 max-w-md mx-auto px-6">
+            <h2 className="text-2xl font-bold text-white">Something went wrong</h2>
+            <p className="text-gray-300">{message}</p>
+            <div className="text-xs text-gray-500">Error ID: {digest}</div>
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={() => window.location.reload()}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#FFD700] text-black rounded-lg hover:bg-[#E6C200]"
+              >
+                Reload
+              </button>
+              <button
+                onClick={() => { try { this.setState({ hasError: false, error: undefined, digest: undefined }) } catch {} }}
+                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-600 text-white rounded-lg hover:bg-gray-800"
+              >
+                Retry
+              </button>
+              <button
+                onClick={() => { try { window.location.href = '/' } catch {} }}
+                className="inline-flex items-center gap-2 px-4 py-2 border border-[#FFD700] text-[#FFD700] rounded-lg hover:bg-[#FFD700] hover:text-black"
+              >
+                Home
+              </button>
+            </div>
+          </div>
         </div>
       );
     }

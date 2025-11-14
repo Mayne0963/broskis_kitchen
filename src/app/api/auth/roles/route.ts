@@ -5,6 +5,7 @@ export const revalidate = 0;
 import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, ensureAdmin } from '@/lib/firebase/admin';
 import { UserRole } from '@/lib/auth/rbac';
+import { z } from 'zod';
 
 
 
@@ -12,7 +13,15 @@ import { UserRole } from '@/lib/auth/rbac';
 export async function POST(request: NextRequest) {
   try {
     await ensureAdmin(request);
-    const { uid, role } = await request.json();
+    const BodySchema = z.object({ uid: z.string().min(1), role: z.enum(['admin','customer','user']).transform(r => (r === 'user' ? 'customer' : r)) });
+    const parsed = BodySchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid body', issues: parsed.error.issues },
+        { status: 400 }
+      );
+    }
+    const { uid, role } = parsed.data;
     
     if (!uid || !role) {
       return NextResponse.json(
@@ -26,9 +35,10 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error setting user role:', error);
+    const requestId = `req_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    console.error('Error setting user role:', { error, requestId });
     return NextResponse.json(
-      { success: false, error: 'Failed to set user role' },
+      { success: false, error: 'Failed to set user role', requestId },
       { status: 500 }
     );
   }
@@ -39,9 +49,19 @@ export async function GET(request: NextRequest) {
   try {
     await ensureAdmin(request);
     const { searchParams } = new URL(request.url);
-    const uid = searchParams.get('uid');
-    const action = searchParams.get('action');
-    const maxResults = parseInt(searchParams.get('maxResults') || '1000');
+    const QuerySchema = z.object({
+      uid: z.string().optional(),
+      action: z.enum(['list']).optional(),
+      maxResults: z.string().transform(v => parseInt(v)).optional(),
+    });
+    const q = QuerySchema.parse({
+      uid: searchParams.get('uid') || undefined,
+      action: searchParams.get('action') || undefined,
+      maxResults: searchParams.get('maxResults') || undefined,
+    });
+    const uid = q.uid;
+    const action = q.action;
+    const maxResults = q.maxResults ?? 1000;
     
     if (action === 'list') {
       // Get all users with their roles
@@ -68,9 +88,10 @@ export async function GET(request: NextRequest) {
       );
     }
   } catch (error) {
-    console.error('Error getting user role/users:', error);
+    const requestId = `req_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    console.error('Error getting user role/users:', { error, requestId });
     return NextResponse.json(
-      { success: false, error: 'Failed to get user role/users' },
+      { success: false, error: 'Failed to get user role/users', requestId },
       { status: 500 }
     );
   }
@@ -80,14 +101,17 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     await ensureAdmin(request);
-    const { assignments } = await request.json();
+    const AssignmentSchema = z.object({ uid: z.string().min(1), role: z.enum(['admin','customer','user']).transform(r => (r === 'user' ? 'customer' : r)) });
+    const BodySchema = z.object({ assignments: z.array(AssignmentSchema) });
+    const parsed = BodySchema.safeParse(await request.json());
     
-    if (!Array.isArray(assignments)) {
+    if (!parsed.success) {
       return NextResponse.json(
-        { success: false, error: 'assignments must be an array' },
+        { success: false, error: 'Invalid body', issues: parsed.error.issues },
         { status: 400 }
       );
     }
+    const { assignments } = parsed.data;
     
     const results = await Promise.all(
       assignments.map(async ({ uid, role }: { uid: string; role: UserRole }) => {
@@ -109,9 +133,10 @@ export async function PUT(request: NextRequest) {
       results
     });
   } catch (error) {
-    console.error('Error in bulk role assignment:', error);
+    const requestId = `req_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    console.error('Error in bulk role assignment:', { error, requestId });
     return NextResponse.json(
-      { success: false, error: 'Failed to process bulk role assignment' },
+      { success: false, error: 'Failed to process bulk role assignment', requestId },
       { status: 500 }
     );
   }

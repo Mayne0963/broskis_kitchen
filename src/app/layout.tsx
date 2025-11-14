@@ -25,7 +25,7 @@ import Link from "next/link"
 import { isAdmin } from "../lib/roles"
 
 import { playfair, montserrat } from "./fonts"
-import StructuredData, { OrganizationStructuredData } from "../components/seo/StructuredData"
+import StructuredDataHead, { OrganizationStructuredDataHead } from "../components/seo/StructuredDataHead"
 import { SkipNavigation } from "../components/accessibility/AccessibilityEnhancer"
 import AccessibilityAudit from "../components/accessibility/AccessibilityAudit"
 import PWAManager from "../components/pwa/PWAManager"
@@ -123,8 +123,8 @@ export default async function RootLayout({
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
-        <StructuredData type="website" />
-        <OrganizationStructuredData />
+        <StructuredDataHead type="website" />
+        <OrganizationStructuredDataHead />
       </head>
       <body suppressHydrationWarning className={`${fontClasses} bg-black text-white min-h-screen flex flex-col antialiased`}>
         {/* Initialize Remote Config on client post-hydration */}
