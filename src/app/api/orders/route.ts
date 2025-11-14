@@ -92,14 +92,11 @@ export async function GET(request: NextRequest) {
         .orderBy('createdAt', 'desc')
         .limit(100);
       
-      // Filter out test orders if includeTest is false
-      if (!includeTest) {
-        ordersQuery = ordersQuery.where('isTest', '!=', true);
-      }
+      // Fetch orders first; filter test orders in memory to avoid Firestore index/inequality issues
       
       const allOrdersSnapshot = await ordersQuery.get();
     
-      const orders = allOrdersSnapshot.docs.map(doc => {
+      let orders = allOrdersSnapshot.docs.map(doc => {
         const data = doc.data();
         return {
           id: doc.id,
@@ -112,6 +109,11 @@ export async function GET(request: NextRequest) {
           tags: data.tags || []
         };
       });
+
+      // Apply test order filter post-query if needed
+      if (!includeTest) {
+        orders = orders.filter(o => o.isTest !== true);
+      }
     
       return NextResponse.json({ orders });
     }
@@ -127,6 +129,11 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Orders API error:', error);
     
+    // If upstream threw a Response (e.g., ensureAdmin), return it as-is
+    if (error instanceof Response) {
+      return error;
+    }
+
     // Handle authentication errors
     if (error.code === 'auth/id-token-expired' || error.code === 'auth/argument-error') {
       return NextResponse.json(
