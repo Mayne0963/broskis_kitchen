@@ -9,9 +9,10 @@ export default function ErrorMonitor() {
     // Handle unhandled promise rejections
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       try {
-        logError(new Error(event.reason), {
+        const msg = typeof event.reason === 'string' ? event.reason : String(event.reason)
+        logError(new Error(msg), {
           type: 'unhandledRejection',
-          reason: event.reason
+          reason: msg
         })
       } catch (error) {
         console.error('Error in handleUnhandledRejection:', error)

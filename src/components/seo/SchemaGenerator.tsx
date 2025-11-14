@@ -301,9 +301,14 @@ export default function SchemaGenerator({ type = 'all' }: SchemaGeneratorProps) 
   const pathname = usePathname()
 
   useEffect(() => {
-    // Remove existing schema scripts
-    const existingSchemas = document.querySelectorAll('script[data-schema]')
-    existingSchemas.forEach(script => script.remove())
+    try {
+      const existingSchemas = typeof document !== 'undefined'
+        ? document.querySelectorAll('script[data-schema]')
+        : ([] as any)
+      existingSchemas.forEach(script => {
+        try { script.remove() } catch {}
+      })
+    } catch {}
 
     const schemas: any[] = []
 
@@ -336,19 +341,27 @@ export default function SchemaGenerator({ type = 'all' }: SchemaGeneratorProps) 
       }
     }
 
-    // Add schemas to document head
-    schemas.forEach((schema, index) => {
-      const script = document.createElement('script')
-      script.type = 'application/ld+json'
-      script.setAttribute('data-schema', 'true')
-      script.textContent = JSON.stringify(schema, null, 2)
-      document.head.appendChild(script)
-    })
+    try {
+      if (typeof document !== 'undefined' && document.head) {
+        schemas.forEach((schema) => {
+          const script = document.createElement('script')
+          script.type = 'application/ld+json'
+          script.setAttribute('data-schema', 'true')
+          script.textContent = JSON.stringify(schema, null, 2)
+          try { document.head.appendChild(script) } catch {}
+        })
+      }
+    } catch {}
 
     return () => {
-      // Cleanup on unmount
-      const schemaScripts = document.querySelectorAll('script[data-schema]')
-      schemaScripts.forEach(script => script.remove())
+      try {
+        const schemaScripts = typeof document !== 'undefined'
+          ? document.querySelectorAll('script[data-schema]')
+          : ([] as any)
+        schemaScripts.forEach(script => {
+          try { script.remove() } catch {}
+        })
+      } catch {}
     }
   }, [pathname, type])
 

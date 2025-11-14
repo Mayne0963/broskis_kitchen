@@ -323,16 +323,23 @@ export function compressImage(
  */
 export function useCriticalImagePreloader(criticalImages: string[]) {
   useEffect(() => {
-    // Preload critical images immediately
     const preloadPromises = criticalImages.map(src => {
       return new Promise<void>((resolve) => {
-        const link = document.createElement('link')
-        link.rel = 'preload'
-        link.as = 'image'
-        link.href = src
-        link.onload = () => resolve()
-        link.onerror = () => resolve() // Don't block on errors
-        document.head.appendChild(link)
+        try {
+          const link = document.createElement('link')
+          link.rel = 'preload'
+          link.as = 'image'
+          link.href = src
+          link.onload = () => resolve()
+          link.onerror = () => resolve()
+          if (document.head) {
+            document.head.appendChild(link)
+          } else {
+            resolve()
+          }
+        } catch {
+          resolve()
+        }
       })
     })
 
@@ -341,13 +348,18 @@ export function useCriticalImagePreloader(criticalImages: string[]) {
     })
 
     return () => {
-      // Cleanup preload links
-      const preloadLinks = document.querySelectorAll('link[rel="preload"][as="image"]')
-      preloadLinks.forEach(link => {
-        if (criticalImages.some(src => link.getAttribute('href')?.includes(src))) {
-          link.remove()
-        }
-      })
+      try {
+        const preloadLinks = typeof document !== 'undefined'
+          ? document.querySelectorAll('link[rel="preload"][as="image"]')
+          : ([] as any)
+        preloadLinks.forEach(link => {
+          try {
+            if (criticalImages.some(src => (link.getAttribute('href') || '').includes(src))) {
+              link.remove()
+            }
+          } catch {}
+        })
+      } catch {}
     }
   }, [criticalImages])
 }

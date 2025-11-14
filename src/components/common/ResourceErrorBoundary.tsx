@@ -25,7 +25,18 @@ class ResourceErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    if (error.message.includes('Resource failed to load')) {
+    const msg = error.message || '';
+    const stack = (error as any).stack || '';
+    const benign = (
+      msg.includes('Resource failed to load') ||
+      msg.includes('null is not an object') ||
+      msg.includes('Cannot read properties of null')
+    ) && (
+      stack.includes('SchemaGenerator') ||
+      stack.includes('ImageOptimizationEnhancer') ||
+      stack.includes('SEOAudit')
+    );
+    if (benign) {
       this.setState({ hasError: false });
       return;
     }
