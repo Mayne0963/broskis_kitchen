@@ -32,6 +32,7 @@ import PWAManager from "../components/pwa/PWAManager"
 import { PageLoadingWrapper } from "../components/auth/PageLoadingWrapper"
 import { BrandedLoading } from "../components/ui/LoadingStates"
 import RemoteConfigInit from "@/components/system/RemoteConfigInit"
+import ClientOnly from "../components/common/ClientOnly"
 
 export const metadata: Metadata = {
   title: {
@@ -125,7 +126,7 @@ export default async function RootLayout({
         <StructuredData type="website" />
         <OrganizationStructuredData />
       </head>
-      <body className={`${fontClasses} bg-black text-white min-h-screen flex flex-col antialiased`}>
+      <body suppressHydrationWarning className={`${fontClasses} bg-black text-white min-h-screen flex flex-col antialiased`}>
         {/* Initialize Remote Config on client post-hydration */}
         <script dangerouslySetInnerHTML={{ __html: "window.__initRC__=true;" }} />
         <ServiceWorkerCleanup />
@@ -158,14 +159,16 @@ export default async function RootLayout({
                   <Footer />
 
                   <CookieConsent />
-                  <SEOAudit />
-                  <SchemaGenerator />
-                  <RemoteConfigInit />
-                  <NetworkStatus />
-                  <ErrorMonitor />
-                  {/* <PerformanceMonitor /> */}
-                  <AccessibilityAudit />
-                  <PWAManager />
+                  <ClientOnly>
+                    <SEOAudit />
+                    <SchemaGenerator />
+                    <RemoteConfigInit />
+                    <NetworkStatus />
+                    <ErrorMonitor />
+                    {/* <PerformanceMonitor /> */}
+                    <AccessibilityAudit />
+                    <PWAManager />
+                  </ClientOnly>
                 </Providers>
                 <MiniNowPlaying />
               </GlobalAudioProvider>
