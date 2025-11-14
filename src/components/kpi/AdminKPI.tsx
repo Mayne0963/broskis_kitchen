@@ -1,14 +1,31 @@
 "use client";
 
-import useSWR from 'swr';
+import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { BarChart3, DollarSign, Users } from 'lucide-react';
 
-const fetcher = (url: string) => fetch(url, { credentials: 'include' }).then(r => r.json());
-
 export default function AdminKPI() {
-  const { data, error, isLoading } = useSWR('/api/orders?kpi=1', fetcher);
-  
+  const [data, setData] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const ac = new AbortController();
+    (async () => {
+      try {
+        const res = await fetch('/api/orders?kpi=1', { credentials: 'include', signal: ac.signal });
+        if (!res.ok) throw new Error(await res.text());
+        const json = await res.json();
+        setData(json);
+      } catch (e: any) {
+        if (e?.name !== 'AbortError') setError(e?.message || 'Failed to load metrics');
+      } finally {
+        setLoading(false);
+      }
+    })();
+    return () => ac.abort();
+  }, []);
+
   const kpi = data?.kpi ?? { totalOrders: 0, revenueCents: 0, activeUsers: 0 };
   const revenue = new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -22,7 +39,7 @@ export default function AdminKPI() {
           <CardContent className="p-6">
             <div className="text-center text-red-600">
               <p>Error loading admin metrics</p>
-              <p className="text-sm">{error.message || 'Access denied'}</p>
+              <p className="text-sm">{error}</p>
             </div>
           </CardContent>
         </Card>
@@ -30,7 +47,7 @@ export default function AdminKPI() {
     );
   }
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <KpiCard label="Total Orders" value="Loading..." icon={BarChart3} />
