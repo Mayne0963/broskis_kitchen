@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Search, Package, Clock, CheckCircle, Truck } from 'lucide-react'
 import { guestOrderUtils } from '@/utils/guestOrderTracking'
 import { safeFetch } from '@/lib/utils/safeFetch'
@@ -53,7 +53,17 @@ export default function TrackOrderPage() {
           const response = await safeFetch(`/api/orders/${orderId}`)
           if (response.ok) {
             const { order: fullOrder } = await response.json()
-            setOrder(fullOrder)
+            const sanitized = {
+              id: String(fullOrder?.id || orderId),
+              status: String(fullOrder?.status || 'pending'),
+              total: typeof fullOrder?.total === 'number' ? fullOrder.total : Number(fullOrder?.total || 0),
+              orderType: String(fullOrder?.orderType || 'pickup'),
+              items: Array.isArray(fullOrder?.items) ? fullOrder.items : [],
+              createdAt: String(fullOrder?.createdAt || new Date().toISOString()),
+              estimatedTime: fullOrder?.estimatedTime,
+              contactInfo: fullOrder?.contactInfo || { email: email, phone: '' },
+            } as Order
+            setOrder(sanitized)
             setLoading(false)
             return
           }
@@ -69,7 +79,17 @@ export default function TrackOrderPage() {
 
       if (response.ok) {
         const { order } = await response.json()
-        setOrder(order)
+        const sanitized = {
+          id: String(order?.id || orderId),
+          status: String(order?.status || 'pending'),
+          total: typeof order?.total === 'number' ? order.total : Number(order?.total || 0),
+          orderType: String(order?.orderType || 'pickup'),
+          items: Array.isArray(order?.items) ? order.items : [],
+          createdAt: String(order?.createdAt || new Date().toISOString()),
+          estimatedTime: order?.estimatedTime,
+          contactInfo: order?.contactInfo || { email: email, phone: '' },
+        } as Order
+        setOrder(sanitized)
       } else {
         const { error } = await response.json()
         setError(error || 'Order not found')
@@ -120,6 +140,7 @@ export default function TrackOrderPage() {
   }
 
   return (
+    <TrackOrderErrorBoundary>
     <div className="min-h-screen bg-[var(--color-dark-charcoal)] py-8">
       <div className="max-w-4xl mx-auto px-4">
         {/* Header */}
@@ -277,5 +298,32 @@ export default function TrackOrderPage() {
         )}
       </div>
     </div>
+    </TrackOrderErrorBoundary>
   )
+}
+
+class TrackOrderErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props)
+    this.state = { hasError: false }
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+  componentDidCatch(error: any) {
+    console.error('TrackOrder page error:', error)
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-[var(--color-dark-charcoal)] text-white flex items-center justify-center">
+          <div className="text-center p-6">
+            <h2 className="text-2xl font-bold mb-2">Unable to load order</h2>
+            <p className="text-gray-400">Please refresh the page or try again later.</p>
+          </div>
+        </div>
+      )
+    }
+    return this.props.children as any
+  }
 }
