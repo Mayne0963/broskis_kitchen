@@ -117,6 +117,9 @@ export async function PATCH(
     
   } catch (error) {
     console.error('Failed to update order:', error);
+    if (error instanceof Response) {
+      return error;
+    }
     return NextResponse.json(
       { 
         ok: false, 
