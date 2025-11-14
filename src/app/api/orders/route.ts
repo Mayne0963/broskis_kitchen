@@ -68,11 +68,7 @@ export async function GET(request: NextRequest) {
     const mine = searchParams.get('mine') === '1';
     const wantKpi = searchParams.get('kpi') === '1';
     const includeTestParam = searchParams.get('includeTest');
-    
-    // Determine includeTest default based on environment
-    const includeTest = includeTestParam !== null 
-      ? includeTestParam === 'true' 
-      : process.env.NODE_ENV === 'development';
+    const includeTest = includeTestParam === 'true';
     
     // For admin-only operations (KPI or all orders), verify admin authentication
     if (wantKpi || !mine) {
@@ -112,7 +108,11 @@ export async function GET(request: NextRequest) {
 
       // Apply test order filter post-query if needed
       if (!includeTest) {
-        orders = orders.filter(o => o.isTest !== true);
+        orders = orders.filter(o => {
+          const id = String(o.id || "");
+          const isStripeTest = id.startsWith('cs_test') || id.startsWith('pi_test');
+          return o.isTest !== true && !isStripeTest;
+        });
       }
     
       return NextResponse.json({ orders });
