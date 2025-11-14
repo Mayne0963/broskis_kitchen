@@ -21,15 +21,14 @@ export async function GET() {
 
     const orders = snap.docs.map(d => {
       const o = d.data() as any;
-      const createdAt = o.createdAt?.toDate?.() || new Date();
-      const totalCents = Number(o.totalCents ?? o.total ?? 0);
+      const totalCents = Number(o.totalCents || 0);
       return {
         id: d.id,
-        createdAt: createdAt.toISOString(),
-        items: Array.isArray(o.items) ? o.items.map((i: any) => ({ name: i.name, qty: i.qty })) : [],
-        status: o.status || "processing",
+        date: (o.createdAt?.toDate?.() || new Date()).toISOString().slice(0,10),
+        items: (o.items || []).map((i:any)=>({ name: i.name, qty: i.qty })),
         totalCents,
-        total: Number((totalCents / 100).toFixed(2)),
+        totalFormatted: new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"}).format(totalCents/100),
+        status: o.status || "processing",
       };
     });
 

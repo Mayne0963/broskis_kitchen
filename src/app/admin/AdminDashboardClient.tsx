@@ -42,7 +42,7 @@ export default function AdminDashboardClient({ adminEmail, adminName }: AdminDas
 
   const fetchOrders = async () => {
     try {
-      const response = await safeFetch('/api/orders?includeTest=true');
+      const response = await safeFetch('/api/orders');
       if (!response.ok) {
         console.error('Failed to fetch orders:', response.status);
         setOrders([]);
