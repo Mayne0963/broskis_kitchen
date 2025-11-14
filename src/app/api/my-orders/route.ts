@@ -15,25 +15,19 @@ export async function GET() {
     const snap = await adminDb
       .collection("orders")
       .where("userId", "==", user.uid)
+      .orderBy("createdAt", "desc")
       .limit(50)
       .get();
 
-    const orderedDocs = snap.docs
-      .map(d => ({ id: d.id, data: d.data() as any }))
-      .sort((a, b) => {
-        const am = a.data?.createdAt?.toMillis?.() || 0;
-        const bm = b.data?.createdAt?.toMillis?.() || 0;
-        return bm - am;
-      });
-
-    const orders = orderedDocs.map(({ id, data: o }) => {
+    const orders = snap.docs.map(d => {
+      const o = d.data() as any;
       const totalCents = Number(o.totalCents || 0);
       return {
-        id,
-        date: (o.createdAt?.toDate?.() || new Date()).toISOString().slice(0, 10),
-        items: (o.items || []).map((i: any) => ({ name: i.name, qty: i.qty })),
+        id: d.id,
+        date: (o.createdAt?.toDate?.() || new Date()).toISOString().slice(0,10),
+        items: (o.items || []).map((i:any)=>({ name: i.name, qty: i.qty })),
         totalCents,
-        totalFormatted: new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(totalCents / 100),
+        totalFormatted: new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"}).format(totalCents/100),
         status: o.status || "processing",
       };
     });
