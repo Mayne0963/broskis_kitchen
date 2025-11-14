@@ -3,6 +3,7 @@
 import React, { createContext, useState, useContext, useEffect, type ReactNode } from "react"
 import type { CartContextType, CartItem } from "@/types"
 import { toast } from "sonner"
+import { loadSessionOrder, saveSessionOrder, clearSessionOrder, saveLocalSnapshot, makeOrderPayload } from "@/lib/utils/orderPersistence"
 
 // Create the context with a default undefined value
 const CartContext = createContext<CartContextType | undefined>(undefined)
@@ -85,26 +86,37 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     toast.success("Cart cleared", {
       description: "All items have been removed from your cart",
     })
+    try { clearSessionOrder() } catch {}
   }
 
-  // Load cart from localStorage on mount
   useEffect(() => {
     try {
+      const sessionOrder = loadSessionOrder()
+      if (sessionOrder && Array.isArray(sessionOrder.items) && sessionOrder.items.length > 0) {
+        setItems(sessionOrder.items as any)
+        return
+      }
       const savedCart = localStorage.getItem("cart")
       if (savedCart) {
         setItems(JSON.parse(savedCart))
       }
     } catch (err) {
-      console.error("Failed to load cart from localStorage:", err)
+      console.error("Failed to load cart:", err)
     }
   }, [])
 
-  // Save cart to localStorage when it changes
   useEffect(() => {
     try {
       localStorage.setItem("cart", JSON.stringify(items))
+      if ((items?.length ?? 0) > 0) {
+        const payload = makeOrderPayload(items as any)
+        saveSessionOrder(payload)
+        if (items.length === 1) {
+          saveLocalSnapshot(payload)
+        }
+      }
     } catch (err) {
-      console.error("Failed to save cart to localStorage:", err)
+      console.error("Failed to persist order:", err)
     }
   }, [items])
 

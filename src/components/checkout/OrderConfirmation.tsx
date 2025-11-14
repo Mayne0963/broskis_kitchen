@@ -4,6 +4,7 @@ import { CheckCircle, Clock, MapPin, Truck, Star, Download, MessageCircle } from
 import { useRouter } from 'next/navigation'
 import RealTimeOrderStatus from '@/components/orders/RealTimeOrderStatus'
 import { useState } from 'react'
+import { clearSessionOrder, clearLocalSnapshot } from '@/lib/utils/orderPersistence'
 
 interface CartItem {
   id: string
@@ -62,6 +63,10 @@ export default function OrderConfirmation({
   const estimatedTime = getEstimatedDeliveryTime()
   const pointsEarned = Math.floor(finalTotal * 10)
   
+  if (typeof window !== 'undefined') {
+    try { clearSessionOrder(); clearLocalSnapshot() } catch {}
+  }
+
   const getDeliveryAddress = () => {
     if (checkoutData.selectedAddress) {
       return `${checkoutData.selectedAddress.street}, ${checkoutData.selectedAddress.city}, ${checkoutData.selectedAddress.state} ${checkoutData.selectedAddress.zipCode}`
