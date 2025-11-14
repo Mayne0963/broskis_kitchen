@@ -2,7 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import optimization styles */
+/* Import design tokens and optimization styles */
+@import '../styles/design-tokens.css';
 @import '../styles/image-optimization.css';
 @import '../styles/mobile-enhancements.css';
 @import '../styles/music-player-enhancements.css';

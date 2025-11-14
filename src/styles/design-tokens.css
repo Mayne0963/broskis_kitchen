@@ -1,0 +1,322 @@
+/* ==========================================
+   BROSKI'S KITCHEN DESIGN TOKENS
+   Unified Visual Identity System
+   ========================================== */
+
+:root {
+  /* ==========================================
+     CORE BRAND COLORS (from homepage)
+     ========================================== */
+  
+  /* Primary Brand Colors */
+  --color-brand-gold: #FFD700;           /* Broski's signature gold */
+  --color-brand-gold-light: #FFE55C;     /* Lighter gold for hover states */
+  --color-brand-gold-dark: #E6C200;      /* Darker gold for depth */
+  --color-brand-burgundy: #B22222;       /* Badazz burgundy red */
+  --color-brand-burgundy-light: #DC143C; /* Lighter burgundy */
+  --color-brand-burgundy-dark: #8B1818;  /* Darker burgundy */
+  
+  /* Neutral Colors */
+  --color-black: #000000;                /* True black */
+  --color-black-rich: #0A0A0A;          /* Rich black for depth */
+  --color-black-deep: #0B0C0F;           /* Deep black for panels */
+  --color-white: #FFFFFF;                /* Pure white */
+  --color-off-white: #F8F5F0;            /* Warm off-white */
+  --color-gray-50: #F9FAFB;              /* Lightest gray */
+  --color-gray-100: #F3F4F6;              /* Very light gray */
+  --color-gray-200: #E5E7EB;              /* Light gray */
+  --color-gray-300: #D1D5DB;              /* Medium light gray */
+  --color-gray-400: #9CA3AF;              /* Medium gray */
+  --color-gray-500: #6B7280;              /* Base gray */
+  --color-gray-600: #4B5563;              /* Dark gray */
+  --color-gray-700: #374151;              /* Darker gray */
+  --color-gray-800: #1F2937;              /* Very dark gray */
+  --color-gray-900: #111827;              /* Darkest gray */
+
+  /* ==========================================
+     SEMANTIC COLORS (Usage-based)
+     ========================================== */
+  
+  /* Background Colors */
+  --color-bg-primary: var(--color-black);
+  --color-bg-secondary: var(--color-black-rich);
+  --color-bg-tertiary: var(--color-black-deep);
+  --color-bg-surface: rgba(16, 17, 22, 0.78); /* Glass effect */
+  --color-bg-card: var(--color-black-rich);
+  --color-bg-hover: rgba(255, 255, 255, 0.05);
+  --color-bg-active: rgba(255, 215, 0, 0.1);
+  --color-bg-selected: rgba(255, 215, 0, 0.15);
+  
+  /* Text Colors */
+  --color-text-primary: var(--color-white);
+  --color-text-secondary: rgba(255, 255, 255, 0.8);
+  --color-text-tertiary: rgba(255, 255, 255, 0.6);
+  --color-text-muted: rgba(255, 255, 255, 0.4);
+  --color-text-inverse: var(--color-black);
+  --color-text-brand: var(--color-brand-gold);
+  --color-text-link: var(--color-brand-gold-light);
+  --color-text-link-hover: var(--color-brand-gold);
+  
+  /* Border Colors */
+  --color-border-primary: rgba(255, 255, 255, 0.1);
+  --color-border-secondary: rgba(255, 255, 255, 0.16);
+  --color-border-tertiary: rgba(255, 255, 255, 0.2);
+  --color-border-brand: var(--color-brand-gold);
+  --color-border-focus: rgba(255, 215, 0, 0.35);
+  
+  /* State Colors */
+  --color-state-hover: rgba(255, 215, 0, 0.1);
+  --color-state-active: rgba(255, 215, 0, 0.15);
+  --color-state-focus: rgba(255, 215, 0, 0.35);
+  --color-state-disabled: rgba(255, 255, 255, 0.2);
+  --color-state-loading: var(--color-brand-gold);
+  
+  /* Status Colors */
+  --color-status-success: #10B981;        /* Green */
+  --color-status-warning: #F59E0B;        /* Amber */
+  --color-status-error: #EF4444;          /* Red */
+  --color-status-info: #3B82F6;           /* Blue */
+  --color-status-pending: var(--color-brand-gold);
+  --color-status-confirmed: #059669;      /* Dark green */
+  --color-status-cancelled: var(--color-brand-burgundy);
+  
+  /* ==========================================
+     TYPOGRAPHY TOKENS
+     ========================================== */
+  
+  /* Font Families */
+  --font-family-primary: 'Montserrat', 'Segoe UI', sans-serif;
+  --font-family-secondary: 'Playfair Display', serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  
+  /* Font Sizes */
+  --font-size-xs: 0.75rem;     /* 12px */
+  --font-size-sm: 0.875rem;    /* 14px */
+  --font-size-base: 1rem;      /* 16px */
+  --font-size-lg: 1.125rem;    /* 18px */
+  --font-size-xl: 1.25rem;     /* 20px */
+  --font-size-2xl: 1.5rem;     /* 24px */
+  --font-size-3xl: 1.875rem;   /* 30px */
+  --font-size-4xl: 2.25rem;    /* 36px */
+  --font-size-5xl: 3rem;       /* 48px */
+  --font-size-6xl: 3.75rem;    /* 60px */
+  --font-size-7xl: 4.5rem;     /* 72px */
+  
+  /* Font Weights */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  
+  /* Letter Spacing */
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+  --letter-spacing-widest: 0.1em;
+  
+  /* ==========================================
+     SPACING TOKENS (8px baseline grid)
+     ========================================== */
+  
+  --spacing-0: 0;              /* 0px */
+  --spacing-1: 0.25rem;         /* 4px */
+  --spacing-2: 0.5rem;         /* 8px */
+  --spacing-3: 0.75rem;         /* 12px */
+  --spacing-4: 1rem;            /* 16px */
+  --spacing-5: 1.25rem;         /* 20px */
+  --spacing-6: 1.5rem;          /* 24px */
+  --spacing-8: 2rem;            /* 32px */
+  --spacing-10: 2.5rem;         /* 40px */
+  --spacing-12: 3rem;            /* 48px */
+  --spacing-16: 4rem;            /* 64px */
+  --spacing-20: 5rem;            /* 80px */
+  --spacing-24: 6rem;            /* 96px */
+  --spacing-32: 8rem;            /* 128px */
+  
+  /* ==========================================
+     LAYOUT TOKENS
+     ========================================== */
+  
+  /* Container Widths */
+  --container-xs: 20rem;        /* 320px */
+  --container-sm: 24rem;        /* 384px */
+  --container-md: 28rem;        /* 448px */
+  --container-lg: 32rem;        /* 512px */
+  --container-xl: 36rem;        /* 576px */
+  --container-2xl: 42rem;        /* 672px */
+  --container-3xl: 48rem;        /* 768px */
+  --container-4xl: 56rem;        /* 896px */
+  --container-5xl: 64rem;        /* 1024px */
+  --container-6xl: 72rem;        /* 1152px */
+  --container-7xl: 80rem;        /* 1280px */
+  
+  /* Breakpoints */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+  
+  /* Z-Index Scale */
+  --z-index-dropdown: 1000;
+  --z-index-sticky: 1020;
+  --z-index-fixed: 1030;
+  --z-index-modal-backdrop: 1040;
+  --z-index-modal: 1050;
+  --z-index-popover: 1060;
+  --z-index-tooltip: 1070;
+  --z-index-toast: 1080;
+  
+  /* ==========================================
+     ANIMATION TOKENS
+     ========================================== */
+  
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Animation Duration */
+  --duration-instant: 0ms;
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 350ms;
+  --duration-slower: 500ms;
+  
+  /* Animation Easing */
+  --easing-linear: linear;
+  --easing-ease: ease;
+  --easing-ease-in: ease-in;
+  --easing-ease-out: ease-out;
+  --easing-ease-in-out: ease-in-out;
+  --easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --easing-accelerate: cubic-bezier(0.4, 0, 1, 1);
+  
+  /* ==========================================
+     EFFECT TOKENS
+     ========================================== */
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  --shadow-none: 0 0 #0000;
+  
+  /* Glow Effects */
+  --glow-gold-sm: 0 0 10px rgba(255, 215, 0, 0.3);
+  --glow-gold-md: 0 0 20px rgba(255, 215, 0, 0.4);
+  --glow-gold-lg: 0 0 30px rgba(255, 215, 0, 0.5);
+  --glow-burgundy-sm: 0 0 10px rgba(178, 34, 34, 0.3);
+  --glow-burgundy-md: 0 0 20px rgba(178, 34, 34, 0.4);
+  
+  /* Blur Effects */
+  --blur-sm: 4px;
+  --blur-base: 8px;
+  --blur-md: 12px;
+  --blur-lg: 16px;
+  --blur-xl: 24px;
+  
+  /* Opacity */
+  --opacity-0: 0;
+  --opacity-25: 0.25;
+  --opacity-50: 0.5;
+  --opacity-75: 0.75;
+  --opacity-100: 1;
+  
+  /* ==========================================
+     COMPONENT-SPECIFIC TOKENS
+     ========================================== */
+  
+  /* Button Tokens */
+  --button-padding-x: var(--spacing-4);
+  --button-padding-y: var(--spacing-2);
+  --button-border-radius: var(--spacing-2);
+  --button-font-size: var(--font-size-sm);
+  --button-font-weight: var(--font-weight-semibold);
+  --button-transition: var(--transition-normal);
+  
+  /* Input Tokens */
+  --input-padding-x: var(--spacing-4);
+  --input-padding-y: var(--spacing-2);
+  --input-border-radius: var(--spacing-2);
+  --input-border-width: 1px;
+  --input-font-size: var(--font-size-sm);
+  --input-transition: var(--transition-fast);
+  
+  /* Card Tokens */
+  --card-padding: var(--spacing-6);
+  --card-border-radius: var(--spacing-4);
+  --card-shadow: var(--shadow-lg);
+  --card-border: var(--color-border-primary);
+  
+  /* Navigation Tokens */
+  --nav-height: 5rem;
+  --nav-padding-x: var(--spacing-6);
+  --nav-padding-y: var(--spacing-4);
+  --nav-border: var(--color-border-primary);
+  
+  /* ==========================================
+     ACCESSIBILITY TOKENS
+     ========================================== */
+  
+  /* Focus States */
+  --focus-ring-width: 3px;
+  --focus-ring-color: var(--color-state-focus);
+  --focus-ring-offset: 2px;
+  
+  /* Color Contrast (WCAG 2.1 AA Compliant) */
+  --contrast-ratio-normal: 4.5;   /* AA compliance */
+  --contrast-ratio-large: 3;      /* AA compliance for large text */
+  
+  /* Motion Preferences */
+  --motion-reduced: initial;
+  --motion-duration: var(--duration-normal);
+  
+  /* High Contrast Mode */
+  --high-contrast-border: 2px solid currentColor;
+}
+
+/* Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-reduced: none;
+    --motion-duration: var(--duration-instant);
+    --transition-fast: var(--duration-instant);
+    --transition-normal: var(--duration-instant);
+    --transition-slow: var(--duration-instant);
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  :root {
+    --color-border-primary: currentColor;
+    --color-border-secondary: currentColor;
+    --color-text-secondary: var(--color-white);
+    --color-bg-hover: rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Dark Mode Override (for consistency) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Ensure dark theme consistency */
+    --color-bg-primary: var(--color-black);
+    --color-bg-secondary: var(--color-black-rich);
+    --color-text-primary: var(--color-white);
+    --color-text-secondary: rgba(255, 255, 255, 0.8);
+  }
+}

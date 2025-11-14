@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -8,7 +9,7 @@ import {
   Zap, 
   Users, 
   QrCode, 
-  Copy, 
+  Copy,
   Check,
   Trophy,
   Sparkles,
@@ -19,6 +20,14 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
+
+// Import new design system components
+import { Container } from "@/components/atoms/Grid"
+import { Typography } from "@/components/atoms/Typography"
+import { Button } from "@/components/atoms/Button"
+import { Card } from "@/components/atoms/Card"
+import { Grid, Stack } from "@/components/atoms/Grid"
+import { Badge } from "@/components/atoms/Badge"
 
 // Types
 interface RewardOffer {
@@ -51,12 +60,36 @@ interface Transaction {
   metadata?: any;
 }
 
-// Tier configuration
+// Tier configuration with design system colors
 const TIER_CONFIG = {
-  bronze: { name: 'Bronze', threshold: 0, color: 'from-amber-600 to-amber-800', icon: Star },
-  silver: { name: 'Silver', threshold: 500, color: 'from-gray-400 to-gray-600', icon: Trophy },
-  gold: { name: 'Gold', threshold: 1500, color: 'from-yellow-400 to-yellow-600', icon: Crown },
-  platinum: { name: 'Platinum', threshold: 3000, color: 'from-purple-400 to-purple-600', icon: Sparkles }
+  bronze: { 
+    name: 'Bronze', 
+    threshold: 0, 
+    color: 'from-[var(--color-status-warning)] to-[var(--color-status-warning-dark)]', 
+    icon: Star,
+    badgeVariant: 'warning' as const
+  },
+  silver: { 
+    name: 'Silver', 
+    threshold: 500, 
+    color: 'from-[var(--color-text-secondary)] to-[var(--color-text-tertiary)]', 
+    icon: Trophy,
+    badgeVariant: 'secondary' as const
+  },
+  gold: { 
+    name: 'Gold', 
+    threshold: 1500, 
+    color: 'from-[var(--color-brand-gold)] to-[var(--color-brand-gold-light)]', 
+    icon: Crown,
+    badgeVariant: 'gold' as const
+  },
+  platinum: { 
+    name: 'Platinum', 
+    threshold: 3000, 
+    color: 'from-[var(--color-brand-burgundy)] to-[var(--color-brand-burgundy-light)]', 
+    icon: Sparkles,
+    badgeVariant: 'primary' as const
+  }
 };
 
 // Sample reward offers
@@ -225,20 +258,24 @@ export default function RewardsClient({ initial }: { initial: any }) {
   if (!state?.ok) {
     const unauth = state?.reason === "unauthenticated";
     return (
-      <div className="mx-auto max-w-3xl p-8">
-        <div className="card">
-          <h2 className="text-xl font-semibold mb-1">Oops! Something went wrong</h2>
-          <p className="text-white/70">
-            {unauth
-              ? "Please sign in to view your rewards."
-              : "We couldn't load your rewards right now. Please try again."}
-          </p>
-          <div className="mt-4 flex gap-3">
-            <button className="btn-primary" onClick={() => location.reload()}>Try Again</button>
-            {unauth && <a className="btn-ghost underline" href="/login">Go to Login</a>}
-          </div>
-        </div>
-      </div>
+      <Container className="max-w-3xl py-8">
+        <Card>
+          <Card.Content>
+            <Stack direction="column" gap="md">
+              <Typography variant="h4">Oops! Something went wrong</Typography>
+              <Typography variant="body" className="text-[var(--color-text-secondary)]">
+                {unauth
+                  ? "Please sign in to view your rewards."
+                  : "We couldn't load your rewards right now. Please try again."}
+              </Typography>
+              <Stack direction="row" gap="md">
+                <Button variant="primary" onClick={() => location.reload()}>Try Again</Button>
+                {unauth && <Button variant="ghost" href="/login">Go to Login</Button>}
+              </Stack>
+            </Stack>
+          </Card.Content>
+        </Card>
+      </Container>
     );
   }
 
@@ -248,119 +285,131 @@ export default function RewardsClient({ initial }: { initial: any }) {
   const TierIcon = currentTierConfig.icon;
 
   return (
-    <div className="mx-auto max-w-6xl p-6 space-y-8">
-      {/* Header Section */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center space-y-4"
-      >
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-          Broski's Rewards
-        </h1>
-        <p className="text-white/70 text-lg">Earn points, unlock rewards, and level up your dining experience</p>
-      </motion.div>
+    <Container className="max-w-6xl py-8">
+      <Stack direction="column" gap="xl">
+        {/* Header Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center space-y-4"
+        >
+          <Typography variant="hero" className="bg-gradient-to-r from-[var(--color-brand-gold)] to-[var(--color-brand-gold-light)] bg-clip-text text-transparent">
+            Broski's Rewards
+          </Typography>
+          <Typography variant="h5" className="text-[var(--color-text-secondary)]">
+            Earn points, unlock rewards, and level up your dining experience
+          </Typography>
+        </motion.div>
 
-      {/* Points & Tier Overview */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-6"
-      >
-        {/* Current Points */}
-        <div className="card bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border-yellow-500/30">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-white/70 text-sm">Available Points</p>
-              <p className="text-3xl font-bold text-yellow-400">{profile.points.toLocaleString()}</p>
-            </div>
-            <Gift className="h-8 w-8 text-yellow-400" />
-          </div>
-        </div>
+        {/* Points & Tier Overview */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <Grid cols={1} md={3} gap="lg">
+            {/* Current Points */}
+            <Card variant="elevated" className="bg-gradient-to-br from-[var(--color-brand-gold-transparent)] to-[var(--color-brand-gold-light-transparent)] border-[var(--color-brand-gold)]/30">
+              <Card.Content>
+                <Stack direction="row" gap="md" alignment="center" justify="between">
+                  <Stack direction="column" gap="xs">
+                    <Typography variant="body-sm" className="text-[var(--color-text-secondary)]">Available Points</Typography>
+                    <Typography variant="h3" className="text-[var(--color-brand-gold)]">{profile.points.toLocaleString()}</Typography>
+                  </Stack>
+                  <Gift className="h-8 w-8 text-[var(--color-brand-gold)]" />
+                </Stack>
+              </Card.Content>
+            </Card>
 
-        {/* Lifetime Points */}
-        <div className="card bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-purple-500/30">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-white/70 text-sm">Lifetime Points</p>
-              <p className="text-3xl font-bold text-purple-400">{profile.lifetimePoints.toLocaleString()}</p>
-            </div>
-            <TrendingUp className="h-8 w-8 text-purple-400" />
-          </div>
-        </div>
+            {/* Lifetime Points */}
+            <Card variant="elevated" className="bg-gradient-to-br from-[var(--color-status-info-transparent)] to-[var(--color-status-info-light-transparent)] border-[var(--color-status-info)]/30">
+              <Card.Content>
+                <Stack direction="row" gap="md" alignment="center" justify="between">
+                  <Stack direction="column" gap="xs">
+                    <Typography variant="body-sm" className="text-[var(--color-text-secondary)]">Lifetime Points</Typography>
+                    <Typography variant="h3" className="text-[var(--color-status-info)]">{profile.lifetimePoints.toLocaleString()}</Typography>
+                  </Stack>
+                  <TrendingUp className="h-8 w-8 text-[var(--color-status-info)]" />
+                </Stack>
+              </Card.Content>
+            </Card>
 
-        {/* Current Tier */}
-        <div className={`card bg-gradient-to-br ${currentTierConfig.color}/20 border-current/30`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-white/70 text-sm">Current Tier</p>
-              <p className="text-2xl font-bold">{currentTierConfig.name}</p>
-            </div>
-            <TierIcon className="h-8 w-8" />
-          </div>
-        </div>
-      </motion.div>
+            {/* Current Tier */}
+            <Card variant="elevated" className={`bg-gradient-to-br ${currentTierConfig.color}/20 border-current/30`}>
+              <Card.Content>
+                <Stack direction="row" gap="md" alignment="center" justify="between">
+                  <Stack direction="column" gap="xs">
+                    <Typography variant="body-sm" className="text-[var(--color-text-secondary)]">Current Tier</Typography>
+                    <Typography variant="h3">{currentTierConfig.name}</Typography>
+                  </Stack>
+                  <TierIcon className="h-8 w-8" />
+                </Stack>
+              </Card.Content>
+            </Card>
+          </Grid>
+        </motion.div>
 
       {/* Tier Progress */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="card"
       >
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Tier Progress</h2>
-          {tierProgress.nextTierName && (
-            <span className="text-sm text-white/70">
-              {tierProgress.pointsToNext} points to {tierProgress.nextTierName}
-            </span>
-          )}
-        </div>
-        
-        <div className="space-y-4">
-          {/* Progress Bar */}
-          <div className="relative">
-            <div className="w-full bg-white/10 rounded-full h-3">
-              <motion.div 
-                className={`h-3 rounded-full bg-gradient-to-r ${currentTierConfig.color}`}
-                initial={{ width: 0 }}
-                animate={{ width: `${tierProgress.progress}%` }}
-                transition={{ duration: 1, delay: 0.5 }}
-              />
-            </div>
-            <div className="flex justify-between mt-2 text-sm text-white/70">
-              <span>{currentTierConfig.name}</span>
-              {tierProgress.nextTierName && <span>{tierProgress.nextTierName}</span>}
-            </div>
-          </div>
-
-          {/* Tier Benefits */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-            {Object.entries(TIER_CONFIG).map(([key, tier]) => {
-              const isUnlocked = profile.lifetimePoints >= tier.threshold;
-              const Icon = tier.icon;
-              return (
-                <div 
-                  key={key}
-                  className={`p-3 rounded-lg border ${
-                    isUnlocked 
-                      ? `bg-gradient-to-br ${tier.color}/20 border-current/30` 
-                      : 'bg-white/5 border-white/10'
-                  }`}
-                >
-                  <Icon className={`h-5 w-5 mb-2 ${isUnlocked ? '' : 'text-white/30'}`} />
-                  <p className={`text-sm font-medium ${isUnlocked ? '' : 'text-white/50'}`}>
-                    {tier.name}
-                  </p>
-                  <p className={`text-xs ${isUnlocked ? 'text-white/70' : 'text-white/30'}`}>
-                    {tier.threshold} pts
-                  </p>
+        <Card>
+          <Card.Content>
+            <Stack direction="row" gap="md" alignment="center" justify="between" className="mb-6">
+              <Typography variant="h4">Tier Progress</Typography>
+              {tierProgress.nextTierName && (
+                <Typography variant="body-sm" className="text-[var(--color-text-secondary)]">
+                  {tierProgress.pointsToNext} points to {tierProgress.nextTierName}
+                </Typography>
+              )}
+            </Stack>
+            
+            <Stack direction="column" gap="lg">
+              {/* Progress Bar */}
+              <div className="relative">
+                <div className="w-full bg-[var(--color-background-subtle)] rounded-full h-3">
+                  <motion.div 
+                    className={`h-3 rounded-full bg-gradient-to-r ${currentTierConfig.color}`}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${tierProgress.progress}%` }}
+                    transition={{ duration: 1, delay: 0.5 }}
+                  />
                 </div>
-              );
-            })}
-          </div>
-        </div>
+                <div className="flex justify-between mt-2">
+                  <Typography variant="body-sm">{currentTierConfig.name}</Typography>
+                  {tierProgress.nextTierName && <Typography variant="body-sm">{tierProgress.nextTierName}</Typography>}
+                </div>
+              </div>
+
+              {/* Tier Benefits */}
+              <Grid cols={2} md={4} gap="md">
+                {Object.entries(TIER_CONFIG).map(([key, tier]) => {
+                  const isUnlocked = profile.lifetimePoints >= tier.threshold;
+                  const Icon = tier.icon;
+                  return (
+                    <Card 
+                      key={key}
+                      variant={isUnlocked ? "elevated" : "minimal"}
+                      className={`${isUnlocked ? `bg-gradient-to-br ${tier.color}/20 border-current/30` : 'opacity-60'}`}
+                    >
+                      <Card.Content className="text-center">
+                        <Icon className={`h-5 w-5 mx-auto mb-2 ${isUnlocked ? '' : 'text-[var(--color-text-tertiary)]'}`} />
+                        <Typography variant="body-sm" className={isUnlocked ? '' : 'text-[var(--color-text-tertiary)]'}>
+                          {tier.name}
+                        </Typography>
+                        <Typography variant="body-xs" className={isUnlocked ? 'text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'}>
+                          {tier.threshold} pts
+                        </Typography>
+                      </Card.Content>
+                    </Card>
+                  );
+                })}
+              </Grid>
+            </Stack>
+          </Card.Content>
+        </Card>
       </motion.div>
 
       {/* Action Buttons */}
@@ -368,23 +417,26 @@ export default function RewardsClient({ initial }: { initial: any }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="grid grid-cols-1 md:grid-cols-2 gap-4"
       >
-        <button
-          onClick={() => setShowRedemptionModal(true)}
-          className="btn-primary flex items-center justify-center gap-2 py-4"
-        >
-          <Gift className="h-5 w-5" />
-          Redeem Rewards
-        </button>
-        
-        <button
-          onClick={() => setShowReferralModal(true)}
-          className="btn-ghost flex items-center justify-center gap-2 py-4 border-2 border-white/20 hover:border-white/40"
-        >
-          <Users className="h-5 w-5" />
-          Refer Friends
-        </button>
+        <Grid cols={1} md={2} gap="lg">
+          <Button
+            variant="primary"
+            onClick={() => setShowRedemptionModal(true)}
+            startIcon={<Gift />}
+            size="lg"
+          >
+            Redeem Rewards
+          </Button>
+          
+          <Button
+            variant="outline"
+            onClick={() => setShowReferralModal(true)}
+            startIcon={<Users />}
+            size="lg"
+          >
+            Refer Friends
+          </Button>
+        </Grid>
       </motion.div>
 
       {/* Recent Transactions */}
@@ -392,44 +444,57 @@ export default function RewardsClient({ initial }: { initial: any }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="card"
       >
-        <div className="flex items-center gap-2 mb-4">
-          <Clock className="h-5 w-5" />
-          <h2 className="text-xl font-semibold">Recent Activity</h2>
-        </div>
-        
-        <div className="space-y-3">
-          {transactions.slice(0, 5).map((transaction) => (
-            <div key={transaction.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-full ${
-                  transaction.delta > 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-                }`}>
-                  {transaction.delta > 0 ? <TrendingUp className="h-4 w-4" /> : <Gift className="h-4 w-4" />}
-                </div>
-                <div>
-                  <p className="font-medium">{transaction.description}</p>
-                  <p className="text-sm text-white/60">
-                    {new Date(transaction.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-              <div className={`font-bold ${
-                transaction.delta > 0 ? 'text-green-400' : 'text-red-400'
-              }`}>
-                {transaction.delta > 0 ? '+' : ''}{transaction.delta}
-              </div>
-            </div>
-          ))}
-          
-          {transactions.length === 0 && (
-            <div className="text-center py-8 text-white/60">
-              <Clock className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              <p>No transactions yet. Start earning points with your first order!</p>
-            </div>
-          )}
-        </div>
+        <Card>
+          <Card.Content>
+            <Stack direction="row" gap="md" alignment="center" className="mb-6">
+              <Clock className="h-5 w-5 text-[var(--color-text-secondary)]" />
+              <Typography variant="h4">Recent Activity</Typography>
+            </Stack>
+            
+            <Stack direction="column" gap="md">
+              {transactions.slice(0, 5).map((transaction) => (
+                <Card key={transaction.id} variant="minimal" className="bg-[var(--color-background-subtle)]">
+                  <Card.Content>
+                    <Stack direction="row" gap="md" alignment="center" justify="between">
+                      <Stack direction="row" gap="md" alignment="center">
+                        <div className={`p-2 rounded-full ${
+                          transaction.delta > 0 ? 'bg-[var(--color-status-success-transparent)] text-[var(--color-status-success)]' : 'bg-[var(--color-status-error-transparent)] text-[var(--color-status-error)]'
+                        }`}>
+                          {transaction.delta > 0 ? <TrendingUp className="h-4 w-4" /> : <Gift className="h-4 w-4" />}
+                        </div>
+                        <Stack direction="column" gap="xs">
+                          <Typography variant="body">{transaction.description}</Typography>
+                          <Typography variant="body-xs" className="text-[var(--color-text-secondary)]">
+                            {new Date(transaction.createdAt).toLocaleDateString()}
+                          </Typography>
+                        </Stack>
+                      </Stack>
+                      <Typography variant="h6" className={
+                        transaction.delta > 0 ? 'text-[var(--color-status-success)]' : 'text-[var(--color-status-error)]'
+                      }>
+                        {transaction.delta > 0 ? '+' : ''}{transaction.delta}
+                      </Typography>
+                    </Stack>
+                  </Card.Content>
+                </Card>
+              ))}
+              
+              {transactions.length === 0 && (
+                <Card variant="minimal" className="text-center py-8">
+                  <Card.Content>
+                    <Stack direction="column" gap="md" alignment="center">
+                      <Clock className="h-12 w-12 text-[var(--color-text-tertiary)]" />
+                      <Typography variant="body" className="text-[var(--color-text-secondary)]">
+                        No transactions yet. Start earning points with your first order!
+                      </Typography>
+                    </Stack>
+                  </Card.Content>
+                </Card>
+              )}
+            </Stack>
+          </Card.Content>
+        </Card>
       </motion.div>
 
       {/* Redemption Modal */}
@@ -446,32 +511,35 @@ export default function RewardsClient({ initial }: { initial: any }) {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-black border border-white/20 rounded-xl p-6 max-w-4xl w-full max-h-[80vh] overflow-y-auto"
+              className="bg-[var(--color-background-elevated)] border border-[var(--color-border-subtle)] rounded-xl p-6 max-w-4xl w-full max-h-[80vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold">Redeem Rewards</h3>
-                <button
+              <Stack direction="row" gap="md" alignment="center" justify="between" className="mb-6">
+                <Typography variant="h3">Redeem Rewards</Typography>
+                <Button
+                  variant="ghost"
                   onClick={() => setShowRedemptionModal(false)}
-                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                  size="sm"
+                  className="p-2"
                 >
                   <X className="h-5 w-5" />
-                </button>
-              </div>
+                </Button>
+              </Stack>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Grid cols={1} md={2} lg={3} gap="md">
                 {REWARD_OFFERS.filter(reward => reward.isActive).map((reward) => {
                   const canRedeem = profile.points >= reward.pointsCost;
                   const tierMet = !reward.tierRequirement || 
                     TIER_CONFIG[profile.tier].threshold >= TIER_CONFIG[reward.tierRequirement].threshold;
 
                   return (
-                    <div
+                    <Card
                       key={reward.id}
-                      className={`p-4 rounded-lg border transition-all ${
+                      variant={canRedeem && tierMet ? "elevated" : "minimal"}
+                      className={`transition-all cursor-pointer ${
                         canRedeem && tierMet
-                          ? 'border-yellow-500/50 bg-yellow-500/10 hover:bg-yellow-500/20 cursor-pointer'
-                          : 'border-white/20 bg-white/5 opacity-60'
+                          ? 'bg-[var(--color-brand-gold-transparent)] border-[var(--color-brand-gold)]/50 hover:bg-[var(--color-brand-gold-light-transparent)]'
+                          : 'opacity-60'
                       }`}
                       onClick={() => {
                         if (canRedeem && tierMet) {
@@ -479,62 +547,71 @@ export default function RewardsClient({ initial }: { initial: any }) {
                         }
                       }}
                     >
-                      <div className="flex items-start justify-between mb-3">
-                        <h4 className="font-semibold">{reward.name}</h4>
-                        <span className="text-yellow-400 font-bold">{reward.pointsCost}</span>
-                      </div>
-                      <p className="text-sm text-white/70 mb-3">{reward.description}</p>
-                      
-                      {reward.tierRequirement && (
-                        <div className="flex items-center gap-1 mb-2">
-                          <Crown className="h-3 w-3" />
-                          <span className="text-xs text-white/60">
-                            {TIER_CONFIG[reward.tierRequirement].name}+ required
-                          </span>
-                        </div>
-                      )}
-                      
-                      <div className="flex items-center justify-between">
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          reward.category === 'food' ? 'bg-green-500/20 text-green-400' :
-                          reward.category === 'discount' ? 'bg-blue-500/20 text-blue-400' :
-                          'bg-purple-500/20 text-purple-400'
-                        }`}>
-                          {reward.category}
-                        </span>
+                      <Card.Content>
+                        <Stack direction="row" gap="md" alignment="start" justify="between" className="mb-3">
+                          <Typography variant="h6" className="flex-1">{reward.name}</Typography>
+                          <Badge variant="gold">{reward.pointsCost}</Badge>
+                        </Stack>
+                        <Typography variant="body-sm" className="text-[var(--color-text-secondary)] mb-3">{reward.description}</Typography>
                         
-                        {canRedeem && tierMet && (
-                          <ChevronRight className="h-4 w-4 text-yellow-400" />
+                        {reward.tierRequirement && (
+                          <Stack direction="row" gap="xs" alignment="center" className="mb-3">
+                            <Crown className="h-3 w-3 text-[var(--color-brand-gold)]" />
+                            <Typography variant="body-xs" className="text-[var(--color-text-secondary)]">
+                              {TIER_CONFIG[reward.tierRequirement].name}+ required
+                            </Typography>
+                          </Stack>
                         )}
-                      </div>
-                    </div>
+                        
+                        <Stack direction="row" gap="md" alignment="center" justify="between">
+                          <Badge 
+                            variant={
+                              reward.category === 'food' ? 'success' :
+                              reward.category === 'discount' ? 'info' :
+                              'primary'
+                            }
+                            size="sm"
+                          >
+                            {reward.category}
+                          </Badge>
+                          
+                          {canRedeem && tierMet && (
+                            <ChevronRight className="h-4 w-4 text-[var(--color-brand-gold)]" />
+                          )}
+                        </Stack>
+                      </Card.Content>
+                    </Card>
                   );
                 })}
-              </div>
+              </Grid>
 
               {/* Confirmation Dialog */}
               {selectedReward && (
-                <div className="mt-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-                  <h4 className="font-semibold mb-2">Confirm Redemption</h4>
-                  <p className="text-sm text-white/70 mb-4">
-                    Redeem <strong>{selectedReward.name}</strong> for <strong>{selectedReward.pointsCost} points</strong>?
-                  </p>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => handleRedeem(selectedReward)}
-                      disabled={isRedeeming}
-                      className="btn-primary flex-1 disabled:opacity-50"
-                    >
-                      {isRedeeming ? 'Redeeming...' : 'Confirm Redemption'}
-                    </button>
-                    <button
-                      onClick={() => setSelectedReward(null)}
-                      className="btn-ghost flex-1"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
+                <Card variant="elevated" className="mt-6 bg-[var(--color-brand-gold-transparent)] border-[var(--color-brand-gold)]/30">
+                  <Card.Content>
+                    <Typography variant="h5" className="mb-3">Confirm Redemption</Typography>
+                    <Typography variant="body" className="text-[var(--color-text-secondary)] mb-4">
+                      Redeem <strong>{selectedReward.name}</strong> for <strong>{selectedReward.pointsCost} points</strong>?
+                    </Typography>
+                    <Grid cols={2} gap="md">
+                      <Button
+                        onClick={() => handleRedeem(selectedReward)}
+                        disabled={isRedeeming}
+                        variant="primary"
+                        className="w-full"
+                      >
+                        {isRedeeming ? 'Redeeming...' : 'Confirm Redemption'}
+                      </Button>
+                      <Button
+                        onClick={() => setSelectedReward(null)}
+                        variant="ghost"
+                        className="w-full"
+                      >
+                        Cancel
+                      </Button>
+                    </Grid>
+                  </Card.Content>
+                </Card>
               )}
             </motion.div>
           </motion.div>
@@ -555,64 +632,79 @@ export default function RewardsClient({ initial }: { initial: any }) {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-black border border-white/20 rounded-xl p-6 max-w-md w-full"
+              className="bg-[var(--color-background-elevated)] border border-[var(--color-border-subtle)] rounded-xl p-6 max-w-md w-full"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold">Refer Friends</h3>
-                <button
+              <Stack direction="row" gap="md" alignment="center" justify="between" className="mb-6">
+                <Typography variant="h3">Refer Friends</Typography>
+                <Button
+                  variant="ghost"
                   onClick={() => setShowReferralModal(false)}
-                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                  size="sm"
+                  className="p-2"
                 >
                   <X className="h-5 w-5" />
-                </button>
-              </div>
+                </Button>
+              </Stack>
 
-              <div className="text-center space-y-4">
-                <div className="p-6 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg">
-                  <Users className="h-12 w-12 mx-auto mb-3 text-purple-400" />
-                  <h4 className="font-semibold mb-2">Earn 200 Points</h4>
-                  <p className="text-sm text-white/70">
-                    For every friend you refer who makes their first order
-                  </p>
-                </div>
+              <Stack direction="column" gap="lg" alignment="center">
+                <Card variant="elevated" className="bg-gradient-to-br from-[var(--color-status-info-transparent)] to-[var(--color-status-info-light-transparent)] border-[var(--color-status-info)]/30">
+                  <Card.Content className="text-center">
+                    <Users className="h-12 w-12 mx-auto mb-3 text-[var(--color-status-info)]" />
+                    <Typography variant="h5" className="mb-2">Earn 200 Points</Typography>
+                    <Typography variant="body-sm" className="text-[var(--color-text-secondary)]">
+                      For every friend you refer who makes their first order
+                    </Typography>
+                  </Card.Content>
+                </Card>
 
                 {profile.referralCode && (
-                  <div className="space-y-3">
-                    <p className="text-sm text-white/70">Your referral code:</p>
-                    <div className="flex items-center gap-2 p-3 bg-white/10 rounded-lg">
-                      <code className="flex-1 text-center font-mono text-lg font-bold">
-                        {profile.referralCode}
-                      </code>
-                      <button
-                        onClick={copyReferralCode}
-                        className="p-2 hover:bg-white/10 rounded transition-colors"
-                      >
-                        {copiedReferral ? (
-                          <Check className="h-4 w-4 text-green-400" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </button>
-                    </div>
+                  <Stack direction="column" gap="md" className="w-full">
+                    <Typography variant="body-sm" className="text-[var(--color-text-secondary)]">Your referral code:</Typography>
+                    <Card variant="minimal" className="bg-[var(--color-background-subtle)]">
+                      <Card.Content>
+                        <Stack direction="row" gap="md" alignment="center">
+                          <code className="flex-1 text-center font-mono text-lg font-bold text-[var(--color-brand-gold)]">
+                            {profile.referralCode}
+                          </code>
+                          <Button
+                            variant="ghost"
+                            onClick={copyReferralCode}
+                            size="sm"
+                            className="p-2"
+                          >
+                            {copiedReferral ? (
+                              <Check className="h-4 w-4 text-[var(--color-status-success)]" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </Stack>
+                      </Card.Content>
+                    </Card>
                     
-                    <div className="flex items-center justify-center gap-2 p-3 bg-white/5 rounded-lg">
-                      <QrCode className="h-5 w-5" />
-                      <span className="text-sm">QR Code coming soon</span>
-                    </div>
-                  </div>
+                    <Card variant="minimal" className="bg-[var(--color-background-subtle)]">
+                      <Card.Content>
+                        <Stack direction="row" gap="md" alignment="center" justify="center">
+                          <QrCode className="h-5 w-5 text-[var(--color-text-secondary)]" />
+                          <Typography variant="body-sm" className="text-[var(--color-text-secondary)]">QR Code coming soon</Typography>
+                        </Stack>
+                      </Card.Content>
+                    </Card>
+                  </Stack>
                 )}
 
-                <div className="text-xs text-white/60 space-y-1">
-                  <p>• Your friend gets 100 points on their first order</p>
-                  <p>• You get 200 points when they complete their order</p>
-                  <p>• No limit on referrals!</p>
-                </div>
-              </div>
+                <Stack direction="column" gap="xs" className="text-center">
+                  <Typography variant="body-xs" className="text-[var(--color-text-secondary)]">• Your friend gets 100 points on their first order</Typography>
+                  <Typography variant="body-xs" className="text-[var(--color-text-secondary)]">• You get 200 points when they complete their order</Typography>
+                  <Typography variant="body-xs" className="text-[var(--color-text-secondary)]">• No limit on referrals!</Typography>
+                </Stack>
+              </Stack>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </Stack>
+  </Container>
   );
 }

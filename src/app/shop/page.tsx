@@ -5,14 +5,24 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import { useCart } from "../../lib/context/CartContext"
+import { useCart } from "@/lib/context/CartContext"
 import { FaSearch, FaFilter } from "react-icons/fa"
-import ProductCard from "../../components/shop/ProductCard"
-import CategoryFilter from "../../components/shop/CategoryFilter"
-import ProductQuickView from "../../components/shop/ProductQuickView"
-import Newsletter from "../../components/shop/Newsletter"
-import { products, categories } from "../../data/merch-data"
-import type { Product } from "../../types/merch"
+import ProductCard from "@/components/shop/ProductCard"
+import CategoryFilter from "@/components/shop/CategoryFilter"
+import ProductQuickView from "@/components/shop/ProductQuickView"
+import Newsletter from "@/components/shop/Newsletter"
+import { products, categories } from "@/data/merch-data"
+import type { Product } from "@/types/merch"
+
+// Import new design system components
+import { Container } from "@/components/atoms/Grid"
+import { Typography } from "@/components/atoms/Typography"
+import { Button } from "@/components/atoms/Button"
+import { Card } from "@/components/atoms/Card"
+import { Grid, Stack } from "@/components/atoms/Grid"
+import { Input } from "@/components/atoms/Input"
+import { Select } from "@/components/atoms/Select"
+import { FormField, Label } from "@/components/molecules/FormField"
 
 export default function ShopPage() {
   const { addItem } = useCart()
@@ -84,8 +94,8 @@ export default function ShopPage() {
   }
 
   return (
-    <div className="min-h-screen pb-20">
-      {/* Hero Section */}
+    <div className="min-h-screen">
+      {/* Hero Section - Using new design system */}
       <section className="relative h-[40vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
@@ -98,202 +108,219 @@ export default function ShopPage() {
           />
           <div className="absolute inset-0 bg-black bg-opacity-60"></div>
         </div>
-        <div className="container mx-auto px-4 z-10 text-center">
-          <h1 className="heading-xl mb-4 text-white gritty-shadow">Official Merch</h1>
-          <p className="text-xl text-[#FFD700] max-w-2xl mx-auto">
-            Rep the brand with our exclusive collection of Broski&apos;s Kitchen apparel and accessories.
-          </p>
-        </div>
+        <Container className="relative z-10 text-center">
+          <Stack direction="column" gap="md" alignment="center">
+            <Typography variant="hero" className="text-white">
+              Official Merch
+            </Typography>
+            <Typography variant="h5" className="text-[var(--color-brand-gold)] max-w-2xl">
+              Rep the brand with our exclusive collection of Broski's Kitchen apparel and accessories.
+            </Typography>
+          </Stack>
+        </Container>
       </section>
 
-      {/* Featured Products Section */}
-      <section className="py-12 bg-[#111111]">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-8 text-center">Featured Collection</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products
-              .filter((product) => product.featured)
-              .slice(0, 4)
-              .map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onAddToCart={() => handleAddToCart(product)}
-                  onQuickView={() => handleQuickView(product)}
-                />
-              ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Search and Filter Section */}
-      <section className="bg-[#0A0A0A] py-8 sticky top-20 z-30 border-b border-[#333333]">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            {/* Search Bar */}
-            <div className="relative w-full md:w-1/3">
-              <input
-                type="text"
-                placeholder="Search merchandise..."
-                className="input w-full pl-10"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#FFD700]" />
-            </div>
-
-            {/* Category Filter */}
-            <CategoryFilter
-              categories={categories}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-            />
-
-            {/* Sort Dropdown */}
-            <div className="relative w-full md:w-auto">
-              <select
-                className="input w-full appearance-none pr-10"
-                value={sortOption}
-                onChange={(e) => setSortOption(e.target.value)}
-              >
-                <option value="featured">Featured</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="newest">Newest</option>
-                <option value="bestselling">Best Selling</option>
-              </select>
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <FaFilter className="text-[#FFD700]" />
-              </div>
-            </div>
-
-            {/* Advanced Filters Toggle */}
-            <button className="btn-outline flex items-center gap-2" onClick={() => setShowFilters(!showFilters)}>
-              <FaFilter /> {showFilters ? "Hide Filters" : "Show Filters"}
-            </button>
-          </div>
-
-          {/* Advanced Filters */}
-          {showFilters && (
-            <div className="mt-6 p-4 bg-black rounded-lg border border-[#FFD700] animate-fade-in">
-              <h3 className="text-lg font-bold mb-4">Filters</h3>
-
-              {/* Price Range */}
-              <div className="mb-6">
-                <h4 className="text-sm font-medium mb-2">
-                  Price Range: ${priceRange[0]} - ${priceRange[1]}
-                </h4>
-                <div className="flex items-center gap-4">
-                  <span className="text-xs">${priceRange[0]}</span>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    step="5"
-                    value={priceRange[1]}
-                    onChange={(e) => setPriceRange([priceRange[0], Number.parseInt(e.target.value)])}
-                    className="w-full h-2 bg-[#FFD700] rounded-lg appearance-none cursor-pointer"
-                    aria-label="Price range filter"
+      {/* Featured Products Section - Using new design system */}
+      <section className="py-12 bg-[var(--color-background-subtle)]">
+        <Container>
+          <Stack direction="column" gap="xl">
+            <Typography variant="h3" className="text-center">
+              Featured Collection
+            </Typography>
+            <Grid cols={1} md={2} lg={4} gap="lg">
+              {products
+                .filter((product) => product.featured)
+                .slice(0, 4)
+                .map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onAddToCart={() => handleAddToCart(product)}
+                    onQuickView={() => handleQuickView(product)}
                   />
-                  <span className="text-xs">${priceRange[1]}</span>
-                </div>
-              </div>
-
-              {/* Additional Filters */}
-              <div>
-                <h4 className="text-sm font-medium mb-2">Product Status</h4>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" className="rounded border-[#FFD700] text-gold-foil focus:ring-gold-foil" />
-                    <span className="text-sm">New Arrivals</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" className="rounded border-[#FFD700] text-gold-foil focus:ring-gold-foil" />
-                    <span className="text-sm">Best Sellers</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" className="rounded border-[#FFD700] text-gold-foil focus:ring-gold-foil" />
-                    <span className="text-sm">On Sale</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" className="rounded border-[#FFD700] text-gold-foil focus:ring-gold-foil" />
-                    <span className="text-sm">Limited Edition</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+                ))}
+            </Grid>
+          </Stack>
+        </Container>
       </section>
 
-      {/* Products Grid Section */}
-      <section className="py-12">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl font-bold">All Products</h2>
-            <div className="text-sm text-[#FFD700]">
-              {filteredProducts.length} {filteredProducts.length === 1 ? "Product" : "Products"}
-            </div>
-          </div>
-
-          {filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {filteredProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onAddToCart={() => handleAddToCart(product)}
-                  onQuickView={() => handleQuickView(product)}
+      {/* Search and Filter Section - Using new design system */}
+      <section className="bg-[var(--color-background-elevated)] py-8 sticky top-20 z-30 border-b border-[var(--color-border-subtle)]">
+        <Container>
+          <Stack direction="column" gap="lg">
+            <Grid cols={1} md={4} gap="md" alignment="end">
+              {/* Search Bar */}
+              <FormField>
+                <Label htmlFor="shop-search" className="sr-only">Search merchandise</Label>
+                <Input
+                  id="shop-search"
+                  type="text"
+                  placeholder="Search merchandise..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  startIcon={<FaSearch className="text-[var(--color-brand-gold)]" />}
                 />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-20">
-              <h3 className="text-2xl font-bold mb-4">No products found</h3>
-              <p className="text-[#FFD700] mb-6">Try adjusting your filters or search query</p>
-              <button
-                className="btn-primary"
-                onClick={() => {
-                  setSelectedCategory("all")
-                  setSearchQuery("")
-                  setPriceRange([0, 100])
-                  setSortOption("featured")
-                }}
-              >
-                Reset Filters
-              </button>
-            </div>
-          )}
-        </div>
+              </FormField>
+
+              {/* Category Filter */}
+              <div className="w-full">
+                <CategoryFilter
+                  categories={categories}
+                  selectedCategory={selectedCategory}
+                  setSelectedCategory={setSelectedCategory}
+                />
+              </div>
+
+              {/* Sort Dropdown */}
+              <FormField>
+                <Label htmlFor="sort-select">Sort by</Label>
+                <Select
+                  id="sort-select"
+                  value={sortOption}
+                  onChange={(e) => setSortOption(e.target.value)}
+                  options={[
+                    { value: 'featured', label: 'Featured' },
+                    { value: 'price-low', label: 'Price: Low to High' },
+                    { value: 'price-high', label: 'Price: High to Low' },
+                    { value: 'newest', label: 'Newest' },
+                    { value: 'bestselling', label: 'Best Selling' },
+                  ]}
+                />
+              </FormField>
+
+              {/* Advanced Filters Toggle */}
+              <div className="flex justify-center">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowFilters(!showFilters)}
+                  startIcon={<FaFilter />}
+                >
+                  {showFilters ? "Hide Filters" : "Show Filters"}
+                </Button>
+              </div>
+            </Grid>
+
+            {/* Advanced Filters */}
+            {showFilters && (
+              <Card variant="elevated" className="animate-fade-in">
+                <Card.Content>
+                  <Stack direction="column" gap="lg">
+                    <Typography variant="h5">Filters</Typography>
+                    
+                    {/* Price Range */}
+                    <FormField>
+                      <Label htmlFor="price-range">Price Range: ${priceRange[0]} - ${priceRange[1]}</Label>
+                      <Input
+                        id="price-range"
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="5"
+                        value={priceRange[1]}
+                        onChange={(e) => setPriceRange([priceRange[0], Number.parseInt(e.target.value)])}
+                        aria-label="Price range filter"
+                      />
+                    </FormField>
+
+                    {/* Additional Filters */}
+                    <div>
+                      <Typography variant="h6" className="mb-4">Product Status</Typography>
+                      <Grid cols={2} md={4} gap="md">
+                        {['New Arrivals', 'Best Sellers', 'On Sale', 'Limited Edition'].map((filter) => (
+                          <FormField key={filter}>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <Input type="checkbox" className="rounded" />
+                              <Typography variant="body-sm">{filter}</Typography>
+                            </label>
+                          </FormField>
+                        ))}
+                      </Grid>
+                    </div>
+                  </Stack>
+                </Card.Content>
+              </Card>
+            )}
+          </Stack>
+        </Container>
       </section>
 
-      {/* About Our Merch Section */}
-      <section className="py-16 bg-[#111111]">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold mb-6">About Our Merch</h2>
-              <p className="text-[#FFD700] mb-4">
-                At Broski&apos;s Kitchen, we believe in quality that matches our food. Our merchandise is crafted with
+      {/* Products Grid Section - Using new design system */}
+      <section className="py-12">
+        <Container>
+          <Stack direction="column" gap="xl">
+            <Stack direction="row" gap="md" alignment="center" justify="between">
+              <Typography variant="h3">All Products</Typography>
+              <Typography variant="body" className="text-[var(--color-brand-gold)]">
+                {filteredProducts.length} {filteredProducts.length === 1 ? "Product" : "Products"}
+              </Typography>
+            </Stack>
+
+            {filteredProducts.length > 0 ? (
+              <Grid cols={1} md={3} lg={4} gap="lg">
+                {filteredProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onAddToCart={() => handleAddToCart(product)}
+                    onQuickView={() => handleQuickView(product)}
+                  />
+                ))}
+              </Grid>
+            ) : (
+              <Card variant="elevated" className="text-center py-20">
+                <Card.Content>
+                  <Stack direction="column" gap="md" alignment="center">
+                    <Typography variant="h4">No products found</Typography>
+                    <Typography variant="body" className="text-[var(--color-text-secondary)]">
+                      Try adjusting your filters or search query
+                    </Typography>
+                    <Button
+                      variant="primary"
+                      onClick={() => {
+                        setSelectedCategory("all")
+                        setSearchQuery("")
+                        setPriceRange([0, 100])
+                        setSortOption("featured")
+                      }}
+                    >
+                      Reset Filters
+                    </Button>
+                  </Stack>
+                </Card.Content>
+              </Card>
+            )}
+          </Stack>
+        </Container>
+      </section>
+
+      {/* About Our Merch Section - Using new design system */}
+      <section className="py-16 bg-[var(--color-background-subtle)]">
+        <Container>
+          <Grid cols={1} md={2} gap="xl" alignment="center">
+            <Stack direction="column" gap="md">
+              <Typography variant="h3">About Our Merch</Typography>
+              <Typography variant="body" className="text-[var(--color-text-secondary)]">
+                At Broski's Kitchen, we believe in quality that matches our food. Our merchandise is crafted with
                 premium materials and designed to last, just like the memories you make in our restaurants.
-              </p>
-              <p className="text-[#FFD700] mb-4">
+              </Typography>
+              <Typography variant="body" className="text-[var(--color-text-secondary)]">
                 Each piece is designed in-house and produced in limited quantities to ensure exclusivity. We partner
                 with sustainable manufacturers who share our values of quality and responsibility.
-              </p>
-              <p className="text-[#FFD700]">
-                From comfortable tees to stylish accessories, our merch lets you take a piece of the Broski&apos;s
+              </Typography>
+              <Typography variant="body" className="text-[var(--color-text-secondary)]">
+                From comfortable tees to stylish accessories, our merch lets you take a piece of the Broski's
                 experience home with you.
-              </p>
+              </Typography>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            
+            <Grid cols={2} gap="md">
               <div className="aspect-square relative rounded-lg overflow-hidden">
                 <Image
                   src="/images/menu-1.svg"
                   alt="Broski's Kitchen Merchandise"
                   fill
                   className="object-cover"
-            unoptimized
+                  unoptimized
                 />
               </div>
               <div className="aspect-square relative rounded-lg overflow-hidden">
@@ -302,7 +329,7 @@ export default function ShopPage() {
                   alt="Broski's Kitchen Merchandise"
                   fill
                   className="object-cover"
-            unoptimized
+                  unoptimized
                 />
               </div>
               <div className="aspect-square relative rounded-lg overflow-hidden">
@@ -311,7 +338,7 @@ export default function ShopPage() {
                   alt="Broski's Kitchen Merchandise"
                   fill
                   className="object-cover"
-            unoptimized
+                  unoptimized
                 />
               </div>
               <div className="aspect-square relative rounded-lg overflow-hidden">
@@ -320,20 +347,20 @@ export default function ShopPage() {
                   alt="Broski's Kitchen Merchandise"
                   fill
                   className="object-cover"
-            unoptimized
+                  unoptimized
                 />
               </div>
-            </div>
-          </div>
-        </div>
+            </Grid>
+          </Grid>
+        </Container>
       </section>
 
-      {/* Newsletter Section */}
-      <section className="py-16 bg-black relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/20 to-[#880808]/20 opacity-50"></div>
-        <div className="container mx-auto px-4 relative z-10">
+      {/* Newsletter Section - Using new design system */}
+      <section className="py-16 bg-[var(--color-background)] relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-brand-gold-transparent)] to-[var(--color-brand-burgundy-transparent)] opacity-20"></div>
+        <Container className="relative z-10">
           <Newsletter />
-        </div>
+        </Container>
       </section>
 
       {/* Product Quick View Modal */}
