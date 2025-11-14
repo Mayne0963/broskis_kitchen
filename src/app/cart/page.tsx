@@ -9,7 +9,6 @@ import { OrderItem } from "../../types/order";
 import { FaShoppingCart, FaTrash, FaPlus, FaMinus, FaArrowLeft, FaCreditCard, FaCog, FaLock } from "react-icons/fa";
 import { safeFetch } from "../../lib/utils/safeFetch";
 import { AuthGuard } from "../../components/auth/AuthGuard";
-import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
 import { useOrderResumePrompt } from "@/hooks/useOrderResumePrompt";
 
 function normalizePrice(p: unknown): number {
@@ -138,20 +137,16 @@ function CartContent() {
     <div className="min-h-screen py-20">
       <div className="container mx-auto px-4 max-w-6xl">
         {shouldPrompt && (
-          <AlertDialog open={shouldPrompt}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Continue previous order?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {summary ? `${summary.items} items • $${summary.total.toFixed(2)}` : "A saved order was found."}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel onClick={decline}>No</AlertDialogCancel>
-                <AlertDialogAction onClick={accept}>Yes</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+            <div className="bg-black border border-[#FFD700] rounded-lg p-6 w-full max-w-md">
+              <h2 className="text-xl font-bold mb-2">Continue previous order?</h2>
+              <p className="text-gray-300 mb-4">{summary ? `${summary.items} items • $${summary.total.toFixed(2)}` : "A saved order was found."}</p>
+              <div className="flex gap-2 justify-end">
+                <button onClick={decline} className="btn-outline">No</button>
+                <button onClick={accept} className="btn-primary">Yes</button>
+              </div>
+            </div>
+          </div>
         )}
         <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
 
