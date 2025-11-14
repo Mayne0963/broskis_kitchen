@@ -22,6 +22,7 @@ function CartContent() {
   const [loading, setLoading] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [promoError, setPromoError] = useState<string | null>(null);
+  const { shouldPrompt, summary, accept, decline } = useOrderResumePrompt();
 
   const payloadItems = useMemo(() => {
     return (items || []).map((it: any) => ({
@@ -336,4 +337,3 @@ export default function CartPage() {
     </AuthGuard>
   );
 }
-  const { shouldPrompt, summary, accept, decline } = useOrderResumePrompt();
