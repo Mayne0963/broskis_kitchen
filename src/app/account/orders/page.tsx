@@ -18,10 +18,10 @@ function OrderHistoryPageContent() {
 
   // Fetch user orders on component mount
   useEffect(() => {
-    if (validateUserId(user?.id) && !authLoading) {
+    if (!authLoading) {
       refresh()
     }
-  }, [user?.id, authLoading, refresh])
+  }, [authLoading, refresh])
 
   if (authLoading) {
     return (
@@ -107,7 +107,7 @@ function OrderHistoryPageContent() {
 export default function OrderHistoryPage() {
   return (
     <AuthGuard requireAuth={true} requireEmailVerification={false}>
-      <OrderProvider autoLoad={false}>
+      <OrderProvider autoLoad={true}>
         <OrderHistoryPageContent />
       </OrderProvider>
     </AuthGuard>
