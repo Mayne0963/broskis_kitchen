@@ -1,28 +1,22 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import Image from "next/image"
-import { useCart } from "@/lib/context/CartContext"
-import { useAgeVerification } from "@/lib/context/AgeVerificationContext"
-import { FaSearch, FaFilter, FaStar, FaFire, FaLeaf } from "react-icons/fa"
-import AgeVerificationModal from "@/components/modals/AgeVerificationModal"
-import MenuItemCard from "@/components/menu/MenuItemCard"
-import CategoryFilter from "@/components/menu/CategoryFilter"
-import { categories } from "@/data/menu-data"
-import { getVisibleMenuItems, shouldShowTestItems } from "@/utils/menuUtils"
-import type { CustomizationOption } from "@/types"
-import { GridSkeleton, EmptyState, SearchLoading } from "@/components/common/LoadingStates"
-import { LoadingOverlay, useLoadingState } from "@/components/common/EnhancedLoadingStates"
+import type { Metadata } from "next"
 
-// Import new design system components
-import { Container } from "@/components/atoms/Grid"
-import { Typography } from "@/components/atoms/Typography"
-import { Button } from "@/components/atoms/Button"
-import { Card } from "@/components/atoms/Card"
-import { Badge } from "@/components/atoms/Badge"
-import { Grid, Stack } from "@/components/atoms/Grid"
-import { Input } from "@/components/atoms/Input"
-import { FormField, Label, HelperText } from "@/components/molecules/FormField"
+// Note: Metadata export for client components is handled by layout.tsx
+// This page uses the template from root layout: "%s | Broski's Kitchen"
+import Image from "next/image"
+import { useCart } from "../../lib/context/CartContext"
+import { useAgeVerification } from "../../lib/context/AgeVerificationContext"
+import { FaSearch, FaFilter, FaStar, FaFire, FaLeaf } from "react-icons/fa"
+import AgeVerificationModal from "../../components/modals/AgeVerificationModal"
+import MenuItemCard from "../../components/menu/MenuItemCard"
+import CategoryFilter from "../../components/menu/CategoryFilter"
+import { categories } from "../../data/menu-data"
+import { getVisibleMenuItems, shouldShowTestItems } from "../../utils/menuUtils"
+import type { CustomizationOption } from "../../types"
+import { GridSkeleton, EmptyState, SearchLoading } from "../../components/common/LoadingStates"
+import { LoadingOverlay, useLoadingState } from "../../components/common/EnhancedLoadingStates"
 
 export default function MenuPage() {
   const { addItem } = useCart()
@@ -40,6 +34,24 @@ export default function MenuPage() {
     return getVisibleMenuItems()
   }, [])
   
+  // Hero Image Section
+  const heroSection = (
+    <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden">
+      <Image
+        src="/images/menu-hero.svg"
+        alt="Broski's Kitchen Menu Hero"
+        fill
+        style={{ objectFit: "cover" }}
+        priority
+        className="brightness-75"
+            unoptimized
+      />
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-white z-10">
+        <h1 className="text-4xl md:text-6xl font-bold mb-4">Our Menu</h1>
+        <p className="text-xl md:text-2xl">Discover Our Delicious Offerings</p>
+      </div>
+    </div>
+  )
   const [showFilters, setShowFilters] = useState(false)
   const [priceRange, setPriceRange] = useState([0, 50])
   const [dietaryFilters, setDietaryFilters] = useState({
@@ -186,136 +198,135 @@ export default function MenuPage() {
   }
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section - Using new design system */}
+    <div className="min-h-screen pb-20">
+      {/* Hero Section */}
       <section className="relative h-[40vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <Image 
-            src="/images/menu-hero.svg" 
-            alt="Broski's Kitchen Menu" 
-            fill 
-            className="object-cover" 
-            priority
-            unoptimized 
-          />
+          <Image src="/images/menu-hero.svg" alt="Broski's Kitchen Menu" fill className="object-cover" priority
+            unoptimized />
           <div className="absolute inset-0 bg-black bg-opacity-60"></div>
         </div>
-        <Container size="full" className="relative z-10 text-center">
-          <Stack direction="column" gap="md" alignment="center">
-            <Typography variant="hero" className="text-white">
-              Our Menu
-            </Typography>
-            <Typography variant="h5" className="text-gray-200 max-w-2xl">
-              Discover our luxury street gourmet dishes, crafted with premium ingredients and innovative techniques.
-            </Typography>
-          </Stack>
-        </Container>
+        <div className="container mx-auto px-4 z-10 text-center">
+          <h1 className="heading-xl mb-4 text-white gritty-shadow">Our Menu</h1>
+          <p className="text-xl text-gray-200 max-w-2xl mx-auto">
+            Discover our luxury street gourmet dishes, crafted with premium ingredients and innovative techniques.
+          </p>
+        </div>
       </section>
 
-      {/* Search and Filter Section - Using new design system */}
-      <section className="bg-[var(--color-background-subtle)] py-8 sticky top-20 z-30 border-b border-[var(--color-border-subtle)]">
-        <Container size="full">
-          <Stack direction="column" gap="lg">
-            <Grid cols={1} md={3} gap="md" alignment="center">
-              {/* Search Bar */}
-              <FormField>
-                <Label htmlFor="menu-search" className="sr-only">Search menu</Label>
-                <Input
-                  id="menu-search"
-                  type="text"
-                  placeholder="Search menu..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  startIcon={<FaSearch className="text-[var(--color-text-secondary)]" />}
-                />
-              </FormField>
+      {/* Search and Filter Section */}
+      <section className="bg-[#111111] py-8 sticky top-20 z-30 border-b border-[#333333]">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            {/* Search Bar */}
+            <div className="relative w-full md:w-1/3">
+              <input
+                type="text"
+                placeholder="Search menu..."
+                className="input w-full pl-10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            </div>
 
-              {/* Category Filter */}
-              <div className="w-full">
-                <CategoryFilter
-                  categories={categories}
-                  selectedCategory={selectedCategory}
-                  setSelectedCategory={setSelectedCategory}
-                />
+            {/* Category Filter */}
+            <CategoryFilter
+              categories={categories}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+            />
+
+            {/* Advanced Filters Toggle */}
+            <button className="btn-outline flex items-center gap-2" onClick={() => setShowFilters(!showFilters)}>
+              <FaFilter /> {showFilters ? "Hide Filters" : "Show Filters"}
+            </button>
+          </div>
+
+          {/* Advanced Filters */}
+          {showFilters && (
+            <div className="mt-6 p-4 bg-[#1A1A1A] rounded-lg border border-[#333333] animate-fade-in">
+              <h3 className="text-lg font-bold mb-4">Filters</h3>
+
+              {/* Price Range */}
+              <div className="mb-6">
+                <h4 className="text-sm font-medium mb-2">
+                  Price Range: ${priceRange[0]} - ${priceRange[1]}
+                </h4>
+                <div className="flex items-center gap-4">
+                  <span className="text-xs">${priceRange[0]}</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="50"
+                    step="5"
+                    value={priceRange[1]}
+                    onChange={(e) => setPriceRange([priceRange[0], Number.parseInt(e.target.value)])}
+                    className="w-full h-2 bg-[#333333] rounded-lg appearance-none cursor-pointer"
+                    aria-label="Price range filter"
+                  />
+                  <span className="text-xs">${priceRange[1]}</span>
+                </div>
               </div>
 
-              {/* Advanced Filters Toggle */}
-              <div className="flex justify-center">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowFilters(!showFilters)}
-                  startIcon={<FaFilter />}
-                >
-                  {showFilters ? "Hide Filters" : "Show Filters"}
-                </Button>
+              {/* Dietary Preferences */}
+              <div>
+                <h4 className="text-sm font-medium mb-2">Dietary Preferences</h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={dietaryFilters.vegetarian}
+                      onChange={() => handleDietaryFilterChange("vegetarian")}
+                      className="rounded border-[#333333] text-gold-foil focus:ring-gold-foil"
+                    />
+                    <span className="text-sm">Vegetarian</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={dietaryFilters.vegan}
+                      onChange={() => handleDietaryFilterChange("vegan")}
+                      className="rounded border-[#333333] text-gold-foil focus:ring-gold-foil"
+                    />
+                    <span className="text-sm">Vegan</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={dietaryFilters.glutenFree}
+                      onChange={() => handleDietaryFilterChange("glutenFree")}
+                      className="rounded border-[#333333] text-gold-foil focus:ring-gold-foil"
+                    />
+                    <span className="text-sm">Gluten Free</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={dietaryFilters.dairyFree}
+                      onChange={() => handleDietaryFilterChange("dairyFree")}
+                      className="rounded border-[#333333] text-gold-foil focus:ring-gold-foil"
+                    />
+                    <span className="text-sm">Dairy Free</span>
+                  </label>
+                </div>
               </div>
-            </Grid>
-
-            {/* Advanced Filters */}
-            {showFilters && (
-              <Card variant="elevated" className="animate-fade-in">
-                <Card.Content>
-                  <Stack direction="column" gap="lg">
-                    <Typography variant="h5">Filters</Typography>
-                    
-                    {/* Price Range */}
-                    <FormField>
-                      <Label htmlFor="price-range">Price Range: ${priceRange[0]} - ${priceRange[1]}</Label>
-                      <Input
-                        id="price-range"
-                        type="range"
-                        min="0"
-                        max="50"
-                        step="5"
-                        value={priceRange[1]}
-                        onChange={(e) => setPriceRange([priceRange[0], Number.parseInt(e.target.value)])}
-                        aria-label="Price range filter"
-                      />
-                    </FormField>
-
-                    {/* Dietary Preferences */}
-                    <div>
-                      <Typography variant="h6" className="mb-4">Dietary Preferences</Typography>
-                      <Grid cols={2} md={4} gap="md">
-                        {Object.entries(dietaryFilters).map(([key, value]) => (
-                          <FormField key={key}>
-                            <label className="flex items-center gap-2 cursor-pointer">
-                              <Input
-                                type="checkbox"
-                                checked={value}
-                                onChange={() => handleDietaryFilterChange(key)}
-                                className="rounded"
-                              />
-                              <Typography variant="body">
-                                {key === 'vegetarian' && 'Vegetarian'}
-                                {key === 'vegan' && 'Vegan'}
-                                {key === 'glutenFree' && 'Gluten Free'}
-                                {key === 'dairyFree' && 'Dairy Free'}
-                              </Typography>
-                            </label>
-                          </FormField>
-                        ))}
-                      </Grid>
-                    </div>
-                  </Stack>
-                </Card.Content>
-              </Card>
-            )}
-          </Stack>
-        </Container>
+            </div>
+          )}
+        </div>
       </section>
 
-      {/* Menu Items Section - Using new design system */}
+      {/* Menu Items Section */}
       <section className="py-12">
-        <Container size="full">
+        <div className="container mx-auto px-4">
           <LoadingOverlay isLoading={isInitialLoading} message="Loading menu items...">
             {isSearching && <SearchLoading />}
             
             {!isInitialLoading && !isSearching && (
-              <Stack direction="column" gap="xl">
+              <>
                 {/* Regular Menu Items */}
                 {filteredItems.filter(item => !item.isTestItem).length > 0 ? (
-                  <Grid cols={3} md={3} lg={4} xl={5} gap="xl">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {filteredItems.filter(item => !item.isTestItem).map((item) => (
                       <MenuItemCard
                         key={item.id}
@@ -323,15 +334,15 @@ export default function MenuPage() {
                         onAddToCart={(quantity, customizations) => handleAddToCart(item, quantity, customizations)}
                       />
                     ))}
-                  </Grid>
+                  </div>
                 ) : (
                   !filteredItems.some(item => item.isTestItem) && (
                     <EmptyState
                       title="No items found"
                       description="No menu items match your current filters. Try adjusting your search criteria."
                       action={
-                        <Button
-                          variant="primary"
+                        <button
+                          className="btn-primary"
                           onClick={() => {
                             setSelectedCategory("all")
                             setSearchQuery("")
@@ -345,7 +356,7 @@ export default function MenuPage() {
                           }}
                         >
                           Reset Filters
-                        </Button>
+                        </button>
                       }
                     />
                   )
@@ -353,66 +364,64 @@ export default function MenuPage() {
 
                 {/* Test Items Section */}
                 {filteredItems.some(item => item.isTestItem) && (
-                  <Stack direction="column" gap="md">
-                    <Stack direction="row" gap="md" alignment="center">
-                      <Typography variant="h4">Test Products</Typography>
-                      <Badge variant="error">TEST</Badge>
-                      <Typography variant="body-sm" className="text-[var(--color-text-secondary)]">
+                  <div className="mt-16">
+                    <div className="flex items-center gap-3 mb-8">
+                      <h2 className="text-2xl font-bold">Test Products</h2>
+                      <div className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                        TEST
+                      </div>
+                      <div className="text-sm text-gray-400">
                         (Internal Testing Only)
-                      </Typography>
-                    </Stack>
-                    <Grid cols={1} md={2} lg={3} gap="xl">
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                       {filteredItems.filter(item => item.isTestItem).map((item) => (
                         <div key={item.id} className="relative">
-                          <Badge variant="error" className="absolute -top-2 -right-2 z-10">
+                          <div className="absolute -top-2 -right-2 z-10 bg-red-600 text-white px-2 py-1 rounded-full text-xs font-bold">
                             TEST
-                          </Badge>
+                          </div>
                           <MenuItemCard
                             item={item}
                             onAddToCart={(quantity, customizations) => handleAddToCart(item, quantity, customizations)}
                           />
                         </div>
                       ))}
-                    </Grid>
-                  </Stack>
+                    </div>
+                  </div>
                 )}
-              </Stack>
+              </>
             )}
             
             {isInitialLoading && <GridSkeleton count={6} />}
           </LoadingOverlay>
-        </Container>
+        </div>
       </section>
 
-      {/* Legend Section - Using new design system */}
-      <section className="py-8 bg-[var(--color-background-subtle)]">
-        <Container size="full">
-          <Stack direction="column" gap="md">
-            <Typography variant="h4">Menu Legend</Typography>
-            <Grid cols={1} md={3} gap="md">
-              <Stack direction="row" gap="md" alignment="center">
-                <Badge variant="gold" size="lg">
-                  <FaStar />
-                </Badge>
-                <Typography variant="body">Popular Item</Typography>
-              </Stack>
-              
-              <Stack direction="row" gap="md" alignment="center">
-                <Badge variant="error" size="lg">
-                  <FaFire />
-                </Badge>
-                <Typography variant="body">New Item</Typography>
-              </Stack>
-              
-              <Stack direction="row" gap="md" alignment="center">
-                <Badge variant="success" size="lg">
-                  <FaLeaf />
-                </Badge>
-                <Typography variant="body">Infused Item (21+ Only)</Typography>
-              </Stack>
-            </Grid>
-          </Stack>
-        </Container>
+      {/* Legend Section */}
+      <section className="py-8 bg-[#111111]">
+        <div className="container mx-auto px-4">
+          <h2 className="text-xl font-bold mb-4">Menu Legend</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-gold-foil bg-opacity-20 flex items-center justify-center">
+                <FaStar className="text-gold-foil" />
+              </div>
+              <span>Popular Item</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-blood-red bg-opacity-20 flex items-center justify-center">
+                <FaFire className="text-blood-red" />
+              </div>
+              <span>New Item</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-emerald-green bg-opacity-20 flex items-center justify-center">
+                <FaLeaf className="text-emerald-green" />
+              </div>
+              <span>Infused Item (21+ Only)</span>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Age Verification Modal */}
