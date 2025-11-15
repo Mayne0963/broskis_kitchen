@@ -19,7 +19,10 @@ async function fetchOrders(): Promise<Order[]> {
     const res = await fetch("/api/my-orders", { credentials: "include", cache: "no-store" });
     if (!res.ok) {
       console.warn("orders fetch failed:", res.status);
-      return [];
+      if (res.status === 401) {
+        throw new Error("Please log in to view your orders");
+      }
+      throw new Error(`Failed to fetch orders: ${res.status}`);
     }
     const json = await res.json();
     // Support both { orders: [...] } and raw array shapes
@@ -27,7 +30,7 @@ async function fetchOrders(): Promise<Order[]> {
     return arr;
   } catch (e) {
     console.warn("orders fetch error:", e);
-    return [];
+    throw e; // Re-throw the error so it can be handled by the caller
   }
 }
 
@@ -45,9 +48,15 @@ export function OrderProvider({
   const refresh = React.useCallback(async () => {
     setLoading(true);
     setError(null);
-    const data = await fetchOrders();
-    setOrders(Array.isArray(data) ? data : []);
-    setLoading(false);
+    try {
+      const data = await fetchOrders();
+      setOrders(Array.isArray(data) ? data : []);
+    } catch (error: any) {
+      setError(error.message || "Failed to load orders");
+      setOrders([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   React.useEffect(() => {
