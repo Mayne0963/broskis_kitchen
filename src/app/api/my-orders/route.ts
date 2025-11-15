@@ -71,45 +71,39 @@ export async function GET() {
 
     console.log(`Fetching orders for user: ${user.uid}`);
 
-    // Validate user.uid before using in query
-    if (!user.uid) {
-      console.error('User UID is undefined, cannot query orders');
+    // Validate user data before using in Firestore queries
+    if (!user.uid && !user.email) {
+      console.log('User has no valid uid or email, returning empty orders');
       return NextResponse.json({ orders: [] });
     }
 
-    // Try to find orders by userId first, then fall back to email
     let snap;
-    try {
+    
+    // Try to find orders by userId first, if available
+    if (user.uid) {
       snap = await adminDb
         .collection("orders")
         .where("userId", "==", user.uid)
         .orderBy("createdAt", "desc")
         .limit(50)
         .get();
-    } catch (error: any) {
-      console.error('Error querying by userId:', error.message);
-      snap = { empty: true, docs: [] } as any;
     }
 
-    // If no orders found by userId, try by email
-    if (snap.empty && user.email) {
+    // If no orders found by userId, try by email (if available and different from uid)
+    if ((!snap || snap.empty) && user.email && user.email !== user.uid) {
       console.log(`No orders found by userId, trying email: ${user.email}`);
-      
-      // Validate email before using in query
-      if (!user.email) {
-        console.error('User email is undefined, cannot query by email');
-      } else {
-        try {
-          snap = await adminDb
-            .collection("orders")
-            .where("userEmail", "==", user.email)
-            .orderBy("createdAt", "desc")
-            .limit(50)
-            .get();
-        } catch (error: any) {
-          console.error('Error querying by email:', error.message);
-        }
-      }
+      snap = await adminDb
+        .collection("orders")
+        .where("userEmail", "==", user.email)
+        .orderBy("createdAt", "desc")
+        .limit(50)
+        .get();
+    }
+
+    // Handle case where no valid queries were executed
+    if (!snap) {
+      console.log('No valid user data to query orders');
+      return NextResponse.json({ orders: [] });
     }
 
     console.log(`Found ${snap.docs.length} orders for user: ${user.uid}`);
