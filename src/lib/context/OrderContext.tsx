@@ -20,11 +20,18 @@ async function fetchOrders(): Promise<Order[]> {
     if (!res.ok) {
       console.warn("orders fetch failed:", res.status);
       const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
-      const errorMessage = errorData?.error || `Failed to fetch orders: ${res.status}`;
+      let errorMessage = errorData?.error || `Failed to fetch orders: ${res.status}`;
       
+      // Handle specific error cases with user-friendly messages
       if (res.status === 401) {
         throw new Error("Please log in to view your orders");
       }
+      
+      // Handle index-related errors with a more helpful message
+      if (errorData?.details && errorData.details.includes('index')) {
+        errorMessage = "Orders are being prepared. Please try again in a moment.";
+      }
+      
       throw new Error(errorMessage);
     }
     const json = await res.json();

@@ -142,6 +142,17 @@ export async function GET() {
     return NextResponse.json({ orders });
   } catch (error: any) {
     console.error('Order history API error:', error);
+    
+    // Handle Firestore index errors specifically
+    if (error.code === 'FAILED_PRECONDITION' && error.message.includes('requires an index')) {
+      const errorMessage = 'Orders are being prepared. Please try again in a moment.';
+      console.error('Firestore index required:', error.message);
+      return NextResponse.json({ 
+        error: errorMessage,
+        details: 'Database index is being created. This usually takes a few minutes.'
+      }, { status: 500 });
+    }
+    
     const errorMessage = error.message || 'Failed to fetch orders';
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
