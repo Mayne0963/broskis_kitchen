@@ -17,7 +17,7 @@ interface Order {
   id: string;
   createdAt: string;
   status: string;
-  userEmail?: string;
+  userId?: string;
   userName?: string;
   totalCents: number;
   items: OrderItem[];
@@ -104,13 +104,13 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, index }) => {
             </div>
 
             {/* Customer Info */}
-            {(order.userEmail || order.userName) && (
+            {(order.userId || order.userName) && (
               <div className="text-xs text-zinc-400">
                 {order.userName && (
                   <div className="font-medium text-zinc-300">{order.userName}</div>
                 )}
-                {order.userEmail && (
-                  <div className="truncate">{order.userEmail}</div>
+                {order.userId && (
+                  <div className="truncate">{order.userId}</div>
                 )}
               </div>
             )}

@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
 
     if (q) {
       docs = docs.filter(o => {
-        const hay = `${o.id} ${o.userEmail ?? ''} ${o.userName ?? ''} ${o.status ?? ''}`.toLowerCase();
+        const hay = `${o.id} ${o.userId ?? ''} ${o.userName ?? ''} ${o.status ?? ''}`.toLowerCase();
         return hay.includes(q);
       });
     }
@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
       id: o.id,
       createdAt: o.createdAt?.toDate?.() ?? new Date(o.createdAt),
       status: o.status ?? 'pending',
-      userEmail: o.userEmail ?? '',
+      userId: o.userId ?? '',
       userName: o.userName ?? '',
       totalCents: Number(o.totalCents ?? o.total_cents ?? o.total ?? 0),
       items: Array.isArray(o.items) ? o.items.map((it: any) => ({

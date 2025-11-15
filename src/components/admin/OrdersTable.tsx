@@ -11,7 +11,7 @@ export type AdminOrder = {
   id: string;
   createdAt: string | Date;
   status: string;
-  userEmail?: string;
+  userId?: string;
   userName?: string;
   totalCents: number;
   items: { name: string; qty: number; priceCents: number; options?: any[]; id?: string }[];
@@ -56,7 +56,7 @@ export default function OrdersTable({ orders }: { orders: AdminOrder[] }) {
             <tr key={o.id} className={`hover:bg-zinc-900/60 ${o.showTestWarning ? 'bg-red-900/20' : ''}`}>
               <td className="px-4 py-3 font-mono text-zinc-200">#{o.id.slice(0, 8)}</td>
               <td className="px-4 py-3 text-zinc-300">{o.when.toLocaleString()}</td>
-              <td className="px-4 py-3 text-zinc-300">{o.userName || o.userEmail || '—'}</td>
+              <td className="px-4 py-3 text-zinc-300">{o.userName || o.userId || '—'}</td>
               <td className="px-4 py-3 text-zinc-200">{o.line || '—'}</td>
               <td className="px-4 py-3 font-medium">{usd(o.totalCents)}</td>
               <td className="px-4 py-3"><StatusPill status={o.status} /></td>

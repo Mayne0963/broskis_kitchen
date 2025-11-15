@@ -72,39 +72,18 @@ export async function GET() {
     console.log(`Fetching orders for user: ${user.uid}`);
 
     // Validate user data before using in Firestore queries
-    if (!user.uid && !user.email) {
-      console.log('User has no valid uid or email, returning empty orders');
+    if (!user.uid) {
+      console.log('User has no valid uid, returning empty orders');
       return NextResponse.json({ orders: [] });
     }
 
-    let snap;
-    
-    // Try to find orders by userId first, if available
-    if (user.uid) {
-      snap = await adminDb
-        .collection("orders")
-        .where("userId", "==", user.uid)
-        .orderBy("createdAt", "desc")
-        .limit(50)
-        .get();
-    }
-
-    // If no orders found by userId, try by email (if available and different from uid)
-    if ((!snap || snap.empty) && user.email && user.email !== user.uid) {
-      console.log(`No orders found by userId, trying email: ${user.email}`);
-      snap = await adminDb
-        .collection("orders")
-        .where("userEmail", "==", user.email)
-        .orderBy("createdAt", "desc")
-        .limit(50)
-        .get();
-    }
-
-    // Handle case where no valid queries were executed
-    if (!snap) {
-      console.log('No valid user data to query orders');
-      return NextResponse.json({ orders: [] });
-    }
+    // Query orders by userId only (removing userEmail fallback)
+    const snap = await adminDb
+      .collection("orders")
+      .where("userId", "==", user.uid)
+      .orderBy("createdAt", "desc")
+      .limit(50)
+      .get();
 
     console.log(`Found ${snap.docs.length} orders for user: ${user.uid}`);
     

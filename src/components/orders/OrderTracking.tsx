@@ -46,6 +46,7 @@ import { pushNotificationService } from '@/lib/services/push-notification-servic
 import { getOTWOrderStatus } from '@/lib/services/otw-integration'
 import OTWTracker from './OTWTracker'
 import { safeFetch } from '@/lib/utils/safeFetch'
+import { validateUserId } from '@/lib/utils/userIdValidation'
 
 interface OrderTrackingProps {
   userId: string
@@ -104,6 +105,12 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
 
   // Fetch orders from API as fallback (must be defined before effects that depend on it)
   const fetchOrdersFromAPI = useCallback(async () => {
+    if (!validateUserId(userId)) {
+      setError('User not authenticated')
+      setIsLoading(false)
+      return
+    }
+
     try {
       setIsLoading(true)
       const response = await safeFetch(`/api/my-orders`)
@@ -126,7 +133,7 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
 
   // Load saved filter preferences and presets
    useEffect(() => {
-     if (typeof window !== 'undefined') {
+     if (typeof window !== 'undefined' && validateUserId(userId)) {
        const savedPrefs = localStorage.getItem(`orderFilters_${userId}`)
        if (savedPrefs) {
          try {
@@ -170,7 +177,7 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
 
   // Real-time Firebase listener for user's orders
   useEffect(() => {
-    if (!userId) return
+    if (!validateUserId(userId)) return
 
     if (!isFirebaseConfigured() || !db) {
       setOrders(initialOrders)

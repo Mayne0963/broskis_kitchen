@@ -7,6 +7,7 @@ import Link from "next/link"
 import { useEffect } from "react"
 import OrderTracking from "@/components/orders/OrderTracking"
 import { AuthGuard } from "@/components/auth/AuthGuard"
+import { validateUserId } from "@/lib/utils/userIdValidation"
 
 // Force dynamic rendering to prevent prerendering issues
 export const dynamic = 'force-dynamic'
@@ -17,10 +18,10 @@ function OrderHistoryPageContent() {
 
   // Fetch user orders on component mount
   useEffect(() => {
-    if (user && !authLoading) {
+    if (validateUserId(user?.id) && !authLoading) {
       refresh()
     }
-  }, [user, authLoading, refresh])
+  }, [user?.id, authLoading, refresh])
 
   if (authLoading) {
     return (
@@ -89,12 +90,12 @@ function OrderHistoryPageContent() {
             </button>
           </div>
         ) : orders && orders.length > 0 ? (
-          <OrderTracking userId={user.uid} initialOrders={orders} />
+          <OrderTracking userId={validateUserId(user?.id) ? user.id : ''} initialOrders={orders} />
         ) : (
           <div className="text-center p-16 border border-[var(--color-ash-gray)]/20 rounded-lg">
             <FaShoppingBag className="text-5xl text-gold-foil mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">No orders yet</h3>
-            <p className="text-muted-foreground">When you place orders, they'll show up here for tracking.</p>
+            <p className="text-muted-foreground">When you place orders, they&apos;ll show up here for tracking.</p>
             <Link href="/" className="inline-block mt-6 bg-gold-foil text-black px-5 py-2 rounded-md font-semibold hover:bg-gold-foil/90">Explore Menu</Link>
           </div>
         )}

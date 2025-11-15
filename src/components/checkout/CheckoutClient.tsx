@@ -69,7 +69,6 @@ interface CheckoutClientProps {
   paymentMethods: PaymentMethod[]
   userId: string
   isAuthenticated: boolean
-  userEmail: string
 }
 
 type CheckoutStep = 'delivery' | 'payment' | 'review' | 'confirmation'
@@ -103,8 +102,7 @@ export default function CheckoutClient({
   addresses, 
   paymentMethods, 
   userId,
-  isAuthenticated,
-  userEmail
+  isAuthenticated
 }: CheckoutClientProps) {
   const [currentStep, setCurrentStep] = useState<CheckoutStep>('delivery')
   const [checkoutData, setCheckoutData] = useState<CheckoutData>({
@@ -296,7 +294,7 @@ export default function CheckoutClient({
         pickupLocation: checkoutData.deliveryType === 'pickup' ? 'Main Location' : undefined,
         contactInfo: {
           email: isAuthenticated 
-            ? (checkoutData.selectedAddress?.email || userEmail || 'customer@example.com')
+            ? (checkoutData.selectedAddress?.email || 'customer@example.com')
             : (checkoutData.guestEmail || 'guest@example.com'),
           phone: isAuthenticated 
             ? (checkoutData.selectedAddress?.phone || '555-0123')
