@@ -16,7 +16,19 @@ const OrdersCtx = React.createContext<OrdersState | null>(null);
 async function fetchOrders(): Promise<Order[]> {
   try {
     // Prefer user-specific orders to avoid admin requirement
-    const res = await fetch("/api/my-orders", { credentials: "include", cache: "no-store" });
+    const headers: HeadersInit = { };
+    try {
+      if (typeof window !== 'undefined') {
+        const { getAuth } = await import('firebase/auth');
+        const currentUser = getAuth().currentUser;
+        if (currentUser) {
+          const idToken = await currentUser.getIdToken(false);
+          headers['Authorization'] = `Bearer ${idToken}`;
+        }
+      }
+    } catch {}
+
+    const res = await fetch("/api/my-orders", { credentials: "include", cache: "no-store", headers });
     if (!res.ok) {
       console.warn("orders fetch failed:", res.status);
       const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));

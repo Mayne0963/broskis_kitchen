@@ -37,7 +37,8 @@ vi.mock('@/lib/authServer', () => ({
 describe('Orders parity between dashboard and order history', () => {
   it('dashboard count equals API orders length', async () => {
     const totals = await getUserTotals('U1')
-    const res = await MyOrdersRoute.GET()
+    const req = new (require('next/server').NextRequest)('http://localhost/api/my-orders')
+    const res = await (MyOrdersRoute as any).GET(req)
     const json = await (res as any).json()
     const list = Array.isArray(json?.orders) ? json.orders : []
     expect(totals.ordersCount).toBe(list.length)

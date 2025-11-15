@@ -235,7 +235,8 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
           setError('Failed to load orders. Please try again.')
           setIsLoading(false)
           setOrders(initialOrders)
-          if (error.code === 'permission-denied') {
+          const msg = String(error?.message || '')
+          if (error.code === 'permission-denied' || error.code === 'failed-precondition' || msg.includes('index')) {
             fetchOrdersFromAPI()
           }
         }

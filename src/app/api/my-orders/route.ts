@@ -15,8 +15,23 @@ export async function GET(req: NextRequest) {
     const limit = Math.min(100, Math.max(1, limitParam));
     const cursorIso = searchParams.get('cursor');
     const cursorTs = cursorIso ? Timestamp.fromDate(new Date(cursorIso)) : null;
-    const user = await getServerUser();
+    let user = await getServerUser();
     console.log('User authentication check:', user ? `User found: ${user.uid}` : 'No user found');
+
+    if (!user) {
+      const authHeader = req.headers.get('authorization') || req.headers.get('Authorization');
+      const match = authHeader && authHeader.match(/^Bearer\s+(.+)$/i);
+      if (match) {
+        try {
+          const { adminAuth } = await import('@/lib/firebase/admin');
+          const decoded = await adminAuth.verifyIdToken(match[1]);
+          user = { uid: decoded.uid, email: decoded.email || null, role: (decoded as any).role || 'user' } as any;
+          console.log('Authenticated via Authorization header:', user.uid);
+        } catch (e) {
+          console.warn('Authorization header verification failed');
+        }
+      }
+    }
     
     // For testing purposes, if no user is found, return some test orders
     // This allows us to test the UI without authentication
@@ -78,7 +93,7 @@ export async function GET(req: NextRequest) {
     console.log(`Fetching orders for user: ${user.uid}`);
 
     // Validate user data before using in Firestore queries
-    if (!user.uid) {
+    if (!user?.uid) {
       console.log('User has no valid uid, returning empty orders');
       return NextResponse.json({ orders: [] });
     }

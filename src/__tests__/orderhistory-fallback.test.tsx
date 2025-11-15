@@ -22,9 +22,10 @@ vi.mock('@/lib/authServer', () => ({
 
 describe('my-orders API handles index errors gracefully', () => {
   it('returns helpful error when index is missing', async () => {
-    const res = await MyOrdersRoute.GET()
+    const req = new (require('next/server').NextRequest)('http://localhost/api/my-orders')
+    const res = await (MyOrdersRoute as any).GET(req)
     const json = await (res as any).json()
-    expect((res as NextResponse).status).toBe(500)
-    expect(json?.details).toContain('index')
+    expect((res as any).status).toBe(500)
+    expect(String(json?.details || '')).toContain('index')
   })
 })
