@@ -98,12 +98,11 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
     { id: '5', name: 'Soft Drink', price: 2.99, category: 'Beverages' }
   ]);
 
-  // Initialize lastRefresh after mount to avoid SSR/client date mismatch
   useEffect(() => {
     setLastRefresh(new Date())
   }, [])
 
-  // Fetch orders from API as fallback (must be defined before effects that depend on it)
+  
   const fetchOrdersFromAPI = useCallback(async () => {
     if (!validateUserId(userId)) {
       setError('User not authenticated')
@@ -130,6 +129,12 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
       setIsLoading(false)
     }
   }, [userId, initialOrders])
+
+  useEffect(() => {
+    if (validateUserId(userId)) {
+      fetchOrdersFromAPI()
+    }
+  }, [userId, fetchOrdersFromAPI])
 
   // Load saved filter preferences and presets
    useEffect(() => {
@@ -175,7 +180,6 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
     }
   }, [userId, statusFilter, orderTypeFilter, dateFilter, sortBy, activeTab])
 
-  // Real-time Firebase listener for user's orders
   useEffect(() => {
     if (!validateUserId(userId)) return
 
