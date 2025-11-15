@@ -19,10 +19,13 @@ async function fetchOrders(): Promise<Order[]> {
     const res = await fetch("/api/my-orders", { credentials: "include", cache: "no-store" });
     if (!res.ok) {
       console.warn("orders fetch failed:", res.status);
+      const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
+      const errorMessage = errorData?.error || `Failed to fetch orders: ${res.status}`;
+      
       if (res.status === 401) {
         throw new Error("Please log in to view your orders");
       }
-      throw new Error(`Failed to fetch orders: ${res.status}`);
+      throw new Error(errorMessage);
     }
     const json = await res.json();
     // Support both { orders: [...] } and raw array shapes

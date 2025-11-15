@@ -125,7 +125,8 @@ export async function GET() {
 
     return NextResponse.json({ orders });
   } catch (error: any) {
-    const details = handleServerError(error, "api/my-orders");
-    return NextResponse.json(details, { status: 500 });
+    console.error('Order history API error:', error);
+    const errorMessage = error.message || 'Failed to fetch orders';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

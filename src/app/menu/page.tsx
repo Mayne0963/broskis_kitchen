@@ -200,7 +200,7 @@ export default function MenuPage() {
           />
           <div className="absolute inset-0 bg-black bg-opacity-60"></div>
         </div>
-        <Container className="relative z-10 text-center">
+        <Container size="full" className="relative z-10 text-center">
           <Stack direction="column" gap="md" alignment="center">
             <Typography variant="hero" className="text-white">
               Our Menu
@@ -214,7 +214,7 @@ export default function MenuPage() {
 
       {/* Search and Filter Section - Using new design system */}
       <section className="bg-[var(--color-background-subtle)] py-8 sticky top-20 z-30 border-b border-[var(--color-border-subtle)]">
-        <Container>
+        <Container size="full">
           <Stack direction="column" gap="lg">
             <Grid cols={1} md={3} gap="md" alignment="center">
               {/* Search Bar */}
@@ -307,7 +307,7 @@ export default function MenuPage() {
 
       {/* Menu Items Section - Using new design system */}
       <section className="py-12">
-        <Container>
+        <Container size="full">
           <LoadingOverlay isLoading={isInitialLoading} message="Loading menu items...">
             {isSearching && <SearchLoading />}
             
@@ -315,7 +315,7 @@ export default function MenuPage() {
               <Stack direction="column" gap="xl">
                 {/* Regular Menu Items */}
                 {filteredItems.filter(item => !item.isTestItem).length > 0 ? (
-                  <Grid cols={3} md={2} lg={3} gap="xl">
+                  <Grid cols={3} md={3} lg={4} xl={5} gap="xl">
                     {filteredItems.filter(item => !item.isTestItem).map((item) => (
                       <MenuItemCard
                         key={item.id}
@@ -386,7 +386,7 @@ export default function MenuPage() {
 
       {/* Legend Section - Using new design system */}
       <section className="py-8 bg-[var(--color-background-subtle)]">
-        <Container>
+        <Container size="full">
           <Stack direction="column" gap="md">
             <Typography variant="h4">Menu Legend</Typography>
             <Grid cols={1} md={3} gap="md">
