@@ -315,7 +315,7 @@ export default function MenuPage() {
               <Stack direction="column" gap="xl">
                 {/* Regular Menu Items */}
                 {filteredItems.filter(item => !item.isTestItem).length > 0 ? (
-                  <Grid cols={1} md={2} lg={3} gap="xl">
+                  <Grid cols={3} md={2} lg={3} gap="xl">
                     {filteredItems.filter(item => !item.isTestItem).map((item) => (
                       <MenuItemCard
                         key={item.id}
