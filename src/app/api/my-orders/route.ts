@@ -71,23 +71,45 @@ export async function GET() {
 
     console.log(`Fetching orders for user: ${user.uid}`);
 
+    // Validate user.uid before using in query
+    if (!user.uid) {
+      console.error('User UID is undefined, cannot query orders');
+      return NextResponse.json({ orders: [] });
+    }
+
     // Try to find orders by userId first, then fall back to email
-    let snap = await adminDb
-      .collection("orders")
-      .where("userId", "==", user.uid)
-      .orderBy("createdAt", "desc")
-      .limit(50)
-      .get();
+    let snap;
+    try {
+      snap = await adminDb
+        .collection("orders")
+        .where("userId", "==", user.uid)
+        .orderBy("createdAt", "desc")
+        .limit(50)
+        .get();
+    } catch (error: any) {
+      console.error('Error querying by userId:', error.message);
+      snap = { empty: true, docs: [] } as any;
+    }
 
     // If no orders found by userId, try by email
     if (snap.empty && user.email) {
       console.log(`No orders found by userId, trying email: ${user.email}`);
-      snap = await adminDb
-        .collection("orders")
-        .where("userEmail", "==", user.email)
-        .orderBy("createdAt", "desc")
-        .limit(50)
-        .get();
+      
+      // Validate email before using in query
+      if (!user.email) {
+        console.error('User email is undefined, cannot query by email');
+      } else {
+        try {
+          snap = await adminDb
+            .collection("orders")
+            .where("userEmail", "==", user.email)
+            .orderBy("createdAt", "desc")
+            .limit(50)
+            .get();
+        } catch (error: any) {
+          console.error('Error querying by email:', error.message);
+        }
+      }
     }
 
     console.log(`Found ${snap.docs.length} orders for user: ${user.uid}`);
