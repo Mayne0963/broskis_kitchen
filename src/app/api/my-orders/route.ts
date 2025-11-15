@@ -2,13 +2,19 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { Timestamp } from "firebase-admin/firestore";
 import { getServerUser } from "@/lib/authServer";
 import { adminDb } from "@/lib/firebase/admin";
 import { handleServerError } from "@/lib/utils/errorLogger";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const { searchParams } = new URL(req.url);
+    const limitParam = Number(searchParams.get('limit') || 50);
+    const limit = Math.min(100, Math.max(1, limitParam));
+    const cursorIso = searchParams.get('cursor');
+    const cursorTs = cursorIso ? Timestamp.fromDate(new Date(cursorIso)) : null;
     const user = await getServerUser();
     console.log('User authentication check:', user ? `User found: ${user.uid}` : 'No user found');
     
@@ -78,12 +84,17 @@ export async function GET() {
     }
 
     // Query orders by userId only (removing userEmail fallback)
-    const snap = await adminDb
+    let q = adminDb
       .collection("orders")
       .where("userId", "==", user.uid)
       .orderBy("createdAt", "desc")
-      .limit(50)
-      .get();
+      .limit(limit);
+
+    if (cursorTs) {
+      q = q.startAfter(cursorTs);
+    }
+
+    const snap = await q.get();
 
     console.log(`Found ${snap.docs.length} orders for user: ${user.uid}`);
     
@@ -118,7 +129,10 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json({ orders });
+    const last = snap.docs[snap.docs.length - 1];
+    const nextCursor = last ? (last.data() as any).createdAt?.toDate?.()?.toISOString?.() : null;
+
+    return NextResponse.json({ orders, nextCursor });
   } catch (error: any) {
     console.error('Order history API error:', error);
     

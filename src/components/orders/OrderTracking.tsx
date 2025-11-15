@@ -55,6 +55,7 @@ interface OrderTrackingProps {
 
 export default function OrderTracking({ userId, initialOrders = [] }: OrderTrackingProps) {
   const [orders, setOrders] = useState<Order[]>(initialOrders)
+  const [nextCursor, setNextCursor] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const { isLoading: isRefreshLoading, error: refreshError, withLoading, clearError } = useLoadingState()
@@ -117,6 +118,7 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
         const data = await response.json()
         const arr = Array.isArray(data) ? data : Array.isArray(data?.orders) ? data.orders : []
         setOrders(arr)
+        setNextCursor(data?.nextCursor ?? null)
         setError(null)
       } else {
         throw new Error('Failed to fetch orders')
@@ -135,6 +137,22 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
       fetchOrdersFromAPI()
     }
   }, [userId, fetchOrdersFromAPI])
+
+  const loadMore = useCallback(async () => {
+    if (!nextCursor) return
+    try {
+      setIsLoading(true)
+      const response = await safeFetch(`/api/my-orders?cursor=${encodeURIComponent(nextCursor)}`)
+      if (response.ok) {
+        const data = await response.json()
+        const arr = Array.isArray(data?.orders) ? data.orders : []
+        setOrders(prev => [...prev, ...arr])
+        setNextCursor(data?.nextCursor ?? null)
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }, [nextCursor])
 
   // Load saved filter preferences and presets
    useEffect(() => {
@@ -1826,6 +1844,21 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Pagination */}
+      {nextCursor && (
+        <div className="flex justify-center pt-2">
+          <Button
+            variant="outline"
+            onClick={loadMore}
+            disabled={isLoading}
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            Load More
+          </Button>
+        </div>
+      )}
 
       {/* Save Filter Preset Modal */}
       {showPresetModal && (

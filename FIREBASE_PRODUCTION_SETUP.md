@@ -43,7 +43,7 @@ NEXT_PUBLIC_FIREBASE_APP_ID=1:your-sender-id:web:your-app-id
 Once you have proper credentials, run:
 
 ```bash
-node scripts/setAdminClaim.js amarikelsaw10@gmail.com
+node scripts/setAdminClaim.js 00broskis@gmail.com
 ```
 
 ### Step 4: Verify Setup
