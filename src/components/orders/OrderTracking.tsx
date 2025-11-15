@@ -237,7 +237,9 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
             updatedAt: doc.data().updatedAt?.toDate?.() || new Date()
           })) as Order[]
 
-          setOrders(ordersData)
+          if (ordersData.length > 0) {
+            setOrders(ordersData)
+          }
           setIsLoading(false)
         },
         (error) => {
