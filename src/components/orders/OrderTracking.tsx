@@ -201,7 +201,7 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
   useEffect(() => {
     if (!validateUserId(userId)) return
 
-    if (!isFirebaseConfigured() || !db) {
+    if (!isFirebaseConfigured || !db) {
       setOrders(initialOrders)
       setIsLoading(false)
       return
