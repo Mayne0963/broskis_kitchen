@@ -138,6 +138,15 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
     }
   }, [userId, fetchOrdersFromAPI])
 
+  useEffect(() => {
+    const activeStatuses = new Set(['pending','paid','preparing','ready','out_for_delivery'])
+    const hasActive = orders.some(o => activeStatuses.has(o.status))
+    const hasCompleted = orders.some(o => !activeStatuses.has(o.status))
+    if (!hasActive && hasCompleted) {
+      setActiveTab('completed')
+    }
+  }, [orders])
+
   const loadMore = useCallback(async () => {
     if (!nextCursor) return
     try {

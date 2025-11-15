@@ -109,13 +109,28 @@ export async function GET(req: NextRequest) {
       q = q.startAfter(cursorTs);
     }
 
-    const snap = await q.get();
-
+    let snap = await q.get();
     console.log(`Found ${snap.docs.length} orders for user: ${user.uid}`);
     
     // Debug: log the first few orders to see their structure
     if (snap.docs.length > 0) {
       console.log('First order data:', JSON.stringify(snap.docs[0].data(), null, 2));
+    }
+
+    if (snap.docs.length === 0 && user.email) {
+      let q2 = adminDb
+        .collection("orders")
+        .where("userEmail", "==", user.email)
+        .orderBy("createdAt", "desc")
+        .limit(limit);
+      if (cursorTs) {
+        q2 = q2.startAfter(cursorTs);
+      }
+      const snap2 = await q2.get();
+      if (snap2.docs.length > 0) {
+        console.log(`Fallback by email found ${snap2.docs.length} orders for ${user.email}`);
+        snap = snap2 as any;
+      }
     }
 
     const orders = snap.docs.map(d => {
