@@ -461,65 +461,65 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
      });
    }, []);
 
-   const sendChatMessage = useCallback(async () => {
-     if (!chatInput.trim()) return;
+  const generateSupportResponse = useCallback((userMessage: string, order: Order | null): string => {
+    const lowerMessage = userMessage.toLowerCase();
+    
+    if (lowerMessage.includes('status') || lowerMessage.includes('where')) {
+      return order ? 
+        `Your order #${order.orderNumber} is currently ${getStatusDisplayName(order.status)}. ${getStatusMessage(order.status)}` :
+        'I can help you check your order status. Please provide your order number.';
+    }
+    
+    if (lowerMessage.includes('cancel')) {
+      return order && ['pending', 'confirmed'].includes(order.status) ?
+        `I can help you cancel order #${order.orderNumber}. Please confirm if you'd like to proceed with the cancellation.` :
+        'This order cannot be cancelled as it\'s already being prepared or has been completed.';
+    }
+    
+    if (lowerMessage.includes('change') || lowerMessage.includes('modify')) {
+      return order && order.status === 'pending' ?
+        `I can help you modify order #${order.orderNumber}. What changes would you like to make?` :
+        'Unfortunately, this order cannot be modified as it\'s already being prepared.';
+    }
+    
+    if (lowerMessage.includes('delivery') || lowerMessage.includes('time')) {
+      return order && order.type === 'delivery' ?
+        `Your delivery order #${order.orderNumber} is estimated to arrive in ${order.estimatedDeliveryTime ? formatTimeRemaining(new Date(order.estimatedDeliveryTime)) : '30-45 minutes'}.` :
+        'For pickup orders, you can collect your order once it\'s ready. We\'ll notify you when it\'s prepared.';
+    }
+    
+    return 'Thank you for contacting us! How can I assist you with your order today? I can help with order status, modifications, cancellations, and delivery information.';
+  }, []);
 
-     const userMessage = {
-       id: Date.now().toString(),
-       type: 'user',
-       content: chatInput,
-       timestamp: new Date(),
-       isSupport: false
-     };
+  const sendChatMessage = useCallback(async () => {
+    if (!chatInput.trim()) return;
 
-     setChatMessages(prev => [userMessage, ...prev]);
-     setChatInput('');
-     setIsChatLoading(true);
+    const userMessage = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: chatInput,
+      timestamp: new Date(),
+      isSupport: false
+    };
 
-     // Simulate support response
-     setTimeout(() => {
-       const supportMessage = {
-         id: (Date.now() + 1).toString(),
-         type: 'support',
-         content: generateSupportResponse(chatInput, chatOrderContext),
-         timestamp: new Date(),
-         isSupport: true
-       };
-       
-       setChatMessages(prev => [supportMessage, ...prev]);
-       setIsChatLoading(false);
-     }, 1500);
-   }, [chatInput, chatOrderContext, generateSupportResponse]);
+    setChatMessages(prev => [userMessage, ...prev]);
+    setChatInput('');
+    setIsChatLoading(true);
 
-   const generateSupportResponse = useCallback((userMessage: string, order: Order | null): string => {
-     const lowerMessage = userMessage.toLowerCase();
-     
-     if (lowerMessage.includes('status') || lowerMessage.includes('where')) {
-       return order ? 
-         `Your order #${order.orderNumber} is currently ${getStatusDisplayName(order.status)}. ${getStatusMessage(order.status)}` :
-         'I can help you check your order status. Please provide your order number.';
-     }
-     
-     if (lowerMessage.includes('cancel')) {
-       return order && ['pending', 'confirmed'].includes(order.status) ?
-         `I can help you cancel order #${order.orderNumber}. Please confirm if you'd like to proceed with the cancellation.` :
-         'This order cannot be cancelled as it\'s already being prepared or has been completed.';
-     }
-     
-     if (lowerMessage.includes('change') || lowerMessage.includes('modify')) {
-       return order && order.status === 'pending' ?
-         `I can help you modify order #${order.orderNumber}. What changes would you like to make?` :
-         'Unfortunately, this order cannot be modified as it\'s already being prepared.';
-     }
-     
-     if (lowerMessage.includes('delivery') || lowerMessage.includes('time')) {
-       return order && order.type === 'delivery' ?
-         `Your delivery order #${order.orderNumber} is estimated to arrive in ${order.estimatedDeliveryTime ? formatTimeRemaining(new Date(order.estimatedDeliveryTime)) : '30-45 minutes'}.` :
-         'For pickup orders, you can collect your order once it\'s ready. We\'ll notify you when it\'s prepared.';
-     }
-     
-     return 'Thank you for contacting us! How can I assist you with your order today? I can help with order status, modifications, cancellations, and delivery information.';
-   }, []);
+    // Simulate support response
+    setTimeout(() => {
+      const supportMessage = {
+        id: (Date.now() + 1).toString(),
+        type: 'support',
+        content: generateSupportResponse(userMessage.content, chatOrderContext),
+        timestamp: new Date(),
+        isSupport: true
+      };
+      
+      setChatMessages(prev => [supportMessage, ...prev]);
+      setIsChatLoading(false);
+    }, 1500);
+  }, [chatInput, chatOrderContext, generateSupportResponse]);
 
    const getStatusMessage = (status: OrderStatus): string => {
      switch (status) {
