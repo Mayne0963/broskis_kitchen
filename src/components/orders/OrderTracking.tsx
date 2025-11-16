@@ -1130,7 +1130,7 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
       case 'confirmed': return 'bg-blue-500 text-white'
       case 'preparing': return 'bg-orange-500 text-white animate-pulse'
       case 'ready': return 'bg-green-500 text-white animate-bounce'
-      case 'out-for-delivery': return 'bg-purple-500 text-white animate-pulse'
+      case 'out_for_delivery': return 'bg-purple-500 text-white animate-pulse'
       case 'delivered': return 'bg-emerald-500 text-white'
       case 'completed': return 'bg-emerald-600 text-white'
       case 'cancelled': return 'bg-red-500 text-white'
@@ -1156,7 +1156,7 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
       case 'confirmed': return <CheckCircle className="w-4 h-4" />
       case 'preparing': return <ChefHat className="w-4 h-4" />
       case 'ready': return <Package className="w-4 h-4" />
-      case 'out-for-delivery': return <Truck className="w-4 h-4" />
+      case 'out_for_delivery': return <Truck className="w-4 h-4" />
       case 'delivered': return <CheckCircle className="w-4 h-4" />
       case 'completed': return <CheckCircle className="w-4 h-4" />
       case 'cancelled': return <AlertCircle className="w-4 h-4" />
@@ -1226,7 +1226,7 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
       case 'oldest':
         return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
       case 'status':
-        const statusOrder = ['pending', 'confirmed', 'preparing', 'ready', 'out-for-delivery', 'delivered', 'completed', 'cancelled']
+        const statusOrder = ['pending', 'confirmed', 'preparing', 'ready', 'out_for_delivery', 'delivered', 'completed', 'cancelled']
         return statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status)
       case 'total':
         return b.total - a.total
@@ -1299,7 +1299,7 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
   }
 
   const getOrderProgress = (status: OrderStatus): number => {
-    const statusOrder = ['pending', 'confirmed', 'preparing', 'ready', 'out-for-delivery', 'delivered', 'completed']
+    const statusOrder = ['pending', 'confirmed', 'preparing', 'ready', 'out_for_delivery', 'delivered', 'completed']
     const currentIndex = statusOrder.indexOf(status)
     return currentIndex >= 0 ? ((currentIndex + 1) / statusOrder.length) * 100 : 0
   }

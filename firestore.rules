@@ -5,11 +5,11 @@ service cloud.firestore {
     function isSignedIn() {
       return request.auth != null;
     }
-    
+
     function isSelf(uid) {
       return isSignedIn() && request.auth.uid == uid;
     }
-    
+
     function isAdmin() {
       // Accept either explicit admin claim or role value
       return isSignedIn() && (
@@ -17,11 +17,11 @@ service cloud.firestore {
         request.auth.token.role == "admin"
       );
     }
-    
+
     function isStaff() {
       return isSignedIn() && request.auth.token.role == "staff";
     }
-    
+
     function isValidEmail() {
       return isSignedIn() && request.auth.token.email_verified == true;
     }
@@ -32,13 +32,12 @@ service cloud.firestore {
       allow write: if isSelf(uid) || isAdmin();
     }
 
+    // User orders subcollection (if used alongside top-level orders)
     match /users/{uid}/orders/{orderId} {
+      // Owners can read their own orders; admin/staff have full visibility
       allow read: if isSelf(uid) || isAdmin() || isStaff();
-      allow create, update, delete: if false;
-    }
-    
-    match /orders/{orderId} {
-      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin() || isStaff());
+
+      // Writes follow the same constraints as top-level orders
       allow create: if isSignedIn() &&
         request.resource.data.keys().hasAll([
           'userId', 'status', 'createdAt'
@@ -46,163 +45,15 @@ service cloud.firestore {
         request.resource.data.userId == request.auth.uid &&
         request.resource.data.status is string &&
         request.resource.data.createdAt is timestamp;
+
       allow update: if (
-        isSignedIn() && resource.data.userId == request.auth.uid &&
+        isSignedIn() && isSelf(uid) &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']) &&
         request.resource.data.status is string &&
         request.resource.data.updatedAt is timestamp
       ) || isAdmin() || isStaff();
+
       allow delete: if isAdmin();
-    }
-    
-    // REWARDS SYSTEM COLLECTIONS
-    
-    // Rewards profiles - users can read their own, only system/admin can write
-    match /rewardsProfiles/{userId} {
-      allow read: if isSelf(userId) || isAdmin();
-      allow create: if false; // Only server-side code can create profiles
-      allow update: if false; // Only server-side code can update profiles
-      allow delete: if isAdmin();
-    }
-    
-    // Rewards transactions - users can read their own, only system/admin can write
-    match /rewardsTransactions/{transactionId} {
-      allow read: if isSignedIn() && 
-                     (resource.data.uid == request.auth.uid || isAdmin());
-      allow create: if false; // Only server-side code can create transactions
-      allow update, delete: if false; // Transactions are immutable
-    }
-    
-    // Referral codes - users can read their own, only system can write
-    match /referralCodes/{codeId} {
-      allow read: if isSignedIn() && 
-                     (resource.data.uid == request.auth.uid || isAdmin());
-      allow create: if false; // Only server-side code can create referral codes
-      allow update, delete: if false; // Referral codes are immutable
-    }
-    
-    // Referral tracking - users can read their own, only system can write
-    match /referralTracking/{trackingId} {
-      allow read: if isSignedIn() && 
-                     (resource.data.referrerId == request.auth.uid || 
-                      resource.data.refereeId == request.auth.uid || 
-                      isAdmin());
-      allow create: if false; // Only server-side code can create tracking records
-      allow update, delete: if false; // Tracking records are immutable
-    }
-    
-    // Reward offers - read-only for authenticated users, admin can write
-    match /rewardOffers/{offerId} {
-      allow read: if isSignedIn();
-      allow create, update: if isAdmin() && 
-                              request.resource.data.keys().hasAll([
-                                'name', 'description', 'pointsCost', 'category', 
-                                'isActive', 'createdAt'
-                              ]) &&
-                              request.resource.data.pointsCost is int &&
-                              request.resource.data.pointsCost > 0 &&
-                              request.resource.data.isActive is bool;
-      allow delete: if isAdmin();
-    }
-    
-    // Redemption history - users can read their own, only system can write
-    match /redemptionHistory/{redemptionId} {
-      allow read: if isSignedIn() && 
-                     (resource.data.uid == request.auth.uid || isAdmin());
-      allow create: if false; // Only server-side code can create redemptions
-      allow update: if false; // Only system can update redemption status
-      allow delete: if false; // Redemptions are immutable
-    }
-    
-    // Spin wheel history - users can read their own, only system can write
-    match /spinHistory/{spinId} {
-      allow read: if isSignedIn() && 
-                     (resource.data.uid == request.auth.uid || isAdmin());
-      allow create: if false; // Only server-side code can create spin records
-      allow update, delete: if false; // Spin history is immutable
-    }
-    
-    // Legacy loyalty collection (for backward compatibility)
-    match /loyalty/{userId} {
-      allow read: if isSelf(userId) || isAdmin();
-      allow create: if isSelf(userId) && isValidEmail() && 
-                   request.resource.data.keys().hasAll(['email', 'createdAt']) &&
-                   request.resource.data.email == request.auth.token.email &&
-                   request.resource.data.currentPoints == 0 &&
-                   request.resource.data.totalEarned == 0 &&
-                   request.resource.data.totalRedeemed == 0;
-      allow update: if (isSelf(userId) && 
-                       // Users can only update certain fields
-                       request.resource.data.diff(resource.data).affectedKeys()
-                         .hasOnly(['lastActivity', 'name']) &&
-                       request.resource.data.email == resource.data.email &&
-                       request.resource.data.currentPoints == resource.data.currentPoints &&
-                       request.resource.data.totalEarned == resource.data.totalEarned &&
-                       request.resource.data.totalRedeemed == resource.data.totalRedeemed) ||
-                       isAdmin(); // Admins can update any field
-      allow delete: if isAdmin();
-    }
-    
-    // Admin-only collections for analytics and management
-    match /adminLogs/{logId} {
-      allow read, write: if isAdmin();
-    }
-    
-    // Menu drops - readable by authenticated users, writable by admins
-    match /menuDrops/{dropId} {
-      allow read: if isSignedIn();
-      allow create, update, delete: if isAdmin();
-    }
-    
-    // Public offers - readable by authenticated users, writable by admins
-    match /offers/{offerId} {
-      allow read: if isSignedIn();
-      allow create, update, delete: if isAdmin();
-    }
-    
-    // Idempotency keys - system use only
-    match /idempotencyKeys/{keyId} {
-      allow read, write: if false; // Only server-side code
-    }
-    
-    // Default deny all other collections
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-}
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // Optimized helper functions with fast short-circuit evaluation
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    function isSelf(uid) {
-      return isSignedIn() && request.auth.uid == uid;
-    }
-
-    function isAdmin() {
-      // Accept either explicit admin claim or role value
-      return isSignedIn() && (
-        request.auth.token.admin == true ||
-        request.auth.token.role == "admin"
-      );
-    }
-
-    function isStaff() {
-      return isSignedIn() && request.auth.token.role == "staff";
-    }
-
-    function isValidEmail() {
-      return isSignedIn() && request.auth.token.email_verified == true;
-    }
-
-    // Optimized users collection with O(1) lookups
-    match /users/{uid} {
-      allow read: if isSelf(uid) || isAdmin();
-      allow write: if isSelf(uid) || isAdmin();
     }
 
     match /orders/{orderId} {

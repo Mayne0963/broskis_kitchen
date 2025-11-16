@@ -133,6 +133,27 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    // Additional fallback: check user subcollections via collection group
+    if (snap.docs.length === 0) {
+      try {
+        let q3 = adminDb
+          .collectionGroup("orders")
+          .where("userId", "==", user.uid)
+          .orderBy("createdAt", "desc")
+          .limit(limit);
+        if (cursorTs) {
+          q3 = q3.startAfter(cursorTs);
+        }
+        const snap3 = await q3.get();
+        if (snap3.docs.length > 0) {
+          console.log(`Collection group fallback found ${snap3.docs.length} orders for user: ${user.uid}`);
+          snap = snap3 as any;
+        }
+      } catch (cgErr: any) {
+        console.warn('Collection group query failed or requires index:', cgErr?.message || cgErr);
+      }
+    }
+
     const orders = snap.docs.map(d => {
       const o = d.data() as any;
       return {
