@@ -26,7 +26,7 @@ export default function NavBar() {
 
         <div className="flex items-center gap-2">
           <Link
-            href="/order"
+            href="https://otw-chi.vercel.app"
             className="btn btn-lg border-[1.5px]"
             style={{
               background:

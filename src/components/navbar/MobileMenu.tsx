@@ -205,7 +205,7 @@ export default function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
               </Link>
               {isAdmin && (
                 <Link 
-                  href="/admin/dashboard" 
+                  href="/admin" 
                   prefetch={false}
                   onClick={closeMenu} 
                   data-testid="mobile-menu-cta"
@@ -214,7 +214,7 @@ export default function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
                   Admin
                 </Link>
               )}
-              <form action="/api/auth/signout" method="post">
+              <form action="/api/auth/logout" method="post">
                 <button 
                   data-testid="mobile-menu-cta"
                   className="btn btn-ghost w-full"
@@ -225,7 +225,7 @@ export default function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
             </>
           ) : (
             <Link 
-              href="/login" 
+              href="/auth/login" 
               onClick={closeMenu} 
               data-testid="mobile-menu-cta"
               className="btn btn-primary w-full"

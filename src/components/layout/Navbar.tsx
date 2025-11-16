@@ -152,7 +152,7 @@ const Navbar: React.FC = () => {
                     Dashboard
                   </AccessibleMenuItem>
                   <AccessibleMenuItem 
-                    href="/profile"
+                    href="/account/profile"
                     onClick={() => setUserDropdownOpen(false)}
                   >
                     Profile

@@ -89,7 +89,7 @@ const RedeemModal: React.FC<RedeemModalProps> = ({ reward, userPoints, onClose }
                 You need to be logged in to redeem rewards. Sign in to unlock exclusive benefits!
               </p>
               <div className="flex gap-3">
-                <Link href="/login" className="btn-outline flex-1 text-center">
+                <Link href="/auth/login" className="btn-outline flex-1 text-center">
                   Login
                 </Link>
                 <Link href="/auth/signup" className="btn-primary flex-1 text-center flex items-center justify-center">

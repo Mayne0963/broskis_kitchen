@@ -270,7 +270,7 @@ export default function RewardsClient({ initial }: { initial: any }) {
               </Typography>
               <Stack direction="row" gap="md">
                 <Button variant="primary" onClick={() => location.reload()}>Try Again</Button>
-                {unauth && <Button variant="ghost" href="/login">Go to Login</Button>}
+                {unauth && <Button variant="ghost" href="/auth/login">Go to Login</Button>}
               </Stack>
             </Stack>
           </Card.Content>
