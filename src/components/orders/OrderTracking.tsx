@@ -155,8 +155,16 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
       if (response.ok) {
         const data = await response.json()
         const arr = Array.isArray(data?.orders) ? data.orders : []
-        setOrders(prev => [...prev, ...arr])
+        setOrders(prev => {
+          const map = new Map<string, Order>()
+          prev.forEach(o => map.set(o.id, o))
+          arr.forEach(o => map.set(o.id, o))
+          return Array.from(map.values())
+        })
         setNextCursor(data?.nextCursor ?? null)
+        if (process.env.NODE_ENV !== 'production') {
+          console.debug('[orders] load-more', { added: arr.length, pathUsed: data?.pathUsed })
+        }
       }
     } finally {
       setIsLoading(false)
@@ -258,6 +266,9 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
       setError('Failed to connect to real-time updates')
       setIsLoading(false)
       setOrders(initialOrders)
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('[orders] listener error', error)
+      }
     }
   }, [userId, initialOrders, fetchOrdersFromAPI])
 

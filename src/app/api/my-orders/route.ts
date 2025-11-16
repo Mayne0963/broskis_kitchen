@@ -110,6 +110,7 @@ export async function GET(req: NextRequest) {
     }
 
     let snap = await q.get();
+    let pathUsed: 'orders_by_uid' | 'orders_by_email' | 'collection_group' | 'none' = 'orders_by_uid';
     console.log(`Found ${snap.docs.length} orders for user: ${user.uid}`);
     
     // Debug: log the first few orders to see their structure
@@ -130,6 +131,7 @@ export async function GET(req: NextRequest) {
       if (snap2.docs.length > 0) {
         console.log(`Fallback by email found ${snap2.docs.length} orders for ${user.email}`);
         snap = snap2 as any;
+        pathUsed = 'orders_by_email';
       }
     }
 
@@ -148,6 +150,7 @@ export async function GET(req: NextRequest) {
         if (snap3.docs.length > 0) {
           console.log(`Collection group fallback found ${snap3.docs.length} orders for user: ${user.uid}`);
           snap = snap3 as any;
+          pathUsed = 'collection_group';
         }
       } catch (cgErr: any) {
         console.warn('Collection group query failed or requires index:', cgErr?.message || cgErr);
@@ -156,6 +159,9 @@ export async function GET(req: NextRequest) {
 
     const orders = snap.docs.map(d => {
       const o = d.data() as any;
+      const status = typeof o.status === 'string' ? o.status : 'pending';
+      const createdAt = o.createdAt?.toDate?.() || new Date();
+      const updatedAt = o.updatedAt?.toDate?.() || createdAt;
       return {
         id: d.id,
         userId: o.userId,
@@ -164,7 +170,7 @@ export async function GET(req: NextRequest) {
         tax: Number(o.tax || 0),
         deliveryFee: Number(o.deliveryFee || 0),
         total: Number(o.total || 0),
-        status: o.status || "pending",
+        status,
         orderType: o.orderType || "pickup",
         deliveryAddress: o.deliveryAddress || null,
         pickupLocation: o.pickupLocation || null,
@@ -172,8 +178,8 @@ export async function GET(req: NextRequest) {
         paymentInfo: o.paymentInfo || null,
         specialInstructions: o.specialInstructions || "",
         estimatedTime: o.estimatedTime || "",
-        createdAt: o.createdAt?.toDate?.() || new Date(),
-        updatedAt: o.updatedAt?.toDate?.() || o.createdAt?.toDate?.() || new Date(),
+        createdAt,
+        updatedAt,
         otwOrderId: o.otwOrderId || null,
         driverInfo: o.driverInfo || null,
         paymentStatus: o.paymentStatus || "pending",
@@ -182,8 +188,8 @@ export async function GET(req: NextRequest) {
 
     const last = snap.docs[snap.docs.length - 1];
     const nextCursor = last ? (last.data() as any).createdAt?.toDate?.()?.toISOString?.() : null;
-
-    return NextResponse.json({ orders, nextCursor });
+    console.log(`my-orders response: { pathUsed: ${pathUsed}, count: ${orders.length}, nextCursor: ${nextCursor} }`);
+    return NextResponse.json({ orders, nextCursor, pathUsed }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error: any) {
     console.error('Order history API error:', error);
     
@@ -197,6 +203,7 @@ export async function GET(req: NextRequest) {
       }, { status: 500 });
     }
     
+    handleServerError(error, 'my-orders');
     const errorMessage = error.message || 'Failed to fetch orders';
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
