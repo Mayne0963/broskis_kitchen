@@ -54,6 +54,7 @@
     "env:setup": "node scripts/setup-vercel-env.js",
     "env:commands": "bash scripts/vercel-env-commands.sh",
     "backfill-test-orders": "tsx scripts/backfill-test-orders.ts",
+    "backfill:userid": "tsx scripts/backfillUserId.ts --apply --limit=200",
     "stripe:listen": "bash scripts/stripe-listen.sh",
     "stripe:trigger": "bash scripts/stripe-trigger-checkout.sh",
     "music:scan": "tsx scripts/scanAudio.ts",
