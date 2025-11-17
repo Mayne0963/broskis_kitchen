@@ -110,7 +110,7 @@ export async function GET(req: NextRequest) {
     }
 
     let snap = await q.get();
-    let pathUsed: 'orders_by_uid' | 'orders_by_email' | 'collection_group' | 'none' = 'orders_by_uid';
+    let pathUsed: 'orders_by_uid' | 'collection_group' | 'none' = 'orders_by_uid';
     console.log(`Found ${snap.docs.length} orders for user: ${user.uid}`);
     
     // Debug: log the first few orders to see their structure
@@ -118,23 +118,7 @@ export async function GET(req: NextRequest) {
       console.log('First order data:', JSON.stringify(snap.docs[0].data(), null, 2));
     }
 
-    // Fallback by email for legacy orders until backfill is completed
-    if (snap.docs.length === 0 && user.email) {
-      let q2 = adminDb
-        .collection("orders")
-        .where("userEmail", "==", user.email)
-        .orderBy("createdAt", "desc")
-        .limit(limit);
-      if (cursorTs) {
-        q2 = q2.startAfter(cursorTs);
-      }
-      const snap2 = await q2.get();
-      if (snap2.docs.length > 0) {
-        console.log(`Fallback by email found ${snap2.docs.length} orders for ${user.email}`);
-        snap = snap2 as any;
-        pathUsed = 'orders_by_email';
-      }
-    }
+    // Email fallback removed post-backfill to enforce UID-only retrieval
 
     // Additional fallback: check user subcollections via collection group
     if (snap.docs.length === 0) {

@@ -143,8 +143,9 @@ export async function ensureAdmin(req: NextRequest) {
 }
 
 // Export Firebase Admin utilities
-export const Timestamp = admin.firestore.Timestamp;
-export const FieldValue = admin.firestore.FieldValue;
+import { Timestamp as FATimestamp, FieldValue as FAFieldValue } from 'firebase-admin/firestore';
+export const Timestamp = FATimestamp;
+export const FieldValue = FAFieldValue;
 
 // Legacy compatibility exports (so old imports keep working)
 export const adminDb = db; // some files import { adminDb }
