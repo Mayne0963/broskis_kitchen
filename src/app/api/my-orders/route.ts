@@ -163,27 +163,37 @@ export async function GET(req: NextRequest) {
       const status = typeof o.status === 'string' ? o.status : 'pending';
       const createdAt = o.createdAt?.toDate?.() || new Date();
       const updatedAt = o.updatedAt?.toDate?.() || createdAt;
+      const normalizedItems = Array.isArray(o.items) ? o.items.map((it: any) => ({
+        name: it?.name ?? it?.title ?? 'Item',
+        quantity: Number(it?.quantity ?? it?.qty ?? 1),
+        price: Number(
+          typeof it?.price === 'number' ? it.price :
+          typeof it?.priceCents === 'number' ? (it.priceCents / 100) : 0
+        ),
+      })) : [];
+      const orderType = o.orderType ?? o.type ?? 'pickup';
+      const contactInfo = o.contactInfo ?? { email: o.userEmail ?? '', phone: o.userPhone ?? '', name: o.userName ?? '' };
       return {
         id: d.id,
         userId: o.userId,
-        items: o.items || [],
-        subtotal: Number(o.subtotal || 0),
-        tax: Number(o.tax || 0),
-        deliveryFee: Number(o.deliveryFee || 0),
-        total: Number(o.total || 0),
+        items: normalizedItems,
+        subtotal: Number(o.subtotal ?? 0),
+        tax: Number(o.tax ?? 0),
+        deliveryFee: Number(o.deliveryFee ?? 0),
+        total: Number(o.total ?? (Number(o.subtotal ?? 0) + Number(o.tax ?? 0) + Number(o.deliveryFee ?? 0))),
         status,
-        orderType: o.orderType || "pickup",
-        deliveryAddress: o.deliveryAddress || null,
-        pickupLocation: o.pickupLocation || null,
-        contactInfo: o.contactInfo || { email: "", phone: "" },
-        paymentInfo: o.paymentInfo || null,
-        specialInstructions: o.specialInstructions || "",
-        estimatedTime: o.estimatedTime || "",
+        orderType,
+        deliveryAddress: o.deliveryAddress ?? null,
+        pickupLocation: o.pickupLocation ?? null,
+        contactInfo,
+        paymentInfo: o.paymentInfo ?? null,
+        specialInstructions: o.specialInstructions ?? "",
+        estimatedTime: o.estimatedTime ?? "",
         createdAt,
         updatedAt,
-        otwOrderId: o.otwOrderId || null,
-        driverInfo: o.driverInfo || null,
-        paymentStatus: o.paymentStatus || "pending",
+        otwOrderId: o.otwOrderId ?? null,
+        driverInfo: o.driverInfo ?? null,
+        paymentStatus: o.paymentStatus ?? "pending",
       };
     });
 
