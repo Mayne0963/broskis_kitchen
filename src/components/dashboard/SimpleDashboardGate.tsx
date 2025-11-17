@@ -93,14 +93,14 @@ export default function SimpleDashboardGate() {
           <CardContent className="space-y-4">
             <Button 
               className="w-full" 
-              onClick={() => window.location.href = '/login'}
+              onClick={() => window.location.href = '/auth/login'}
             >
               Sign In
             </Button>
             <div className="text-center">
               <p className="text-sm text-gray-600">
                 Don&apos;t have an account?{' '}
-                <a href="/signup" className="text-blue-600 hover:underline">
+                <a href="/auth/signup" className="text-blue-600 hover:underline">
                   Sign up
                 </a>
               </p>

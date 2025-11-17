@@ -75,7 +75,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
       })
       
       if (response.ok) {
-        router.push('/login')
+        router.push('/auth/login')
       }
     } catch (error) {
       console.error('Error logging out:', error)
