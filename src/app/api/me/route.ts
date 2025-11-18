@@ -6,9 +6,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerUser } from "@/lib/authServer";
 import { adminDb, adminAuth } from "@/lib/firebase/admin";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { authOptions } from "@/lib/auth/options";
+import { withErrorHandler, RequestContext } from "@/lib/middleware/error-handler";
 
-export async function GET(req: NextRequest) {
+async function handler(req: NextRequest, _ctx: RequestContext) {
   try {
     const session = await getServerSession(authOptions);
     let user = await getServerUser();
@@ -41,13 +42,24 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "session_expired", details: "Session has expired" }, { status: 401 });
     }
 
-    const doc = await adminDb.collection("users").doc(user.uid).get();
-    const profile = doc.exists ? doc.data() : {};
+    // Database fetch with defensive error handling
+    let profile: Record<string, any> = {};
+    try {
+      const doc = await adminDb.collection("users").doc(user.uid).get();
+      profile = doc.exists ? (doc.data() || {}) : {};
+    } catch (dbErr: any) {
+      const message = dbErr?.message || String(dbErr);
+      // Map common Firestore/Admin initialization issues to a safe response
+      const isConfigError = /initialize|credentials|FIREBASE|service account/i.test(message);
+      const status = isConfigError ? 503 : 500;
+      const code = isConfigError ? "database_unavailable" : "database_error";
+      return NextResponse.json({ error: code, details: "Unable to fetch user profile" }, { status });
+    }
 
     return NextResponse.json({ 
       sessionValid: isValid,
       user: {
-        uid: user.uid,
+        uid: (user as any).uid,
         email: (user as any).email ?? null,
         displayName: (profile as any)?.displayName ?? (user as any).displayName ?? null,
         role: (user as any).role ?? (profile as any)?.role ?? 'user',
@@ -56,13 +68,24 @@ export async function GET(req: NextRequest) {
       sessionExpiration: expirationTime
     }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error: any) {
-    console.error('/api/me error:', error?.message || error);
-    if (error.code === 'auth/id-token-expired') {
+    const code = error?.code || error?.name;
+    const message = error?.message || String(error);
+    console.error('/api/me error', JSON.stringify({ code, message }));
+
+    if (code === 'auth/id-token-expired') {
       return NextResponse.json({ error: "token_expired", details: "Authentication token has expired" }, { status: 401 });
     }
-    if (error.code === 'auth/argument-error') {
+    if (code === 'auth/argument-error') {
       return NextResponse.json({ error: "invalid_token", details: "Invalid authentication token" }, { status: 400 });
+    }
+    if (/permission|unauth/i.test(message)) {
+      return NextResponse.json({ error: 'unauthorized', details: "Authentication required" }, { status: 401 });
+    }
+    if (/initialize|credentials|FIREBASE|service account/i.test(message)) {
+      return NextResponse.json({ error: 'service_unavailable', details: "Server configuration error" }, { status: 503 });
     }
     return NextResponse.json({ error: 'internal_error', details: "An unexpected error occurred" }, { status: 500 });
   }
 }
+
+export const GET = withErrorHandler(handler);
