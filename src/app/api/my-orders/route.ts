@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
           estimatedTime: '15-20 minutes'
         }
       ];
-      return NextResponse.json({ orders: testOrders });
+      return NextResponse.json({ orders: testOrders, pathUsed: 'test_orders' });
     }
 
     console.log(`Fetching orders for user: ${user.uid}`);
@@ -98,9 +98,11 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ orders: [] });
     }
 
-    // Query orders by userId only (removing userEmail fallback)
-    let q = adminDb
-      .collection("orders")
+    const ordersCollection = adminDb.collection("orders");
+    type PathUsed = 'orders_by_uid' | 'orders_by_email' | 'collection_group' | 'test_orders';
+    let pathUsed: PathUsed = 'orders_by_uid';
+
+    let q = ordersCollection
       .where("userId", "==", user.uid)
       .orderBy("createdAt", "desc")
       .limit(limit);
@@ -110,15 +112,40 @@ export async function GET(req: NextRequest) {
     }
 
     let snap = await q.get();
-    let pathUsed: 'orders_by_uid' | 'collection_group' | 'none' = 'orders_by_uid';
-    console.log(`Found ${snap.docs.length} orders for user: ${user.uid}`);
+    console.log(`[my-orders] uid query returned ${snap.docs.length} docs for ${user.uid}`);
     
     // Debug: log the first few orders to see their structure
     if (snap.docs.length > 0) {
       console.log('First order data:', JSON.stringify(snap.docs[0].data(), null, 2));
     }
 
-    // Email fallback removed post-backfill to enforce UID-only retrieval
+    if (snap.docs.length === 0 && user.email) {
+      const emailCandidates = Array.from(
+        new Set(
+          [user.email, user.email?.toLowerCase?.() || null].filter(Boolean)
+        )
+      ) as string[];
+      for (const candidate of emailCandidates) {
+        console.log(`[my-orders] UID lookup empty. Attempting email fallback for ${candidate}`);
+        let emailQuery = ordersCollection
+          .where("userEmail", "==", candidate)
+          .orderBy("createdAt", "desc")
+          .limit(limit);
+        if (cursorTs) {
+          emailQuery = emailQuery.startAfter(cursorTs);
+        }
+        const emailSnap = await emailQuery.get();
+        if (emailSnap.docs.length > 0) {
+          snap = emailSnap as any;
+          pathUsed = 'orders_by_email';
+          console.log(`[my-orders] Email fallback succeeded with ${emailSnap.docs.length} docs for ${candidate}`);
+          break;
+        }
+      }
+      if (pathUsed !== 'orders_by_email') {
+        console.warn(`[my-orders] Email fallback returned no orders for user ${user.uid}`);
+      }
+    }
 
     // Additional fallback: check user subcollections via collection group
     if (snap.docs.length === 0) {

@@ -1253,13 +1253,17 @@ export default function OrderTracking({ userId, initialOrders = [] }: OrderTrack
         clearError()
         setIsRefreshing(true)
         
-        const response = await safeFetch(`/api/orders?userId=${userId}`)
+        const response = await safeFetch(`/api/my-orders`, { cache: 'no-store' })
         if (!response.ok) {
+          const body = await response.text().catch(() => '')
+          console.error('[orders] manual refresh failed', { status: response.status, body })
           throw new Error(`Failed to fetch orders: ${response.status}`)
         }
         
         const data = await response.json()
-        setOrders(data.orders || [])
+        const arr = Array.isArray(data) ? data : Array.isArray(data?.orders) ? data.orders : []
+        setOrders(arr)
+        setNextCursor(data?.nextCursor ?? null)
         setLastRefresh(new Date())
         toast.success('Orders refreshed successfully')
       } catch (error) {

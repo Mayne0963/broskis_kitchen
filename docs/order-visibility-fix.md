@@ -23,3 +23,12 @@
 
 ## Recommended Follow-Up
 - Backfill `userId` on legacy email-only orders to enable clean UID-only retrieval and eventually remove email fallback.
+
+## January 2025 Regression and Fix
+- **Regression:** `/api/my-orders` removed the `userEmail` fallback after a partial backfill, so customers whose historical orders still lacked `userId` saw an empty history even though `/api/auth/status` confirmed they were logged in.
+- **UI gap:** The manual refresh button still called the admin-only `/api/orders` endpoint, which always responded with a `501` for shoppers and overwrote the visible state with an error.
+- **Fixes implemented:**
+  - Re-enabled the email fallback (original + lower-cased candidate) and kept the collection-group fallback. Structured logs now note which path succeeded and when fallbacks return no docs.
+  - Manual refresh now hits `/api/my-orders` and reuses the same flexible response parsing as the initial load so customers see the same data everywhere.
+  - Added targeted Vitest coverage (`src/__tests__/myorders-fallbacks.test.ts`) to enforce the fallback order and avoid regressions if we change query code again.
+- **Result:** Customers with legacy orders immediately see their history again and the refresh action no longer surfaces admin-only errors.

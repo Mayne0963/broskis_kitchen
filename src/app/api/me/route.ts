@@ -8,13 +8,44 @@ import { adminDb, adminAuth } from "@/lib/firebase/admin";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/options";
 import { withErrorHandler, RequestContext } from "@/lib/middleware/error-handler";
+import { getSessionCookie } from "@/lib/auth/session";
 
 async function handler(req: NextRequest, _ctx: RequestContext) {
   try {
-    const session = await getServerSession(authOptions);
-    let user = await getServerUser();
-    let isValid = !!session && !!user;
-    let expirationTime = session?.expires ? new Date(session.expires).getTime() : null;
+    const cookieSession = await getSessionCookie();
+    let sessionSource: 'firebase_cookie' | 'auth_server' | 'nextauth' | 'bearer' | null = null;
+    let user: { uid: string; email: string | null; role?: string } | null = null;
+    let expirationTime: number | null = null;
+
+    if (cookieSession) {
+      user = { uid: cookieSession.uid, email: cookieSession.email, role: cookieSession.role };
+      sessionSource = 'firebase_cookie';
+      expirationTime = cookieSession.sessionExpiry ? cookieSession.sessionExpiry * 1000 : null;
+    }
+
+    if (!user) {
+      const serverUser = await getServerUser();
+      if (serverUser) {
+        user = serverUser;
+        sessionSource = 'auth_server';
+      }
+    }
+
+    let nextAuthSession: Awaited<ReturnType<typeof getServerSession>> | null = null;
+    if (!user || !expirationTime) {
+      nextAuthSession = await getServerSession(authOptions);
+      if (!user && nextAuthSession?.user) {
+        user = {
+          uid: (nextAuthSession.user as any).uid || nextAuthSession.user.email || '',
+          email: nextAuthSession.user.email || null,
+          role: (nextAuthSession.user as any).role || 'user',
+        };
+        sessionSource = 'nextauth';
+      }
+      if (!expirationTime && nextAuthSession?.expires) {
+        expirationTime = new Date(nextAuthSession.expires).getTime();
+      }
+    }
 
     // Fallback: verify Authorization Bearer if cookie isn’t present
     if (!user) {
@@ -24,28 +55,30 @@ async function handler(req: NextRequest, _ctx: RequestContext) {
         try {
           const decoded = await adminAuth.verifyIdToken(match[1]);
           user = { uid: decoded.uid, email: decoded.email || null, role: (decoded as any).role || 'user' } as any;
-          isValid = !!user;
           expirationTime = decoded.exp ? decoded.exp * 1000 : null;
+          sessionSource = 'bearer';
         } catch (error) {
-          isValid = false;
+          console.warn('[api/me] Authorization header verification failed', { message: (error as any)?.message });
           return NextResponse.json({ error: "invalid_token", details: "Token verification failed" }, { status: 401 });
         }
       }
     }
 
-    if (!isValid) {
+    if (!user) {
+      console.warn('[api/me] unauthorized - no session detected');
       return NextResponse.json({ error: "unauthorized", details: "No valid session or token found" }, { status: 401 });
     }
 
     // Check for expired session
     if (expirationTime && expirationTime < Date.now()) {
+      console.warn('[api/me] session expired', { userId: user.uid, expirationTime });
       return NextResponse.json({ error: "session_expired", details: "Session has expired" }, { status: 401 });
     }
 
     // Database fetch with defensive error handling
     let profile: Record<string, any> = {};
     try {
-      const doc = await adminDb.collection("users").doc(user.uid).get();
+      const doc = await adminDb.collection("users").doc((user as any).uid).get();
       profile = doc.exists ? (doc.data() || {}) : {};
     } catch (dbErr: any) {
       const message = dbErr?.message || String(dbErr);
@@ -57,7 +90,8 @@ async function handler(req: NextRequest, _ctx: RequestContext) {
     }
 
     return NextResponse.json({ 
-      sessionValid: isValid,
+      sessionValid: true,
+      sessionSource,
       user: {
         uid: (user as any).uid,
         email: (user as any).email ?? null,

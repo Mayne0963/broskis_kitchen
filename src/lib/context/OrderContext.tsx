@@ -30,8 +30,8 @@ async function fetchOrders(): Promise<Order[]> {
 
     const res = await fetch("/api/my-orders", { credentials: "include", cache: "no-store", headers });
     if (!res.ok) {
-      console.warn("orders fetch failed:", res.status);
       const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
+      console.error("[orders] /api/my-orders failed", { status: res.status, error: errorData });
       let errorMessage = errorData?.error || `Failed to fetch orders: ${res.status}`;
       
       // Handle specific error cases with user-friendly messages
@@ -51,7 +51,7 @@ async function fetchOrders(): Promise<Order[]> {
     const arr = Array.isArray(json) ? json : Array.isArray(json?.orders) ? json.orders : [];
     return arr;
   } catch (e) {
-    console.warn("orders fetch error:", e);
+    console.error("orders fetch error:", e);
     throw e; // Re-throw the error so it can be handled by the caller
   }
 }

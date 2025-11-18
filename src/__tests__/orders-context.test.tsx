@@ -22,8 +22,9 @@ describe('OrderContext', () => {
 
     const { result } = renderHook(() => useOrders(), { wrapper })
 
-    // Wait microtask
-    await act(async () => {})
+    await act(async () => {
+      await result.current.refresh()
+    })
 
     expect(result.current.orders.length).toBe(1)
 

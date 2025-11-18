@@ -35,6 +35,11 @@ This change set resolves 401 errors and failed refreshes seen on the dashboard w
 - Session expiry helpers:
   - `src/lib/session/exp.ts`: reads `__session` and background-calls `/api/auth/refresh`.
 
+### API session parity
+- `/api/me` previously required both NextAuth *and* Firebase cookies, so customers with only a Firebase session saw a 401 while `/api/auth/status` reported they were signed in.
+- The route now trusts the Firebase session cookie first, then falls back to cached server auth, NextAuth, and finally the `Authorization: Bearer` header. Responses include `sessionSource` plus detailed logging when fallbacks are triggered or tokens expire.
+- Added `src/__tests__/api-me-session.test.ts` to cover cookie, bearer, and expired-session scenarios so the endpoint stays aligned with `/api/auth/status`.
+
 ### Admin Status Alignment
 - Client admin checks now rely on `user.role === 'admin'` or `user.admin === true`.
 - Removed client env-based allowlist to avoid mismatches; server keeps allowlist fallback.
