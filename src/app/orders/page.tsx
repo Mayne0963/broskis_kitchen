@@ -43,7 +43,8 @@ function OrderHistoryPageContent() {
             <p className="text-muted-foreground">Track and manage your orders</p>
           </div>
           <Link href="/profile" className="text-gold-foil hover:underline flex items-center">
-            <FaArrowLeft className="mr-2" /> Back to Profile
+            <FaArrowLeft className="mr-2" /> 
+            <p className="text-sm">Back to Profile</p>
           </Link>
         </div>
 
