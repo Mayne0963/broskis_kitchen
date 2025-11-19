@@ -55,9 +55,9 @@ export default function KitchenDisplay({ initialOrders = [] }: KitchenDisplayPro
 
     try {
       const ordersRef = collection(db, COLLECTIONS.ORDERS)
+      // Load all orders at once, ordered by creation time
       const q = query(
         ordersRef,
-        where('status', 'in', ['confirmed', 'preparing', 'ready']),
         orderBy('createdAt', 'asc')
       )
 
