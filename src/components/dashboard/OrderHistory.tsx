@@ -37,6 +37,12 @@ export function OrderHistory({ orders }: { orders: Order[] }) {
         <CardTitle className="text-[var(--color-harvest-gold)]">Order History</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-4">
+        {!orders && (
+          <div className="text-center text-zinc-500 text-sm py-8">
+            Loading orders...
+          </div>
+        )}
+        
         {orders.length === 0 ? (
           <p className="text-gray-400 text-center py-4">No orders found</p>
         ) : (
