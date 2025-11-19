@@ -44,7 +44,8 @@ export function isTestOrder(order: OrderLike): boolean {
   // Handle different total field names (totalCents, total, amount_total)
   // Updated to account for 50¢ test item price
   const totalAmount = order.totalCents || order.total || order.amount_total || 0;
-  const byAmount = Number(totalAmount) <= 50 && order.currency === 'USD';
+  const currency = typeof order.currency === 'string' ? order.currency.toUpperCase() : '';
+  const byAmount = Number(totalAmount) <= 50 && currency === 'USD';
 
   return Boolean(byItem || byTag || byFlag || byMeta || byAmount);
 }

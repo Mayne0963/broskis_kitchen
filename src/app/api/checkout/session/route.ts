@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from "next/server";
+import { getServerUser } from "@/lib/authServer";
 
 type InItem = { name?: any; price?: any; qty?: any };
 type NormItem = { name: string; price: number; qty: number };
@@ -21,6 +22,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
     const rawItems: InItem[] = Array.isArray(body?.items) ? body.items : [];
+    const serverUser = await getServerUser().catch(() => null);
 
     const items: NormItem[] = rawItems.map(normalizeItem).filter(Boolean) as NormItem[];
     console.log("[CHECKOUT] incoming items:", rawItems);
@@ -53,11 +55,21 @@ export async function POST(req: NextRequest) {
       }));
 
       const successBase = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://broskiskitchen.com";
+      const metadata: Record<string, string> = {};
+      if (serverUser?.uid) metadata.userId = serverUser.uid;
+      if (serverUser?.email) metadata.userEmail = serverUser.email;
+      if (items.length) {
+        metadata.items = items.slice(0, 10).map((it) => it.name).join(", ").slice(0, 400);
+      }
+
       const session = await stripe.checkout.sessions.create({
         mode: "payment",
         line_items,
         success_url: `${successBase}/checkout?success=1`,
         cancel_url: `${successBase}/checkout?canceled=1`,
+        client_reference_id: serverUser?.uid || undefined,
+        customer_email: serverUser?.email || undefined,
+        metadata: Object.keys(metadata).length ? metadata : undefined,
       });
       url = session.url ?? null;
       sessionId = session.id ?? null;
