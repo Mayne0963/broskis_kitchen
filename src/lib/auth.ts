@@ -16,7 +16,7 @@ export async function requireAuth(req: NextRequest): Promise<AuthUser> {
     
     // First try to get token from session cookie
     const cookieStore = await cookies();
-    const sessionCookie = cookieStore.get('__session');
+    const sessionCookie = cookieStore.get('__session') || cookieStore.get('session');
     
     if (sessionCookie) {
       // Verify session cookie
@@ -89,7 +89,7 @@ export function isAdmin(customClaims?: Record<string, any>): boolean {
 
 // Helper to decode cookie 'session'
 export async function getUserFromCookies(req: NextRequest) {
-  const token = req.cookies.get('session')?.value;
+  const token = req.cookies.get('__session')?.value || req.cookies.get('session')?.value;
   if (!token) return null;
   try {
     const decoded = await adminAuth().verifyIdToken(token, true);

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { adminAuth } from '@/lib/firebase/admin';
+import { setSessionCookies, clearSessionCookies } from '@/lib/auth/sessionCookieHelpers';
 
 const ALLOWED_ORIGINS = new Set([
   'https://broskiskitchen.com',
@@ -34,13 +35,7 @@ export async function POST(request: NextRequest) {
       const origin = request.headers.get('origin');
       const headers = corsHeadersForOrigin(origin);
       Object.entries(headers).forEach(([k, v]) => response.headers.set(k, v));
-      response.cookies.set('__session', sessionCookie, {
-        maxAge: expiresIn / 1000,
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/'
-      });
+      setSessionCookies(response.cookies, sessionCookie, expiresIn / 1000);
       return response;
     }
 
@@ -63,13 +58,7 @@ export async function POST(request: NextRequest) {
     const origin = request.headers.get('origin');
     const headers = corsHeadersForOrigin(origin);
     Object.entries(headers).forEach(([k, v]) => response.headers.set(k, v));
-    response.cookies.set('__session', newCookie, {
-      maxAge: expiresIn / 1000,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/'
-    });
+    setSessionCookies(response.cookies, newCookie, expiresIn / 1000);
     return response;
   } catch (error) {
     console.error('Session refresh error:', error);
@@ -77,13 +66,7 @@ export async function POST(request: NextRequest) {
     const origin = request.headers.get('origin');
     const headers = corsHeadersForOrigin(origin);
     Object.entries(headers).forEach(([k, v]) => response.headers.set(k, v));
-    response.cookies.set('__session', '', {
-      maxAge: 0,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/'
-    });
+    clearSessionCookies(response.cookies);
     return response;
   }
 }

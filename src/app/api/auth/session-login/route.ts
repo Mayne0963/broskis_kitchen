@@ -3,8 +3,8 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import { adminAuth } from '@/lib/firebase/admin'
+import { setSessionCookies } from '@/lib/auth/sessionCookieHelpers'
 
 export async function POST(request: NextRequest) {
   if (process.env.NEXT_PHASE === 'phase-production-build') {
@@ -48,15 +48,8 @@ export async function POST(request: NextRequest) {
     const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
     const sessionCookie = await auth.createSessionCookie(idToken, { expiresIn });
 
-    // Set the session cookie
     const response = NextResponse.json({ success: true }, { status: 200 });
-    response.cookies.set('__session', sessionCookie, {
-      maxAge: expiresIn / 1000,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/'
-    });
+    setSessionCookies(response.cookies, sessionCookie, expiresIn / 1000);
     
     return response;
   } catch (error: unknown) {

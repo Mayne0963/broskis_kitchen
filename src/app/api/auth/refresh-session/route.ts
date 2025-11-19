@@ -3,8 +3,8 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { adminAuth } from '@/lib/firebase/admin';
+import { setSessionCookies } from '@/lib/auth/sessionCookieHelpers';
 
 /**
  * Refresh session cookie with latest claims
@@ -53,13 +53,7 @@ export async function POST(request: NextRequest) {
       }
     });
     
-    response.cookies.set('__session', sessionCookie, {
-      maxAge: expiresIn / 1000,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/'
-    });
+    setSessionCookies(response.cookies, sessionCookie, expiresIn / 1000);
     
     console.log('[REFRESH_SESSION] Session cookie updated');
     

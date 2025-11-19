@@ -13,7 +13,7 @@ export interface SessionUser {
 export async function getSessionCookieForMiddleware(): Promise<SessionUser | null> {
   try {
     const cookieStore = await cookies()
-    const sessionCookie = cookieStore.get('__session')?.value
+    const sessionCookie = cookieStore.get('__session')?.value || cookieStore.get('session')?.value
     console.log('Middleware: Session cookie:', sessionCookie ? 'exists' : 'missing');
 
     if (!sessionCookie) {

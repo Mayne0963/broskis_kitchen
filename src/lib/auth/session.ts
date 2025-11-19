@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { adminAuth } from "@/lib/firebase/admin";
+import { clearSessionCookies } from "@/lib/auth/sessionCookieHelpers";
 import { DecodedIdToken } from "firebase-admin/auth";
 
 export interface SessionUser {
@@ -35,7 +36,7 @@ export interface AuthResult {
 export async function getSessionCookie(): Promise<SessionUser | null> {
   try {
     const cookieStore = cookies();
-    const sessionCookie = cookieStore.get("__session")?.value;
+    const sessionCookie = cookieStore.get("__session")?.value || cookieStore.get("session")?.value;
 
     if (!sessionCookie) {
       console.log("[SESSION] No session cookie found");
@@ -97,13 +98,7 @@ export async function getSessionCookie(): Promise<SessionUser | null> {
 export async function clearSessionCookie(): Promise<void> {
   try {
     const cookieStore = cookies();
-    cookieStore.set("__session", "", {
-      maxAge: 0,
-      path: "/",
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax"
-    });
+    clearSessionCookies(cookieStore);
     console.log("[SESSION] Session cookie cleared");
   } catch (error) {
     console.error("[SESSION] Failed to clear session cookie:", error);
