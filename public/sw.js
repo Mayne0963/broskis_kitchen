@@ -1,6 +1,6 @@
 // Service Worker for chunk loading error recovery and offline support
 
-const CACHE_NAME = 'broski-kitchen-v1';
+const CACHE_NAME = 'broski-kitchen-v2';
 
 // Basic cache of "/" and manifest
 const STATIC_ASSETS = [
@@ -53,6 +53,20 @@ self.addEventListener('fetch', (event) => {
 
   // Skip non-GET requests
   if (request.method !== 'GET') {
+    return;
+  }
+
+  try {
+    const url = new URL(request.url);
+    const isSameOrigin = url.origin === self.location.origin;
+    const isFirestore = url.hostname.includes('firestore.googleapis.com');
+    
+    // Skip handling cross-origin requests (e.g., Firestore, Google APIs)
+    if (!isSameOrigin || isFirestore) {
+      return;
+    }
+  } catch (error) {
+    // If URL parsing fails, let the request continue without SW handling
     return;
   }
 
