@@ -3,10 +3,8 @@
 const CACHE_NAME = 'broski-kitchen-v2';
 
 // Basic cache of "/" and manifest
-const STATIC_ASSETS = [
-  '/',
-  '/manifest.webmanifest'
-];
+const STATIC_ASSETS = ['/', '/manifest.webmanifest'];
+const STATIC_PATHS = new Set(STATIC_ASSETS);
 
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
@@ -52,25 +50,26 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
 
   // Skip non-GET requests
-  if (request.method !== 'GET') {
-    return;
-  }
+  if (request.method !== 'GET') return;
 
+  let url;
   try {
-    const url = new URL(request.url);
-    const isSameOrigin = url.origin === self.location.origin;
-    const isFirestore = url.hostname.includes('firestore.googleapis.com');
-    
-    // Skip handling cross-origin requests (e.g., Firestore, Google APIs)
-    if (!isSameOrigin || isFirestore) {
-      return;
-    }
+    url = new URL(request.url);
   } catch (error) {
     // If URL parsing fails, let the request continue without SW handling
     return;
   }
 
-  // Network-first strategy for all GET requests
+  const isSameOrigin = url.origin === self.location.origin;
+  const isFirestore = url.hostname.includes('firestore.googleapis.com');
+
+  // Skip cross-origin requests (Firestore, Google APIs, Stripe, etc.)
+  if (!isSameOrigin || isFirestore) return;
+
+  // Only handle explicit static assets to avoid interfering with API routes
+  if (!STATIC_PATHS.has(url.pathname)) return;
+
+  // Network-first strategy for known static assets
   event.respondWith(networkFirst(request));
 });
 
