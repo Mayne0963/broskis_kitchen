@@ -34,6 +34,24 @@ export async function GET(req: NextRequest) {
       }
     }
     
+    // Try to resolve uid from email if uid is missing but email is present
+    if (!user?.uid && user?.email) {
+      try {
+        const userSnap = await adminDb
+          .collection(COLLECTIONS.USERS)
+          .where('email', '==', user.email)
+          .limit(1)
+          .get();
+        if (userSnap.docs.length > 0) {
+          const resolvedUid = userSnap.docs[0].id;
+          user = { ...(user as any), uid: resolvedUid } as any;
+          console.log(`[my-orders] Resolved uid from email ${user.email}: ${resolvedUid}`);
+        }
+      } catch (resolveErr) {
+        console.warn('[my-orders] Failed to resolve uid from email:', resolveErr);
+      }
+    }
+
     // For testing purposes, if no user is found, return some test orders
     // This allows us to test the UI without authentication
     if (!user) {
@@ -120,6 +138,25 @@ export async function GET(req: NextRequest) {
       console.log('First order data:', JSON.stringify(snap.docs[0].data(), null, 2));
     }
 
+    // Fallback: some legacy/orders may store uid under the field name "uid"
+    if (snap.docs.length === 0) {
+      try {
+        let byUid = ordersCollection
+          .where('uid', '==', user.uid)
+          .orderBy('createdAt', 'desc')
+          .limit(limit);
+        if (cursorTs) byUid = byUid.startAfter(cursorTs);
+        const uidSnap = await byUid.get();
+        if (uidSnap.docs.length > 0) {
+          snap = uidSnap as any;
+          pathUsed = 'orders_by_uid';
+          console.log(`[my-orders] Fallback by field "uid" succeeded with ${uidSnap.docs.length} docs for ${user.uid}`);
+        }
+      } catch (uidErr: any) {
+        console.warn('[my-orders] uid field fallback failed:', uidErr?.message || uidErr);
+      }
+    }
+
     if (snap.docs.length === 0 && user.email) {
       const emailCandidates = Array.from(
         new Set(
@@ -129,6 +166,7 @@ export async function GET(req: NextRequest) {
 
       for (const candidate of emailCandidates) {
         console.log(`[my-orders] UID lookup empty. Attempting email fallback for ${candidate}`);
+        // Try userEmail (normalized field), then raw email field
         let emailQuery = ordersCollection
           .where("userEmail", "==", candidate)
           .orderBy("createdAt", "desc")
@@ -140,7 +178,35 @@ export async function GET(req: NextRequest) {
         if (emailSnap.docs.length > 0) {
           snap = emailSnap as any;
           pathUsed = 'orders_by_email';
-          console.log(`[my-orders] Email fallback succeeded with ${emailSnap.docs.length} docs for ${candidate}`);
+          console.log(`[my-orders] Email fallback (userEmail) succeeded with ${emailSnap.docs.length} docs for ${candidate}`);
+          break;
+        }
+
+        // Try raw email field used by some test/fallback writes
+        let rawEmailQuery = ordersCollection
+          .where('email', '==', candidate)
+          .orderBy('createdAt', 'desc')
+          .limit(limit);
+        if (cursorTs) rawEmailQuery = rawEmailQuery.startAfter(cursorTs);
+        const rawEmailSnap = await rawEmailQuery.get();
+        if (rawEmailSnap.docs.length > 0) {
+          snap = rawEmailSnap as any;
+          pathUsed = 'orders_by_email';
+          console.log(`[my-orders] Email fallback (email) succeeded with ${rawEmailSnap.docs.length} docs for ${candidate}`);
+          break;
+        }
+
+        // Try lowercased email field if present
+        let lowerEmailQuery = ordersCollection
+          .where('userEmailLower', '==', candidate.toLowerCase())
+          .orderBy('createdAt', 'desc')
+          .limit(limit);
+        if (cursorTs) lowerEmailQuery = lowerEmailQuery.startAfter(cursorTs);
+        const lowerEmailSnap = await lowerEmailQuery.get();
+        if (lowerEmailSnap.docs.length > 0) {
+          snap = lowerEmailSnap as any;
+          pathUsed = 'orders_by_email';
+          console.log(`[my-orders] Email fallback (userEmailLower) succeeded with ${lowerEmailSnap.docs.length} docs for ${candidate}`);
           break;
         }
       }

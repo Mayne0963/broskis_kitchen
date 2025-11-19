@@ -59,8 +59,17 @@ export async function POST(req: NextRequest) {
           console.log('✅ Order document created/updated in Firestore:', session.id);
           console.log('📦 Order details:', orderDoc);
           
-        } catch (firestoreError) {
-          console.error('❌ Failed to save checkout session to Firestore:', firestoreError);
+        } catch (err) {
+          console.error('❌ Failed to save checkout session with Stripe line items:', err);
+          
+          // Fallback: write a minimal order using session data only (no line items)
+          try {
+            const fallbackOrderDoc = toOrderDocFromSession(session, []);
+            await adminDb.collection('orders').doc(session.id).set(fallbackOrderDoc, { merge: true });
+            console.log('✅ Fallback order document created/updated in Firestore (session-only):', session.id);
+          } catch (fallbackErr) {
+            console.error('❌ Fallback write failed:', fallbackErr);
+          }
           // Don't throw - we still want to return 200 to Stripe
         }
         
