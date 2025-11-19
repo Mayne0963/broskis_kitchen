@@ -59,15 +59,18 @@ const getStatusIcon = (status: OrderStatus) => {
     }
   }
 
-const formatTime = (date: Date) => {
-  return date.toLocaleTimeString('en-US', {
+const toDate = (v: any) => (v instanceof Date ? v : new Date(v));
+const formatTime = (date: any) => {
+  const d = toDate(date);
+  return d.toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit'
   })
 }
 
-const formatDate = (date: Date) => {
-  return date.toLocaleDateString('en-US', {
+const formatDate = (date: any) => {
+  const d = toDate(date);
+  return d.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
     hour: '2-digit',

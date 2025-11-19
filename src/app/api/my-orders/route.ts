@@ -264,15 +264,22 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    const normalizeDate = (v: any) => {
+      if (v && typeof v.toDate === 'function') return v.toDate();
+      if (typeof v === 'string') {
+        const d = new Date(v);
+        return isNaN(d.getTime()) ? new Date() : d;
+      }
+      if (typeof v === 'number') return new Date(v > 1e12 ? v : v * 1000);
+      if (v && typeof v === 'object' && typeof v._seconds === 'number') return new Date(v._seconds * 1000);
+      return new Date();
+    };
+
     const orders = snap.docs.map(d => {
       const o = d.data() as any;
       const status = typeof o.status === 'string' ? o.status : 'pending';
-      const createdAt =
-        o.createdAt?.toDate?.() ||
-        (typeof o.createdAt === 'string' ? new Date(o.createdAt) : new Date());
-      const updatedAt =
-        o.updatedAt?.toDate?.() ||
-        (typeof o.updatedAt === 'string' ? new Date(o.updatedAt) : createdAt);
+      const createdAt = normalizeDate(o.createdAt);
+      const updatedAt = o.updatedAt ? normalizeDate(o.updatedAt) : createdAt;
       const normalizedItems = Array.isArray(o.items) ? o.items.map((it: any) => ({
         name: it?.name ?? it?.title ?? 'Item',
         quantity: Number(it?.quantity ?? it?.qty ?? 1),

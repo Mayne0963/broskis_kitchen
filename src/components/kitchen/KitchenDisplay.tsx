@@ -160,12 +160,14 @@ export default function KitchenDisplay({ initialOrders = [] }: KitchenDisplayPro
     return orderType === 'delivery' ? <Car className="w-4 h-4" /> : <Package className="w-4 h-4" />
   }
 
-  const formatTime = (date: Date): string => {
+  const toDate = (v: any) => (v instanceof Date ? v : new Date(v))
+  const formatTime = (date: any): string => {
+    const d = toDate(date)
     return new Intl.DateTimeFormat('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: true
-    }).format(date)
+    }).format(d)
   }
 
   const formatCurrency = (amount: number): string => {
