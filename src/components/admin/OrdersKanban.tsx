@@ -168,6 +168,12 @@ const Column: React.FC<ColumnProps> = ({ column, orders }) => {
               <OrderCard key={order.id} order={order} index={index} />
             ))}
             {provided.placeholder}
+
+            {!orders && (
+              <div className="text-center text-zinc-500 text-sm py-8">
+                Loading orders...
+              </div>
+            )}
             
             {orders.length === 0 && (
               <div className="text-center text-zinc-500 text-sm py-8">
