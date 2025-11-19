@@ -7,19 +7,21 @@ const createQueryStub = () => ({
   orderBy: vi.fn().mockReturnThis(),
   limit: vi.fn().mockReturnThis(),
   startAfter: vi.fn().mockReturnThis(),
-  get: vi.fn()
+  get: vi.fn().mockResolvedValue({ docs: [] })
 })
 
 const queryState = {
   userQuery: createQueryStub(),
   emailQuery: createQueryStub(),
-  collectionGroupQuery: createQueryStub()
+  collectionGroupQuery: createQueryStub(),
+  userSubcollectionQuery: createQueryStub()
 }
 
 const resetQueryState = () => {
   queryState.userQuery = createQueryStub()
   queryState.emailQuery = createQueryStub()
   queryState.collectionGroupQuery = createQueryStub()
+  queryState.userSubcollectionQuery = createQueryStub()
 }
 
 vi.mock('@/lib/authServer', () => ({
@@ -28,13 +30,32 @@ vi.mock('@/lib/authServer', () => ({
 
 vi.mock('@/lib/firebase/admin', () => ({
   adminDb: {
-    collection: vi.fn(() => ({
-      where: vi.fn((field: string) => {
-        if (field === 'userId') return queryState.userQuery
-        if (field === 'userEmail') return queryState.emailQuery
-        throw new Error(`Unexpected where field ${field}`)
-      })
-    })),
+    collection: vi.fn((name: string) => {
+      if (name === 'orders') {
+        return {
+          where: vi.fn((field: string) => {
+            if (field === 'userId') return queryState.userQuery
+            if (field === 'userEmail') return queryState.emailQuery
+            throw new Error(`Unexpected where field ${field}`)
+          }),
+          orderBy: vi.fn().mockReturnThis(),
+          limit: vi.fn().mockReturnThis(),
+          startAfter: vi.fn().mockReturnThis(),
+          get: vi.fn()
+        }
+      }
+      if (name === 'users') {
+        return {
+          doc: vi.fn(() => ({
+            collection: vi.fn((colName: string) => {
+              if (colName !== 'orders') throw new Error(`Unexpected subcollection ${colName}`)
+              return queryState.userSubcollectionQuery
+            })
+          }))
+        }
+      }
+      throw new Error(`Unexpected collection ${name}`)
+    }),
     collectionGroup: vi.fn(() => queryState.collectionGroupQuery)
   }
 }))
@@ -62,9 +83,27 @@ describe('my-orders fallbacks', () => {
     expect(json.pathUsed).toBe('orders_by_email')
   })
 
+  it('falls back to the user orders subcollection when top-level collections return empty', async () => {
+    queryState.userQuery.get.mockResolvedValueOnce({ docs: [] })
+    queryState.emailQuery.get.mockResolvedValueOnce({ docs: [] })
+    const subDocs = {
+      docs: [
+        { id: 'oSUB', data: () => ({ createdAt: { toDate: () => new Date('2025-01-02') } }) }
+      ]
+    }
+    queryState.userSubcollectionQuery.get.mockResolvedValueOnce(subDocs)
+
+    const req = new NextRequest('http://localhost/api/my-orders')
+    const res = await (MyOrdersRoute as any).GET(req)
+    const json = await (res as any).json()
+    expect(json.orders.length).toBe(1)
+    expect(json.pathUsed).toBe('user_subcollection')
+  })
+
   it('falls back to collection group when both top-level paths return empty', async () => {
     queryState.userQuery.get.mockResolvedValueOnce({ docs: [] })
     queryState.emailQuery.get.mockResolvedValueOnce({ docs: [] })
+    queryState.userSubcollectionQuery.get.mockResolvedValueOnce({ docs: [] })
     const cgDocs = {
       docs: [
         { id: 'oCG', data: () => ({ userId: 'U1', createdAt: { toDate: () => new Date('2025-01-02') } }) }

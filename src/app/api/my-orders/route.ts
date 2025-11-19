@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Timestamp } from "firebase-admin/firestore";
 import { getServerUser } from "@/lib/authServer";
 import { adminDb } from "@/lib/firebase/admin";
+import { COLLECTIONS } from "@/lib/firebase/collections";
 import { handleServerError } from "@/lib/utils/errorLogger";
 
 export async function GET(req: NextRequest) {
@@ -98,8 +99,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ orders: [] });
     }
 
-    const ordersCollection = adminDb.collection("orders");
-    type PathUsed = 'orders_by_uid' | 'orders_by_email' | 'collection_group' | 'test_orders';
+    const ordersCollection = adminDb.collection(COLLECTIONS.ORDERS);
+    type PathUsed = 'orders_by_uid' | 'orders_by_email' | 'user_subcollection' | 'collection_group' | 'test_orders';
     let pathUsed: PathUsed = 'orders_by_uid';
 
     let q = ordersCollection
@@ -125,6 +126,7 @@ export async function GET(req: NextRequest) {
           [user.email, user.email?.toLowerCase?.() || null].filter(Boolean)
         )
       ) as string[];
+
       for (const candidate of emailCandidates) {
         console.log(`[my-orders] UID lookup empty. Attempting email fallback for ${candidate}`);
         let emailQuery = ordersCollection
@@ -142,8 +144,35 @@ export async function GET(req: NextRequest) {
           break;
         }
       }
+
       if (pathUsed !== 'orders_by_email') {
         console.warn(`[my-orders] Email fallback returned no orders for user ${user.uid}`);
+      }
+    }
+
+    if (snap.docs.length === 0) {
+      try {
+        let userOrdersQuery = adminDb
+          .collection(COLLECTIONS.USERS)
+          .doc(user.uid)
+          .collection(COLLECTIONS.ORDERS)
+          .orderBy("createdAt", "desc")
+          .limit(limit);
+
+        if (cursorTs) {
+          userOrdersQuery = userOrdersQuery.startAfter(cursorTs);
+        }
+
+        const userOrdersSnap = await userOrdersQuery.get();
+        if (userOrdersSnap.docs.length > 0) {
+          snap = userOrdersSnap as any;
+          pathUsed = 'user_subcollection';
+          console.log(`[my-orders] User orders subcollection fallback succeeded with ${userOrdersSnap.docs.length} docs for ${user.uid}`);
+        } else {
+          console.warn(`[my-orders] User orders subcollection fallback returned no orders for user ${user.uid}`);
+        }
+      } catch (subErr: any) {
+        console.warn(`[my-orders] User orders subcollection fallback failed for ${user.uid}:`, subErr?.message || subErr);
       }
     }
 
@@ -151,7 +180,7 @@ export async function GET(req: NextRequest) {
     if (snap.docs.length === 0) {
       try {
         let q3 = adminDb
-          .collectionGroup("orders")
+          .collectionGroup(COLLECTIONS.ORDERS)
           .where("userId", "==", user.uid)
           .orderBy("createdAt", "desc")
           .limit(limit);
@@ -172,8 +201,12 @@ export async function GET(req: NextRequest) {
     const orders = snap.docs.map(d => {
       const o = d.data() as any;
       const status = typeof o.status === 'string' ? o.status : 'pending';
-      const createdAt = o.createdAt?.toDate?.() || new Date();
-      const updatedAt = o.updatedAt?.toDate?.() || createdAt;
+      const createdAt =
+        o.createdAt?.toDate?.() ||
+        (typeof o.createdAt === 'string' ? new Date(o.createdAt) : new Date());
+      const updatedAt =
+        o.updatedAt?.toDate?.() ||
+        (typeof o.updatedAt === 'string' ? new Date(o.updatedAt) : createdAt);
       const normalizedItems = Array.isArray(o.items) ? o.items.map((it: any) => ({
         name: it?.name ?? it?.title ?? 'Item',
         quantity: Number(it?.quantity ?? it?.qty ?? 1),
@@ -184,9 +217,10 @@ export async function GET(req: NextRequest) {
       })) : [];
       const orderType = o.orderType ?? o.type ?? 'pickup';
       const contactInfo = o.contactInfo ?? { email: o.userEmail ?? '', phone: o.userPhone ?? '', name: o.userName ?? '' };
+      const normalizedUserId = o.userId ?? o.uid ?? o.customerId ?? user.uid;
       return {
         id: d.id,
-        userId: o.userId,
+        userId: normalizedUserId,
         items: normalizedItems,
         subtotal: Number(o.subtotal ?? 0),
         tax: Number(o.tax ?? 0),

@@ -74,10 +74,8 @@ export default function NotificationPreferences() {
 
   useEffect(() => {
     // Check push notification support
-    setPushSupported(pushNotificationService.constructor.isSupported());
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      setPushPermission(Notification.permission);
-    }
+    setPushSupported(pushNotificationService.isSupported());
+    setPushPermission(pushNotificationService.getPermissionStatus());
 
     loadPreferences();
   }, [user]);

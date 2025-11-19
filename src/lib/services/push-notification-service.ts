@@ -359,12 +359,24 @@ class PushNotificationService {
   }
 
   // Check if push notifications are supported
-  static isSupported(): boolean {
-    return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+  isSupported(): boolean {
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+      return false;
+    }
+
+    return (
+      'serviceWorker' in navigator &&
+      'PushManager' in window &&
+      'Notification' in window
+    );
   }
 
   // Get current notification permission status
-  static getPermissionStatus(): NotificationPermission {
+  getPermissionStatus(): NotificationPermission {
+    if (typeof window === 'undefined' || typeof Notification === 'undefined') {
+      return 'default';
+    }
+
     return Notification.permission;
   }
 }
