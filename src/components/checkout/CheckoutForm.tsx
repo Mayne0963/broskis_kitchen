@@ -36,6 +36,11 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
   // Lunch Drop (optional)
   const [workplaceName, setWorkplaceName] = useState<string>('')
   const [workplaceShift, setWorkplaceShift] = useState<string>('')
+  // Display-only Delivery Date badge label (tomorrow)
+  const _now = new Date()
+  const _tomorrow = new Date(_now)
+  _tomorrow.setDate(_now.getDate() + 1)
+  const deliveryDateLabel = _tomorrow.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
   
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -121,6 +126,27 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
 
       // TODO: Implement order creation via API
       // const orderId = await createOrder(orderData)
+      // Fire-and-forget POST to /api/order for Lunch Drop tracking
+      try {
+        const payload = {
+          customerName: formData.deliveryAddress
+            ? `${formData.deliveryAddress.firstName || ''} ${formData.deliveryAddress.lastName || ''}`.trim() || null
+            : null,
+          phone: formData.phone || null,
+          email: formData.email || null,
+          items: items.map(i => ({ name: i.name, price: i.price, qty: i.quantity })),
+          total: total,
+          workplaceName: workplaceName || null,
+          workplaceShift: workplaceShift || '',
+        }
+        await fetch('/api/order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+      } catch (err) {
+        console.warn('Failed to POST /api/order:', err)
+      }
       
       clearCart()
       // onOrderComplete(orderId)
@@ -227,19 +253,19 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
 
             <div className="checkout-lunchdrop-row">
               <div className="checkout-lunchdrop-field">
-                <label htmlFor="workplaceName">Workplace Name</label>
+                <label htmlFor="workplaceName">Workplace Name (Optional)</label>
                 <input
                   type="text"
                   id="workplaceName"
                   name="workplaceName"
-                  placeholder="Example: General Motors – Body Shop"
+                  placeholder="Where do you work?"
                   value={workplaceName}
                   onChange={(e) => setWorkplaceName(e.target.value)}
                 />
               </div>
 
               <div className="checkout-lunchdrop-field">
-                <label htmlFor="workplaceShift">Shift</label>
+                <label htmlFor="workplaceShift">Workplace Shift</label>
                 <select
                   id="workplaceShift"
                   name="workplaceShift"
@@ -540,10 +566,13 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
                     <span>$4.99</span>
                   </div>
                 )}
-                <div className="flex justify-between font-bold text-lg border-t border-[#333333] pt-2 mt-2">
-                  <span>Total:</span>
-                  <span className="text-gold-foil">${(total + (formData.orderType === 'delivery' && subtotal < 50 ? 4.99 : 0)).toFixed(2)}</span>
-                </div>
+              <div className="flex justify-between font-bold text-lg border-t border-[#333333] pt-2 mt-2">
+                <span>Total:</span>
+                <span className="text-gold-foil">${(total + (formData.orderType === 'delivery' && subtotal < 50 ? 4.99 : 0)).toFixed(2)}</span>
+              </div>
+              <div className="mt-3">
+                <span className="race-date-badge">Delivery Date: <b>{deliveryDateLabel}</b></span>
+              </div>
               </div>
             </div>
           </div>

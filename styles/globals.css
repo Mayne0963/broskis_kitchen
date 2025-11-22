@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -90,5 +86,385 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* ---------- Base styles for legacy (pages/) routes ---------- */
+body {
+  font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+  background: #000;
+  color: #fff;
+}
+
+.page-wrapper {
+  background: #000;
+  min-height: 100vh;
+  padding: 60px 20px;
+  color: #fff;
+}
+
+.page-title {
+  font-size: 34px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #ffd700;
+  margin-bottom: 8px;
+}
+
+.page-sub {
+  font-size: 15px;
+  color: #cccccc;
+  margin-bottom: 24px;
+  max-width: 700px;
+}
+
+/* CTA buttons used across Lunch Drop pages */
+.btn-race,
+.btn-signup,
+.btn-order {
+  padding: 12px 22px;
+  border-radius: 40px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 2px solid;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: 0.25s all ease;
+  font-family: inherit;
+}
+
+.btn-race {
+  background: #9c1a1a;
+  border-color: #9c1a1a;
+  color: #ffffff;
+}
+
+.btn-race:hover {
+  background: #b52020;
+}
+
+.btn-signup {
+  background: transparent;
+  border-color: #ffd700;
+  color: #ffd700;
+}
+
+.btn-signup:hover {
+  background: #ffd700;
+  color: #000000;
+}
+
+.btn-order {
+  background: #ffd700;
+  border-color: #ffd700;
+  color: #000000;
+}
+
+.btn-order:hover {
+  background: #f5c400;
+}
+
+.floating-lunch-btn {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 9999;
+  background-color: #9c1a1a;
+  color: #ffffff;
+  border: 2px solid #ffd700;
+  padding: 12px 20px;
+  border-radius: 40px;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: inherit;
+  box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.floating-lunch-btn:hover {
+  background-color: #b52020;
+  transform: translateY(-3px);
+}
+
+/* ----------- Lunch Drop explainer page ----------- */
+.ld-section {
+  margin-bottom: 26px;
+}
+
+.ld-heading {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffd700;
+  margin-bottom: 10px;
+}
+
+.ld-list {
+  list-style: decimal;
+  padding-left: 20px;
+  color: #e4e4e4;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.ld-step-label {
+  display: block;
+  font-weight: 600;
+  color: #ffd700;
+  margin-bottom: 2px;
+}
+
+.ld-cta-row {
+  margin-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+/* ----------- Enter Workplace form ----------- */
+.ew-form {
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ew-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.ew-field label {
+  font-size: 12px;
+  color: #e4e4e4;
+  margin-bottom: 4px;
+}
+
+.ew-field input,
+.ew-field select,
+.ew-field textarea {
+  background: #111;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #ffffff;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.ew-field input:focus,
+.ew-field select:focus,
+.ew-field textarea:focus {
+  outline: none;
+  border-color: #ffd700;
+}
+
+.ew-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.ew-row .ew-field {
+  flex: 1 1 220px;
+}
+
+.ew-submit-btn {
+  margin-top: 6px;
+  padding: 10px 22px;
+  border-radius: 40px;
+  border: 2px solid #ffd700;
+  background: #ffd700;
+  color: #000;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s all ease;
+}
+
+.ew-submit-btn:hover {
+  background: #f5c400;
+}
+
+.ew-thankyou {
+  max-width: 600px;
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+  font-size: 14px;
+  color: #e4e4e4;
+}
+
+/* ----------- Order Race leaderboard ----------- */
+.shift-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.shift-tab {
+  border-radius: 999px;
+  border: 2px solid #444;
+  background: #111;
+  color: #dddddd;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: 0.2s all ease;
+}
+
+.shift-tab--active {
+  background: #ffd700;
+  border-color: #ffd700;
+  color: #000;
+}
+
+.shift-tab:hover:not(.shift-tab--active) {
+  border-color: #ffd700;
+}
+
+.winner-card {
+  border: 1px solid #ffd700;
+  background: radial-gradient(circle at top left, rgba(255, 215, 0, 0.18), #111);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+
+.winner-label {
+  font-size: 12px;
+  color: #ffd700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.winner-name {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 4px 0;
+}
+
+.winner-text {
+  font-size: 13px;
+  color: #cccccc;
+}
+
+.race-table-wrap {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid #222;
+  background: #050505;
+}
+
+.race-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.race-table thead {
+  background: #111;
+}
+
+.race-table th,
+.race-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #222;
+}
+
+.race-table th {
+  color: #aaaaaa;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.race-table tbody tr:nth-child(even) {
+  background: #090909;
+}
+
+.race-table tbody tr:hover {
+  background: #141414;
+}
+
+.race-empty {
+  text-align: center;
+  padding: 18px 12px;
+  color: #777;
+}
+
+.race-progress {
+  width: 160px;
+  max-width: 100%;
+  background: #222;
+  border-radius: 999px;
+  overflow: hidden;
+  height: 7px;
+}
+
+.race-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #ffd700, #ffb300);
+  border-radius: 999px;
+}
+
+.race-date-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.race-date-label {
+  font-size: 13px;
+  color: #cccccc;
+}
+
+.race-date-label b {
+  color: #ffd700;
+}
+
+.race-date-badge {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.15);
+  color: #a7f3d0;
+  border: 1px solid rgba(34, 197, 94, 0.7);
+}
+
+.race-bottom-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+@media (max-width: 600px) {
+  .page-wrapper {
+    padding: 40px 16px;
+  }
+  .page-title {
+    font-size: 28px;
+  }
+  .page-sub {
+    font-size: 14px;
+  }
+  .race-progress {
+    width: 120px;
+  }
+  .race-date-row {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
