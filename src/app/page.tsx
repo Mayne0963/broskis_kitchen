@@ -169,6 +169,27 @@ function Page() {
         </div>
       </section>
 
+      {/* Broski's Lunch Drop Section - Added under hero section */}
+      <section className="lunchdrop-section">
+        <div className="lunchdrop-inner">
+          <h2 className="lunchdrop-title">BROSKI'S LUNCH DROP™</h2>
+
+          <p className="lunchdrop-desc">
+            First workplace on your shift to hit <b>22 plates</b> wins tomorrow's Broski lunch delivered by OTW.
+          </p>
+
+          <p className="lunchdrop-sub">
+            1st · 2nd · 3rd Shift · Day-Before Pre-Orders Only · Free OTW Delivery
+          </p>
+
+          <div className="lunchdrop-buttons">
+            <a href="/order-race" className="btn-race">VIEW ORDER RACE</a>
+            <a href="/enter-workplace" className="btn-signup">ENTER YOUR WORKPLACE</a>
+            <a href="/order" className="btn-order">PLACE LUNCH ORDER</a>
+          </div>
+        </div>
+      </section>
+
       {/* Navigation Bar - Below Hero Section */}
       <nav className="bg-black border-b-2 border-[#FFD700] py-4">
         <div className="container mx-auto px-4">

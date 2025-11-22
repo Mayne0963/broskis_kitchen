@@ -1509,3 +1509,120 @@ html, body {
   outline: none;
   box-shadow: 0 0 0 3px var(--bk-focus);
 }
+
+/* ===== BROSKI'S LUNCH DROP SECTION STYLES ===== */
+.lunchdrop-section {
+  width: 100%;
+  background: #000;
+  padding: 60px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.lunchdrop-inner {
+  max-width: 900px;
+  text-align: center;
+}
+
+.lunchdrop-title {
+  font-size: 38px;
+  color: #ffd700;
+  font-weight: 900;
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+  text-transform: uppercase;
+}
+
+.lunchdrop-desc {
+  color: #e4e4e4;
+  font-size: 20px;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.lunchdrop-sub {
+  color: #7c7c7c;
+  font-size: 14px;
+  margin-bottom: 26px;
+}
+
+.lunchdrop-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+.btn-race,
+.btn-signup,
+.btn-order {
+  padding: 12px 22px;
+  border-radius: 40px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 2px solid;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: 0.25s all ease;
+  font-family: inherit;
+}
+
+/* Red button */
+.btn-race {
+  background: #9c1a1a;
+  border-color: #9c1a1a;
+  color: #ffffff;
+}
+
+.btn-race:hover {
+  background: #b52020;
+}
+
+/* Gold outline button */
+.btn-signup {
+  background: transparent;
+  border-color: #ffd700;
+  color: #ffd700;
+}
+
+.btn-signup:hover {
+  background: #ffd700;
+  color: #000000;
+}
+
+/* Solid gold button */
+.btn-order {
+  background: #ffd700;
+  border-color: #ffd700;
+  color: #000000;
+}
+
+.btn-order:hover {
+  background: #f5c400;
+}
+
+/* ===== FLOATING LUNCH DROP BUTTON STYLES ===== */
+.floating-lunch-btn {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 9999;
+  background-color: #9c1a1a;
+  color: #ffffff;
+  border: 2px solid #ffd700;
+  padding: 12px 20px;
+  border-radius: 40px;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: inherit;
+  box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.floating-lunch-btn:hover {
+  background-color: #b52020;
+  transform: translateY(-3px);
+}
