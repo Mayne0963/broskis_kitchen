@@ -1626,3 +1626,135 @@ html, body {
   background-color: #b52020;
   transform: translateY(-3px);
 }
+
+/* ===== NEW PAGE STYLES ===== */
+.page-wrapper {
+  background: #000;
+  min-height: 100vh;
+  padding: 60px 20px;
+  color: #fff;
+}
+
+.page-title {
+  font-size: 34px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #ffd700;
+  margin-bottom: 8px;
+}
+
+.page-sub {
+  font-size: 15px;
+  color: #cccccc;
+  margin-bottom: 24px;
+  max-width: 700px;
+}
+
+/* Lunch Drop page */
+.ld-section {
+  margin-bottom: 26px;
+}
+
+.ld-heading {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffd700;
+  margin-bottom: 10px;
+}
+
+.ld-list {
+  list-style: decimal;
+  padding-left: 20px;
+  color: #e4e4e4;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.ld-step-label {
+  display: block;
+  font-weight: 600;
+  color: #ffd700;
+  margin-bottom: 2px;
+}
+
+.ld-cta-row {
+  margin-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+/* Enter Workplace */
+.ew-form {
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ew-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.ew-field label {
+  font-size: 12px;
+  color: #e4e4e4;
+  margin-bottom: 4px;
+}
+
+.ew-field input,
+.ew-field select,
+.ew-field textarea {
+  background: #111;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #ffffff;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.ew-field input:focus,
+.ew-field select:focus,
+.ew-field textarea:focus {
+  outline: none;
+  border-color: #ffd700;
+}
+
+.ew-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.ew-row .ew-field {
+  flex: 1 1 220px;
+}
+
+.ew-submit-btn {
+  margin-top: 6px;
+  padding: 10px 22px;
+  border-radius: 40px;
+  border: 2px solid #ffd700;
+  background: #ffd700;
+  color: #000;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s all ease;
+}
+
+.ew-submit-btn:hover {
+  background: #f5c400;
+}
+
+.ew-thankyou {
+  max-width: 600px;
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+  font-size: 14px;
+  color: #e4e4e4;
+}
