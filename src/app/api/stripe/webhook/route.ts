@@ -82,6 +82,15 @@ export async function POST(req: NextRequest) {
         
         try {
           // Create/update order document for payment intent
+          const isValidDate = (v: any) => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
+          const metaDelivery = (paymentIntent.metadata as any)?.deliveryDate;
+          const makeTomorrow = () => {
+            const nowJs = new Date();
+            const tomorrowJs = new Date(nowJs);
+            tomorrowJs.setDate(nowJs.getDate() + 1);
+            return tomorrowJs.toISOString().slice(0, 10);
+          };
+          const deliveryDate = isValidDate(metaDelivery) ? metaDelivery : makeTomorrow();
           const orderDoc = {
             id: paymentIntent.id,
             source: 'stripe',
@@ -92,6 +101,7 @@ export async function POST(req: NextRequest) {
             // Lunch Drop fields (optional)
             workplaceName: (paymentIntent.metadata as any)?.workplaceName || null,
             workplaceShift: (paymentIntent.metadata as any)?.workplaceShift || null,
+            deliveryDate,
           };
           
           // Save to Firestore with merge: true for idempotency

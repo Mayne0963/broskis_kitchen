@@ -78,6 +78,8 @@ export interface Order {
   // Volunteer discount fields
   volunteerDiscountCents?: number
   hasVolunteerDiscount?: boolean
+  // Lunch Drop delivery date (YYYY-MM-DD)
+  deliveryDate?: string
 }
 
 export type OrderStatus = 

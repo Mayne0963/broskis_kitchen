@@ -47,6 +47,16 @@ export function toOrderDocFromSession(session: any, lineItems: any[]) {
     // Lunch Drop fields (optional)
     workplaceName: session.metadata?.workplaceName || null,
     workplaceShift: session.metadata?.workplaceShift || null,
+    // Delivery date (YYYY-MM-DD): prefer metadata.deliveryDate if valid, else tomorrow
+    deliveryDate: (() => {
+      const v = session.metadata?.deliveryDate;
+      const isValid = typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
+      if (isValid) return v;
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setDate(now.getDate() + 1);
+      return tomorrow.toISOString().slice(0, 10);
+    })(),
     amount: amountTotalCents,
     amount_total: amountTotalCents,
     amount_subtotal: amountSubtotalCents,

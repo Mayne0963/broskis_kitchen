@@ -104,6 +104,17 @@ async function processCheckoutSession(session: Stripe.Checkout.Session, eventId:
   const orderId = generateOrderId();
   const now = Timestamp.now();
 
+  // Determine delivery date (YYYY-MM-DD): prefer metadata.deliveryDate if valid, else tomorrow
+  const metaDelivery = (session.metadata as any)?.deliveryDate;
+  const isValidDate = (v: any) => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
+  const makeTomorrow = () => {
+    const nowJs = new Date();
+    const tomorrowJs = new Date(nowJs);
+    tomorrowJs.setDate(nowJs.getDate() + 1);
+    return tomorrowJs.toISOString().slice(0, 10);
+  };
+  const deliveryDate = isValidDate(metaDelivery) ? metaDelivery : makeTomorrow();
+
   const order: OrderData = {
     id: orderId,
     createdAt: now,
@@ -120,6 +131,7 @@ async function processCheckoutSession(session: Stripe.Checkout.Session, eventId:
     stripePaymentIntentId: session.payment_intent as string,
     stripeSessionId: session.id,
     stripeCustomerId: session.customer as string,
+    deliveryDate,
     // Volunteer discount information
     volunteerDiscountCents: hasVolunteerDiscount ? volunteerDiscountCents : undefined,
     hasVolunteerDiscount,
@@ -138,6 +150,7 @@ async function processCheckoutSession(session: Stripe.Checkout.Session, eventId:
       // Lunch Drop fields for discoverability
       workplaceName: (session.metadata as any)?.workplaceName || undefined,
       workplaceShift: (session.metadata as any)?.workplaceShift || undefined,
+      deliveryDate,
     },
   };
 
@@ -177,6 +190,17 @@ async function processPaymentIntent(paymentIntent: Stripe.PaymentIntent, eventId
   const orderId = generateOrderId();
   const now = Timestamp.now();
 
+  // Determine delivery date (YYYY-MM-DD): prefer metadata.deliveryDate if valid, else tomorrow
+  const metaDelivery = (paymentIntent.metadata as any)?.deliveryDate;
+  const isValidDate = (v: any) => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
+  const makeTomorrow = () => {
+    const nowJs = new Date();
+    const tomorrowJs = new Date(nowJs);
+    tomorrowJs.setDate(nowJs.getDate() + 1);
+    return tomorrowJs.toISOString().slice(0, 10);
+  };
+  const deliveryDate = isValidDate(metaDelivery) ? metaDelivery : makeTomorrow();
+
   const order: OrderData = {
     id: orderId,
     createdAt: now,
@@ -194,6 +218,7 @@ async function processPaymentIntent(paymentIntent: Stripe.PaymentIntent, eventId
     stripeSessionId: null,
     stripeCustomerId: paymentIntent.customer as string,
     address: null, // Not available in payment intent
+    deliveryDate,
     metadata: {
       stripeEventId: eventId,
       stripePaymentIntentId: paymentIntent.id,
@@ -201,6 +226,7 @@ async function processPaymentIntent(paymentIntent: Stripe.PaymentIntent, eventId
       // Lunch Drop fields for discoverability
       workplaceName: (paymentIntent.metadata as any)?.workplaceName || undefined,
       workplaceShift: (paymentIntent.metadata as any)?.workplaceShift || undefined,
+      deliveryDate,
     },
   };
 

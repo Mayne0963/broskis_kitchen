@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const MAX_PLATES = 22;
 
@@ -20,12 +20,37 @@ const MOCK_SHIFTS = {
 
 export default function OrderRacePage() {
   const [activeShift, setActiveShift] = useState("1st");
+  const [raceData, setRaceData] = useState<any | null>(null);
+
+  // Fetch race data (deliveryDate)
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await fetch('/api/order-race');
+        if (!res.ok) throw new Error(await res.text());
+        const json = await res.json();
+        if (mounted) setRaceData(json);
+      } catch (e) {
+        console.warn('Failed to load order race data:', e);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   const rows = (MOCK_SHIFTS[activeShift] || []).slice().sort(
     (a, b) => b.orders - a.orders
   );
 
   const winner = rows.find((w) => w.orders >= MAX_PLATES);
+
+  // Format delivery date label from "YYYY-MM-DD"
+  let deliveryDateLabel = "";
+  if (raceData?.deliveryDate) {
+    const d = new Date(String(raceData.deliveryDate) + "T00:00:00");
+    const opts: Intl.DateTimeFormatOptions = { weekday: "short", month: "short", day: "numeric", year: "numeric" };
+    deliveryDateLabel = d.toLocaleDateString(undefined, opts);
+  }
 
   return (
     <main className="page-wrapper">
@@ -37,10 +62,14 @@ export default function OrderRacePage() {
 
       <div className="race-date-row">
         <span className="race-date-label">
-          Racing for: <b>Tomorrow&apos;s Lunch Drop</b>
+          {deliveryDateLabel ? (
+            <>Racing for: <b>{deliveryDateLabel}</b></>
+          ) : (
+            <>Racing for: <b>Upcoming Lunch Drop</b></>
+          )}
         </span>
         <span className="race-date-badge">
-          RACE OPEN – ORDERS COUNTING (STATIC PREVIEW)
+          {raceData?.raceClosed === true ? "RACE CLOSED – CUT-OFF PASSED" : "RACE OPEN – ORDERS COUNTING"}
         </span>
       </div>
 
