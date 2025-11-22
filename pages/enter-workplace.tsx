@@ -3,10 +3,50 @@ import { useState } from "react";
 export default function EnterWorkplacePage() {
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // For now, front-end only: just show thank-you
-    setSubmitted(true);
+
+    const form = event.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    const payload = {
+      workplaceName: String(formData.get("workplaceName") || ""),
+      address: String(formData.get("address") || ""),
+      contactName: String(formData.get("contactName") || ""),
+      phone: String(formData.get("phone") || ""),
+      email: String(formData.get("email") || ""),
+      shift: String(formData.get("shift") || ""),
+      employeeCount: formData.get("employeeCount")
+        ? Number(formData.get("employeeCount"))
+        : null,
+      deliveryNotes: String(formData.get("deliveryNotes") || ""),
+    };
+
+    try {
+      const res = await fetch("/api/workplace-signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        console.error("Workplace signup failed:", await res.text());
+        alert("Something went wrong. Please try again.");
+        return;
+      }
+
+      const json = await res.json();
+      if (!json.success) {
+        alert("Something went wrong. Please try again.");
+        return;
+      }
+
+      // Success: show thank-you message
+      setSubmitted(true);
+    } catch (err) {
+      console.error("Workplace signup error:", err);
+      alert("Something went wrong. Please try again.");
+    }
   };
 
   return (
