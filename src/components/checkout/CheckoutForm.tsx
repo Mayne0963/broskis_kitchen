@@ -33,6 +33,9 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
     deliveryTime: 'asap',
     paymentMethod: 'card'
   })
+  // Lunch Drop (optional)
+  const [workplaceName, setWorkplaceName] = useState<string>('')
+  const [workplaceShift, setWorkplaceShift] = useState<string>('')
   
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -110,7 +113,10 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
           stripePaymentIntentId: paymentIntentId
         },
         specialInstructions: formData.specialInstructions,
-        estimatedTime: formData.deliveryTime === 'scheduled' ? formData.scheduledTime : undefined
+        estimatedTime: formData.deliveryTime === 'scheduled' ? formData.scheduledTime : undefined,
+        // Lunch Drop (optional)
+        workplaceName: workplaceName || null,
+        workplaceShift: workplaceShift || null,
       }
 
       // TODO: Implement order creation via API
@@ -227,12 +233,19 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
                   id="workplaceName"
                   name="workplaceName"
                   placeholder="Example: General Motors – Body Shop"
+                  value={workplaceName}
+                  onChange={(e) => setWorkplaceName(e.target.value)}
                 />
               </div>
 
               <div className="checkout-lunchdrop-field">
                 <label htmlFor="workplaceShift">Shift</label>
-                <select id="workplaceShift" name="workplaceShift" defaultValue="">
+                <select
+                  id="workplaceShift"
+                  name="workplaceShift"
+                  value={workplaceShift}
+                  onChange={(e) => setWorkplaceShift(e.target.value)}
+                >
                   <option value="">Select shift (optional)</option>
                   <option value="1st">1st Shift</option>
                   <option value="2nd">2nd Shift</option>
@@ -455,7 +468,10 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
             orderMetadata={{
               email: formData.email,
               phone: formData.phone,
-              orderType: formData.orderType
+              orderType: formData.orderType,
+              // Lunch Drop (optional)
+              workplaceName: workplaceName || '',
+              workplaceShift: ['1st','2nd','3rd'].includes(workplaceShift) ? workplaceShift : '',
             }}
           />
           )}
