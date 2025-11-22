@@ -88,7 +88,10 @@ export async function POST(req: NextRequest) {
             status: 'paid',
             amount: paymentIntent.amount || null,
             currency: paymentIntent.currency || 'usd',
-            createdAt: Timestamp.now()
+            createdAt: Timestamp.now(),
+            // Lunch Drop fields (optional)
+            workplaceName: (paymentIntent.metadata as any)?.workplaceName || null,
+            workplaceShift: (paymentIntent.metadata as any)?.workplaceShift || null,
           };
           
           // Save to Firestore with merge: true for idempotency

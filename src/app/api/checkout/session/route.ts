@@ -62,6 +62,16 @@ export async function POST(req: NextRequest) {
         metadata.items = items.slice(0, 10).map((it) => it.name).join(", ").slice(0, 400);
       }
 
+      // Lunch Drop metadata (optional)
+      const workplaceName = typeof body?.workplaceName === 'string' && body.workplaceName.trim().length > 0
+        ? body.workplaceName.trim()
+        : undefined;
+      const workplaceShift = typeof body?.workplaceShift === 'string' && ['1st','2nd','3rd'].includes(body.workplaceShift)
+        ? body.workplaceShift
+        : undefined;
+      if (workplaceName) metadata.workplaceName = workplaceName;
+      if (workplaceShift) metadata.workplaceShift = workplaceShift;
+
       const session = await stripe.checkout.sessions.create({
         mode: "payment",
         line_items,

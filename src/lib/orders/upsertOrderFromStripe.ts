@@ -135,6 +135,9 @@ async function processCheckoutSession(session: Stripe.Checkout.Session, eventId:
       stripeEventId: eventId,
       stripeSessionId: session.id,
       stripeLiveMode: session.livemode,
+      // Lunch Drop fields for discoverability
+      workplaceName: (session.metadata as any)?.workplaceName || undefined,
+      workplaceShift: (session.metadata as any)?.workplaceShift || undefined,
     },
   };
 
@@ -195,6 +198,9 @@ async function processPaymentIntent(paymentIntent: Stripe.PaymentIntent, eventId
       stripeEventId: eventId,
       stripePaymentIntentId: paymentIntent.id,
       stripeLiveMode: paymentIntent.livemode,
+      // Lunch Drop fields for discoverability
+      workplaceName: (paymentIntent.metadata as any)?.workplaceName || undefined,
+      workplaceShift: (paymentIntent.metadata as any)?.workplaceShift || undefined,
     },
   };
 

@@ -44,6 +44,9 @@ export function toOrderDocFromSession(session: any, lineItems: any[]) {
     userEmailRaw: email,
     customerName: session.customer_details?.name || session.metadata?.customerName || null,
     customerPhone: session.customer_details?.phone || session.metadata?.customerPhone || null,
+    // Lunch Drop fields (optional)
+    workplaceName: session.metadata?.workplaceName || null,
+    workplaceShift: session.metadata?.workplaceShift || null,
     amount: amountTotalCents,
     amount_total: amountTotalCents,
     amount_subtotal: amountSubtotalCents,
