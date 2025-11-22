@@ -1,11 +1,13 @@
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", ["POST"]);
-    return res.status(405).json({ error: "Method not allowed" });
-  }
+import { NextRequest, NextResponse } from "next/server";
 
+export async function POST(req: NextRequest) {
   try {
-    const body = req.body || {};
+    let body: any = {};
+    try {
+      body = await req.json();
+    } catch {
+      body = {};
+    }
 
     const workplace = {
       createdAt: new Date().toISOString(),
@@ -19,13 +21,11 @@ export default async function handler(req, res) {
       deliveryNotes: body.deliveryNotes || "",
     };
 
-    // TODO: integrate with a real database later.
-    // For now, just log so we can confirm:
     console.log("NEW WORKPLACE SIGNUP:", workplace);
 
-    return res.status(200).json({ success: true });
+    return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Workplace signup error:", err);
-    return res.status(500).json({ error: "Internal server error" });
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

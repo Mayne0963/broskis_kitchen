@@ -1,9 +1,11 @@
-import { useState } from "react";
+"use client";
+
+import { FormEvent, useState } from "react";
 
 export default function EnterWorkplacePage() {
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const form = event.target as HTMLFormElement;
@@ -41,7 +43,6 @@ export default function EnterWorkplacePage() {
         return;
       }
 
-      // Success: show thank-you message
       setSubmitted(true);
     } catch (err) {
       console.error("Workplace signup error:", err);
@@ -53,14 +54,14 @@ export default function EnterWorkplacePage() {
     <main className="page-wrapper">
       <h1 className="page-title">ENTER YOUR WORKPLACE</h1>
       <p className="page-sub">
-        Fill this out once to add your job to Broski's Lunch Drop rotation. We'll review your info
-        and follow up.
+        Fill this out once to add your job to Broski&apos;s Lunch Drop rotation.
+        We&apos;ll review your info and follow up.
       </p>
 
       {submitted ? (
         <div className="ew-thankyou">
-          <p>Thank you! We've received your workplace info.</p>
-          <p>We'll reach out after review with next steps for Broski Lunch Drops.</p>
+          <p>Thank you! We&apos;ve received your workplace info.</p>
+          <p>We&apos;ll reach out after review with next steps for Broski Lunch Drops.</p>
         </div>
       ) : (
         <form className="ew-form" onSubmit={handleSubmit}>
