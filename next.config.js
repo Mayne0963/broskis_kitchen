@@ -14,12 +14,11 @@ required.forEach(k => {
 });
 
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Opt in to Turbopack (Next.js 16 default) and silence webpack config warning
+  turbopack: {},
   // Enhanced Vercel deployment configuration
   assetPrefix: process.env.NODE_ENV === 'production' ? undefined : undefined,
   // Remove standalone output for Vercel deployment
