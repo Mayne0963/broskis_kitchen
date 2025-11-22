@@ -1938,3 +1938,61 @@ html, body {
     align-items: flex-start;
   }
 }
+
+/* ===== Lunch Drop: Workplace & Shift styles (checkout form) ===== */
+.checkout-lunchdrop-block {
+  margin-top: 30px;
+  padding: 18px 16px;
+  border-radius: 12px;
+  border: 1px solid #333;
+  background: #080808;
+}
+
+.checkout-lunchdrop-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffd700;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.checkout-lunchdrop-sub {
+  font-size: 12px;
+  color: #aaaaaa;
+  margin-bottom: 14px;
+}
+
+.checkout-lunchdrop-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.checkout-lunchdrop-field {
+  flex: 1 1 220px;
+  display: flex;
+  flex-direction: column;
+}
+
+.checkout-lunchdrop-field label {
+  font-size: 12px;
+  color: #e4e4e4;
+  margin-bottom: 4px;
+}
+
+.checkout-lunchdrop-field input,
+.checkout-lunchdrop-field select {
+  background: #111;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #ffffff;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.checkout-lunchdrop-field input:focus,
+.checkout-lunchdrop-field select:focus {
+  outline: none;
+  border-color: #ffd700;
+}

@@ -212,6 +212,36 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onOrderComplete }) => {
             </div>
           </div>
 
+          {/* Lunch Drop: Workplace & Shift (optional) */}
+          <div className="checkout-lunchdrop-block">
+            <h3 className="checkout-lunchdrop-title">Lunch Drop Details (Optional)</h3>
+            <p className="checkout-lunchdrop-sub">
+              If you&apos;re ordering with your job for Broski&apos;s Lunch Drop, enter your workplace and shift.
+            </p>
+
+            <div className="checkout-lunchdrop-row">
+              <div className="checkout-lunchdrop-field">
+                <label htmlFor="workplaceName">Workplace Name</label>
+                <input
+                  type="text"
+                  id="workplaceName"
+                  name="workplaceName"
+                  placeholder="Example: General Motors – Body Shop"
+                />
+              </div>
+
+              <div className="checkout-lunchdrop-field">
+                <label htmlFor="workplaceShift">Shift</label>
+                <select id="workplaceShift" name="workplaceShift" defaultValue="">
+                  <option value="">Select shift (optional)</option>
+                  <option value="1st">1st Shift</option>
+                  <option value="2nd">2nd Shift</option>
+                  <option value="3rd">3rd Shift</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
           {/* Order Type */}
           <div className="bg-[#1A1A1A] p-6 rounded-lg border border-[#333333]">
             <h3 className="text-lg font-semibold mb-4">Order Type</h3>
