@@ -719,8 +719,7 @@ main {
   }
 
   .cart-item:hover {
-    @apply bg-opacity-5;
-    @apply bg-white;
+    background-color: rgba(255, 255, 255, 0.05);
   }
 
   /* Button Animation */
