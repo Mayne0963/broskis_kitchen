@@ -39,7 +39,7 @@ const AboutPage = () => {
             priority 
             unoptimized
           />
-          <div className="absolute inset-0 bg-black bg-opacity-60"></div>
+          <div className="absolute inset-0 bg-black/60"></div>
         </div>
         <div className="container mx-auto px-4 z-10 text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-4 text-white">Our Story</h1>

@@ -460,7 +460,7 @@ export default function VolunteerPage() {
 
       {/* Volunteer Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-80">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
           <div className="bg-[#1A1A1A] rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden animate-fade-in">
             <VolunteerForm onClose={() => setShowForm(false)} />
           </div>

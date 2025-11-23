@@ -84,7 +84,7 @@ export function SkeletonLoader({
 export function PageLoader({ message = 'Loading...' }: { message?: string }) {
   return (
     <motion.div
-      className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black/75 flex items-center justify-center z-50"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

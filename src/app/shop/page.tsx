@@ -106,7 +106,7 @@ export default function ShopPage() {
             priority
             unoptimized
           />
-          <div className="absolute inset-0 bg-black bg-opacity-60"></div>
+          <div className="absolute inset-0 bg-black/60"></div>
         </div>
         <Container className="relative z-10 text-center">
           <Stack direction="column" gap="md" alignment="center">

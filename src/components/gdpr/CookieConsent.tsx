@@ -133,7 +133,7 @@ export default function CookieConsent() {
   return (
     <>
       {/* Cookie Banner */}
-      <div className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black bg-opacity-50">
+      <div className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black/50">
         <Card className="max-w-4xl shadow-lg border-2 bg-black text-white">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
@@ -200,7 +200,7 @@ export default function CookieConsent() {
 
       {/* Cookie Settings Modal */}
       {showSettings && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-black text-white border-gray-700">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-6">

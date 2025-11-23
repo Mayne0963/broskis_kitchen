@@ -204,7 +204,7 @@ export default function MenuPage() {
         <div className="absolute inset-0 z-0">
           <Image src="/images/menu-hero.svg" alt="Broski's Kitchen Menu" fill className="object-cover" priority
             unoptimized />
-          <div className="absolute inset-0 bg-black bg-opacity-60"></div>
+          <div className="absolute inset-0 bg-black/60"></div>
         </div>
         <div className="container mx-auto px-4 z-10 text-center">
           <h1 className="heading-xl mb-4 text-white gritty-shadow">Our Menu</h1>

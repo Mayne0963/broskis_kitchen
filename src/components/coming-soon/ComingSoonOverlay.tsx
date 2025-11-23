@@ -9,7 +9,7 @@ interface ComingSoonOverlayProps {
 
 const ComingSoonOverlay: React.FC<ComingSoonOverlayProps> = ({ onClose }) => {
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-md">
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/80 backdrop-blur-md">
       <div className="bg-[#1A1A1A] rounded-lg shadow-xl w-full max-w-lg p-8 text-center animate-fade-in">
         <div className="w-20 h-20 bg-gold-foil bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6">
           <FaInfoCircle className="text-gold-foil text-3xl" />

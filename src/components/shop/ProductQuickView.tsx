@@ -24,13 +24,13 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({ product, onClose, o
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-80">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
       <div className="bg-[#1A1A1A] rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden animate-fade-in">
         <div className="relative">
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 z-20 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-colors"
+            className="absolute top-4 right-4 z-20 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
             aria-label="Close"
           >
             <FaTimes />

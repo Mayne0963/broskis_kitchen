@@ -25,7 +25,7 @@ export function FormLoading({
 
   return (
     <motion.div
-      className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black/75 flex items-center justify-center z-50"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -248,7 +248,7 @@ export function LoadingOverlay({
       <AnimatePresence>
         {isLoading && (
           <motion.div
-            className={`absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10 ${
+            className={`absolute inset-0 bg-black/50 flex items-center justify-center z-10 ${
               blur ? 'backdrop-blur-sm' : ''
             }`}
             initial={{ opacity: 0 }}
