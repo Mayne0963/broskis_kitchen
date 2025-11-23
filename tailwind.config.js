@@ -1,15 +1,16 @@
-module.exports = {
+import animate from "tailwindcss-animate";
+
+/** @type {import('tailwindcss').Config} */
+const config = {
   content: [
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/**/*.{js,ts,jsx,tsx,mdx}"
   ],
   safelist: [
-    'bg-[#0B0B0B]',
-    'bg-[#111214]',
-    'text-white',
-    'text-[#F5F6F7]'
+    "bg-[#0B0B0B]",
+    "bg-[#111214]",
+    "text-white",
+    "text-[#F5F6F7]",
   ],
   theme: {
     extend: {
@@ -59,5 +60,7 @@ module.exports = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
-}
+  plugins: [animate],
+};
+
+export default config;

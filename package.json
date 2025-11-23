@@ -146,6 +146,7 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.17",
     "@firebase/rules-unit-testing": "^5.0.0",
     "@playwright/test": "^1.56.1",
     "@testing-library/dom": "^10.4.1",
