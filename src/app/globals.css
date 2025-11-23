@@ -311,7 +311,7 @@ main {
   /* Button Styles - Regal Gold Gradient */
   .btn-primary {
     background: linear-gradient(135deg, #D2BA6A 0%, #E6C875 100%);
-    @apply text-black;
+    color: #000000;
     @apply font-bold;
     @apply py-4;
     @apply px-10;
