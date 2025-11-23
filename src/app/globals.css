@@ -1,3 +1,4 @@
+@reference "tailwindcss";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -422,7 +423,9 @@ main {
 
   /* Feature Card Styles - Regal Gold Gradient */
   .feature-card {
-    @apply card;
+    border-radius: 8px;
+    border: 1px solid #B7985A;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(183, 152, 90, 0.2);
     @apply flex;
     @apply flex-col;
     @apply items-center;
@@ -716,8 +719,7 @@ main {
   }
 
   .cart-item:hover {
-    @apply bg-opacity-5;
-    @apply bg-white;
+    background-color: rgba(255, 255, 255, 0.05);
   }
 
   /* Button Animation */
@@ -956,7 +958,6 @@ main {
 }
 
 .specialty-card {
-  @apply bg-deep-black;
   @apply p-6;
   @apply rounded-lg;
   @apply transition-all;
@@ -1336,14 +1337,24 @@ main {
   @apply inline-flex items-center justify-center rounded-md border border-white/15 px-3 py-2 text-sm font-medium transition;
 }
 .btn:hover { @apply border-white/25; }
-.btn-primary { @apply btn bg-white/10 hover:bg-white/15; }
-.btn-ghost { @apply btn bg-transparent hover:bg-white/10; }
+.btn-primary { @apply bg-white/10 hover:bg-white/15; }
+.btn-ghost { @apply bg-transparent hover:bg-white/10; }
 .input {
   @apply rounded-md border border-white/15 bg-black/40 px-3 py-2 text-sm outline-none ring-0 placeholder:text-white/40;
 }
 .input:focus { @apply border-white/25 shadow-[0_0_0_3px_rgba(255,255,255,0.06)]; }
 .select {
-  @apply input pr-7 appearance-none;
+  /* inherit base input styles */
+  border-radius: 0.375rem;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(0,0,0,0.4);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  outline: none;
+  box-shadow: none;
+  color: #fff;
+  appearance: none;
+  padding-right: 1.75rem;
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white"><path d="M5 7l5 5 5-5"/></svg>');
   background-size: 16px 16px;
   background-repeat: no-repeat;
@@ -1352,7 +1363,7 @@ main {
 .badge {
   @apply inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide;
 }
-.card { @apply glass rounded-xl p-5; }
+.card { border-radius: 0.75rem; padding: 1.25rem; }
 
 /* skeleton shimmer */
 .skel { @apply animate-pulse rounded bg-white/10; }
