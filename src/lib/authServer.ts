@@ -53,7 +53,7 @@ export async function getServerUser(): Promise<ServerUser | null> {
 
 async function getUserFromAuthorizationHeader(): Promise<ServerUser | null> {
   try {
-    const headerStore = headers();
+    const headerStore = await headers();
     const headerValue = headerStore.get("authorization") || headerStore.get("Authorization");
     if (!headerValue) {
       return null;
