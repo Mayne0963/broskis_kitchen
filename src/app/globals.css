@@ -1697,3 +1697,56 @@ html, body {
   background-color: #b52020;
   transform: translateY(-3px);
 }
+.race-date-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.race-date-label { color: rgba(255,255,255,0.85); font-size: 14px; }
+.race-date-badge {
+  color: #FFD700;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(183,152,90,0.35);
+  padding: 6px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.shift-tabs { display: flex; gap: 10px; justify-content: center; margin: 12px 0 20px; }
+.shift-tab {
+  padding: 8px 14px;
+  border-radius: 9999px;
+  border: 1px solid rgba(183,152,90,0.35);
+  background: transparent;
+  color: #FFD700;
+  font-weight: 600;
+  transition: all .2s ease;
+}
+.shift-tab:hover { background: rgba(255,215,0,0.1); }
+.shift-tab--active { background: #FFD700; color: #000; box-shadow: 0 6px 18px rgba(241,196,83,0.35); }
+.winner-card { text-align: center; background: rgba(0,0,0,0.3); border: 1px solid rgba(183,152,90,0.35); padding: 16px; border-radius: 12px; margin-bottom: 16px; }
+.winner-label { color: #FFD700; font-weight: 700; font-size: 12px; letter-spacing: .5px; }
+.winner-name { color: #fff; font-weight: 900; font-size: 20px; margin-top: 4px; }
+.winner-text { color: rgba(255,255,255,0.75); font-size: 14px; margin-top: 6px; }
+.race-table-wrap { margin-top: 12px; overflow-x: auto; }
+.race-table { width: 100%; border-collapse: collapse; background: rgba(0,0,0,0.3); border: 1px solid rgba(183,152,90,0.25); border-radius: 12px; }
+.race-table th, .race-table td { padding: 10px 12px; text-align: left; }
+.race-table thead th { color: #FFD700; font-weight: 700; border-bottom: 1px solid rgba(183,152,90,0.25); }
+.race-table tbody td { color: #fff; border-top: 1px solid rgba(255,255,255,0.06); }
+.race-empty { text-align: center; color: rgba(255,255,255,0.6); padding: 16px; }
+.race-progress { width: 100%; height: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(183,152,90,0.25); border-radius: 9999px; overflow: hidden; }
+.race-progress-bar { height: 100%; background: linear-gradient(90deg, #B7985A 0%, #D2BA6A 100%); }
+.race-bottom-cta { display: flex; justify-content: center; gap: 12px; margin-top: 20px; }
+.ew-form { background: rgba(0,0,0,0.3); border: 1px solid rgba(183,152,90,0.25); padding: 20px; border-radius: 12px; }
+.ew-row { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 640px) { .ew-row { grid-template-columns: 1fr 1fr; } }
+.ew-field { display: flex; flex-direction: column; gap: 6px; }
+.ew-field label { color: rgba(255,255,255,0.8); font-size: 14px; }
+.ew-field input, .ew-field select, .ew-field textarea { width: 100%; padding: 10px 12px; background: var(--color-dark-charcoal); border: 1px solid #4b5563; border-radius: 8px; color: #fff; font-size: 14px; }
+.ew-field input::placeholder, .ew-field textarea::placeholder { color: #9ca3af; }
+.ew-field input:focus, .ew-field select:focus, .ew-field textarea:focus { outline: none; border-color: var(--color-harvest-gold); }
+.ew-submit-btn { display: inline-block; padding: 12px 20px; border-radius: 10px; background: #FFD700; color: #000; font-weight: 700; }
+.ew-submit-btn:hover { filter: brightness(0.95); }
+.ew-thankyou { text-align: center; background: rgba(0,0,0,0.3); border: 1px solid rgba(183,152,90,0.25); padding: 20px; border-radius: 12px; }
