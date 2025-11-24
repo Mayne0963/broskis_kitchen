@@ -160,6 +160,24 @@
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     }
+    ,
+    {
+      "collectionId": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "deliveryDate", "order": "ASCENDING" },
+        { "fieldPath": "workplaceShift", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionId": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "deliveryDate", "order": "ASCENDING" },
+        { "fieldPath": "workplaceName", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    }
   ],
   "fieldOverrides": []
 }

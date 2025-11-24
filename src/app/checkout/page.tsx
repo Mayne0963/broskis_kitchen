@@ -75,7 +75,12 @@ function CheckoutContent() {
       const res = await safeFetch("/api/checkout/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: payloadItems }),
+        body: JSON.stringify({
+          items: payloadItems,
+          // Pass Lunch Drop fields so they propagate to Stripe metadata and Firestore
+          workplaceName: workplaceName || undefined,
+          workplaceShift: workplaceShift || undefined,
+        }),
       });
       console.log("[CHECKOUT] API status:", res.status);
       const j = await res.json();

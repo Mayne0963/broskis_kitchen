@@ -11,7 +11,7 @@ import { headers } from 'next/headers'
 export async function GET(request: NextRequest) {
   try {
     // Verify this is a legitimate cron request from Vercel
-    const headersList = headers()
+    const headersList = await headers()
     const authHeader = headersList.get('authorization')
     
     // Vercel cron jobs include a special authorization header

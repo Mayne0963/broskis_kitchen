@@ -35,7 +35,7 @@ export interface AuthResult {
  */
 export async function getSessionCookie(): Promise<SessionUser | null> {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const sessionCookie = cookieStore.get("__session")?.value || cookieStore.get("session")?.value;
 
     if (!sessionCookie) {
@@ -97,7 +97,7 @@ export async function getSessionCookie(): Promise<SessionUser | null> {
  */
 export async function clearSessionCookie(): Promise<void> {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     clearSessionCookies(cookieStore);
     console.log("[SESSION] Session cookie cleared");
   } catch (error) {

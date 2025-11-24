@@ -79,7 +79,13 @@ export async function POST(req: NextRequest) {
         cancel_url: `${successBase}/checkout?canceled=1`,
         client_reference_id: serverUser?.uid || undefined,
         customer_email: serverUser?.email || undefined,
+        // Attach metadata to the Checkout Session (for session-based processing)
         metadata: Object.keys(metadata).length ? metadata : undefined,
+        // Ensure metadata is copied onto the PaymentIntent so webhook `payment_intent.succeeded`
+        // can read Lunch Drop fields reliably
+        payment_intent_data: Object.keys(metadata).length
+          ? { metadata }
+          : undefined,
       });
       url = session.url ?? null;
       sessionId = session.id ?? null;

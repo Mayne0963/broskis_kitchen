@@ -111,8 +111,7 @@ export class SessionManager {
         refreshToken: additionalData?.refreshToken,
       };
 
-      // Create session cookie
-      await this.setSessionCookie(sessionData);
+      await this.setSessionCookie(idToken);
       
       // Cache the session
       this.sessionCache.set(sessionId, sessionData);
@@ -135,7 +134,7 @@ export class SessionManager {
       if (request) {
         sessionCookie = request.cookies.get("__session")?.value;
       } else {
-        const cookieStore = cookies();
+        const cookieStore = await cookies();
         sessionCookie = cookieStore.get("__session")?.value;
       }
 
@@ -277,7 +276,7 @@ export class SessionManager {
    */
   async invalidateSession(sessionId?: string): Promise<void> {
     try {
-      const cookieStore = cookies();
+      const cookieStore = await cookies();
       cookieStore.set("__session", "", {
         ...SESSION_CONFIG,
         maxAge: 0,
@@ -308,19 +307,10 @@ export class SessionManager {
   /**
    * Set session cookie with proper security
    */
-  private async setSessionCookie(sessionData: SessionData): Promise<void> {
-    const cookieStore = cookies();
-    
-    // Create session cookie with Firebase Admin
-    const sessionCookie = await adminAuth.createSessionCookie(
-      JSON.stringify(sessionData),
-      { expiresIn: SESSION_TIMEOUTS.SESSION_MAX_AGE * 1000 }
-    );
-
-    cookieStore.set("__session", sessionCookie, {
-      ...SESSION_CONFIG,
-      maxAge: SESSION_TIMEOUTS.SESSION_MAX_AGE,
-    });
+  private async setSessionCookie(idToken: string): Promise<void> {
+    const cookieStore = await cookies();
+    const sessionCookie = await adminAuth.createSessionCookie(idToken, { expiresIn: SESSION_TIMEOUTS.SESSION_MAX_AGE * 1000 });
+    cookieStore.set("__session", sessionCookie, { ...SESSION_CONFIG, maxAge: SESSION_TIMEOUTS.SESSION_MAX_AGE });
   }
 
   /**

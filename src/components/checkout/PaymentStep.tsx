@@ -30,6 +30,9 @@ interface CheckoutData {
   useRewards: boolean
   rewardsPoints: number
   paymentType?: 'card' | 'digital_wallet' | 'cashapp'
+  // Lunch Drop (optional)
+  workplaceName?: string
+  workplaceShift?: string
 }
 
 interface PaymentStepProps {
@@ -286,7 +289,12 @@ export default function PaymentStep({
               subtotal: cartData.subtotal.toFixed(2),
               tax: cartData.tax.toFixed(2),
               deliveryFee: cartData.deliveryFee.toFixed(2),
-              originalTotal: cartData.total.toFixed(2)
+              originalTotal: cartData.total.toFixed(2),
+              // Lunch Drop fields (optional)
+              workplaceName: (checkoutData.workplaceName || '').trim(),
+              workplaceShift: ['1st','2nd','3rd'].includes(String(checkoutData.workplaceShift))
+                ? String(checkoutData.workplaceShift)
+                : ''
             }}
           />
         </div>
@@ -305,7 +313,12 @@ export default function PaymentStep({
               subtotal: cartData.subtotal.toFixed(2),
               tax: cartData.tax.toFixed(2),
               deliveryFee: cartData.deliveryFee.toFixed(2),
-              originalTotal: cartData.total.toFixed(2)
+              originalTotal: cartData.total.toFixed(2),
+              // Lunch Drop fields (optional)
+              workplaceName: (checkoutData.workplaceName || '').trim(),
+              workplaceShift: ['1st','2nd','3rd'].includes(String(checkoutData.workplaceShift))
+                ? String(checkoutData.workplaceShift)
+                : ''
             }}
           />
         </div>
@@ -410,7 +423,12 @@ export default function PaymentStep({
                   subtotal: cartData.subtotal.toFixed(2),
                   tax: cartData.tax.toFixed(2),
                   deliveryFee: cartData.deliveryFee.toFixed(2),
-                  originalTotal: cartData.total.toFixed(2)
+                  originalTotal: cartData.total.toFixed(2),
+                  // Lunch Drop fields (optional)
+                  workplaceName: (checkoutData.workplaceName || '').trim(),
+                  workplaceShift: ['1st','2nd','3rd'].includes(String(checkoutData.workplaceShift))
+                    ? String(checkoutData.workplaceShift)
+                    : ''
                 }}
               />
             </div>

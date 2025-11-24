@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.healthCheck = exports.getReferralCode = exports.processReferralBonus = exports.validateRedemptionCode = exports.markCouponUsed = exports.birthdayCron = exports.adminAdjustPoints = exports.redeemPoints = exports.earnPoints = void 0;
+exports.healthCheck = exports.elevateUserToAdmin = exports.getReferralCode = exports.processReferralBonus = exports.validateRedemptionCode = exports.markCouponUsed = exports.birthdayCron = exports.adminAdjustPoints = exports.redeemPoints = exports.earnPoints = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 // Initialize Firebase Admin
@@ -43,6 +43,9 @@ Object.defineProperty(exports, "validateRedemptionCode", { enumerable: true, get
 var processReferralBonus_1 = require("./rewards/processReferralBonus");
 Object.defineProperty(exports, "processReferralBonus", { enumerable: true, get: function () { return processReferralBonus_1.processReferralBonus; } });
 Object.defineProperty(exports, "getReferralCode", { enumerable: true, get: function () { return processReferralBonus_1.getReferralCode; } });
+// Admin functions
+var elevateUser_1 = require("./admin/elevateUser");
+Object.defineProperty(exports, "elevateUserToAdmin", { enumerable: true, get: function () { return elevateUser_1.elevateUserToAdmin; } });
 // Health check function
 exports.healthCheck = functions.https.onRequest((req, res) => {
     res.status(200).json({
