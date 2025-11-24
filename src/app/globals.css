@@ -8,7 +8,7 @@
 
 :root {
   /* Layout Variables */
-  --navbar-height: 5rem;
+  --navbar-height: 4rem;
   --vh: 1vh;
   
   /* Hero Section Matching Color Palette */
@@ -1514,9 +1514,70 @@ html, body {
 }
 
 /* ===== BROSKI'S LUNCH DROP SECTION STYLES ===== */
+.page-wrapper {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.page-title {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #ffd700;
+  text-transform: uppercase;
+  text-shadow: 0 0 8px rgba(241,196,83,0.35);
+  margin-bottom: 10px;
+}
+
+.page-sub {
+  color: rgba(255,255,255,0.82);
+  font-size: 18px;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.ld-section {
+  width: 100%;
+  background: radial-gradient(ellipse at center, rgba(241,196,83,0.08) 0%, rgba(0,0,0,1) 65%);
+  padding: 40px 20px;
+  border-radius: 12px;
+}
+
+.ld-heading {
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffd700;
+  margin-bottom: 12px;
+  text-shadow: 0 0 6px rgba(241,196,83,0.3);
+}
+
+.ld-list {
+  list-style: decimal;
+  padding-left: 20px;
+  color: rgba(255,255,255,0.9);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.ld-step-label {
+  display: block;
+  font-weight: 700;
+  color: #ffd700;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+}
+
+.ld-cta-row {
+  margin-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
 .lunchdrop-section {
   width: 100%;
-  background: #000;
+  background: radial-gradient(ellipse at center, rgba(241,196,83,0.08) 0%, rgba(0,0,0,1) 65%);
   padding: 60px 20px;
   display: flex;
   justify-content: center;
@@ -1534,17 +1595,18 @@ html, body {
   letter-spacing: 1px;
   margin-bottom: 14px;
   text-transform: uppercase;
+  text-shadow: 0 0 8px rgba(241,196,83,0.35);
 }
 
 .lunchdrop-desc {
-  color: #e4e4e4;
+  color: rgba(255,255,255,0.85);
   font-size: 20px;
-  line-height: 1.5;
+  line-height: 1.6;
   margin-bottom: 8px;
 }
 
 .lunchdrop-sub {
-  color: #7c7c7c;
+  color: rgba(255,255,255,0.6);
   font-size: 14px;
   margin-bottom: 26px;
 }
@@ -1576,10 +1638,12 @@ html, body {
   background: #9c1a1a;
   border-color: #9c1a1a;
   color: #ffffff;
+  box-shadow: 0 6px 18px rgba(178,34,34,0.35);
 }
 
 .btn-race:hover {
   background: #b52020;
+  transform: translateY(-2px);
 }
 
 /* Gold outline button */
@@ -1587,11 +1651,13 @@ html, body {
   background: transparent;
   border-color: #ffd700;
   color: #ffd700;
+  box-shadow: 0 4px 14px rgba(241,196,83,0.25);
 }
 
 .btn-signup:hover {
   background: #ffd700;
   color: #000000;
+  transform: translateY(-2px);
 }
 
 /* Solid gold button */
@@ -1599,10 +1665,12 @@ html, body {
   background: #ffd700;
   border-color: #ffd700;
   color: #000000;
+  box-shadow: 0 6px 18px rgba(241,196,83,0.35);
 }
 
 .btn-order:hover {
   background: #f5c400;
+  transform: translateY(-2px);
 }
 
 /* ===== FLOATING LUNCH DROP BUTTON STYLES ===== */

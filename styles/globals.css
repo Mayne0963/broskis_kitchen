@@ -199,6 +199,7 @@ body {
   font-weight: 700;
   color: #ffd700;
   margin-bottom: 10px;
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.35);
 }
 
 .ld-list {
@@ -214,13 +215,15 @@ body {
   font-weight: 600;
   color: #ffd700;
   margin-bottom: 2px;
+  text-transform: uppercase;
 }
 
 .ld-cta-row {
   margin-top: 22px;
   display: flex;
   flex-wrap: wrap;
-  gap: 14px;
+  gap: 16px;
+  align-items: center;
 }
 
 /* ----------- Enter Workplace form ----------- */
