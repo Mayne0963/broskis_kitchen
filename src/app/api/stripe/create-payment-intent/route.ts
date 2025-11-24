@@ -14,7 +14,8 @@ export async function POST(request: NextRequest) {
       apiVersion: '2025-02-24.acacia',
     })
     const { 
-      amount, 
+      amount, // dollars (legacy)
+      amountCents, // preferred: integer cents
       currency = 'usd', 
       metadata = {}, 
       payment_method_types,
@@ -22,7 +23,11 @@ export async function POST(request: NextRequest) {
       confirm = false 
     } = await request.json()
 
-    if (!amount || amount <= 0) {
+    // Normalize amount in cents, supporting both legacy dollars and new cents input
+    const normalizedCents = typeof amountCents === 'number' && Number.isFinite(amountCents)
+      ? Math.round(amountCents)
+      : (typeof amount === 'number' && Number.isFinite(amount) ? Math.round(amount * 100) : 0)
+    if (normalizedCents <= 0) {
       return NextResponse.json(
         { error: 'Invalid amount' },
         { status: 400 }
@@ -31,8 +36,7 @@ export async function POST(request: NextRequest) {
 
     // Stripe minimum charge validation
     const MIN_USD_CENTS = 50;
-    const amountInCents = Math.round(amount * 100);
-    if (currency === 'usd' && amountInCents < MIN_USD_CENTS) {
+    if (currency === 'usd' && normalizedCents < MIN_USD_CENTS) {
       return NextResponse.json(
         { error: 'Minimum charge is $0.50 USD. Please add more items.' },
         { status: 400 }
@@ -41,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     // Prepare payment intent options
     const paymentIntentOptions: Stripe.PaymentIntentCreateParams = {
-      amount: Math.round(amount * 100), // Convert to cents
+      amount: normalizedCents, // already cents
       currency,
       metadata: {
         ...metadata,

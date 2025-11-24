@@ -132,7 +132,7 @@ export default function StripePaymentForm(props: StripePaymentFormProps) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            amount: Math.round(amount * 100), // Convert to cents
+            amountCents: Math.round(amount * 100), // send cents to server
             currency: 'usd',
             metadata: {
               source: 'broskis-kitchen-checkout',

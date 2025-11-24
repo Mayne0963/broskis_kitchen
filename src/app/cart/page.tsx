@@ -326,6 +326,15 @@ function CartContent() {
                 <FaCreditCard /> {loading ? "Starting…" : "Proceed to Checkout"}
               </button>
 
+              <div className="mt-3">
+                <Link
+                  href="/checkout"
+                  className="btn-outline w-full inline-flex items-center justify-center gap-2"
+                >
+                  <FaCreditCard /> Pay In-App
+                </Link>
+              </div>
+
               <p className="text-xs text-gray-500 mt-4 text-center">Taxes and shipping calculated at checkout</p>
             </div>
           </div>

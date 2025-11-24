@@ -68,7 +68,7 @@ export default function PaymentRequestButton({
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            amount: Math.round(amount * 100),
+            amountCents: Math.round(amount * 100),
             currency,
             payment_method: event.paymentMethod.id,
             confirm: true,

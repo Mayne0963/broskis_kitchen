@@ -1,9 +1,10 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useCart } from "../../lib/context/CartContext";
 import { safeFetch } from "@/lib/utils/safeFetch";
 import { AuthGuard } from "../../components/auth/AuthGuard";
 import { loadSessionOrder } from "@/lib/utils/orderPersistence";
+import StripePaymentForm from "@/components/checkout/StripePaymentForm";
 
 type OutItem = { name: string; price: number; qty: number };
 
@@ -46,51 +47,25 @@ function CheckoutContent() {
     return tomorrow.toLocaleDateString(undefined, options);
   }, []);
 
-  async function startPayment() {
-    setLoading(true);
+  // Persist lightweight order draft for tracking, then render in-app payment element
+  async function preflightOrderDraft() {
     try {
-      console.log("[CHECKOUT] items count:", effectiveItems.length);
-      console.log("[CHECKOUT] payload:", payloadItems);
-      // Fire-and-forget POST to /api/order to include Lunch Drop fields
-      // Does not change existing checkout flow
-      try {
-        const body = {
-          customerName: customerName || null,
-          phone: phone || null,
-          email: email || null,
-          items: payloadItems.map(i => ({ name: i.name, price: i.price, qty: i.qty })),
-          total,
-          workplaceName: workplaceName || null,
-          workplaceShift: workplaceShift || "",
-        };
-        // Send without blocking checkout redirect
-        fetch("/api/order", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        }).catch(() => {});
-      } catch (e) {
-        console.warn("[CHECKOUT] POST /api/order failed", e);
-      }
-      const res = await safeFetch("/api/checkout/session", {
+      const body = {
+        customerName: customerName || null,
+        phone: phone || null,
+        email: email || null,
+        items: payloadItems.map(i => ({ name: i.name, price: i.price, qty: i.qty })),
+        total,
+        workplaceName: workplaceName || null,
+        workplaceShift: workplaceShift || "",
+      };
+      fetch("/api/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          items: payloadItems,
-          // Pass Lunch Drop fields so they propagate to Stripe metadata and Firestore
-          workplaceName: workplaceName || undefined,
-          workplaceShift: workplaceShift || undefined,
-        }),
-      });
-      console.log("[CHECKOUT] API status:", res.status);
-      const j = await res.json();
-      console.log("[CHECKOUT] API response:", j);
-      if (j?.url) window.location.href = j.url;
-      else alert(j?.error || "Checkout failed");
-    } catch {
-      alert("Checkout error");
-    } finally {
-      setLoading(false);
+        body: JSON.stringify(body),
+      }).catch(() => {});
+    } catch (e) {
+      console.warn("[CHECKOUT] preflight order failed", e);
     }
   }
 
@@ -173,13 +148,25 @@ function CheckoutContent() {
         </div>
       </div>
 
-      <button
-        onClick={startPayment}
-        disabled={disabled}
-        className="rounded-md bg-[#E9B949] px-6 py-3 font-semibold text-black hover:opacity-90 disabled:opacity-60"
-      >
-        {disabled ? "No items in cart" : (loading ? "Starting…" : "Proceed to Payment")}
-      </button>
+      {/* Built-in Payment Page */}
+      <div className="mt-6">
+        <StripePaymentForm
+          amount={total}
+          onPaymentSuccess={() => {
+            window.location.href = "/checkout/success";
+          }}
+          onPaymentError={(msg) => {
+            alert(msg || "Payment failed");
+          }}
+          orderMetadata={{
+            customerName: (customerName || "").trim(),
+            phone: (phone || "").trim(),
+            email: (email || "").trim(),
+            workplaceName: (workplaceName || "").trim(),
+            workplaceShift: ["1st","2nd","3rd"].includes(workplaceShift) ? workplaceShift : "",
+          }}
+        />
+      </div>
     </main>
   );
 }
@@ -191,3 +178,14 @@ export default function CheckoutPage() {
     </AuthGuard>
   );
 }
+  // Preflight persist a lightweight draft to aid reconciliation
+  
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const preflightDeps = [customerName, phone, email, workplaceName, workplaceShift, payloadItems, total];
+  
+  useEffect(() => {
+    if (payloadItems.length > 0) {
+      preflightOrderDraft();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, preflightDeps);
