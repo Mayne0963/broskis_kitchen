@@ -1755,14 +1755,16 @@ html, body {
   .race-table td:nth-child(4)::before { content: 'Progress'; }
   .race-table td:nth-child(5)::before { content: 'Status'; }
 }
-.ew-form { background: rgba(0,0,0,0.3); border: 1px solid rgba(183,152,90,0.25); padding: 20px; border-radius: 12px; }
-.ew-row { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.ew-form { background: rgba(0,0,0,0.3); border: 1px solid rgba(183,152,90,0.25); padding: 24px; border-radius: 12px; }
+.ew-row { display: grid; grid-template-columns: 1fr; gap: 16px; }
 @media (min-width: 640px) { .ew-row { grid-template-columns: 1fr 1fr; } }
-.ew-field { display: flex; flex-direction: column; gap: 6px; }
+.ew-field { display: flex; flex-direction: column; gap: 8px; }
 .ew-field label { color: rgba(255,255,255,0.8); font-size: 14px; }
-.ew-field input, .ew-field select, .ew-field textarea { width: 100%; padding: 10px 12px; background: var(--color-dark-charcoal); border: 1px solid #4b5563; border-radius: 8px; color: #fff; font-size: 14px; }
+.ew-field input, .ew-field select, .ew-field textarea { width: 100%; padding: 10px 12px; background: var(--color-dark-charcoal); border: 1px solid #4b5563; border-radius: 8px; color: #fff; font-size: 14px; transition: border-color .2s ease, box-shadow .2s ease; }
+.ew-field select { appearance: none; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white"><path d="M5 7l5 5 5-5"/></svg>'); background-repeat: no-repeat; background-position: right 0.5rem center; background-size: 16px 16px; padding-right: 1.75rem; }
 .ew-field input::placeholder, .ew-field textarea::placeholder { color: #9ca3af; }
-.ew-field input:focus, .ew-field select:focus, .ew-field textarea:focus { outline: none; border-color: var(--color-harvest-gold); }
-.ew-submit-btn { display: inline-block; padding: 12px 20px; border-radius: 10px; background: #FFD700; color: #000; font-weight: 700; }
-.ew-submit-btn:hover { filter: brightness(0.95); }
-.ew-thankyou { text-align: center; background: rgba(0,0,0,0.3); border: 1px solid rgba(183,152,90,0.25); padding: 20px; border-radius: 12px; }
+.ew-field input:focus, .ew-field select:focus, .ew-field textarea:focus { outline: none; border-color: var(--color-harvest-gold); box-shadow: 0 0 0 3px rgba(241,196,83,0.15); }
+.ew-submit-btn { display: inline-block; padding: 12px 22px; border-radius: 10px; background: #FFD700; color: #000; font-weight: 700; border: 2px solid #FFD700; box-shadow: 0 6px 18px rgba(241,196,83,0.35); transition: transform .2s ease, box-shadow .2s ease, filter .2s ease; }
+.ew-submit-btn:hover { filter: brightness(0.95); transform: translateY(-1px); box-shadow: 0 10px 24px rgba(241,196,83,0.45); }
+.ew-thankyou { text-align: center; background: rgba(0,0,0,0.3); border: 1px solid rgba(183,152,90,0.25); padding: 24px; border-radius: 12px; }
+.ew-thankyou p { color: rgba(255,255,255,0.85); }
