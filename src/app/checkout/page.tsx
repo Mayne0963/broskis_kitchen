@@ -15,10 +15,10 @@ function normalizePrice(p: unknown): number {
 
 function CheckoutContent() {
   const [loading, setLoading] = useState(false);
-  // New Lunch Drop fields and basic contact info
   const [customerName, setCustomerName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [workplaces, setWorkplaces] = useState<{ workplaceName: string; shifts: string[] }[]>([]);
   const [workplaceName, setWorkplaceName] = useState("");
   const [workplaceShift, setWorkplaceShift] = useState("");
   const { items = [] } = useCart();
@@ -78,6 +78,7 @@ function CheckoutContent() {
   }, [customerName, phone, email, workplaceName, workplaceShift, payloadItems, total]);
 
   const disabled = loading || payloadItems.length === 0;
+  const canProceed = !disabled && Boolean(workplaceName) && ["1st","2nd","3rd"].includes(workplaceShift);
 
   return (
     <main className="mx-auto max-w-3xl p-6">
@@ -120,26 +121,30 @@ function CheckoutContent() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Workplace Name (Optional)</label>
-            <input
-              type="text"
+            <label className="block text-sm font-medium text-gray-300 mb-2">Workplace</label>
+            <select
               value={workplaceName}
               onChange={(e) => setWorkplaceName(e.target.value)}
-              placeholder="Where do you work?"
-              className="w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-[var(--color-harvest-gold)] focus:outline-none"
-            />
+              className="w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border border-gray-600 rounded-lg text-white focus:border-[var(--color-harvest-gold)] focus:outline-none"
+            >
+              <option value="">Select your workplace</option>
+              {workplaces.map(w => (
+                <option key={w.workplaceName} value={w.workplaceName}>{w.workplaceName}</option>
+              ))}
+            </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Workplace Shift</label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Shift</label>
             <select
               value={workplaceShift}
               onChange={(e) => setWorkplaceShift(e.target.value)}
-              className="w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border border-gray-600 rounded-lg text-white focus:border-[var(--color-harvest-gold)] focus:outline-none"
+              disabled={!selectedWorkplace || selectedWorkplace.shifts.length === 0}
+              className="w-full px-3 py-2 bg-[var(--color-dark-charcoal)] border border-gray-600 rounded-lg text-white focus:border-[var(--color-harvest-gold)] focus:outline-none disabled:opacity-60"
             >
-              <option value="">Select a shift (optional)</option>
-              <option value="1st">1st</option>
-              <option value="2nd">2nd</option>
-              <option value="3rd">3rd</option>
+              <option value="">{!selectedWorkplace ? "Select a workplace first" : "Select a shift"}</option>
+              {selectedWorkplace?.shifts.map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
             </select>
           </div>
         </div>
@@ -158,22 +163,28 @@ function CheckoutContent() {
 
       {/* Built-in Payment Page */}
       <div className="mt-6">
-        <StripePaymentForm
-          amount={total}
-          onPaymentSuccess={() => {
-            window.location.href = "/checkout/success";
-          }}
-          onPaymentError={(msg) => {
-            alert(msg || "Payment failed");
-          }}
-          orderMetadata={{
-            customerName: (customerName || "").trim(),
-            phone: (phone || "").trim(),
-            email: (email || "").trim(),
-            workplaceName: (workplaceName || "").trim(),
-            workplaceShift: ["1st","2nd","3rd"].includes(workplaceShift) ? workplaceShift : "",
-          }}
-        />
+        {canProceed ? (
+          <StripePaymentForm
+            amount={total}
+            onPaymentSuccess={() => {
+              window.location.href = "/checkout/success";
+            }}
+            onPaymentError={(msg) => {
+              alert(msg || "Payment failed");
+            }}
+            orderMetadata={{
+              customerName: (customerName || "").trim(),
+              phone: (phone || "").trim(),
+              email: (email || "").trim(),
+              workplaceName: (workplaceName || "").trim(),
+              workplaceShift: workplaceShift,
+            }}
+          />
+        ) : (
+          <div className="px-4 py-3 bg-[var(--color-dark-charcoal)] border border-gray-600 rounded-lg text-gray-300">
+            Select your workplace and an available shift to proceed.
+          </div>
+        )}
       </div>
     </main>
   );
@@ -186,3 +197,30 @@ export default function CheckoutPage() {
     </AuthGuard>
   );
 }
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await safeFetch("/api/workplace-signup?aggregate=true&limit=200");
+        const j = await res.json();
+        if (Array.isArray(j?.workplaces)) {
+          setWorkplaces(j.workplaces);
+        }
+      } catch {
+        setWorkplaces([]);
+      }
+    })();
+  }, []);
+
+  const selectedWorkplace = useMemo(() => {
+    return workplaces.find(w => w.workplaceName === workplaceName) || null;
+  }, [workplaces, workplaceName]);
+
+  useEffect(() => {
+    if (!selectedWorkplace) {
+      setWorkplaceShift("");
+    } else if (selectedWorkplace && selectedWorkplace.shifts.length > 0) {
+      if (!selectedWorkplace.shifts.includes(workplaceShift)) {
+        setWorkplaceShift("");
+      }
+    }
+  }, [selectedWorkplace]);
