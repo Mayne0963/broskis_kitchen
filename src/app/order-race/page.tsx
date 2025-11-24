@@ -160,8 +160,11 @@ export default function OrderRacePage() {
               else if (row.orders >= Math.round(maxPlates * 0.5)) status = "Close";
               else if (row.orders >= Math.round(maxPlates * 0.25)) status = "Building";
 
+              const isWinner = row.orders >= maxPlates;
+              const rowClass = "race-row" + (isWinner ? " race-row--winner" : "");
+
               return (
-                <tr key={row.workplaceName}>
+                <tr key={row.workplaceName} className={rowClass}>
                   <td>{index + 1}</td>
                   <td>{row.workplaceName}</td>
                   <td>
