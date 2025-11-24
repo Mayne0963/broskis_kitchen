@@ -69,6 +69,14 @@ function CheckoutContent() {
     }
   }
 
+  // Preflight persist a lightweight draft to aid reconciliation whenever inputs change
+  useEffect(() => {
+    if (payloadItems.length > 0) {
+      preflightOrderDraft();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [customerName, phone, email, workplaceName, workplaceShift, payloadItems, total]);
+
   const disabled = loading || payloadItems.length === 0;
 
   return (
@@ -178,14 +186,3 @@ export default function CheckoutPage() {
     </AuthGuard>
   );
 }
-  // Preflight persist a lightweight draft to aid reconciliation
-  
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const preflightDeps = [customerName, phone, email, workplaceName, workplaceShift, payloadItems, total];
-  
-  useEffect(() => {
-    if (payloadItems.length > 0) {
-      preflightOrderDraft();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, preflightDeps);
