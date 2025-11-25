@@ -73,18 +73,25 @@ export async function GET(req: NextRequest) {
     }
 
     const allShifts = ["1st", "2nd", "3rd"];
+    const normalizeShift = (raw: string): string[] => {
+      const s = raw.trim().toLowerCase();
+      if (!s) return [];
+      // Common variants mapping
+      if (/(multi|multiple|all)/.test(s)) return allShifts;
+      if (/^(1|first|1st)(\s*shift)?$/.test(s) || /shift\s*1/.test(s)) return ["1st"];
+      if (/^(2|second|2nd)(\s*shift)?$/.test(s) || /shift\s*2/.test(s)) return ["2nd"];
+      if (/^(3|third|3rd)(\s*shift)?$/.test(s) || /shift\s*3/.test(s)) return ["3rd"];
+      // Exact matches fallback
+      if (["1st","2nd","3rd"].includes(raw)) return [raw as any];
+      return [];
+    };
     const map = new Map<string, Set<string>>();
     for (const d of snap.docs) {
       const data = d.data() as any;
       const name = String(data.workplaceName || "").trim();
       if (!name) continue;
-      const rawShift = String(data.shift || "").trim().toLowerCase();
-      let shifts: string[] = [];
-      if (rawShift === "multiple") {
-        shifts = allShifts;
-      } else if (["1st", "2nd", "3rd"].includes(String(data.shift))) {
-        shifts = [String(data.shift)];
-      }
+      const rawShift = String(data.shift || "");
+      const shifts = normalizeShift(rawShift);
       if (!map.has(name)) map.set(name, new Set<string>());
       const set = map.get(name)!;
       for (const s of shifts) set.add(s);
@@ -102,6 +109,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ workplaces });
   } catch (err) {
     console.error("Failed to fetch workplace signups:", err);
+    try {
+      const message = (err as any)?.message || String(err);
+      const isConfigError = /initialize|credentials|FIREBASE|service account/i.test(message);
+      if (isConfigError) {
+        // Graceful fallback: return empty list to avoid front-end failure
+        return NextResponse.json({ workplaces: [] }, { status: 200 });
+      }
+    } catch {}
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
