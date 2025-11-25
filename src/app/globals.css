@@ -1908,3 +1908,28 @@ html, body {
     grid-template-columns: 1fr;
   }
 }
+
+/* Lunch Drop – appended rules for new elements */
+.lunchdrop-how {
+  font-size: 13px;
+  color: #dddddd;
+  margin-top: 8px;
+  margin-bottom: 18px;
+  max-width: 780px;
+}
+
+.lunchdrop-learn-link {
+  font-size: 12px;
+  color: #b3b3b3;
+  margin-top: 4px;
+}
+
+.lunchdrop-learn-link a {
+  color: #ffd700;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.45);
+}
+
+.lunchdrop-learn-link a:hover {
+  border-bottom-color: #ffd700;
+}

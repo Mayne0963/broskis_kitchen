@@ -193,6 +193,13 @@ function Page() {
             This ain&apos;t delivery. This is <span className="lunchdrop-highlight">community</span>.
           </p>
 
+          <p className="lunchdrop-how">
+            <span className="lunchdrop-highlight">Broski&apos;s Lunch Drop™</span> — first
+            workplace on your shift to hit <b>22 plates</b> wins tomorrow&apos;s Broski lunch
+            delivered by OTW. 1st, 2nd, and 3rd shift. Day-before pre-orders only. Free OTW
+            delivery.
+          </p>
+
           <div className="lunchdrop-columns">
             <div className="lunchdrop-card">
               <h3 className="lunchdrop-card-title">Where Workplaces Turn Into Teams</h3>
@@ -231,10 +238,14 @@ function Page() {
           </div>
 
           <div className="lunchdrop-cta-row">
-            <a href="/order-race" className="btn-primary">🔥 Join the Race</a>
-            <a href="/lunch-drop" className="btn-ghost">🍽️ Learn About Lunch Drop</a>
+            <a href="/order" className="btn-primary">🔥 Place Lunch Order</a>
+            <a href="/order-race" className="btn-ghost">🏁 View Order Race</a>
             <a href="/enter-workplace" className="btn-outline">🏆 Enter Your Workplace</a>
           </div>
+
+          <p className="lunchdrop-learn-link">
+            🍽 <a href="/lunch-drop">Learn about Lunch Drop</a>
+          </p>
 
           <div className="lunchdrop-tagline-row">
             <p className="lunchdrop-tagline">This ain&apos;t takeout — this a takeover.</p>
@@ -243,26 +254,7 @@ function Page() {
         </div>
       </section>
 
-      {/* Broski's Lunch Drop Section - Added under hero section */}
-      <section className="lunchdrop-section">
-        <div className="lunchdrop-inner">
-          <h2 className="lunchdrop-title">BROSKI'S LUNCH DROP™</h2>
-
-          <p className="lunchdrop-desc">
-            First workplace on your shift to hit <b>22 plates</b> wins tomorrow's Broski lunch delivered by OTW.
-          </p>
-
-          <p className="lunchdrop-sub">
-            1st · 2nd · 3rd Shift · Day-Before Pre-Orders Only · Free OTW Delivery
-          </p>
-
-          <div className="lunchdrop-buttons">
-            <a href="/order-race" className="btn-race">VIEW ORDER RACE</a>
-            <a href="/enter-workplace" className="btn-signup">ENTER YOUR WORKPLACE</a>
-            <a href="/order" className="btn-order">PLACE LUNCH ORDER</a>
-          </div>
-        </div>
-      </section>
+      {/* Removed duplicate Broski's Lunch Drop strip; content merged into lunchdrop-movement */}
 
       {/* Navigation Bar - Below Hero Section */}
       <nav className="bg-black border-b-2 border-[#FFD700] py-4">
