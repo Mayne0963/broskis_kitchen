@@ -38,6 +38,36 @@ function CheckoutContent() {
 
   const total = useMemo(() => payloadItems.reduce((sum, it) => sum + it.price * it.qty, 0), [payloadItems]);
 
+  // Load workplaces and shifts from server (aggregated from signups)
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await safeFetch("/api/workplace-signup?aggregate=true&limit=200");
+        const j = await res.json();
+        if (Array.isArray(j?.workplaces)) {
+          setWorkplaces(j.workplaces);
+        }
+      } catch {
+        setWorkplaces([]);
+      }
+    })();
+  }, []);
+
+  const selectedWorkplace = useMemo(() => {
+    return workplaces.find(w => w.workplaceName === workplaceName) || null;
+  }, [workplaces, workplaceName]);
+
+  // Reset/validate shift when workplace selection changes
+  useEffect(() => {
+    if (!selectedWorkplace) {
+      setWorkplaceShift("");
+    } else if (selectedWorkplace && selectedWorkplace.shifts.length > 0) {
+      if (!selectedWorkplace.shifts.includes(workplaceShift)) {
+        setWorkplaceShift("");
+      }
+    }
+  }, [selectedWorkplace]);
+
   // Compute delivery date label (display-only badge)
   const deliveryDateLabel = useMemo(() => {
     const now = new Date();
@@ -197,30 +227,3 @@ export default function CheckoutPage() {
     </AuthGuard>
   );
 }
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await safeFetch("/api/workplace-signup?aggregate=true&limit=200");
-        const j = await res.json();
-        if (Array.isArray(j?.workplaces)) {
-          setWorkplaces(j.workplaces);
-        }
-      } catch {
-        setWorkplaces([]);
-      }
-    })();
-  }, []);
-
-  const selectedWorkplace = useMemo(() => {
-    return workplaces.find(w => w.workplaceName === workplaceName) || null;
-  }, [workplaces, workplaceName]);
-
-  useEffect(() => {
-    if (!selectedWorkplace) {
-      setWorkplaceShift("");
-    } else if (selectedWorkplace && selectedWorkplace.shifts.length > 0) {
-      if (!selectedWorkplace.shifts.includes(workplaceShift)) {
-        setWorkplaceShift("");
-      }
-    }
-  }, [selectedWorkplace]);
