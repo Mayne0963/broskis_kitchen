@@ -239,12 +239,12 @@ function Page() {
 
           <div className="lunchdrop-cta-row">
             <a href="/order" className="btn-primary">🔥 Place Lunch Order</a>
-            <a href="/order-race" className="btn-ghost">🏁 View Order Race</a>
+            <a href="/order-race" className="btn-outline">🏁 View Order Race</a>
             <a href="/enter-workplace" className="btn-outline">🏆 Enter Your Workplace</a>
           </div>
 
           <p className="lunchdrop-learn-link">
-            🍽 <a href="/lunch-drop">Learn about Lunch Drop</a>
+            🍽 <a href="/lunch-drop">Learn About Lunch Drop</a>
           </p>
 
           <div className="lunchdrop-tagline-row">
