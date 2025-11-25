@@ -153,7 +153,7 @@ const CartDropdown: React.FC = () => {
                       className="btn-primary block text-center w-full"
                       onClick={() => setIsOpen(false)}
                     >
-                      Checkout
+                      Lunch Drop - Individual
                     </Link>
                   </div>
                 </div>
