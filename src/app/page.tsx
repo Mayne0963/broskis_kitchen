@@ -99,9 +99,9 @@ function Page() {
               HOME OF THE AWARD-WINNING
             </h1>
              
-            {/* BOOSIE WINGS - Larger, Gold, Bold Serif, ALL CAPS */}
+            {/* BROSKI WINGS - Larger, Gold, Bold Serif, ALL CAPS */}
             <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-[var(--color-harvest-gold)] uppercase tracking-tight leading-none" style={{ fontFamily: 'var(--font-playfair), serif', color: '#FFD700' }}>
-              BOOSIE WINGS
+              BROSKI WINGS
             </h2>
              
             {/* CAUSE IT'S BADAZZ - Red, All Caps, smaller */}
