@@ -19,46 +19,70 @@ interface RaceData {
 
 const FALLBACK_MAX_PLATES = 22;
 
-const MOCK_SHIFTS: Record<ShiftKey, ShiftRow[]> = {
-  "1st": [
-    { workplaceName: "General Motors – Body Shop", orders: 17 },
-    { workplaceName: "Amazon Sort Center", orders: 9 },
-    { workplaceName: "Parkview Hospital – 5th Floor", orders: 6 },
-  ],
-  "2nd": [
-    { workplaceName: "Dana Corporation", orders: 12 },
-    { workplaceName: "Sweetwater Sound", orders: 5 },
-  ],
-  "3rd": [
-    { workplaceName: "FedEx Hub", orders: 14 },
-    { workplaceName: "Steel Dynamics – Night Crew", orders: 4 },
-  ],
-};
+function formatDateISO(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
 
 export default function OrderRacePage() {
   const [activeShift, setActiveShift] = useState<ShiftKey>("1st");
   const [raceData, setRaceData] = useState<RaceData | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string>(""); // YYYY-MM-DD
 
+  // Initialize date to tomorrow to match server default
   useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const res = await fetch("/api/order-race");
-        if (!res.ok) throw new Error(await res.text());
-        const json = (await res.json()) as RaceData;
-        if (mounted) setRaceData(json);
-      } catch (e) {
-        console.warn("Failed to load order race data:", e);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate() + 1);
+    setSelectedDate(formatDateISO(tomorrow));
   }, []);
 
+  // Fetch helper
+  async function fetchRaceData(date?: string) {
+    setLoading(true);
+    setError(null);
+    try {
+      const qs = date ? `?date=${encodeURIComponent(date)}` : "";
+      const res = await fetch(`/api/order-race${qs}`, { cache: "no-store" });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || `Failed with status ${res.status}`);
+      }
+      const json = (await res.json()) as RaceData;
+      setRaceData(json);
+    } catch (e: any) {
+      console.warn("Failed to load order race data:", e);
+      setError(e?.message || "Failed to load race data");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Initial load + refresh when date changes
+  useEffect(() => {
+    if (!selectedDate) return;
+    let mounted = true;
+    fetchRaceData(selectedDate);
+
+    // Poll for live updates while race is open
+    const interval = setInterval(() => {
+      if (!mounted) return;
+      // Only poll when race not closed (based on last known data)
+      const closed = raceData?.raceClosed === true;
+      if (!closed) fetchRaceData(selectedDate);
+    }, 30000);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDate]);
+
   const rows = useMemo(() => {
-    const dataRows = raceData?.shifts?.[activeShift];
-    const list = (dataRows?.length ? dataRows : MOCK_SHIFTS[activeShift]).slice();
+    const dataRows = raceData?.shifts?.[activeShift] || [];
+    const list = dataRows.slice();
     return list.sort((a, b) => b.orders - a.orders);
   }, [activeShift, raceData]);
 
@@ -102,6 +126,22 @@ export default function OrderRacePage() {
             ? "RACE CLOSED – CUT-OFF PASSED"
             : "RACE OPEN – ORDERS COUNTING"}
         </span>
+        <span className="race-date-controls">
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            className="race-date-input"
+          />
+          <button
+            type="button"
+            className="btn-outline"
+            onClick={() => fetchRaceData(selectedDate)}
+            disabled={loading}
+          >
+            {loading ? "Refreshing..." : "Refresh"}
+          </button>
+        </span>
       </div>
 
       <div className="shift-tabs">
@@ -133,6 +173,9 @@ export default function OrderRacePage() {
       )}
 
       <div className="race-table-wrap">
+        {error && (
+          <div className="race-error">{error}</div>
+        )}
         <table className="race-table">
           <thead>
             <tr>
@@ -147,7 +190,9 @@ export default function OrderRacePage() {
             {rows.length === 0 && (
               <tr>
                 <td colSpan={5} className="race-empty">
-                  No workplaces active on this shift yet.
+                  {loading
+                    ? "Loading race data..."
+                    : "No workplaces active on this shift yet."}
                 </td>
               </tr>
             )}
