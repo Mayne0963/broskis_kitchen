@@ -71,13 +71,30 @@ export async function POST(req: NextRequest) {
 
         try {
           // Build normalized order document
+          const isValidDate = (v: any) => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
+          const makeTomorrow = () => {
+            const nowJs = new Date();
+            const tomorrowJs = new Date(nowJs);
+            tomorrowJs.setDate(nowJs.getDate() + 1);
+            return tomorrowJs.toISOString().slice(0, 10);
+          };
+          const meta = (paymentIntent.metadata || {}) as any;
+          const deliveryDate = isValidDate(meta.deliveryDate) ? meta.deliveryDate : makeTomorrow();
+
           const orderDoc = {
             id: paymentIntent.id,
             source: 'stripe',
             status: 'paid',
             amount: paymentIntent.amount,
             currency: paymentIntent.currency,
-            createdAt: Timestamp.now()
+            createdAt: Timestamp.now(),
+            // Lunch Drop fields (optional, allow mocking via metadata)
+            workplaceName: meta.workplaceName || null,
+            workplaceShift: meta.workplaceShift || null,
+            deliveryDate,
+            // Mark as test for clarity in admin views
+            isTest: true,
+            tags: ['test','webhook-mock']
           };
 
           // Save to Firestore

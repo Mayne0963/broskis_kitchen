@@ -169,6 +169,80 @@ function Page() {
         </div>
       </section>
 
+      {/* Lunch Drop Movement Section - Added without modifying existing sections */}
+      <section className="lunchdrop-movement">
+        <div className="lunchdrop-inner">
+          <p className="lunchdrop-kicker">THE PEOPLE&apos;S RESTAURANT</p>
+          <h2 className="lunchdrop-title">
+            Lunch Drop ain&apos;t just delivery.<br />
+            It&apos;s a movement.
+          </h2>
+
+          <p className="lunchdrop-text">
+            Lunch ain&apos;t supposed to feel like punishment. Clock out, rush, swallow
+            something quick, and run back like you borrowed time? Nah. We flipped the script.
+          </p>
+
+          <p className="lunchdrop-text">
+            Welcome to <span className="lunchdrop-highlight">Lunch Drop</span> — the first
+            workplace-powered food movement where the people choose the vibe and the winners
+            get fed like royalty.
+          </p>
+
+          <p className="lunchdrop-text">
+            This ain&apos;t delivery. This is <span className="lunchdrop-highlight">community</span>.
+          </p>
+
+          <div className="lunchdrop-columns">
+            <div className="lunchdrop-card">
+              <h3 className="lunchdrop-card-title">Where Workplaces Turn Into Teams</h3>
+              <p className="lunchdrop-card-text">
+                Each shift becomes a squad. Each squad becomes a tribe. Every plate you order
+                pushes your crew closer to locking in tomorrow&apos;s Broski&apos;s Lunch Drop
+                with free OTW delivery.
+              </p>
+              <p className="lunchdrop-card-text">
+                Y&apos;all ain&apos;t just ordering food. You&apos;re building momentum.
+              </p>
+            </div>
+
+            <div className="lunchdrop-card">
+              <h3 className="lunchdrop-card-title">The Race Makes It Fun</h3>
+              <p className="lunchdrop-card-text">
+                First workplace on each shift to hit the magic number of plates wins the Drop.
+                No meetings. No memos. No permission. The people decide who eats like champions.
+              </p>
+              <p className="lunchdrop-card-text">
+                1st, 2nd, or 3rd shift — everybody has a lane.
+              </p>
+            </div>
+
+            <div className="lunchdrop-card">
+              <h3 className="lunchdrop-card-title">Why We Do This</h3>
+              <p className="lunchdrop-card-text">
+                Because people working hard deserve something real. Because lunch shouldn&apos;t
+                be stress. Because Fort Wayne deserves a win. Because you deserve flavor with
+                purpose.
+              </p>
+              <p className="lunchdrop-card-text">
+                This is food with unity, competition, and pride.
+              </p>
+            </div>
+          </div>
+
+          <div className="lunchdrop-cta-row">
+            <a href="/order-race" className="btn-primary">🔥 Join the Race</a>
+            <a href="/lunch-drop" className="btn-ghost">🍽️ Learn About Lunch Drop</a>
+            <a href="/enter-workplace" className="btn-outline">🏆 Enter Your Workplace</a>
+          </div>
+
+          <div className="lunchdrop-tagline-row">
+            <p className="lunchdrop-tagline">This ain&apos;t takeout — this a takeover.</p>
+            <p className="lunchdrop-tagline">Earn it today. Eat it tomorrow.</p>
+          </div>
+        </div>
+      </section>
+
       {/* Broski's Lunch Drop Section - Added under hero section */}
       <section className="lunchdrop-section">
         <div className="lunchdrop-inner">
