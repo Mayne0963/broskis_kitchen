@@ -1771,15 +1771,28 @@ html, body {
 
 /* Lunch Drop Movement styles (scoped to prevent conflicts with existing Lunch Drop section) */
 .lunchdrop-movement {
+  position: relative;
   padding: 60px 20px;
-  background: radial-gradient(circle at top left, rgba(255, 215, 0, 0.16), #050505);
+  background: radial-gradient(80% 120% at 10% 0%, rgba(255, 215, 0, 0.10), rgba(5, 5, 5, 1) 60%);
   border-top: 1px solid #222;
   border-bottom: 1px solid #222;
+}
+
+.lunchdrop-movement::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 80% at 50% 100%, rgba(255,255,255,0.03), transparent 60%);
 }
 
 .lunchdrop-movement .lunchdrop-inner {
   max-width: 1100px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .lunchdrop-movement .lunchdrop-kicker {
@@ -1798,6 +1811,7 @@ html, body {
   margin-bottom: 14px;
   color: #ffffff;
   text-transform: uppercase;
+  letter-spacing: 0.6px;
 }
 
 .lunchdrop-movement .lunchdrop-text {
@@ -1812,6 +1826,7 @@ html, body {
 .lunchdrop-movement .lunchdrop-highlight {
   color: #ffd700;
   font-weight: 600;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.15);
 }
 
 .lunchdrop-movement .lunchdrop-columns {
@@ -1821,14 +1836,18 @@ html, body {
   margin-top: 26px;
   margin-bottom: 26px;
   align-items: stretch;
+  grid-auto-rows: 1fr;
 }
 
 .lunchdrop-movement .lunchdrop-card {
-  background: #080808;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background: linear-gradient(180deg, #0b0b0b, #090909);
   border-radius: 14px;
   padding: 16px 16px 18px;
   border: 1px solid #262626;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
 }
 
 .lunchdrop-movement .lunchdrop-card-title {
@@ -1850,6 +1869,23 @@ html, body {
   gap: 12px;
   margin-top: 10px;
   margin-bottom: 16px;
+  justify-content: center;
+}
+
+/* Button refinements scoped to movement section to avoid global overrides */
+.lunchdrop-movement .btn-ghost {
+  border: 1px solid #444;
+  color: #f5f5f5;
+}
+.lunchdrop-movement .btn-ghost:hover {
+  border-color: #ffd700;
+}
+.lunchdrop-movement .btn-outline {
+  border: 1px solid #ffd700;
+  color: #ffd700;
+}
+.lunchdrop-movement .btn-outline:hover {
+  background: rgba(255, 215, 0, 0.08);
 }
 
 .lunchdrop-movement .lunchdrop-tagline-row {
