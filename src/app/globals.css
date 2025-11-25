@@ -1919,7 +1919,7 @@ html, body {
 }
 
 .lunchdrop-learn-link {
-  font-size: 14px;
+  font-size: 15px;
   color: #b3b3b3;
   margin-top: 4px;
 }
@@ -1937,7 +1937,7 @@ html, body {
 /* Lunch Drop learn link – CTA refinement (appended only) */
 .lunchdrop-learn-link {
   margin-top: 6px;
-  font-size: 13px;
+  font-size: 15px;
   color: #ffd700;
   text-align: left;
 }
