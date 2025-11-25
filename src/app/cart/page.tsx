@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useCart } from "../../lib/context/CartContext";
@@ -25,9 +25,6 @@ function CartContent() {
   const [customerName, setCustomerName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [workplaces, setWorkplaces] = useState<{ workplaceName: string; shifts: string[] }[]>([]);
-  const [workplaceName, setWorkplaceName] = useState("");
-  const [workplaceShift, setWorkplaceShift] = useState("");
   const [promoCode, setPromoCode] = useState("");
   const [promoError, setPromoError] = useState<string | null>(null);
   const { shouldPrompt, summary, accept, decline } = useOrderResumePrompt();
@@ -78,36 +75,6 @@ function CartContent() {
   const tax = useMemo(() => subtotal * 0.0825, [subtotal]);
   const total = useMemo(() => subtotal + tax, [subtotal, tax]);
   const isUnderMinimum = total < 0.5;
-
-  // Load workplaces when in-app payment panel is opened
-  useEffect(() => {
-    if (!showInAppPayment) return;
-    (async () => {
-      try {
-        const res = await safeFetch("/api/workplace-signup?aggregate=true&limit=200");
-        const j = await res.json();
-        if (Array.isArray(j?.workplaces)) {
-          setWorkplaces(j.workplaces);
-        }
-      } catch {
-        setWorkplaces([]);
-      }
-    })();
-  }, [showInAppPayment]);
-
-  const selectedWorkplace = useMemo(() => {
-    return workplaces.find(w => w.workplaceName === workplaceName) || null;
-  }, [workplaces, workplaceName]);
-
-  useEffect(() => {
-    if (!selectedWorkplace) {
-      setWorkplaceShift("");
-    } else if (selectedWorkplace && selectedWorkplace.shifts.length > 0) {
-      if (!selectedWorkplace.shifts.includes(workplaceShift)) {
-        setWorkplaceShift("");
-      }
-    }
-  }, [selectedWorkplace]);
 
   async function proceedToCheckout() {
     setLoading(true);
@@ -420,42 +387,6 @@ function CartContent() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Workplace</label>
-                <select
-                  value={workplaceName}
-                  onChange={(e) => setWorkplaceName(e.target.value)}
-                  className="w-full px-3 py-2 bg-[#111111] border border-gray-700 rounded-lg text-white focus:border-[#FFD700] focus:outline-none"
-                >
-                  <option value="">Select your workplace</option>
-                  {workplaces.map(w => (
-                    <option key={w.workplaceName} value={w.workplaceName}>{w.workplaceName}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Shift</label>
-                <select
-                  value={workplaceShift}
-                  onChange={(e) => setWorkplaceShift(e.target.value)}
-                  disabled={!selectedWorkplace || selectedWorkplace.shifts.length === 0}
-                  className="w-full px-3 py-2 bg-[#111111] border border-gray-700 rounded-lg text-white focus:border-[#FFD700] focus:outline-none disabled:opacity-60"
-                >
-                  <option value="">{!selectedWorkplace ? "Select a workplace first" : "Select a shift"}</option>
-                  {selectedWorkplace?.shifts.map(s => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {(!workplaceName || !["1st","2nd","3rd"].includes(workplaceShift)) && (
-              <div className="mb-4 p-3 bg-yellow-900/20 border border-yellow-600 rounded-lg text-yellow-400 text-sm">
-                Select your workplace and an available shift to enable payment.
-              </div>
-            )}
-
             <StripePaymentForm
               amount={total}
               onPaymentSuccess={() => {
@@ -465,13 +396,10 @@ function CartContent() {
               onPaymentError={(msg) => {
                 alert(msg || "Payment failed");
               }}
-              disabled={!workplaceName || !["1st","2nd","3rd"].includes(workplaceShift)}
               orderMetadata={{
                 customerName: (customerName || "").trim(),
                 phone: (phone || "").trim(),
                 email: (email || "").trim(),
-                workplaceName: (workplaceName || "").trim(),
-                workplaceShift: workplaceShift,
               }}
             />
           </div>
