@@ -267,7 +267,7 @@ function CartContent() {
                   <span>${tax.toFixed(2)}</span>
                 </div>
 
-                {!isAuthenticated ? (
+                {/* {!isAuthenticated ? (
                   <div className="pt-4 border-t border-[#333333]">
                     <div className="bg-[#111111] p-4 rounded-lg">
                       <div className="flex items-center gap-3 mb-2">
@@ -307,7 +307,7 @@ function CartContent() {
                     </div>
                     {promoError && <p className="text-blood-red text-sm mt-1">{promoError}</p>}
                   </form>
-                )}
+                )} */}
 
                 <div className="flex justify-between pt-4 border-t border-[#333333] font-bold">
                   <span>Total</span>
