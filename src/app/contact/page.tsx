@@ -216,21 +216,6 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Map Section */}
-      <section className="py-12 bg-[#111111]">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-8 text-center">Our Locations</h2>
-          <div className="h-[500px] rounded-lg overflow-hidden">
-            <ContactMap locations={locationData} />
-          </div>
-          <div className="mt-8 text-center">
-            <Link href="/locations" className="btn-outline inline-flex items-center gap-2">
-              View All Locations
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* FAQ Section */}
       <section className="py-16">
         <div className="container mx-auto px-4">
