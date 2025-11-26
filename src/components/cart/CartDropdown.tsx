@@ -148,13 +148,6 @@ const CartDropdown: React.FC = () => {
                     >
                       View Cart
                     </Link>
-                    <Link
-                      href="/checkout"
-                      className="btn-primary block text-center w-full"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Lunch Drop - Individual
-                    </Link>
                   </div>
                 </div>
               </>
