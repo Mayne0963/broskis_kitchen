@@ -1979,3 +1979,45 @@ html, body {
 .lunchorder-checkout-btn { min-width: 220px; }
 @media (max-width: 900px) { .lunchorder-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 640px) { .lunchorder-grid { grid-template-columns: 1fr; } .lunchorder-summary { flex-direction: column; align-items: flex-start; } }
+
+/* Hero slogan kicker */
+.hero-kicker {
+  font-size: 11px;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+  color: #ffd700;
+  font-weight: 400;
+  margin-bottom: 6px;
+  opacity: 0.9;
+}
+
+/* Optional: tighten hero typography if needed */
+.hero-title {
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+
+.hero-subtitle {
+  margin-top: 0;
+  margin-bottom: 4px;
+}
+
+/* Add a bit more breathing room below hero block before next section */
+.hero,
+.hero-content {
+  margin-bottom: 32px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .hero-kicker {
+    font-size: 10px;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+
+  .hero,
+  .hero-content {
+    margin-bottom: 24px;
+  }
+}
