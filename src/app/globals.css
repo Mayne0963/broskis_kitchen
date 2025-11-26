@@ -1771,11 +1771,12 @@ html, body {
 
 /* Lunch Drop Movement styles (scoped to prevent conflicts with existing Lunch Drop section) */
 .lunchdrop-movement {
-  position: relative;
-  padding: 60px 20px;
-  background: radial-gradient(80% 120% at 10% 0%, rgba(255, 215, 0, 0.10), rgba(5, 5, 5, 1) 60%);
-  border-top: 1px solid #222;
-  border-bottom: 1px solid #222;
+  padding: 56px 20px 52px;
+  background: radial-gradient(circle at top center, rgba(255, 215, 0, 0.16), #050505);
+  border-top: 1px solid #222222;
+  border-bottom: 1px solid #1a1a1a;
+  margin-top: 12px;
+  margin-bottom: 0;
 }
 
 .lunchdrop-movement::before {
@@ -1808,7 +1809,8 @@ html, body {
   font-size: 32px;
   line-height: 1.2;
   font-weight: 800;
-  margin-bottom: 14px;
+  margin-top: 6px;
+  margin-bottom: 10px;
   color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 0.6px;
@@ -2018,5 +2020,58 @@ html, body {
   .hero,
   .hero-content {
     margin-bottom: 24px;
+  }
+}
+
+/* Welcome Broski's section styling to tighten flow after Lunch Drop */
+.welcome-broskis {
+  padding: 38px 20px 52px;
+  max-width: 1120px;
+  margin: 0 auto;
+  text-align: center;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.0) 0%,
+    rgba(0, 0, 0, 0.65) 24%,
+    #050505 60%
+  );
+}
+
+.welcome-broskis h2 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #ffd700;
+  margin-bottom: 10px;
+}
+
+.welcome-broskis p {
+  font-size: 14px;
+  color: #dadada;
+  max-width: 720px;
+  margin: 0 auto 16px;
+}
+
+.welcome-broskis .btn-primary {
+  margin-bottom: 22px;
+}
+
+.welcome-broskis .experience-grid {
+  margin-top: 10px;
+}
+
+/* Mobile refinement */
+@media (max-width: 768px) {
+  .welcome-broskis {
+    padding: 28px 16px 44px;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.0) 0%,
+      rgba(0, 0, 0, 0.65) 32%,
+      #050505 70%
+    );
+  }
+
+  .welcome-broskis h2 {
+    font-size: 22px;
   }
 }
