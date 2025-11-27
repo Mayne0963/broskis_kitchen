@@ -2084,7 +2084,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-image: url("/images/Broskis-New-Hero.webp");
+  background-image: url("/images/HomePageHeroImage.webp");
   background-size: cover;
   background-position: center;
 }
