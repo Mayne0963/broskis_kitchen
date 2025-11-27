@@ -44,9 +44,9 @@ function Page() {
   return (
     <MobileEnhancer enableSwipeGestures={true} enableTouchOptimizations={true}>
       <div className="min-h-screen bg-black text-white">
-      {/* Hero Section - Fullscreen */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
-        {/* OTW Delivery Button - Top Right Corner */}
+      {/* Hero Section - Combined */}
+      <section className="hero hero-combined">
+        {/* OTW Delivery Button - Top Right Corner (preserved) */}
         <div className="absolute top-6 right-6 z-20">
           <a 
             href="https://otw-chi.vercel.app" 
@@ -66,107 +66,28 @@ function Page() {
             <span className="text-base font-extrabold tracking-wide">OTW DELIVERY</span>
           </a>
         </div>
-        <div className="relative z-10 text-center px-4 sm:px-6 lg:px-6 max-w-6xl mx-auto flex flex-col items-center justify-start pt-8 w-full">
-          {/* Content after hero */}
-          <motion.div 
-            className="mb-8 flex justify-center"
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: "easeOut" }}
-          >
-            <Image
-              src="/images/broskis-gold-logo.png"
-              alt="Broski's Kitchen Official Gold Logo"
-              width={400}
-              height={200}
-              className="mx-auto drop-shadow-2xl max-w-full h-auto"
-              priority
-              sizes="(max-width: 768px) 300px, 400px"
-              style={{ display: 'block' }}
-              quality={90}
-            />
-          </motion.div>
+        <div className="hero-overlay"></div>
+        <div className="hero-inner">
+          <img src="/images/broskis-gold-logo.png" alt="" className="hero-crest" />
 
-          {/* Tagline/Header Stack */}
-          <motion.div 
-            className="mb-8 space-y-4"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
-          >
-            <p className="hero-kicker">THE PEOPLE’S RESTAURANT</p>
-            {/* HOME OF THE AWARD-WINNING - Gold, Serif, ALL CAPS */}
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-[var(--color-harvest-gold)] uppercase tracking-wide leading-tight" style={{ fontFamily: 'var(--font-playfair), serif', color: '#FFD700' }}>
-              HOME OF THE AWARD-WINNING
-            </h1>
-             
-            {/* BROSKI WINGS - Larger, Gold, Bold Serif, ALL CAPS */}
-            <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-[var(--color-harvest-gold)] uppercase tracking-tight leading-none" style={{ fontFamily: 'var(--font-playfair), serif', color: '#FFD700' }}>
-              BROSKI WINGS
-            </h2>
-             
-            {/* CAUSE IT'S BADAZZ - Red, All Caps, smaller */}
-            <motion.p 
-              className="text-xl md:text-2xl lg:text-3xl font-bold text-[var(--color-burgundy)] uppercase tracking-wide"
-              style={{ color: '#B22222' }}
-              animate={{ 
-                textShadow: [
-                  "0 0 5px #B22222, 0 0 10px #B22222, 0 0 15px #B22222",
-                  "0 0 10px #B22222, 0 0 20px #B22222, 0 0 30px #B22222",
-                  "0 0 5px #B22222, 0 0 10px #B22222, 0 0 15px #B22222"
-                ]
-              }}
-              transition={{ 
-                duration: 2, 
-                repeat: Infinity, 
-                repeatType: "reverse",
-                ease: "easeInOut"
-              }}
-            >
-              CAUSE IT&apos;S BADAZZ
-            </motion.p>
-          </motion.div>
+          <p className="hero-kicker">THE PEOPLE'S RESTAURANT</p>
 
-          {/* Order Now Button - Rounded Rectangle, Crimson Red */}
-          <motion.div 
-            className="mb-16 flex justify-center"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.9, ease: "easeOut" }}
-          >
-            <Link href="/menu" aria-label="Order Now Button for Boosie Wings">
-              <TouchButton 
-                size={isMobile ? 'lg' : 'md'}
-                variant="primary"
-                className="broski-otw-gold-button text-xl"
-                hapticFeedback={true}
-              >
-                Order Now
-              </TouchButton>
-            </Link>
-          </motion.div>
+          <h1 className="hero-title">WELCOME TO BROSKI'S KITCHEN</h1>
 
-          {/* Wings Centerpiece - Ultra-realistic wings spread across width */}
-          <motion.div 
-            className="mb-4 w-full overflow-hidden flex justify-center"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
-          >
-            <div className="relative w-full max-w-6xl">
-              <Image
-                src="/images/HomePageHeroImage.png"
-                alt="Ultra-realistic Boosie Wings spread across black surface"
-                width={2400}
-                height={900}
-                className="w-full h-auto object-cover shadow-2xl rounded-lg"
-                priority
-                sizes="100vw"
-                style={{ display: 'block', maxWidth: '100%', height: 'auto' }}
-                quality={85}
-              />
-            </div>
-          </motion.div>
+          <p className="hero-brandline">
+            Luxury Street Gourmet – where culinary culture meets legacy flavor.
+            From our Boosie Wings to Infused Broski Dust Fries, every plate is
+            served with soul and sauce.
+          </p>
+
+          <p className="hero-subtitle">HOME OF THE AWARD-WINNING BROSKI WINGS</p>
+
+          <p className="hero-tagline">CAUSE IT'S BADAZZ</p>
+
+          <div className="hero-cta-row">
+            <a href="/menu" className="btn-primary">Order Now</a>
+            <a href="/menu" className="btn-outline">Explore Our Menu</a>
+          </div>
         </div>
       </section>
 
@@ -288,51 +209,7 @@ function Page() {
         </div>
       </nav>
 
-      {/* Welcome Block - Below Hero */}
-      <section className="py-20 bg-black relative overflow-hidden">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            {/* Header: WELCOME TO BROSKI'S KITCHEN - Gold, Serif, ALL CAPS, centered */}
-            <motion.h2 
-             className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-[#FFD700] uppercase text-center mb-8"
-             initial={{ opacity: 0, y: 30 }}
-             whileInView={{ opacity: 1, y: 0 }}
-             transition={{ duration: 0.8 }}
-             viewport={{ once: true }}
-           >
-             WELCOME TO BROSKI&apos;S KITCHEN
-           </motion.h2>
-            
-            {/* Subtext: White text with max width readability */}
-            <motion.p 
-              className="text-xl text-white max-w-2xl mx-auto leading-relaxed mb-8" 
-              style={{ maxWidth: '65ch' }}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-              viewport={{ once: true }}
-            >
-              Luxury Street Gourmet – where culinary culture meets legacy flavor. From our Boosie Wings to Infused Broski Dust Fries, every plate is served with soul and sauce.
-            </motion.p>
-            
-            {/* CTA Button: Explore Our Menu - Crimson red with white text */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-              viewport={{ once: true }}
-            >
-              <Link 
-                href="/menu" 
-                className="inline-block bg-[#FFD700] hover:bg-[#E6C200] text-black font-bold py-4 px-12 text-xl rounded-lg shadow-2xl transform hover:scale-105 hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] transition-all duration-300 border-2 border-[#FFD700] hover:border-[#E6C200]"
-                aria-label="Explore Our Menu Button"
-              >
-                Explore Our Menu
-              </Link>
-            </motion.div>
-          </div>
-        </div>
-      </section>
+      {/* (Removed duplicate welcome content to keep a single unified hero) */}
 
       {/* Features Section */}
       <section className="py-20 bg-[#0A0A0A] relative overflow-hidden">

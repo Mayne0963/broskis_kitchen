@@ -2075,3 +2075,64 @@ html, body {
     font-size: 22px;
   }
 }
+
+/* Combined Hero */
+.hero-combined {
+  position: relative;
+  min-height: 90vh;
+  padding: 80px 20px 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url("/images/Broskis-New-Hero.webp");
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(0,0,0,0.2), rgba(0,0,0,0.95)),
+              linear-gradient(to bottom, rgba(0,0,0,0.8), #050505);
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 720px;
+  text-align: center;
+}
+
+.hero-crest { width: 140px; margin: 0 auto 18px; }
+
+.hero-kicker {
+  font-size: 11px; letter-spacing: 2.4px; color: #ffd700; opacity: .9;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+
+.hero-title {
+  font-size: 34px; font-weight: 800; color: #fff; margin-bottom: 10px;
+}
+
+.hero-brandline {
+  font-size: 14px; color: #dedede; margin: 0 auto 16px; max-width: 660px;
+}
+
+.hero-subtitle {
+  font-size: 16px; font-weight: 700; color: #ffd700; margin-bottom: 4px;
+}
+
+.hero-tagline {
+  font-size: 14px; font-weight: 700; color: #ff3b3b;
+  text-transform: uppercase; margin-bottom: 20px;
+}
+
+.hero-cta-row {
+  display: inline-flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+}
+
+@media (max-width:768px){
+  .hero-combined{min-height:80vh;padding:70px 16px 40px;}
+  .hero-title{font-size:26px;}
+  .hero-brandline{font-size:13px;}
+}
