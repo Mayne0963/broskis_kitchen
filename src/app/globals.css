@@ -2107,7 +2107,20 @@ html, body {
   padding-top: 48px;
 }
 
-.hero-crest { width: 140px; max-width: 40vw; margin: -50px auto 24px; }
+.hero-crest {
+  position: relative;
+  z-index: 3;
+  margin-top: -32px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
+}
+.hero-crest img,
+.hero-crest svg {
+  width: 140px;
+  max-width: 40vw;
+  filter: brightness(1.25) drop-shadow(0 0 10px rgba(0, 0, 0, 0.6));
+}
 @media (min-width: 1024px) {
   .hero-crest { margin-top: -60px; }
 }
@@ -2118,7 +2131,7 @@ html, body {
 }
 
 .hero-title {
-  font-size: 34px; font-weight: 800; color: #fff; margin-bottom: 10px;
+  font-size: 34px; font-weight: 800; color: #fff; margin-top: 0; margin-bottom: 10px;
 }
 
 .hero-brandline {
@@ -2170,4 +2183,34 @@ html, body {
 }
 .text-btn-navbar:hover {
   color: #FFF8DC;
+}
+
+/* Keep nav items vertically centered */
+.navbar,
+.nav-right,
+.navbar-actions {
+  display: flex;
+  align-items: center;
+}
+
+/* Featured Lunch Drop button in nav */
+.btn-nav-lunchdrop {
+  background: linear-gradient(135deg, #ffd700, #ffb300);
+  color: #111111;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 8px 22px;
+  line-height: 1.2;
+  margin-top: 0;
+  margin-bottom: 0;
+  border: none;
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.4);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.btn-nav-lunchdrop:hover {
+  background: linear-gradient(135deg, #ffe766, #ffc533);
+  color: #111111;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+  transform: translateY(-1px);
 }
