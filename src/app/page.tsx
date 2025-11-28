@@ -176,41 +176,6 @@ function Page() {
         </div>
       </section>
 
-      {/* Removed duplicate Broski's Lunch Drop strip; content merged into lunchdrop-movement */}
-
-      {/* Navigation Bar - Below Hero Section */}
-      <nav className="bg-black border-b-2 border-[#FFD700] py-4">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-center items-center space-x-8 overflow-x-auto">
-            <Link href="/menu" className="text-white hover:text-[#FFD700] hover:border-b-2 hover:border-[#FFD700] transition-all duration-300 font-medium whitespace-nowrap px-2 py-1">
-              Menu
-            </Link>
-            <span className="text-[#FFD700]">|</span>
-            <Link href="/locations" className="text-white hover:text-[#FFD700] hover:border-b-2 hover:border-[#FFD700] transition-all duration-300 font-medium whitespace-nowrap px-2 py-1">
-              Locations
-            </Link>
-            <span className="text-[#FFD700]">|</span>
-            <Link href="/events" className="text-white hover:text-[#FFD700] hover:border-b-2 hover:border-[#FFD700] transition-all duration-300 font-medium whitespace-nowrap px-2 py-1">
-              Events
-            </Link>
-            <span className="text-[#FFD700]">|</span>
-            <Link href="/rewards" className="text-white hover:text-[#FFD700] hover:border-b-2 hover:border-[#FFD700] transition-all duration-300 font-medium whitespace-nowrap px-2 py-1">
-              Rewards
-            </Link>
-            <span className="text-[#FFD700]">|</span>
-            <Link href="/shop" className="text-white hover:text-[#FFD700] hover:border-b-2 hover:border-[#FFD700] transition-all duration-300 font-medium whitespace-nowrap px-2 py-1">
-              Shop
-            </Link>
-            <span className="text-[#FFD700]">|</span>
-            <Link href="/contact" className="text-white hover:text-[#FFD700] hover:border-b-2 hover:border-[#FFD700] transition-all duration-300 font-medium whitespace-nowrap px-2 py-1">
-              Contact
-            </Link>
-          </div>
-        </div>
-      </nav>
-
-      {/* (Removed duplicate welcome content to keep a single unified hero) */}
-
       {/* Features Section */}
       <section className="py-20 bg-[#0A0A0A] relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#FFD700]/5 via-transparent to-black/10 opacity-50"></div>
