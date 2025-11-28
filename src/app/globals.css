@@ -2082,10 +2082,10 @@ html, body {
   min-height: 80vh;
   padding: 72px 20px 56px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   background-image: url("/images/HomePageHeroImage.webp");
-  background-size: 80% auto;
+  background-size: 65% auto;
   background-position: center bottom;
   background-repeat: no-repeat;
   background-color: #050505;
@@ -2104,10 +2104,10 @@ html, body {
   max-width: 720px;
   text-align: center;
   margin: 0 auto;
-  padding-top: 12px;
+  padding-top: 0;
 }
 
-.hero-crest { width: 140px; max-width: 40vw; margin: -10px auto 18px; }
+.hero-crest { width: 140px; max-width: 40vw; margin: -30px auto 24px; }
 
 .hero-kicker {
   font-size: 11px; letter-spacing: 2.4px; color: #ffd700; opacity: .9;
@@ -2136,7 +2136,7 @@ html, body {
 }
 
 @media (max-width:768px){
-  .hero-combined{min-height:80vh;padding:64px 16px 40px;background-size:115% auto;background-position:center bottom;}
+  .hero-combined{min-height:80vh;padding:64px 16px 40px;background-size:70% auto;background-position:center bottom;}
   .hero-title{font-size:26px;}
   .hero-brandline{font-size:13px;}
 }

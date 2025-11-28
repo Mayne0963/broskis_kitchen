@@ -122,7 +122,7 @@ const Navbar: React.FC = () => {
               <Button asChild variant="primary">
                 <Link href="/lunch-drop" className="broski-otw-gold-button">
                   <Image 
-                    src="/images/otw-logo.png"
+                    src="/otw-logo.png"
                     alt="Lunch Drop" 
                     width={28}
                     height={28} 
