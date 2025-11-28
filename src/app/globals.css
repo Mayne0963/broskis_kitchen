@@ -643,7 +643,7 @@ main {
   /* Navigation Styles - Regal Gold Gradient */
   .nav-link {
     @apply relative;
-    @apply px-4;
+    @apply px-5;
     @apply py-2;
     color: #BFB8A5;
     @apply transition-all;
@@ -2082,7 +2082,7 @@ html, body {
   min-height: 80vh;
   padding: 72px 20px 56px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   background-image: url("/images/HomePageHeroImage.webp");
   background-size: 65% auto;
@@ -2104,7 +2104,7 @@ html, body {
   max-width: 720px;
   text-align: center;
   margin: 0 auto;
-  padding-top: 0;
+  padding-top: 48px;
 }
 
 .hero-crest { width: 140px; max-width: 40vw; margin: -30px auto 24px; }
@@ -2139,6 +2139,7 @@ html, body {
   .hero-combined{min-height:80vh;padding:64px 16px 40px;background-size:70% auto;background-position:center bottom;}
   .hero-title{font-size:26px;}
   .hero-brandline{font-size:13px;}
+  .hero-inner{padding-top: 32px;}
 }
 
 /* Navbar brand text */

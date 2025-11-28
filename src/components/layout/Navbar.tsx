@@ -87,7 +87,7 @@ const Navbar: React.FC = () => {
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
             {/* LEFT: logo */}
-            <div className="min-w-[140px] flex items-center gap-3">
+            <div className="min-w-[140px] flex items-center gap-4">
               <Link href="/" className="flex items-center gap-2">
                 <Image 
                   src="/images/broskis-gold-logo.png"
@@ -102,7 +102,7 @@ const Navbar: React.FC = () => {
 
             {/* CENTER: main nav — perfectly centered */}
             <nav className="absolute left-1/2 -translate-x-1/2 hidden md:flex">
-              <ul className="flex items-center gap-6">
+              <ul className="flex items-center gap-8">
                 {NAV.map((item) => (
                   <li key={item.href}>
                     <Link 
@@ -117,16 +117,10 @@ const Navbar: React.FC = () => {
             </nav>
 
             {/* RIGHT: actions (OTW + Login) */}
-            <div className="min-w-[140px] flex items-center gap-2 justify-end">
+            <div className="min-w-[140px] flex items-center gap-4 justify-end">
               {/* Lunch Drop button (renamed from OTW) */}
               <Button asChild variant="primary">
                 <Link href="/lunch-drop" className="broski-otw-gold-button">
-                  <Image 
-                    src="/otw-logo.png"
-                    alt="Lunch Drop" 
-                    width={28}
-                    height={28} 
-                  />
                   <span className="text-sm font-extrabold tracking-wide">Lunch Drop</span>
                 </Link>
               </Button>
