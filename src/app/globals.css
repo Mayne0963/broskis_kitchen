@@ -2174,18 +2174,6 @@ html, body {
   }
 }
 
-/* Make sure overlay does NOT cover logo */
-.hero-section::after,
-.hero-overlay {
-  z-index: 5 !important; /* stays behind logo */
-}
-
-/* Ensure logo itself stays crisp */
-.hero-logo img {
-  position: relative;
-  z-index: 12 !important;
-}
-
 @media (max-width:768px){
   .hero-combined{min-height:80vh;padding:64px 16px 40px;background-size:70% auto;background-position:center bottom;}
   .hero-title{font-size:26px;}
