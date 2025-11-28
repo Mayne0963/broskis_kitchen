@@ -2175,13 +2175,17 @@ html, body {
 }
 
 /* Navbar text preset: exact same color scheme as btn-primary */
-.text-btn-navbar,
-.text-btn-navbar:link,
+.text-btn-navbar {
+  color: linear-gradient(135deg, #D2BA6A 0%, #E6C875 100%);
+}
+.text-btn-navbar:link {
+  color: linear-gradient(135deg, #D2BA6A 0%, #E6C875 100%);
+}
 .text-btn-navbar:visited {
-  color: #000000;
+  color: linear-gradient(135deg, #D2BA6A 0%, #E6C875 100%);
 }
 .text-btn-navbar:hover {
-  color: #FFF8DC;
+  color: linear-gradient(135deg, #D2BA6A 0%, #E6C875 100%);
 }
 
 /* Keep nav items vertically centered */
