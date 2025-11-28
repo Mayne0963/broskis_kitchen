@@ -2152,7 +2152,6 @@ html, body {
 
 /* Push logo upward & bring above overlay */
 .hero-logo {
-  position: relative;
   margin-top: -8rem; /* pushes upwards */
   margin-bottom: 3rem; /* spacing before text */
 }
