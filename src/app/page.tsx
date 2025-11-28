@@ -87,7 +87,7 @@ function Page() {
           <div className="hero-cta-row">
             <a href="/menu" className="btn-primary">Order Now</a>
             <a href="/menu" className="btn-outline">Explore Our Menu</a>
-            <a href="/lunch-drop" className="btn-outline btn-lunchdrop">Lunch Drop</a>
+            <a href="/lunch-drop" className="btn-primary">Lunch Drop</a>
           </div>
         </div>
       </section>
