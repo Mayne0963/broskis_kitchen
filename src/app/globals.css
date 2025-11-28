@@ -643,7 +643,7 @@ main {
   /* Navigation Styles - Regal Gold Gradient */
   .nav-link {
     @apply relative;
-    @apply px-5;
+    @apply px-4;
     @apply py-2;
     color: #BFB8A5;
     @apply transition-all;
