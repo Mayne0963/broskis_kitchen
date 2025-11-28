@@ -308,7 +308,7 @@ main {
 @layer components {
   /* Button Styles - Regal Gold Gradient */
   .btn-primary {
-    background: linear-gradient(135deg, #D2BA6A 0%, #E6C875 100%);
+    background: linear-gradient( 135deg, #D2BA6A 0%, #E6C875 100%);
     @apply text-black;
     @apply font-bold;
     @apply py-4;
@@ -2119,7 +2119,6 @@ html, body {
 .hero-crest svg {
   width: 140px;
   max-width: 40vw;
-  filter: brightness(1.25) drop-shadow(0 0 10px rgba(0, 0, 0, 0.6));
 }
 @media (min-width: 1024px) {
   .hero-crest { margin-top: -60px; }
