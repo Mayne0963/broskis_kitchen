@@ -46,6 +46,26 @@ function Page() {
       <div className="min-h-screen bg-black text-white">
       {/* Hero Section - Combined */}
       <section className="hero hero-combined">
+        {/* OTW Delivery Button - Top Right Corner (preserved) */}
+        <div className="absolute top-6 right-6 z-20">
+          <a 
+            href="https://otw-chi.vercel.app" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="broski-otw-gold-button"
+          >
+            <Image 
+              src="/otw-logo.png" 
+              alt="OTW Logo" 
+              width={36} 
+              height={18} 
+              className="filter brightness-110"
+              priority
+              quality={95}
+            />
+            <span className="text-base font-extrabold tracking-wide">OTW DELIVERY</span>
+          </a>
+        </div>
         <div className="hero-overlay"></div>
         <div className="hero-inner">
           <img src="/images/broskis-gold-logo.png" alt="" className="hero-crest" />
