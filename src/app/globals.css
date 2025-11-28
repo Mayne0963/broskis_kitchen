@@ -2150,27 +2150,40 @@ html, body {
   display: inline-flex; gap: 10px; flex-wrap: wrap; justify-content: center;
 }
 
-/* Hero logo positioning — premium centered spacing */
+/* Push logo upward & bring above overlay */
 .hero-logo {
-  margin-bottom: 2.5rem;
-  margin-top: -4rem;
-  transform: translateY(-20px);
+  position: relative;
+  z-index: 12 !important; /* ensures logo sits above overlay */
+  margin-top: -8rem; /* pushes upwards */
+  margin-bottom: 3rem; /* spacing before text */
 }
 
+/* Reduce offset on tablets */
 @media (max-width: 1024px) {
   .hero-logo {
-    margin-bottom: 2rem;
-    margin-top: -2.5rem;
-    transform: translateY(-10px);
+    margin-top: -5rem;
+    margin-bottom: 2.5rem;
   }
 }
 
+/* Reduce further on mobile */
 @media (max-width: 600px) {
   .hero-logo {
-    margin-bottom: 1.5rem;
-    margin-top: -1.5rem;
-    transform: translateY(-6px);
+    margin-top: -3rem;
+    margin-bottom: 2rem;
   }
+}
+
+/* Make sure overlay does NOT cover logo */
+.hero-section::after,
+.hero-overlay {
+  z-index: 5 !important; /* stays behind logo */
+}
+
+/* Ensure logo itself stays crisp */
+.hero-logo img {
+  position: relative;
+  z-index: 12 !important;
 }
 
 @media (max-width:768px){
