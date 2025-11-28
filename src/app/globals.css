@@ -2156,6 +2156,7 @@ html, body {
   z-index: 12 !important; /* ensures logo sits above overlay */
   margin-top: -8rem; /* pushes upwards */
   margin-bottom: 3rem; /* spacing before text */
+  filter: brightness(1.15) contrast(1.1); /* ensures logo pops */
 }
 
 /* Reduce offset on tablets */
