@@ -2107,7 +2107,11 @@ html, body {
   padding-top: 48px;
 }
 
-.hero-crest { width: 140px; max-width: 40vw; margin: -30px auto 24px; }
+.hero-crest { width: 140px; max-width: 40vw; margin: 0 auto 18px; }
+
+/* Move logo upward within hero */
+.hero-logo { margin-top: -40px; }
+@media (min-width: 1024px) { .hero-logo { margin-top: -60px; } }
 
 .hero-kicker {
   font-size: 11px; letter-spacing: 2.4px; color: #ffd700; opacity: .9;
