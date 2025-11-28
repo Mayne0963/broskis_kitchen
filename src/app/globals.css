@@ -2150,6 +2150,29 @@ html, body {
   display: inline-flex; gap: 10px; flex-wrap: wrap; justify-content: center;
 }
 
+/* Hero logo positioning — premium centered spacing */
+.hero-logo {
+  margin-bottom: 2.5rem;
+  margin-top: -4rem;
+  transform: translateY(-20px);
+}
+
+@media (max-width: 1024px) {
+  .hero-logo {
+    margin-bottom: 2rem;
+    margin-top: -2.5rem;
+    transform: translateY(-10px);
+  }
+}
+
+@media (max-width: 600px) {
+  .hero-logo {
+    margin-bottom: 1.5rem;
+    margin-top: -1.5rem;
+    transform: translateY(-6px);
+  }
+}
+
 @media (max-width:768px){
   .hero-combined{min-height:80vh;padding:64px 16px 40px;background-size:70% auto;background-position:center bottom;}
   .hero-title{font-size:26px;}
