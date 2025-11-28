@@ -2079,14 +2079,16 @@ html, body {
 /* Combined Hero */
 .hero-combined {
   position: relative;
-  min-height: 90vh;
-  padding: 80px 20px 60px;
+  min-height: 80vh;
+  padding: 72px 20px 56px;
   display: flex;
   align-items: center;
   justify-content: center;
   background-image: url("/images/HomePageHeroImage.webp");
-  background-size: cover;
-  background-position: center;
+  background-size: 80% auto;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-color: #050505;
 }
 
 .hero-overlay {
@@ -2101,9 +2103,11 @@ html, body {
   z-index: 2;
   max-width: 720px;
   text-align: center;
+  margin: 0 auto;
+  padding-top: 12px;
 }
 
-.hero-crest { width: 140px; margin: 0 auto 18px; }
+.hero-crest { width: 140px; max-width: 40vw; margin: -10px auto 18px; }
 
 .hero-kicker {
   font-size: 11px; letter-spacing: 2.4px; color: #ffd700; opacity: .9;
@@ -2132,7 +2136,14 @@ html, body {
 }
 
 @media (max-width:768px){
-  .hero-combined{min-height:80vh;padding:70px 16px 40px;}
+  .hero-combined{min-height:80vh;padding:64px 16px 40px;background-size:115% auto;background-position:center bottom;}
   .hero-title{font-size:26px;}
   .hero-brandline{font-size:13px;}
 }
+
+/* Navbar brand text */
+.navbar-brand-text { color: #ffd700; }
+.navbar-brand-text:hover { color: #ffe866; }
+
+/* Lunch Drop hero button tweak */
+.btn-lunchdrop { border-color: #ffd700; }

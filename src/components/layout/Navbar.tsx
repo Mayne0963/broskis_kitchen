@@ -96,7 +96,7 @@ const Navbar: React.FC = () => {
                   height={36} 
                   priority 
                 />
-                <span className="text-2xl font-bold graffiti-text hover:text-white transition-colors duration-300">Broski&apos;s Kitchen</span>
+                <span className="text-2xl font-bold graffiti-text navbar-brand-text hover:text-white transition-colors duration-300">Broski&apos;s Kitchen</span>
               </Link>
             </div>
 
@@ -118,16 +118,16 @@ const Navbar: React.FC = () => {
 
             {/* RIGHT: actions (OTW + Login) */}
             <div className="min-w-[140px] flex items-center gap-2 justify-end">
-              {/* OTW button with larger image */}
+              {/* Lunch Drop button (renamed from OTW) */}
               <Button asChild variant="primary">
-                <Link href="https://otw-chi.vercel.app" className="broski-otw-gold-button">
+                <Link href="/lunch-drop" className="broski-otw-gold-button">
                   <Image 
                     src="/images/otw-logo.png"
-                    alt="OTW" 
+                    alt="Lunch Drop" 
                     width={28}
                     height={28} 
                   />
-                  <span className="text-sm font-extrabold tracking-wide">OTW</span>
+                  <span className="text-sm font-extrabold tracking-wide">Lunch Drop</span>
                 </Link>
               </Button>
 

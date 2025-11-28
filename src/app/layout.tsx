@@ -158,10 +158,7 @@ export default async function RootLayout({
                   </PageLoadingWrapper>
                   <Footer />
 
-                  {/* Floating Lunch Drop Button - Visible on all pages */}
-                  <a href="/lunch-drop" className="floating-lunch-btn">
-                    JOIN LUNCH DROP
-                  </a>
+                  {/* Removed floating Lunch Drop button; CTA moved into hero */}
 
                   <CookieConsent />
                   <ClientOnly>
