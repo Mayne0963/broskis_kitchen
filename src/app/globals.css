@@ -792,24 +792,7 @@ main {
     @apply z-10;
   }
 
-  .hero-logo {
-    @apply absolute;
-    @apply inset-0;
-    @apply flex;
-    @apply items-center;
-    @apply justify-center;
-    @apply z-20;
-    @apply opacity-25;
-    @apply mt-16;
-    filter: drop-shadow(0 0 20px rgba(183, 152, 90, 0.3));
-  }
-
-  .hero-logo svg {
-    @apply w-96;
-    @apply h-96;
-    @apply max-w-[50vw];
-    @apply max-h-[50vh];
-  }
+  
 
   /* Enhanced hero image styling */
   .hero-image {
@@ -2096,11 +2079,12 @@ html, body {
   inset: 0;
   background: radial-gradient(circle, rgba(0,0,0,0.10), rgba(0,0,0,0.65)),
               linear-gradient(to bottom, rgba(0,0,0,0.40), rgba(5,5,5,0.85));
+  z-index: 1;
 }
 
 .hero-inner {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   max-width: 720px;
   text-align: center;
   margin: 0 auto;
@@ -2109,19 +2093,16 @@ html, body {
 
 .hero-crest {
   position: relative;
-  z-index: 3;
-  margin-top: -32px;
-  margin-bottom: 24px;
+  z-index: 4;
+  margin-top: -96px;   /* pull crest upward */
+  margin-bottom: 32px; /* spacing before WELCOME */
   display: flex;
   justify-content: center;
 }
 .hero-crest img,
 .hero-crest svg {
-  width: 140px;
+  width: 160px;
   max-width: 40vw;
-}
-@media (min-width: 1024px) {
-  .hero-crest { margin-top: -60px; }
 }
 
 .hero-kicker {
@@ -2151,24 +2132,30 @@ html, body {
 }
 
 /* Push logo upward & bring above overlay */
+/* NEW clean hero-logo: spacing only */
 .hero-logo {
-  margin-top: -8rem; /* pushes upwards */
-  margin-bottom: 3rem; /* spacing before text */
+  position: relative;
+  z-index: 5;
+  margin-top: -16px;
 }
 
-/* Reduce offset on tablets */
 @media (max-width: 1024px) {
+  .hero-crest {
+    margin-top: -72px;
+    margin-bottom: 24px;
+  }
   .hero-logo {
-    margin-top: -5rem;
-    margin-bottom: 2.5rem;
+    margin-top: -8px;
   }
 }
 
-/* Reduce further on mobile */
 @media (max-width: 600px) {
+  .hero-crest {
+    margin-top: -56px;
+    margin-bottom: 20px;
+  }
   .hero-logo {
-    margin-top: -3rem;
-    margin-bottom: 2rem;
+    margin-top: -4px;
   }
 }
 
