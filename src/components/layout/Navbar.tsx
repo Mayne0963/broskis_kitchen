@@ -120,7 +120,7 @@ const Navbar: React.FC = () => {
             <div className="min-w-[140px] flex items-center gap-2 justify-end">
               {/* Lunch Drop button (renamed from OTW) */}
               <Button asChild>
-                <Link href="/lunch-drop" className="btn-nav btn-nav-lunchdrop-red">
+                <Link href="/lunch-drop" className="btn-nav btn-nav-lunchdrop-heat">
                   <span className="text-sm font-extrabold tracking-wide">Lunch Drop</span>
                 </Link>
               </Button>

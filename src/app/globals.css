@@ -2248,3 +2248,70 @@ html, body {
     box-shadow: 0 0 6px rgba(193, 39, 45, 0.6), 0 0 12px rgba(193, 39, 45, 0.4), inset 0 0 4px rgba(255, 255, 255, 0.1);
   }
 }
+
+/* NAVBAR — LUNCH DROP HEAT-WAVE BUTTON */
+.btn-nav-lunchdrop-heat {
+  background: #C1272D !important;
+  color: #fff !important;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 8px 26px;
+  border: 2px solid #C1272D;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease-in-out;
+  box-shadow: 0 0 10px rgba(193, 39, 45, 0.75), 0 0 22px rgba(193, 39, 45, 0.4), inset 0 0 6px rgba(255,255,255,0.15);
+}
+
+.btn-nav-lunchdrop-heat::before {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 140%;
+  height: 140%;
+  background: radial-gradient(rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.03), transparent 65%);
+  opacity: 0.22;
+  animation: broski-heatwave 3.8s infinite ease-in-out;
+  pointer-events: none;
+  filter: blur(8px);
+}
+
+.btn-nav-lunchdrop-heat:hover {
+  background: #E2343A !important;
+  border-color: #E2343A !important;
+  transform: scale(1.07);
+  box-shadow: 0 0 14px rgba(226, 52, 58, 0.95), 0 0 28px rgba(226, 52, 58, 0.7), inset 0 0 10px rgba(255,255,255,0.22);
+}
+
+.btn-nav-lunchdrop-heat:hover::before {
+  animation-duration: 2.2s;
+  opacity: 0.30;
+  filter: blur(10px);
+}
+
+@keyframes broski-heatwave {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.15;
+  }
+  25% {
+    transform: scale(1.05) rotate(8deg);
+    opacity: 0.24;
+  }
+  50% {
+    transform: scale(1.12) rotate(15deg);
+    opacity: 0.32;
+  }
+  75% {
+    transform: scale(1.05) rotate(8deg);
+    opacity: 0.25;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.15;
+  }
+}
