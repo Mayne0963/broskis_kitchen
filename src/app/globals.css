@@ -2148,3 +2148,23 @@ html, body {
 
 /* Lunch Drop hero button tweak */
 .btn-lunchdrop { border-color: #ffd700; }
+
+/* Text preset: match btn-primary foreground color */
+.text-btn-primary,
+.text-btn-primary:link,
+.text-btn-primary:visited {
+  color: #000000;
+}
+.text-btn-primary:hover {
+  color: #FFF8DC;
+}
+
+/* Navbar text preset: exact same color scheme as btn-primary */
+.text-btn-navbar,
+.text-btn-navbar:link,
+.text-btn-navbar:visited {
+  color: #000000;
+}
+.text-btn-navbar:hover {
+  color: #FFF8DC;
+}
