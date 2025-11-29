@@ -2181,6 +2181,16 @@ html, body {
 .navbar-brand-text { color: #ffd700; }
 .navbar-brand-text:hover { color: #ffe866; }
 
+/* Navbar text gold like buttons */
+.navbar a,
+.navbar button,
+.navbar span {
+  background: linear-gradient(135deg, #D2BA6A 0%, #E6C875 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* Lunch Drop hero button tweak */
 .btn-lunchdrop { border-color: #ffd700; }
 
