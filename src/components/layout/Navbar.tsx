@@ -28,6 +28,15 @@ const NAV = [
   { href: "/contact", label: "Contact" },
 ]
 
+const brandGradientStyles: React.CSSProperties = {
+  backgroundImage: "linear-gradient(135deg, #D2BA6A 0%, #E6C875 50%, #F0D285 100%)",
+  WebkitBackgroundClip: "text",
+  backgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+  color: "transparent",
+  display: "inline-block",
+}
+
 const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [userDropdownOpen, setUserDropdownOpen] = useState(false)
@@ -96,7 +105,12 @@ const Navbar: React.FC = () => {
                   height={36} 
                   priority 
                 />
-                <span className="text-2xl font-bold navbar-gold-text">Broski&apos;s Kitchen</span>
+                <span 
+                  className="text-2xl font-bold leading-tight navbar-gold-text"
+                  style={brandGradientStyles}
+                >
+                  Broski&apos;s Kitchen
+                </span>
               </Link>
             </div>
 
