@@ -2092,17 +2092,21 @@ html, body {
 }
 
 .hero-crest {
-  position: relative;
-  z-index: 4;
-  margin-top: -96px;   /* pull crest upward */
-  margin-bottom: 32px; /* spacing before WELCOME */
-  display: flex;
-  justify-content: center;
+  @apply relative;
+  @apply flex;
+  @apply items-center;
+  @apply justify-center;
+  @apply z-30;
+  /* push the logo higher in the hero */
+  margin-top: clamp(-4.5rem, -7vh, -3.5rem);
+  /* clean space between crest and the headline */
+  margin-bottom: clamp(1.75rem, 3.25vh, 2.5rem);
+  filter: drop-shadow(0 0 22px rgba(183, 152, 90, 0.65));
+  opacity: 1;
 }
-.hero-crest img,
-.hero-crest svg {
-  width: 160px;
-  max-width: 40vw;
+.hero-crest img {
+  width: auto;
+  height: clamp(110px, 14vh, 165px);
 }
 
 .hero-kicker {
@@ -2134,9 +2138,13 @@ html, body {
 /* Push logo upward & bring above overlay */
 /* NEW clean hero-logo: spacing only */
 .hero-logo {
-  position: relative;
-  z-index: 5;
-  margin-top: -16px;
+  @apply relative;
+  @apply flex;
+  @apply items-center;
+  @apply justify-center;
+  @apply opacity-100;
+  @apply mt-0;
+  filter: drop-shadow(0 0 20px rgba(183, 152, 90, 0.3));
 }
 
 @media (max-width: 1024px) {
