@@ -107,7 +107,7 @@ const Navbar: React.FC = () => {
                   <li key={item.href}>
                     <Link 
                       href={item.href} 
-                      className={`nav-link ${pathname === item.href ? "nav-link-active" : ""}`}
+                      className={`nav-link ${pathname === item.href ? "nav-link-active" : ""} text-btn-navbar`}
                     >
                       {item.label}
                     </Link>
