@@ -2079,12 +2079,12 @@ html, body {
   inset: 0;
   background: radial-gradient(circle, rgba(0,0,0,0.10), rgba(0,0,0,0.65)),
               linear-gradient(to bottom, rgba(0,0,0,0.40), rgba(5,5,5,0.85));
-  z-index: 1;
+  z-index: 20;
 }
 
 .hero-inner {
   position: relative;
-  z-index: 3;
+  z-index: 30;
   max-width: 720px;
   text-align: center;
   margin: 0 auto;
@@ -2096,17 +2096,16 @@ html, body {
   @apply flex;
   @apply items-center;
   @apply justify-center;
-  @apply z-30;
-  /* push the logo higher in the hero */
-  margin-top: clamp(-4.5rem, -7vh, -3.5rem);
-  /* clean space between crest and the headline */
-  margin-bottom: clamp(1.75rem, 3.25vh, 2.5rem);
-  filter: drop-shadow(0 0 22px rgba(183, 152, 90, 0.65));
+  @apply z-40;
+  margin-top: clamp(-9rem, -13vh, -6rem);
+  margin-bottom: clamp(1.75rem, 3vh, 2.5rem);
   opacity: 1;
 }
-.hero-crest img {
-  width: auto;
-  height: clamp(110px, 14vh, 165px);
+
+.hero-crest-img {
+  max-width: clamp(120px, 11vw, 170px);
+  height: auto;
+  filter: drop-shadow(0 0 12px rgba(0, 0, 0, 0.75));
 }
 
 .hero-kicker {

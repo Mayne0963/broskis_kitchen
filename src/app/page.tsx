@@ -69,7 +69,11 @@ function Page() {
         <div className="hero-overlay"></div>
         <div className="hero-inner">
           <div className="hero-crest">
-            <img src="/images/broskis-gold-logo.png" alt="Broski's Kitchen" />
+            <img
+              src="/images/broskis-gold-logo.png"
+              alt="Broski's Kitchen crest"
+              className="hero-crest-img"
+            />
           </div>
 
           <p className="hero-kicker">THE PEOPLE'S RESTAURANT</p>
