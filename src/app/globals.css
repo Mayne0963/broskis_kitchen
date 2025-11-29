@@ -2183,11 +2183,11 @@ html, body {
 
 /* Navbar brand gradient text utility */
 .navbar-gold-text {
-  background: linear-gradient(135deg, #E6C875 0%, #F0D285 100%);
+  background: linear-gradient(135deg, #D2BA6A 0%, #E6C875 50%, #F0D285 100%);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
-  color: transparent;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
 }
 
 /* Navbar text gold like buttons */
