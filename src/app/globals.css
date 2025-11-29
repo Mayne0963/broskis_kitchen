@@ -2097,7 +2097,7 @@ html, body {
   @apply items-center;
   @apply justify-center;
   @apply z-40;
-  margin-top: clamp(-9rem, -13vh, -6rem);
+  margin-top: clamp(-21rem, -33vh, -15rem);
   margin-bottom: clamp(1.75rem, 3vh, 2.5rem);
   opacity: 1;
 }
