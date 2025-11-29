@@ -2091,7 +2091,7 @@ html, body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 70vh;
+  min-height: calc(80vh - 72px - 56px); /* account for hero-combined vertical padding to truly center */
   text-align: center;
 }
 
