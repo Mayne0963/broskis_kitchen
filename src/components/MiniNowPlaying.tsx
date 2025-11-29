@@ -42,9 +42,9 @@ export default function MiniNowPlaying() {
     if (!current) return null;
   
     const translateX = isOpen ? "0" : "calc(-100% + 36px)";
-
+    
     return (
-      <div 
+      <div
         ref={panelRef}
         className="fixed bottom-4 left-0 z-40 text-white"
         style={{ 
