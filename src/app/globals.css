@@ -2181,6 +2181,15 @@ html, body {
 .navbar-brand-text { color: #ffd700; }
 .navbar-brand-text:hover { color: #ffe866; }
 
+/* Navbar brand gradient text utility */
+.navbar-gold-text {
+  background: linear-gradient(135deg, #E6C875 0%, #F0D285 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
 /* Navbar text gold like buttons */
 .navbar a,
 .navbar button,

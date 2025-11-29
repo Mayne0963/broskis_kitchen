@@ -5,6 +5,7 @@ const config = {
   content: [
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/globals.css",
   ],
   safelist: [
     "bg-[#0B0B0B]",
