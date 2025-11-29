@@ -2102,7 +2102,7 @@ html, body {
   @apply justify-center;
   @apply z-40;
   margin-top: clamp(-21rem, -33vh, -15rem);
-  margin-bottom: clamp(21rem, 33vh, 15rem);
+  margin-bottom: clamp(9rem, 13vh, 6rem);
   opacity: 1;
 }
 
