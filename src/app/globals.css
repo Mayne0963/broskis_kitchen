@@ -2101,8 +2101,8 @@ html, body {
   @apply items-center;
   @apply justify-center;
   @apply z-40;
-  margin-top: clamp(-3.5rem, -5vh, -2.5rem);
-  margin-bottom: clamp(1.75rem, 3vh, 2.5rem);
+  margin-top: clamp(-21rem, -33vh, -15rem);
+  margin-bottom: clamp(21rem, 33vh, 15rem);
   opacity: 1;
 }
 
