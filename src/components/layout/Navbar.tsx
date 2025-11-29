@@ -123,7 +123,7 @@ const Navbar: React.FC = () => {
               {/* Lunch Drop button (renamed from OTW) */}
               <Button asChild>
                 <Link href="/lunch-drop" className="btn-primary">
-                  <span className="text-sm font-extrabold tracking-wide text-red-500">Lunch Drop</span>
+                  <span className="text-sm font-extrabold tracking-wide text-red-600">Lunch Drop</span>
                 </Link>
               </Button>
 
