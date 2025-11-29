@@ -2183,11 +2183,15 @@ html, body {
 
 /* Navbar brand gradient text utility */
 .navbar-gold-text {
-  background: linear-gradient(135deg, #D2BA6A 0%, #E6C875 50%, #F0D285 100%);
+  background-image: linear-gradient(120deg, #B7985A 0%, #E6C875 45%, #F8E2A0 100%);
+  background-size: 200% 200%;
+  background-position: 50% 50%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent !important;
   color: transparent !important;
+  display: inline-block;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Navbar text gold like buttons */
@@ -2215,13 +2219,25 @@ html, body {
 
 /* Navbar text preset: exact same color scheme as btn-primary */
 .text-btn-navbar {
-  color: linear-gradient(135deg, #D2BA6A 0%, #E6C875 100%);
+  background: linear-gradient(135deg, #D2BA6A 0%, #E6C875 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 .text-btn-navbar:link {
-  color: linear-gradient(135deg, #D2BA6A 0%, #E6C875 100%);
+  background: linear-gradient(135deg, #D2BA6A 0%, #E6C875 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 .text-btn-navbar:visited {
-  color: linear-gradient(135deg, #D2BA6A 0%, #E6C875 100%);
+  background: linear-gradient(135deg, #D2BA6A 0%, #E6C875 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 .text-btn-navbar:hover {
   color: linear-gradient(135deg, #D2BA6A 0%, #E6C875 100%);
