@@ -2072,7 +2072,7 @@ html, body {
   gap: 0;
   background-image: url("/images/HomePageHeroImage.webp");
   background-size: 65% auto;
-  background-position: center bottom;
+  background-position: center 15%;
   background-repeat: no-repeat;
   background-color: #050505;
 }
@@ -2125,8 +2125,8 @@ html, body {
   @apply items-center;
   @apply justify-center;
   @apply z-40;
-  margin-top: clamp(-21rem, -33vh, -15rem);
-  margin-bottom: clamp(6rem, 9vh, 4rem);
+  margin-top: 0;
+  margin-bottom: clamp(3rem, 6vh, 4.5rem);
   opacity: 1;
 }
 
