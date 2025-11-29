@@ -45,7 +45,7 @@ function Page() {
     <MobileEnhancer enableSwipeGestures={true} enableTouchOptimizations={true}>
       <div className="min-h-screen bg-black text-white">
       {/* Hero Section - Combined */}
-      <section className="hero hero-combined">
+      <section id="hero" className="hero hero-combined relative overflow-hidden">
         {/* OTW Delivery Button - Top Right Corner (preserved) */}
         <div className="absolute top-6 right-6 z-20">
           <a 
@@ -67,7 +67,7 @@ function Page() {
           </a>
         </div>
         <div className="hero-overlay"></div>
-        <div className="hero-content-stack">
+        <div className="hero-content-stack mx-auto max-w-5xl px-4 py-24 text-center space-y-12">
           <div className="hero-inner space-y-4">
             <div className="hero-crest">
               <img
@@ -94,7 +94,7 @@ function Page() {
             </div>
           </div>
 
-          <div className="lunchdrop-movement hero-lunchdrop-embedded">
+          <div className="lunchdrop-movement hero-lunchdrop-embedded mt-12 w-full max-w-4xl mx-auto space-y-6">
             <div className="lunchdrop-inner">
               <p className="lunchdrop-kicker">THE PEOPLE&apos;S RESTAURANT</p>
               <h2 className="lunchdrop-title">

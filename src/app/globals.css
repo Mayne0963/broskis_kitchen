@@ -2068,8 +2068,8 @@ html, body {
   padding: 72px 20px 56px;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 48px;
+  justify-content: center;
+  gap: 0;
   background-image: url("/images/HomePageHeroImage.webp");
   background-size: 65% auto;
   background-position: center bottom;
@@ -2101,7 +2101,8 @@ html, body {
 .hero-content-stack {
   position: relative;
   z-index: 30;
-  width: min(1200px, 100%);
+  width: 100%;
+  max-width: 1200px;
   display: flex;
   flex-direction: column;
   gap: 48px;
