@@ -96,7 +96,7 @@ const Navbar: React.FC = () => {
                   height={36} 
                   priority 
                 />
-                <span className="text-2xl font-bold graffiti-text text-btn-navbar transition-colors duration-300">Broski&apos;s Kitchen</span>
+                <span className="text-2xl font-bold navbar-gold-text">Broski&apos;s Kitchen</span>
               </Link>
             </div>
 
@@ -107,7 +107,7 @@ const Navbar: React.FC = () => {
                   <li key={item.href}>
                     <Link 
                       href={item.href} 
-                      className={`${pathname === item.href ? "nav-link-active" : ""} text-btn-navbar transition-colors duration-300`}
+                      className={`nav-link ${pathname === item.href ? "nav-link-active" : ""}`}
                     >
                       {item.label}
                     </Link>
