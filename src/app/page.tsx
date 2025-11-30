@@ -93,13 +93,6 @@ function Page() {
                   <a href="/menu" className="btn-outline">Explore Our Menu</a>
                   <a href="/lunch-drop" className="btn-primary">Lunch Drop</a>
                 </div>
-
-                <div className="hero-ribbon">
-                  <span className="hero-ribbon-badge">Lunch Drop™</span>
-                  <p className="hero-ribbon-copy">
-                    Clock in the crew, chase 22 plates, and earn tomorrow&apos;s free OTW delivery.
-                  </p>
-                </div>
               </div>
 
               <div className="hero-lunchdrop-embedded hero-pane">
