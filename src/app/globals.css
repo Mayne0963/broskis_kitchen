@@ -2203,6 +2203,7 @@ html, body {
   font-size: 13px;
   max-width: 480px;
   text-align: center;
+  line-height: 1.5;
 }
 
 .hero-inner-merged .hero-brandline {
