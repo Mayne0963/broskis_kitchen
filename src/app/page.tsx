@@ -44,141 +44,152 @@ function Page() {
   return (
     <MobileEnhancer enableSwipeGestures={true} enableTouchOptimizations={true}>
       <div className="min-h-screen bg-black text-white">
-      {/* Hero Section - Combined */}
-      <section id="hero" className="hero hero-combined relative overflow-hidden">
-        {/* OTW Delivery Button - Top Right Corner (preserved) */}
-        <div className="absolute top-6 right-6 z-20">
-          <a 
-            href="https://otw-chi.vercel.app" 
-            target="_blank"
-            rel="noopener noreferrer"
-            className="broski-otw-gold-button"
-          >
-            <Image 
-              src="/otw-logo.png" 
-              alt="OTW Logo" 
-              width={36} 
-              height={18} 
-              className="filter brightness-110"
-              priority
-              quality={95}
-            />
-            <span className="text-base font-extrabold tracking-wide">OTW DELIVERY</span>
-          </a>
-        </div>
-        <div className="hero-overlay"></div>
-        <div className="hero-content-stack mx-auto max-w-5xl px-4 py-24 text-center space-y-12">
-          <div className="hero-inner space-y-4">
-            <div className="hero-crest">
-              <img
-                src="/images/broskis-gold-logo.png"
-                alt="Broski's Kitchen crest"
-                className="hero-crest-img"
+        {/* Hero Section - Combined */}
+        <section id="hero" className="hero hero-combined relative overflow-hidden">
+          <div className="absolute top-6 right-6 z-40">
+            <a 
+              href="https://otw-chi.vercel.app" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="broski-otw-gold-button"
+            >
+              <Image 
+                src="/otw-logo.png" 
+                alt="OTW Logo" 
+                width={36} 
+                height={18} 
+                className="filter brightness-110"
+                priority
+                quality={95}
               />
-            </div>
-
-            <p className="hero-kicker">THE PEOPLE'S RESTAURANT</p>
-
-            <h1 className="hero-title">WELCOME TO BROSKI'S KITCHEN</h1>
-
-            <p className="hero-brandline">
-              Luxury Street Gourmet – where culinary culture meets legacy flavor.
-              From our Boosie Wings to Infused Broski Dust Fries, every plate is
-              served with soul and sauce.
-            </p>
-
-            <div className="hero-cta-row">
-              <a href="/menu" className="btn-primary">Order Now</a>
-              <a href="/menu" className="btn-outline">Explore Our Menu</a>
-              <a href="/lunch-drop" className="btn-primary">Lunch Drop</a>
-            </div>
+              <span className="text-base font-extrabold tracking-wide">OTW DELIVERY</span>
+            </a>
           </div>
 
-          <div className="lunchdrop-movement hero-lunchdrop-embedded mt-12 w-full max-w-4xl mx-auto space-y-6">
-            <div className="lunchdrop-inner">
-              <p className="lunchdrop-kicker">THE PEOPLE&apos;S RESTAURANT</p>
-              <h2 className="lunchdrop-title">
-                Lunch Drop ain&apos;t just delivery.<br />
-                It&apos;s a movement.
-              </h2>
-
-              <p className="lunchdrop-text">
-                Lunch ain&apos;t supposed to feel like punishment. Clock out, rush, swallow
-                something quick, and run back like you borrowed time? Nah. We flipped the script.
-              </p>
-
-              <p className="lunchdrop-text">
-                Welcome to <span className="lunchdrop-highlight">Lunch Drop</span> — the first
-                workplace-powered food movement where the people choose the vibe and the winners
-                get fed like royalty.
-              </p>
-
-              <p className="lunchdrop-text">
-                This ain&apos;t delivery. This is <span className="lunchdrop-highlight">community</span>.
-              </p>
-
-              <p className="lunchdrop-how">
-                <span className="lunchdrop-highlight">Broski&apos;s Lunch Drop™</span> — first
-                workplace on your shift to hit <b>22 plates</b> wins tomorrow&apos;s Broski lunch
-                delivered by OTW. 1st, 2nd, and 3rd shift. Day-before pre-orders only. Free OTW
-                delivery.
-              </p>
-
-              <div className="lunchdrop-columns">
-                <div className="lunchdrop-card">
-                  <h3 className="lunchdrop-card-title">Where Workplaces Turn Into Teams</h3>
-                  <p className="lunchdrop-card-text">
-                    Each shift becomes a squad. Each squad becomes a tribe. Every plate you order
-                    pushes your crew closer to locking in tomorrow&apos;s Broski&apos;s Lunch Drop
-                    with free OTW delivery.
-                  </p>
-                  <p className="lunchdrop-card-text">
-                    Y&apos;all ain&apos;t just ordering food. You&apos;re building momentum.
-                  </p>
+          <div className="hero-overlay"></div>
+          <div className="hero-content-stack mx-auto max-w-6xl px-4 py-20 md:py-24">
+            <div className="hero-merge-grid">
+              <div className="hero-inner hero-pane hero-inner-merged space-y-4">
+                <div className="hero-crest">
+                  <img
+                    src="/images/broskis-gold-logo.png"
+                    alt="Broski's Kitchen crest"
+                    className="hero-crest-img"
+                  />
                 </div>
 
-                <div className="lunchdrop-card">
-                  <h3 className="lunchdrop-card-title">The Race Makes It Fun</h3>
-                  <p className="lunchdrop-card-text">
-                    First workplace on each shift to hit the magic number of plates wins the Drop.
-                    No meetings. No memos. No permission. The people decide who eats like champions.
-                  </p>
-                  <p className="lunchdrop-card-text">
-                    1st, 2nd, or 3rd shift — everybody has a lane.
-                  </p>
+                <p className="hero-kicker">THE PEOPLE'S RESTAURANT</p>
+
+                <h1 className="hero-title">WELCOME TO BROSKI'S KITCHEN</h1>
+
+                <p className="hero-brandline">
+                  Luxury Street Gourmet – where culinary culture meets legacy flavor.
+                  From our Boosie Wings to Infused Broski Dust Fries, every plate is
+                  served with soul and sauce.
+                </p>
+
+                <div className="hero-cta-row">
+                  <a href="/menu" className="btn-primary">Order Now</a>
+                  <a href="/menu" className="btn-outline">Explore Our Menu</a>
+                  <a href="/lunch-drop" className="btn-primary">Lunch Drop</a>
                 </div>
 
-                <div className="lunchdrop-card">
-                  <h3 className="lunchdrop-card-title">Why We Do This</h3>
-                  <p className="lunchdrop-card-text">
-                    Because people working hard deserve something real. Because lunch shouldn&apos;t
-                    be stress. Because Fort Wayne deserves a win. Because you deserve flavor with
-                    purpose.
-                  </p>
-                  <p className="lunchdrop-card-text">
-                    This is food with unity, competition, and pride.
+                <div className="hero-ribbon">
+                  <span className="hero-ribbon-badge">Lunch Drop™</span>
+                  <p className="hero-ribbon-copy">
+                    Clock in the crew, chase 22 plates, and earn tomorrow&apos;s free OTW delivery.
                   </p>
                 </div>
               </div>
 
-              <div className="lunchdrop-cta-row">
-                <a href="/lunch-order" className="btn-primary">🔥 Place Lunch Order</a>
-                <a href="/order-race" className="btn-outline">🏁 View Order Race</a>
-                <a href="/enter-workplace" className="btn-outline">🏆 Enter Your Workplace</a>
-              </div>
+              <div className="hero-lunchdrop-embedded hero-pane">
+                <div className="lunchdrop-movement space-y-4">
+                  <div className="lunchdrop-inner">
+                    <div className="lunchdrop-header">
+                      <span className="lunchdrop-badge">Lunch Drop</span>
+                      <span className="lunchdrop-header-note">Workplace-powered flavor race</span>
+                    </div>
 
-              <p className="lunchdrop-learn-link">
-                🍽 <a href="/lunch-drop">Learn About Lunch Drop</a>
-              </p>
+                    <h2 className="lunchdrop-title">
+                      Lunch Drop ain&apos;t just delivery.<br />
+                      It&apos;s a movement.
+                    </h2>
 
-              <div className="lunchdrop-tagline-row">
-                <p className="lunchdrop-tagline">This ain&apos;t takeout — this a takeover.</p>
-                <p className="lunchdrop-tagline">Earn it today. Eat it tomorrow.</p>
+                    <p className="lunchdrop-text">
+                      Lunch ain&apos;t supposed to feel like punishment. Clock out, rush, swallow
+                      something quick, and run back like you borrowed time? Nah. We flipped the script.
+                    </p>
+
+                    <p className="lunchdrop-text">
+                      Welcome to <span className="lunchdrop-highlight">Lunch Drop</span> — the first
+                      workplace-powered food movement where the people choose the vibe and the winners
+                      get fed like royalty.
+                    </p>
+
+                    <p className="lunchdrop-how">
+                      <span className="lunchdrop-highlight">Broski&apos;s Lunch Drop™</span> — first
+                      workplace on your shift to hit <b>22 plates</b> wins tomorrow&apos;s Broski lunch
+                      delivered by OTW. 1st, 2nd, and 3rd shift. Day-before pre-orders only. Free OTW
+                      delivery.
+                    </p>
+
+                    <div className="lunchdrop-columns">
+                      <div className="lunchdrop-card">
+                        <h3 className="lunchdrop-card-title">Where Workplaces Turn Into Teams</h3>
+                        <p className="lunchdrop-card-text">
+                          Each shift becomes a squad. Each squad becomes a tribe. Every plate you order
+                          pushes your crew closer to locking in tomorrow&apos;s Broski&apos;s Lunch Drop
+                          with free OTW delivery.
+                        </p>
+                        <p className="lunchdrop-card-text">
+                          Y&apos;all ain&apos;t just ordering food. You&apos;re building momentum.
+                        </p>
+                      </div>
+
+                      <div className="lunchdrop-card">
+                        <h3 className="lunchdrop-card-title">The Race Makes It Fun</h3>
+                        <p className="lunchdrop-card-text">
+                          First workplace on each shift to hit the magic number of plates wins the Drop.
+                          No meetings. No memos. No permission. The people decide who eats like champions.
+                        </p>
+                        <p className="lunchdrop-card-text">
+                          1st, 2nd, or 3rd shift — everybody has a lane.
+                        </p>
+                      </div>
+
+                      <div className="lunchdrop-card">
+                        <h3 className="lunchdrop-card-title">Why We Do This</h3>
+                        <p className="lunchdrop-card-text">
+                          Because people working hard deserve something real. Because lunch shouldn&apos;t
+                          be stress. Because Fort Wayne deserves a win. Because you deserve flavor with
+                          purpose.
+                        </p>
+                        <p className="lunchdrop-card-text">
+                          This is food with unity, competition, and pride.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="lunchdrop-cta-row">
+                      <a href="/lunch-order" className="btn-primary">🔥 Place Lunch Order</a>
+                      <a href="/order-race" className="btn-outline">🏁 View Order Race</a>
+                      <a href="/enter-workplace" className="btn-outline">🏆 Enter Your Workplace</a>
+                    </div>
+
+                    <p className="lunchdrop-learn-link">
+                      🍽 <a href="/lunch-drop">Learn About Lunch Drop</a>
+                    </p>
+
+                    <div className="lunchdrop-tagline-row">
+                      <p className="lunchdrop-tagline">This ain&apos;t takeout — this a takeover.</p>
+                      <p className="lunchdrop-tagline">Earn it today. Eat it tomorrow.</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* Features Section */}
       <section className="py-20 bg-[#0A0A0A] relative overflow-hidden">

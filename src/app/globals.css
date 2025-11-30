@@ -1754,22 +1754,20 @@ html, body {
 
 /* Lunch Drop Movement styles (scoped to prevent conflicts with existing Lunch Drop section) */
 .lunchdrop-movement {
-  padding: 56px 20px 52px;
-  background: radial-gradient(circle at top center, rgba(255, 215, 0, 0.16), #050505);
-  border-top: 1px solid #222222;
-  border-bottom: 1px solid #1a1a1a;
-  margin-top: 12px;
-  margin-bottom: 0;
+  padding: clamp(24px, 3vw, 36px);
+  background: transparent;
+  margin: 0;
   position: relative;
   overflow: hidden;
+  z-index: 1;
 }
 
 .lunchdrop-movement::before {
   content: "";
   position: absolute;
-  inset: 0;
+  inset: -10px -14px -22px -14px;
   pointer-events: none;
-  background: radial-gradient(120% 80% at 50% 100%, rgba(255,255,255,0.03), transparent 60%);
+  background: radial-gradient(110% 85% at 50% 100%, rgba(255,255,255,0.05), transparent 62%);
 }
 
 .lunchdrop-movement .lunchdrop-inner {
@@ -1777,8 +1775,38 @@ html, body {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  row-gap: 10px;
+}
+
+.lunchdrop-header {
+  display: flex;
+  gap: 12px;
   align-items: center;
-  text-align: center;
+  flex-wrap: wrap;
+}
+
+.lunchdrop-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background: rgba(255, 215, 0, 0.16);
+  color: #ffd700;
+  font-size: 12px;
+  letter-spacing: 0.8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.2);
+}
+
+.lunchdrop-header-note {
+  font-size: 12px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .lunchdrop-movement .lunchdrop-kicker {
@@ -1795,7 +1823,7 @@ html, body {
   line-height: 1.2;
   font-weight: 800;
   margin-top: 6px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 0.6px;
@@ -1805,9 +1833,9 @@ html, body {
   font-size: 14px;
   color: #cccccc;
   margin-bottom: 10px;
-  max-width: 720px;
-  margin-left: auto;
-  margin-right: auto;
+  max-width: 840px;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .lunchdrop-movement .lunchdrop-highlight {
@@ -1856,7 +1884,7 @@ html, body {
   gap: 12px;
   margin-top: 10px;
   margin-bottom: 16px;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 /* Button refinements scoped to movement section to avoid global overrides */
@@ -1877,6 +1905,9 @@ html, body {
 
 .lunchdrop-movement .lunchdrop-tagline-row {
   margin-top: 6px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .lunchdrop-movement .lunchdrop-tagline {
@@ -1886,13 +1917,27 @@ html, body {
 
 @media (max-width: 768px) {
   .lunchdrop-movement {
-    padding: 40px 16px;
+    padding: 32px 16px;
   }
   .lunchdrop-movement .lunchdrop-title {
     font-size: 24px;
   }
   .lunchdrop-movement .lunchdrop-columns {
     grid-template-columns: 1fr;
+  }
+  .lunchdrop-header {
+    justify-content: center;
+  }
+  .lunchdrop-movement .lunchdrop-inner {
+    align-items: center;
+    text-align: center;
+  }
+  .lunchdrop-movement .lunchdrop-text {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .lunchdrop-movement .lunchdrop-cta-row {
+    justify-content: center;
   }
 }
 
@@ -2067,12 +2112,12 @@ html, body {
   min-height: 80vh;
   padding: 72px 20px 56px;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   gap: 0;
   background-image: url("/images/HomePageHeroImage.webp");
-  background-size: 65% auto;
-  background-position: center 15%;
+  background-size: 70% auto;
+  background-position: center 12%;
   background-repeat: no-repeat;
   background-color: #050505;
 }
@@ -2094,7 +2139,6 @@ html, body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: calc(80vh - 72px - 56px); /* account for hero-combined vertical padding to truly center */
   text-align: center;
 }
 
@@ -2103,11 +2147,64 @@ html, body {
   z-index: 30;
   width: 100%;
   max-width: 1200px;
-  display: flex;
-  flex-direction: column;
-  gap: 48px;
-  align-items: center;
   margin: 0 auto;
+}
+
+.hero-merge-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: clamp(20px, 3vw, 36px);
+  align-items: stretch;
+}
+
+.hero-pane {
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 215, 0, 0.14);
+  border-radius: 18px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(6px);
+}
+
+.hero-inner-merged {
+  align-items: flex-start;
+  text-align: left;
+  padding: clamp(22px, 3vw, 30px);
+  gap: 12px;
+}
+
+.hero-inner-merged .hero-brandline {
+  margin-left: 0;
+}
+
+.hero-ribbon {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.hero-ribbon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background: rgba(255, 215, 0, 0.18);
+  color: #ffd700;
+  font-size: 12px;
+  letter-spacing: 0.6px;
+  font-weight: 800;
+  text-transform: uppercase;
+  box-shadow: 0 0 18px rgba(255, 215, 0, 0.18);
+}
+
+.hero-ribbon-copy {
+  color: #d6d6d6;
+  font-size: 13px;
+  max-width: 420px;
 }
 
 .hero-lunchdrop-embedded {
@@ -2116,7 +2213,22 @@ html, body {
   border-radius: 18px;
   overflow: hidden;
   isolation: isolate;
-  box-shadow: 0 10px 38px rgba(0, 0, 0, 0.35);
+  display: flex;
+  height: 100%;
+  background: radial-gradient(140% 100% at 18% 8%, rgba(255, 215, 0, 0.16), transparent 40%),
+              linear-gradient(135deg, rgba(16, 16, 16, 0.95), rgba(7, 7, 7, 0.9));
+  border: 1px solid rgba(255, 215, 0, 0.18);
+  box-shadow: 0 20px 52px rgba(0, 0, 0, 0.45);
+  z-index: 30;
+}
+
+.hero-lunchdrop-embedded::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(90% 70% at 80% 10%, rgba(255, 255, 255, 0.05), transparent 50%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .hero-crest {
@@ -2194,11 +2306,28 @@ html, body {
   }
 }
 
+@media (max-width: 1100px) {
+  .hero-merge-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width:768px){
   .hero-combined{min-height:80vh;padding:64px 16px 40px;background-size:70% auto;background-position:center bottom;}
   .hero-title{font-size:26px;}
   .hero-brandline{font-size:13px;}
   .hero-inner{padding-top: 32px;}
+  .hero-inner-merged{
+    align-items: center;
+    text-align: center;
+  }
+  .hero-ribbon{
+    justify-content: center;
+    text-align: center;
+  }
+  .hero-ribbon-copy{
+    text-align: center;
+  }
 }
 
 /* Navbar brand text */
