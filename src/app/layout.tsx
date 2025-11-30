@@ -154,7 +154,7 @@ export default async function RootLayout({
                     minLoadingTime={800}
                     showProgressBar={true}
                   >
-                    <main id="main-content" className="flex-grow" tabIndex={-1}>{children}</main>
+                    <main id="main-content" tabIndex={-1}>{children}</main>
                   </PageLoadingWrapper>
                   <Footer />
 
