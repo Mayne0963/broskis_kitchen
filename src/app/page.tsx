@@ -79,25 +79,27 @@ function Page() {
 
               <p className="hero-kicker">THE PEOPLE'S RESTAURANT</p>
 
-              <h1 className="hero-title">Welcome to Broski’s Kitchen</h1>
+              <h1 className="hero-title">Welcome to Broski&apos;s Kitchen</h1>
 
               <p className="hero-brandline">
                 Luxury Street Gourmet where culinary culture meets legacy flavor. From Boosie Wings to Broski Dust Fries, every plate is served with soul, heat, and precision.
               </p>
 
               <div className="hero-cta-row">
-                <a href="/menu" className="btn-primary">ORDER NOW</a>
+                <a href="/menu" className="btn-primary">Explore Our Menu</a>
+                <a href="/menu" className="btn-outline">Order Now</a>
+                <a href="/lunch-drop" className="btn-outline">Lunch Drop for My Workplace</a>
+              </div>
+
+              <div className="hero-divider">
+                <span className="hero-divider-pill">LUNCH DROP® · WORKPLACE-POWERED LUNCH</span>
               </div>
 
               <div className="hero-lunchdrop-embedded hero-pane hero-single-embedded">
                 <div className="lunchdrop-movement space-y-4">
                   <div className="lunchdrop-inner">
-                    <div className="lunchdrop-header">
-                      <span className="lunchdrop-badge">LUNCH DROP • WORKPLACE-POWERED LUNCH</span>
-                    </div>
-
                     <h2 className="lunchdrop-title">
-                      Lunch Drop isn’t just delivery. It’s a movement.
+                      Lunch Drop ain&apos;t just delivery. It&apos;s a movement.
                     </h2>
 
                     <p className="lunchdrop-text">
@@ -112,7 +114,7 @@ function Page() {
                       <div className="lunchdrop-card">
                         <h3 className="lunchdrop-card-title">Where Workplaces Become Teams</h3>
                         <p className="lunchdrop-card-text">
-                          Every plate counts. Each order pushes your crew closer to locking in tomorrow’s Lunch Drop. It’s not just food; it’s momentum.
+                          Every plate counts. Each order pushes your crew closer to locking in tomorrow’s Lunch Drop. It’s not just food, it’s momentum.
                         </p>
                       </div>
 
@@ -132,9 +134,9 @@ function Page() {
                     </div>
 
                     <div className="lunchdrop-cta-row">
-                      <a href="/lunch-order" className="btn-primary">PLACE LUNCH ORDER</a>
-                      <a href="/order-race" className="btn-outline">VIEW ORDER RACE</a>
-                      <a href="/enter-workplace" className="btn-outline">ENTER YOUR WORKPLACE</a>
+                      <a href="/lunch-order" className="btn-primary">Place Lunch Order</a>
+                      <a href="/order-race" className="btn-outline">View Order Race</a>
+                      <a href="/enter-workplace" className="btn-outline">Enter Your Workplace</a>
                     </div>
                   </div>
                 </div>
