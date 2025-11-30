@@ -2111,7 +2111,7 @@ html, body {
 .hero-combined {
   position: relative;
   min-height: 80vh;
-  padding: 72px 20px 56px;
+  padding: 56px 20px 48px;
   display: flex;
   align-items: stretch;
   justify-content: center;
@@ -2316,8 +2316,8 @@ html, body {
   @apply items-center;
   @apply justify-center;
   @apply z-40;
-  margin-top: -40px;
-  margin-bottom: clamp(7rem, 11vh, 5rem);
+  margin-top: 0;
+  margin-bottom: clamp(3rem, 7vh, 4.5rem);
   opacity: 1;
 }
 
@@ -2367,7 +2367,7 @@ html, body {
 
 @media (max-width: 1024px) {
   .hero-crest {
-    margin-top: -72px;
+    margin-top: 0;
     margin-bottom: 24px;
   }
   .hero-logo {
@@ -2377,7 +2377,7 @@ html, body {
 
 @media (max-width: 600px) {
   .hero-crest {
-    margin-top: -56px;
+    margin-top: 0;
     margin-bottom: 20px;
   }
   .hero-logo {
