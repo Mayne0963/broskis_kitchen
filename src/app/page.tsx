@@ -87,13 +87,6 @@ function Page() {
 
               <div className="hero-cta-row">
                 <a href="/menu" className="btn-primary">ORDER NOW</a>
-                <a href="/menu" className="btn-outline">EXPLORE OUR MENU</a>
-                <a href="/lunch-drop" className="btn-primary">LUNCH DROP FOR MY WORKPLACE</a>
-              </div>
-
-              <div className="hero-lunchdrop-bridge">
-                <span className="hero-lunchdrop-pill">Lunch Drop</span>
-                <p className="hero-lunchdrop-bridge-copy">LUNCH DROP BY BROSKI’S KITCHEN — our workplace-powered way to bring the Broski experience straight to your shift.</p>
               </div>
 
               <div className="hero-lunchdrop-embedded hero-pane hero-single-embedded">
