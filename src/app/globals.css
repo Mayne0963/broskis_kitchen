@@ -2111,7 +2111,7 @@ html, body {
 .hero-combined {
   position: relative;
   min-height: 80vh;
-  padding: 56px 20px 48px;
+  padding: 44px 20px 40px;
   display: flex;
   align-items: stretch;
   justify-content: center;
@@ -2288,8 +2288,8 @@ html, body {
   border-radius: 18px;
   overflow: hidden;
   isolation: isolate;
-  display: flex;
-  height: 100%;
+  display: block;
+  height: auto;
   background: radial-gradient(140% 100% at 18% 8%, rgba(255, 215, 0, 0.1), transparent 42%),
               linear-gradient(135deg, rgba(16, 16, 16, 0.9), rgba(7, 7, 7, 0.9));
   border: 1px solid rgba(255, 215, 0, 0.12);
