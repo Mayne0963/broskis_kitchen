@@ -2134,7 +2134,7 @@ html, body {
 .hero-inner {
   position: relative;
   z-index: 30;
-  max-width: 720px;
+  max-width: 980px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -2149,14 +2149,10 @@ html, body {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-}
-
-.hero-merge-grid {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: clamp(20px, 3vw, 32px);
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: 18px;
 }
 
 .hero-pane {
@@ -2170,8 +2166,43 @@ html, body {
 .hero-inner-merged {
   align-items: center;
   text-align: center;
-  padding: clamp(22px, 3vw, 30px);
+  padding: clamp(22px, 3vw, 30px) clamp(18px, 3vw, 28px);
   gap: 12px;
+}
+
+.hero-single-stack {
+  width: 100%;
+  max-width: 1080px;
+}
+
+.hero-lunchdrop-bridge {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 4px 0;
+}
+
+.hero-lunchdrop-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background: rgba(255, 215, 0, 0.14);
+  color: #ffd700;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+.hero-lunchdrop-bridge-copy {
+  color: #d8d8d8;
+  font-size: 13px;
+  max-width: 480px;
+  text-align: center;
 }
 
 .hero-inner-merged .hero-brandline {
@@ -2220,10 +2251,10 @@ html, body {
   isolation: isolate;
   display: flex;
   height: 100%;
-  background: radial-gradient(140% 100% at 18% 8%, rgba(255, 215, 0, 0.16), transparent 40%),
-              linear-gradient(135deg, rgba(16, 16, 16, 0.95), rgba(7, 7, 7, 0.9));
-  border: 1px solid rgba(255, 215, 0, 0.18);
-  box-shadow: 0 20px 52px rgba(0, 0, 0, 0.45);
+  background: radial-gradient(140% 100% at 18% 8%, rgba(255, 215, 0, 0.1), transparent 42%),
+              linear-gradient(135deg, rgba(16, 16, 16, 0.9), rgba(7, 7, 7, 0.9));
+  border: 1px solid rgba(255, 215, 0, 0.12);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.38);
   z-index: 30;
 }
 
@@ -2234,6 +2265,10 @@ html, body {
   background: radial-gradient(90% 70% at 80% 10%, rgba(255, 255, 255, 0.05), transparent 50%);
   pointer-events: none;
   z-index: 0;
+}
+
+.hero-single-embedded {
+  margin-top: 4px;
 }
 
 .hero-crest {

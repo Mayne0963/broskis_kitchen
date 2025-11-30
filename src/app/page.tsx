@@ -68,34 +68,44 @@ function Page() {
 
           <div className="hero-overlay"></div>
           <div className="hero-content-stack mx-auto max-w-6xl px-4 py-20 md:py-24">
-            <div className="hero-merge-grid">
-              <div className="hero-inner hero-pane hero-inner-merged space-y-4">
-                <div className="hero-crest">
-                  <img
-                    src="/images/broskis-gold-logo.png"
-                    alt="Broski's Kitchen crest"
-                    className="hero-crest-img"
-                  />
-                </div>
-
-                <p className="hero-kicker">THE PEOPLE'S RESTAURANT</p>
-
-                <h1 className="hero-title">WELCOME TO BROSKI'S KITCHEN</h1>
-
-                <p className="hero-brandline">
-                  Luxury Street Gourmet – where culinary culture meets legacy flavor.
-                  From our Boosie Wings to Infused Broski Dust Fries, every plate is
-                  served with soul and sauce.
-                </p>
-
-                <div className="hero-cta-row">
-                  <a href="/menu" className="btn-primary">Order Now</a>
-                  <a href="/menu" className="btn-outline">Explore Our Menu</a>
-                  <a href="/lunch-drop" className="btn-primary">Lunch Drop</a>
-                </div>
+            <div className="hero-inner hero-pane hero-inner-merged hero-single-stack space-y-6">
+              <div className="hero-crest">
+                <img
+                  src="/images/broskis-gold-logo.png"
+                  alt="Broski's Kitchen crest"
+                  className="hero-crest-img"
+                />
               </div>
 
-              <div className="hero-lunchdrop-embedded hero-pane">
+              <p className="hero-kicker">THE PEOPLE'S RESTAURANT</p>
+
+              <h1 className="hero-title">WELCOME TO BROSKI'S KITCHEN</h1>
+
+              <p className="hero-brandline">
+                Luxury Street Gourmet – where culinary culture meets legacy flavor.
+                From our Boosie Wings to Infused Broski Dust Fries, every plate is
+                served with soul and sauce.
+              </p>
+
+              <div className="hero-cta-row">
+                <a href="/menu" className="btn-primary">Order Now</a>
+                <a href="/menu" className="btn-outline">Explore Our Menu</a>
+                <a href="/lunch-drop" className="btn-primary">Lunch Drop</a>
+              </div>
+
+              <div className="hero-ribbon">
+                <span className="hero-ribbon-badge">Lunch Drop™</span>
+                <p className="hero-ribbon-copy">
+                  Clock in the crew, chase 22 plates, and earn tomorrow&apos;s free OTW delivery.
+                </p>
+              </div>
+
+              <div className="hero-lunchdrop-bridge">
+                <span className="hero-lunchdrop-pill">Built into the Broski hero</span>
+                <p className="hero-lunchdrop-bridge-copy">One section, one mission — Lunch Drop lives right inside the welcome moment.</p>
+              </div>
+
+              <div className="hero-lunchdrop-embedded hero-pane hero-single-embedded">
                 <div className="lunchdrop-movement space-y-4">
                   <div className="lunchdrop-inner">
                     <div className="lunchdrop-header">
