@@ -67,7 +67,7 @@ function Page() {
           </div>
 
           <div className="hero-overlay"></div>
-          <div className="hero-content-stack mx-auto max-w-6xl px-4 py-8 md:py-12">
+          <div className="hero-content-stack mx-auto max-w-6xl px-4 pt-24 pb-10 md:pt-28 md:pb-14">
             <div className="hero-inner hero-inner-merged hero-single-stack space-y-6">
               <div className="hero-crest">
                 <img
