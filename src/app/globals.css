@@ -2112,10 +2112,7 @@ html, body {
   position: relative;
   min-height: 80vh;
   padding: 32px 20px 36px;
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  gap: 0;
+  display: block;
   background-image: url("/images/HomePageHeroImage.webp");
   background-size: 70% auto;
   background-position: center 28%;
