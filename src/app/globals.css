@@ -2115,7 +2115,7 @@ html, body {
   display: block;
   background-image: url("/images/HomePageHeroImage.webp");
   background-size: 45% auto;
-  background-position: center 5%;
+  background-position: center 12%;
   background-repeat: no-repeat;
   background-color: #050505;
 }
@@ -2311,7 +2311,7 @@ html, body {
 
 .hero-crest {
   position: absolute;
-  top: clamp(120px, 14vw, 180px);
+  top: clamp(180px, 18vw, 260px);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -2320,7 +2320,7 @@ html, body {
   z-index: 15;
   pointer-events: none;
   margin: 0;
-  opacity: 0.9;
+  opacity: 0.85;
 }
 
 .hero-copy-stack {
@@ -2330,13 +2330,13 @@ html, body {
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding-top: clamp(140px, 16vw, 200px);
+  padding-top: clamp(200px, 20vw, 280px);
 }
 
 .hero-crest-img {
-  max-width: clamp(80px, 8vw, 120px);
+  max-width: clamp(72px, 7vw, 110px);
   height: auto;
-  filter: brightness(0.82) drop-shadow(0 0 12px rgba(0, 0, 0, 0.75));
+  filter: brightness(0.7) drop-shadow(0 0 12px rgba(0, 0, 0, 0.85));
 }
 
 .hero-kicker {
