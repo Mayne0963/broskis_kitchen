@@ -132,7 +132,7 @@ function Page() {
                     </div>
 
                     <div className="lunchdrop-cta-row">
-                      <a href="/lunch-order" className="btn-primary">Place Lunch Order</a>
+                      <a href="/lunch-order" className="btn-primary">Place Lunch-Drop Order</a>
                       <a href="/order-race" className="btn-outline">View Order Race</a>
                       <a href="/enter-workplace" className="btn-primary">Enter Your Workplace</a>
                     </div>
