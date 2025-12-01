@@ -126,7 +126,7 @@ export default async function RootLayout({
         <StructuredDataHead type="website" />
         <OrganizationStructuredDataHead />
       </head>
-      <body suppressHydrationWarning className={`${fontClasses} bg-black text-white min-h-screen flex flex-col antialiased`}>
+      <body suppressHydrationWarning className={`${fontClasses} bg-black text-white min-h-screen antialiased`}>
         {/* Initialize Remote Config on client post-hydration */}
         <script dangerouslySetInnerHTML={{ __html: "window.__initRC__=true;" }} />
         <ServiceWorkerCleanup />
