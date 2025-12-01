@@ -2115,7 +2115,7 @@ html, body {
   display: block;
   background-image: url("/images/HomePageHeroImage.webp");
   background-size: 70% auto;
-  background-position: center 28%;
+  background-position: center;
   background-repeat: no-repeat;
   background-color: #050505;
 }
