@@ -2311,7 +2311,7 @@ html, body {
 
 .hero-crest {
   position: absolute;
-  top: clamp(220px, 20vw, 300px);
+  top: clamp(260px, 24vw, 360px);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -2330,11 +2330,11 @@ html, body {
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding-top: clamp(240px, 24vw, 320px);
+  padding-top: clamp(180px, 20vw, 260px);
 }
 
 .hero-crest-img {
-  max-width: clamp(68px, 6.5vw, 100px);
+  max-width: clamp(130px, 12vw, 200px);
   height: auto;
   filter: brightness(0.6) drop-shadow(0 0 14px rgba(0, 0, 0, 0.9));
 }
