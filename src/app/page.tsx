@@ -86,7 +86,7 @@ function Page() {
               </p>
 
               <div className="hero-cta-row">
-                <a href="/menu" className="btn-outline">Order Now</a>
+                <a href="/menu" className="btn-primary">Order Now</a>
               </div>
 
               <div className="hero-divider">
@@ -134,7 +134,7 @@ function Page() {
                     <div className="lunchdrop-cta-row">
                       <a href="/lunch-order" className="btn-primary">Place Lunch Order</a>
                       <a href="/order-race" className="btn-outline">View Order Race</a>
-                      <a href="/enter-workplace" className="btn-outline">Enter Your Workplace</a>
+                      <a href="/enter-workplace" className="btn-primary">Enter Your Workplace</a>
                     </div>
                   </div>
                 </div>
