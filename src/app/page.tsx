@@ -86,9 +86,7 @@ function Page() {
               </p>
 
               <div className="hero-cta-row">
-                <a href="/menu" className="btn-primary">Explore Our Menu</a>
                 <a href="/menu" className="btn-outline">Order Now</a>
-                <a href="/lunch-drop" className="btn-outline">Lunch Drop for My Workplace</a>
               </div>
 
               <div className="hero-divider">
