@@ -77,13 +77,15 @@ function Page() {
                 />
               </div>
 
-              <p className="hero-kicker">THE PEOPLE'S RESTAURANT</p>
+              <div className="hero-copy-stack">
+                <p className="hero-kicker">THE PEOPLE'S RESTAURANT</p>
 
-              <h1 className="hero-title">Welcome to Broski&apos;s Kitchen</h1>
+                <h1 className="hero-title">Welcome to Broski&apos;s Kitchen</h1>
 
-              <p className="hero-brandline">
-                Luxury Street Gourmet where culinary culture meets legacy flavor. From Boosie Wings to Broski Dust Fries, every plate is served with soul, heat, and precision.
-              </p>
+                <p className="hero-brandline">
+                  Luxury Street Gourmet where culinary culture meets legacy flavor. From Boosie Wings to Broski Dust Fries, every plate is served with soul, heat, and precision.
+                </p>
+              </div>
 
               <div className="hero-cta-row">
                 <a href="/menu" className="btn-primary">Order Now</a>
