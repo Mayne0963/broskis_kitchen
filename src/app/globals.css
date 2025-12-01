@@ -2310,15 +2310,17 @@ html, body {
 }
 
 .hero-crest {
-  @apply relative;
-  @apply flex;
-  @apply items-center;
-  @apply justify-center;
-  @apply z-40;
-  z-index: 20;
-  margin-top: 0;
-  margin-bottom: clamp(3rem, 7vh, 4.5rem);
-  opacity: 1;
+  position: absolute;
+  top: clamp(-8px, 2vw, 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 15;
+  pointer-events: none;
+  margin: 0;
+  opacity: 0.95;
 }
 
 .hero-copy-stack {
@@ -2328,6 +2330,7 @@ html, body {
   flex-direction: column;
   align-items: center;
   gap: 6px;
+  padding-top: clamp(42px, 7vw, 90px);
 }
 
 .hero-crest-img {
@@ -2378,7 +2381,7 @@ html, body {
 
 @media (max-width: 1024px) {
   .hero-crest {
-    margin-top: 0;
+    top: clamp(0px, 4vw, 12px);
     margin-bottom: 24px;
   }
   .hero-logo {
@@ -2388,7 +2391,7 @@ html, body {
 
 @media (max-width: 600px) {
   .hero-crest {
-    margin-top: 0;
+    top: clamp(4px, 6vw, 16px);
     margin-bottom: 20px;
   }
   .hero-logo {
