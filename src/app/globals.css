@@ -2114,8 +2114,8 @@ html, body {
   padding: 32px 20px 36px;
   display: block;
   background-image: url("/images/HomePageHeroImage.webp");
-  background-size: 50% auto;
-  background-position: center 14%;
+  background-size: 40% auto;
+  background-position: center 12%;
   background-repeat: no-repeat;
   background-color: #050505;
 }
