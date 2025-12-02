@@ -2120,7 +2120,7 @@ html, body {
   display: block;
   background-image: url("/images/HomePageHeroImage.webp");
   background-size: 45% auto;
-  background-position: top 85% center;
+  background-position: top center;
   background-repeat: no-repeat;
   background-color: #050505;
 }
