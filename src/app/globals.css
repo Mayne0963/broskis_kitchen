@@ -2019,8 +2019,8 @@ html, body {
 @media (max-width: 640px) { .lunchorder-grid { grid-template-columns: 1fr; } .lunchorder-summary { flex-direction: column; align-items: flex-start; } }
 /* Hero slogan kicker */
 .hero-kicker {
-  font-size: 11px;
-  letter-spacing: 2.4px;
+  font-size: 13px;
+  letter-spacing: 2.8px;
   text-transform: uppercase;
   color: #ffd700;
   font-weight: 400;
@@ -2048,8 +2048,8 @@ html, body {
 /* Mobile adjustments */
 @media (max-width: 768px) {
   .hero-kicker {
-    font-size: 10px;
-    letter-spacing: 2px;
+    font-size: 12px;
+    letter-spacing: 2.4px;
     margin-bottom: 4px;
   }
 
@@ -2348,7 +2348,7 @@ html, body {
 }
 
 .hero-kicker {
-  font-size: 11px; letter-spacing: 2.4px; color: #ffd700; opacity: .9;
+  font-size: 13px; letter-spacing: 2.8px; color: #ffd700; opacity: .9;
   text-transform: uppercase; margin: 0;
 }
 
