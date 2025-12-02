@@ -2316,7 +2316,7 @@ html, body {
 
 .hero-crest {
   position: absolute;
-  top: -40%;
+  top: -42%;
   transform: translateX(-50%);
   left: 50%;
   display: flex;
