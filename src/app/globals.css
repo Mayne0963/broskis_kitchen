@@ -2344,7 +2344,7 @@ html, body {
 .hero-crest-img {
   max-width: clamp(140px, 13vw, 215px);
   height: auto;
-  filter: brightness(0.9) drop-shadow(0 0 14px rgba(0, 0, 0, 0.9));
+  filter: brightness(1) drop-shadow(0 0 14px rgba(0, 0, 0, 0.9));
 }
 
 .hero-kicker {
