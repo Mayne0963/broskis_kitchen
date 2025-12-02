@@ -71,7 +71,7 @@ function Page() {
             <div className="hero-inner hero-inner-merged hero-single-stack space-y-6">
               <div className="hero-crest">
                 <img
-                  src="/images/brand/Broski's-logo-cropped.png"
+                  src="/images/brand/Broski's-logo.png"
                   alt="Broski's Kitchen crest"
                   className="hero-crest-img"
                 />
