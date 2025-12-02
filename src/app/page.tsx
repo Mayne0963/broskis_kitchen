@@ -370,7 +370,7 @@ function Page() {
             Join thousands of satisfied customers who have discovered the perfect blend of luxury and street culture.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in animate-delay-400">
-            <Link href="/menu" className="bg-rose-600 hover:bg-rose-500 text-white font-bold py-4 px-10 rounded-lg transform hover:scale-105 transition-all duration-300">
+            <Link href="/menu" className="bg-red-600 hover:bg-red-500 text-[var(--color-silver-pink)] font-bold py-4 px-10 rounded-lg transform hover:scale-105 transition-all duration-300">
               Order Now
             </Link>
             <Link href="/rewards" className="border-2 border-[var(--color-harvest-gold)] text-[var(--color-harvest-gold)] hover:bg-[var(--color-harvest-gold)] hover:text-black font-bold py-4 px-10 rounded-lg transform hover:scale-105 transition-all duration-300">

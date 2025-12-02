@@ -19,6 +19,7 @@
   --color-gold-rich: #FFD700;
   --color-harvest-gold: #FFD700;
   --color-burgundy: #B22222;
+  --color-silver-pink: #BFB8A5;
 
   /* Text Colors */
   --color-off-white: #FFFFFF;
@@ -1301,6 +1302,10 @@ main {
 /* Debug CSS for visualizing fixed overlays */
 .debug-fixed *[style*="position: fixed"], .debug-fixed .fixed {
   outline: 1px solid red !important;
+}
+
+.text-color {
+  color: #BFB8A5
 }
 
 /* Admin Catering Polish */
