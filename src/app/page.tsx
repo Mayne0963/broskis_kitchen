@@ -75,11 +75,10 @@ function Page() {
                   alt="Broski's Kitchen crest"
                   className="hero-crest-img"
                 />
+                <p className="hero-kicker">THE PEOPLE'S RESTAURANT</p>
               </div>
 
               <div className="hero-copy-stack">
-                <p className="hero-kicker">THE PEOPLE'S RESTAURANT</p>
-
                 <h1 className="hero-title">Welcome to Broski&apos;s Kitchen</h1>
 
                 <p className="hero-brandline">
