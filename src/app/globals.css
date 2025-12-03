@@ -2671,7 +2671,7 @@ html, body {
     }
 
   .bg-gold-gradient {
-    background: linear-gradient(90deg, #E6C875 0%, #F0D285 50%, #FFC857 100%);
+    background: linear-gradient( 135deg, #D2BA6A 0%, #E6C875 100%);
   }
 
   .feature-card {
@@ -2718,5 +2718,5 @@ html, body {
 }
 
 .bg-gold-gradient {
-  background: linear-gradient(90deg, #E6C875 0%, #F0D285 50%, #FFC857 100%);
+  background: linear-gradient(135deg, #D2BA6A 0%, #E6C875 100%);
 }

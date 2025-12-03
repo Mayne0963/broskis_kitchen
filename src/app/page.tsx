@@ -77,14 +77,8 @@ function Page() {
               </div>
 
               <div className="flex flex-wrap justify-center gap-3 md:gap-4">
-                <Link href="/menu" className="btn-broski">
-                  Explore Our Menu
-                </Link>
-                <Link href="/otw" className="btn-broski">
+                <Link href="/otw" className="btn-primary">
                   Order Now
-                </Link>
-                <Link href="/lunch-drop" className="btn-broski-ghost">
-                  Lunch Drop for My Workplace
                 </Link>
               </div>
 
@@ -138,14 +132,14 @@ function Page() {
                 </div>
 
                 <div className="flex flex-wrap justify-center gap-3 md:gap-4 mt-6">
-                  <Link href="/lunch-order" className="btn-broski">
-                    Place Lunch Order
+                  <Link href="/enter-workplace" className="btn-primary">
+                    Enter Your Workplace
                   </Link>
                   <Link href="/order-race" className="btn-broski-ghost">
                     View Order Race
                   </Link>
-                  <Link href="/enter-workplace" className="btn-broski-ghost">
-                    Enter Your Workplace
+                  <Link href="/lunch-order" className="btn-primary">
+                    Place Lunch Order
                   </Link>
                 </div>
               </div>
