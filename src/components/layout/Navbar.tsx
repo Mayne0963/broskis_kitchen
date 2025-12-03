@@ -1,11 +1,10 @@
 "use client"
 
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef, useMemo } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { FaBars, FaTimes, FaUser, FaShoppingBag } from "react-icons/fa"
-import { Button } from "@/components/ui/button"
+import { FaBars, FaUser } from "react-icons/fa"
 import CartDropdown from "../../components/cart/CartDropdown"
 import { useCart } from "../../lib/context/CartContext"
 import { useAuth } from "../../lib/context/AuthContext"
@@ -17,16 +16,7 @@ import {
   AccessibleButton 
 } from "../accessibility/AccessibilityEnhancer"
 import MobileMenu from "../navbar/MobileMenu"
-import { NAV_ITEMS, visibleNav } from "../../config/nav"
-
-const NAV = [
-  { href: "/menu", label: "Menu" },
-  { href: "/events", label: "Events" },
-  { href: "/music", label: "Music" },
-  { href: "/coming-soon", label: "Rewards" },
-  { href: "/catering", label: "Catering" },
-  { href: "/contact", label: "Contact" },
-]
+import { MAIN_LINKS } from "../nav/links"
 
 const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -39,6 +29,13 @@ const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const lastScrollYRef = useRef(0)
   const [isVisible, setIsVisible] = useState(true)
+  const navLinks = useMemo(
+    () =>
+      MAIN_LINKS.filter(link =>
+        ["/menu", "/events", "/music", "/catering", "/contact", "/rewards"].includes(link.href)
+      ),
+    []
+  )
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -81,11 +78,19 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, []) // Remove lastScrollY dependency to prevent re-renders
 
+  const headerClassName = `
+    fixed top-0 left-0 right-0 z-[80] w-full border-b border-zinc-800 pointer-events-auto transition-all duration-300
+    ${isScrolled ? "bg-black/80 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.45)]" : "bg-black/60 backdrop-blur-sm"}
+    ${isVisible ? "translate-y-0" : "-translate-y-full"}
+  `
+
   return (
     <>
       <header
         id="navigation"
-        className="sticky top-0 z-[80] bg-black/70 backdrop-blur border-b border-zinc-800 pointer-events-auto"
+        className={headerClassName}
+        data-scrolled={isScrolled}
+        data-visible={isVisible}
       >
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
@@ -108,7 +113,7 @@ const Navbar: React.FC = () => {
             {/* CENTER: main nav — perfectly centered */}
             <nav className="absolute left-1/2 -translate-x-1/2 hidden md:flex">
               <ul className="flex items-center gap-6">
-                {NAV.map((item) => (
+                {navLinks.map((item) => (
                   <li key={item.href}>
                     <Link 
                       href={item.href} 
@@ -193,6 +198,8 @@ const Navbar: React.FC = () => {
               type="button"
               data-testid="mobile-menu-toggle"
               aria-label="Open menu"
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-menu-panel"
               onClick={() => setMobileMenuOpen(true)}
               className="md:hidden inline-flex items-center justify-center rounded-lg px-3 py-2 ring-1 ring-white/20 bg-zinc-900/60 text-white"
             >

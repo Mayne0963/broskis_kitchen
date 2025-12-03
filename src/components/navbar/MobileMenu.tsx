@@ -137,6 +137,7 @@ export default function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="mobile-menu-title"
+        id="mobile-menu-panel"
         data-testid="mobile-menu"
         className="bk-drawer fixed inset-0 z-[100] w-full sm:w-[420px] sm:inset-y-0 sm:right-0 sm:left-auto bg-black text-white shadow-2xl ring-1 ring-white/10 transform transition-transform duration-300 ease-in-out"
         style={{
