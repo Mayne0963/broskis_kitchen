@@ -43,19 +43,6 @@ export function PageLoadingWrapper({
     setMounted(true)
   }, [])
 
-  if (!mounted) {
-    return fallback ? (
-      <>{fallback}</>
-    ) : (
-      <div className={cn("min-h-screen flex items-center justify-center bg-black text-white", className)}>
-        <div className="text-center space-y-3">
-          <Loader2 className="h-10 w-10 animate-spin text-blue-500 mx-auto" />
-          <p className="text-sm text-gray-300">Loading Broski&apos;s Kitchen…</p>
-        </div>
-      </div>
-    )
-  }
-
   // Ensure minimum loading time for smooth UX
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -82,6 +69,20 @@ export function PageLoadingWrapper({
       setErrorReady(false)
     }
   }, [hasError, authCheckComplete])
+
+  // Avoid server/client mismatch while gating auth readiness
+  if (!mounted) {
+    return fallback ? (
+      <>{fallback}</>
+    ) : (
+      <div className={cn("min-h-screen flex items-center justify-center bg-black text-white", className)}>
+        <div className="text-center space-y-3">
+          <Loader2 className="h-10 w-10 animate-spin text-blue-500 mx-auto" />
+          <p className="text-sm text-gray-300">Loading Broski&apos;s Kitchen…</p>
+        </div>
+      </div>
+    )
+  }
 
   // Handle error state
   if (hasError && authCheckComplete && !suppressErrorFlash && errorReady && isOnline) {
