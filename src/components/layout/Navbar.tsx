@@ -85,7 +85,7 @@ const Navbar: React.FC = () => {
     <>
       <header
         id="navigation"
-        className="sticky top-0 z-50 bg-black/70 backdrop-blur border-b border-zinc-800"
+        className="sticky top-0 z-[80] bg-black/70 backdrop-blur border-b border-zinc-800 pointer-events-auto"
       >
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
