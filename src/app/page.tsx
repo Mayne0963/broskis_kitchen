@@ -139,7 +139,7 @@ function Page() {
                     View Order Race
                   </Link>
                   <Link href="/lunch-order" className="btn-primary">
-                    Place Lunch Order
+                    Place Lunch-Drop Order
                   </Link>
                 </div>
               </div>
