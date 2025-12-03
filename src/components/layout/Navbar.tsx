@@ -83,7 +83,10 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-black/70 backdrop-blur border-b border-zinc-800">
+      <header
+        id="navigation"
+        className="sticky top-0 z-50 bg-black/70 backdrop-blur border-b border-zinc-800"
+      >
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
             {/* LEFT: logo */}
@@ -121,11 +124,9 @@ const Navbar: React.FC = () => {
             {/* RIGHT: actions (OTW + Login) */}
             <div className="min-w-[140px] flex items-center gap-2 justify-end">
               {/* Lunch Drop button (renamed from OTW) */}
-              <Button asChild>
-                <Link href="/lunch-drop" className="btn-primary">
-                  <span className="text-sm font-extrabold tracking-wide text-red-600">Lunch Drop</span>
-                </Link>
-              </Button>
+              <Link href="/lunch-drop" className="btn-primary">
+                <span className="text-sm font-extrabold tracking-wide text-red-600">Lunch Drop</span>
+              </Link>
 
               <CartDropdown />
 
@@ -178,9 +179,12 @@ const Navbar: React.FC = () => {
                   </AccessibleMenuItem>
                 </AccessibleDropdown>
               ) : (
-                <Button asChild variant="outline" className="border-zinc-600 hover:bg-zinc-800">
-                  <Link href="/auth/login">Login</Link>
-                </Button>
+                <Link
+                  href="/auth/login"
+                  className="btn-outline border border-zinc-600 hover:bg-zinc-800"
+                >
+                  Login
+                </Link>
               )}
             </div>
 
