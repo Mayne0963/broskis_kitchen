@@ -2637,7 +2637,7 @@ html, body {
     }
 
     .btn-broski {
-      @apply inline-flex items-center justify-center px-5 py-3 rounded-xl font-semibold tracking-wide;
+      @apply inline-flex items-center justify-center px-5 py-3 rounded-full font-semibold tracking-wide;
       @apply border border-yellow-500/60;
       color: #111827;
       background: linear-gradient( 135deg, #D2BA6A 0%, #E6C875 100%);
@@ -2645,7 +2645,6 @@ html, body {
         0 8px 20px rgba(0,0,0,0.35),
         inset 0 1px 0 rgba(255,255,255,0.25);
       transition: transform 120ms ease, box-shadow 200ms ease, filter 180ms ease;
-      border-radius: 8px;
     }
 
     .btn-broski:hover {
@@ -2659,16 +2658,14 @@ html, body {
     }
 
     .btn-broski-ghost {
-      @apply inline-flex items-center justify-center px-5 py-3 rounded-xl font-semibold tracking-wide border;
+      @apply inline-flex items-center justify-center px-5 py-3 rounded-full font-semibold tracking-wide border;
       @apply border-yellow-500/50;
-      border-radius: 8px;
       color: #F9FAFB;
       background: rgba(0,0,0,0.35);
       box-shadow:
         0 8px 20px rgba(0,0,0,0.35),
         inset 0 1px 0 rgba(255,255,255,0.05);
       transition: transform 120ms ease, box-shadow 200ms ease, filter 180ms ease, background-color 180ms ease;
-      
     }
 
     .btn-broski-ghost:hover {
