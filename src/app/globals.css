@@ -373,7 +373,6 @@ main {
     @apply font-bold;
     @apply py-4;
     @apply px-10;
-    border-radius: 8px;
     @apply transition-all;
     @apply duration-300;
     position: relative;
@@ -1110,7 +1109,6 @@ main {
   text-transform: uppercase;
   padding: 12px 30px;
   border: 2px solid #C5A100;
-  border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease-in-out;
   display: inline-flex;
@@ -1197,7 +1195,6 @@ main {
   text-transform: uppercase;
   padding: 12px 30px;
   border: 2px solid #FFD700;
-  border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease-in-out;
   display: inline-flex;
@@ -1612,11 +1609,10 @@ html, body {
 .btn-race,
 .btn-signup,
 .btn-order {
+  @apply rounded-full;
   padding: 12px 22px;
-  border-radius: 40px;
   font-size: 14px;
   font-weight: 600;
-  border: 2px solid;
   cursor: pointer;
   text-decoration: none;
   display: inline-block;
@@ -1801,7 +1797,7 @@ html, body {
   align-items: center;
   gap: 8px;
   padding: 6px 14px;
-  border-radius: 9999px;
+  @apply rounded-full;
   background: rgba(255, 215, 0, 0.16);
   color: #ffd700;
   font-size: 12px;
@@ -2190,11 +2186,11 @@ html, body {
 }
 
 .hero-lunchdrop-pill {
+  @apply rounded-full;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 6px 12px;
-  border-radius: 9999px;
   background: rgba(255, 215, 0, 0.14);
   color: #ffd700;
   font-weight: 800;
@@ -2227,12 +2223,12 @@ html, body {
 }
 
 .hero-ribbon-badge {
+  @apply rounded-full;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   padding: 6px 14px;
-  border-radius: 9999px;
   background: rgba(255, 215, 0, 0.18);
   color: #ffd700;
   font-size: 12px;
@@ -2279,7 +2275,7 @@ html, body {
   align-items: center;
   justify-content: center;
   padding: 0 10px;
-  border-radius: 9999px;
+  @apply rounded-full;
   background: transparent;
   color: #ffd700;
   font-weight: 800;
@@ -2498,10 +2494,10 @@ html, body {
 
 /* Featured Lunch Drop button in nav */
 .btn-nav-lunchdrop {
+  @apply rounded-full;
   background: linear-gradient(135deg, #ffd700, #ffb300);
   color: #111111;
   font-weight: 700;
-  border-radius: 999px;
   padding: 8px 22px;
   line-height: 1.2;
   margin-top: 0;
@@ -2523,7 +2519,7 @@ html, body {
   background: #C1272D !important;
   color: #fff !important;
   font-weight: 700;
-  border-radius: 999px;
+  @apply rounded-full;
   padding: 8px 22px;
   border: 2px solid #C1272D;
   display: inline-flex;
@@ -2558,7 +2554,7 @@ html, body {
   background: #C1272D !important;
   color: #fff !important;
   font-weight: 700;
-  border-radius: 999px;
+  @apply rounded-full;
   padding: 8px 26px;
   border: 2px solid #C1272D;
   display: inline-flex;
