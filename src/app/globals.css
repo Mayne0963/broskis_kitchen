@@ -315,7 +315,6 @@ main {
     @apply font-bold;
     @apply py-4;
     @apply px-10;
-    border-radius: 8px;
     @apply transition-all;
     @apply duration-300;
     border: 2px solid #B7985A;
@@ -352,7 +351,6 @@ main {
     @apply font-semibold;
     @apply py-3;
     @apply px-8;
-    border-radius: 6px;
     @apply border-2;
     border-color: #B7985A;
     @apply hover:shadow-lg;
@@ -1141,7 +1139,6 @@ main {
   text-transform: uppercase;
   padding: 12px 30px;
   border: 2px solid #C5A100;
-  border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease-in-out;
   display: inline-flex;
@@ -1171,7 +1168,6 @@ main {
   text-transform: uppercase;
   padding: 12px 30px;
   border: 2px solid #B22222;
-  border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease-in-out;
   display: inline-flex;
