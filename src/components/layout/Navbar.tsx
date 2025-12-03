@@ -32,7 +32,7 @@ const Navbar: React.FC = () => {
   const navLinks = useMemo(
     () =>
       MAIN_LINKS.filter(link =>
-        ["/menu", "/events", "/music", "/catering", "/contact", "/coming-soon"].includes(link.href)
+        ["/menu", "/events", "/music", "/rewards", "/catering", "/contact"].includes(link.href)
       ),
     []
   )
