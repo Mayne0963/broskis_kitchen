@@ -20,6 +20,7 @@ export function PageLoadingWrapper({
   showProgressBar = true,
   className
 }: PageLoadingWrapperProps) {
+  const [mounted, setMounted] = useState(false)
   const { 
     isAuthReady, 
     isVerifying, 
@@ -36,6 +37,24 @@ export function PageLoadingWrapper({
   const [showContent, setShowContent] = useState(false)
   const [minTimeElapsed, setMinTimeElapsed] = useState(false)
   const [errorReady, setErrorReady] = useState(false)
+
+  // Avoid server/client render mismatch by deferring dynamic checks until mounted
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return fallback ? (
+      <>{fallback}</>
+    ) : (
+      <div className={cn("min-h-screen flex items-center justify-center bg-black text-white", className)}>
+        <div className="text-center space-y-3">
+          <Loader2 className="h-10 w-10 animate-spin text-blue-500 mx-auto" />
+          <p className="text-sm text-gray-300">Loading Broski&apos;s Kitchen…</p>
+        </div>
+      </div>
+    )
+  }
 
   // Ensure minimum loading time for smooth UX
   useEffect(() => {
