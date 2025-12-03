@@ -51,8 +51,8 @@ function Page() {
         >
           <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/80 to-black/95" />
 
-          <div className="relative z-10 flex items-center justify-center px-4 py-24">
-            <div className="hero-panel max-w-5xl mx-auto flex flex-col items-center text-center space-y-8">
+          <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 pt-32 md:pt-36 lg:pt-40 pb-16 md:pb-24 flex flex-col items-center">
+            <div className="w-full flex flex-col items-center text-center space-y-8">
               <div className="hero-crest">
                 <Image
                   src="/images/broskis-gold-logo.png"
@@ -63,7 +63,7 @@ function Page() {
                 />
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-3 text-center max-w-3xl mx-auto">
                 <p className="text-xs md:text-sm tracking-[0.25em] uppercase text-gold-soft">
                   The People&apos;s Restaurant
                 </p>
@@ -77,13 +77,13 @@ function Page() {
               </div>
 
               <div className="flex flex-wrap justify-center gap-3 md:gap-4">
-                <Link href="/menu" className="btn-primary">
+                <Link href="/menu" className="btn-broski">
                   Explore Our Menu
                 </Link>
-                <Link href="/otw" className="btn-secondary">
+                <Link href="/otw" className="btn-broski">
                   Order Now
                 </Link>
-                <Link href="/lunch-drop" className="btn-outline">
+                <Link href="/lunch-drop" className="btn-broski-ghost">
                   Lunch Drop for My Workplace
                 </Link>
               </div>
@@ -92,7 +92,7 @@ function Page() {
                 <div className="h-px w-24 bg-gold-gradient" />
               </div>
 
-              <div className="w-full space-y-5">
+              <div className="max-w-4xl mx-auto text-center mt-10 md:mt-12 space-y-5">
                 <p className="text-[10px] md:text-xs tracking-[0.3em] uppercase text-gold-soft">
                   Lunch Drop® · Workplace-Powered Lunch
                 </p>
@@ -107,8 +107,8 @@ function Page() {
                   hustle moving.
                 </p>
 
-                <div className="grid gap-4 md:grid-cols-3 text-left text-xs md:text-sm mt-4">
-                  <div className="feature-card">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 text-left text-xs md:text-sm mt-6">
+                  <div className="rounded-xl border border-yellow-500/20 bg-black/30 p-4 md:p-5">
                     <h3 className="font-semibold text-white mb-1">
                       Where Workplaces Become Teams
                     </h3>
@@ -117,7 +117,7 @@ function Page() {
                       Broski Lunch Drop with free OTW delivery. Not just food — momentum.
                     </p>
                   </div>
-                  <div className="feature-card">
+                  <div className="rounded-xl border border-yellow-500/20 bg-black/30 p-4 md:p-5">
                     <h3 className="font-semibold text-white mb-1">
                       The Race Makes It Fun
                     </h3>
@@ -126,7 +126,7 @@ function Page() {
                       just real-time results and bragging rights.
                     </p>
                   </div>
-                  <div className="feature-card">
+                  <div className="rounded-xl border border-yellow-500/20 bg-black/30 p-4 md:p-5">
                     <h3 className="font-semibold text-white mb-1">
                       Why We Do This
                     </h3>
@@ -137,14 +137,14 @@ function Page() {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap justify-center gap-3 md:gap-4 mt-4">
-                  <Link href="/lunch-order" className="btn-primary">
+                <div className="flex flex-wrap justify-center gap-3 md:gap-4 mt-6">
+                  <Link href="/lunch-order" className="btn-broski">
                     Place Lunch Order
                   </Link>
-                  <Link href="/order-race" className="btn-secondary">
+                  <Link href="/order-race" className="btn-broski-ghost">
                     View Order Race
                   </Link>
-                  <Link href="/enter-workplace" className="btn-outline">
+                  <Link href="/enter-workplace" className="btn-broski-ghost">
                     Enter Your Workplace
                   </Link>
                 </div>
