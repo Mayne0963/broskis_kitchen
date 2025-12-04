@@ -97,7 +97,7 @@ const Navbar: React.FC = () => {
           <div className="flex h-16 items-center justify-between">
             {/* LEFT: logo */}
             <div className="min-w-[140px] flex items-center gap-3">
-              <AccessibleButton onClick={() => window.location.href = "/"} className="flex items-center gap-2">
+              <AccessibleButton onClick={() => window.location.href = "/"}>
                 <Image 
                   src="/images/broskis-gold-logo.png"
                   alt="Broski's Kitchen" 
