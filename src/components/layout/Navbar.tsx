@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useMemo } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { FaBars, FaUser } from "react-icons/fa"
 import CartDropdown from "../../components/cart/CartDropdown"
 import { useCart } from "../../lib/context/CartContext"
@@ -24,7 +24,6 @@ const Navbar: React.FC = () => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false)
   const { itemCount } = useCart()
   const pathname = usePathname()
-  const router = useRouter()
   const { user, logout } = useAuth()
   const { claims, loading } = useAuthClaims()
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -86,13 +85,6 @@ const Navbar: React.FC = () => {
     ${isVisible ? "translate-y-0" : "-translate-y-full"}
   `
 
-  const handleNavigate = (href: string) => {
-    cancelCheckoutProgress()
-    setMobileMenuOpen(false)
-    setUserDropdownOpen(false)
-    router.push(href)
-  }
-
   return (
     <>
       <header
@@ -126,11 +118,9 @@ const Navbar: React.FC = () => {
                   <li key={item.href}>
                     <Link 
                       href={item.href} 
-                      prefetch={false}
-                      onClick={(e) => {
-                        e.preventDefault()
-                        handleNavigate(item.href)
-                      }}
+                      onClick={() => {
+                      cancelCheckoutProgress()
+                    }}
                       className={`nav-link ${pathname === item.href ? "nav-link-active" : ""}`}
                     >
                       {item.label}
@@ -143,15 +133,7 @@ const Navbar: React.FC = () => {
             {/* RIGHT: actions (OTW + Login) */}
             <div className="min-w-[140px] flex items-center gap-2 justify-end">
               {/* Lunch Drop button (renamed from OTW) */}
-              <Link 
-                href="/lunch-drop" 
-                prefetch={false}
-                className="btn-primary" 
-                onClick={(e) => {
-                  e.preventDefault()
-                  handleNavigate("/lunch-drop")
-                }}
-              >
+              <Link href="/lunch-drop" className="btn-primary" onClick={cancelCheckoutProgress}>
                 <span className="text-sm font-extrabold tracking-wide text-red-600">Lunch Drop</span>
               </Link>
 
@@ -213,7 +195,6 @@ const Navbar: React.FC = () => {
                       cancelCheckoutProgress()
                       await logout()
                       setUserDropdownOpen(false)
-                      router.push("/")
                     }}
                   >
                     Logout
@@ -222,11 +203,7 @@ const Navbar: React.FC = () => {
               ) : (
                 <Link
                   href="/auth/login"
-                  prefetch={false}
-                  onClick={(e) => {
-                    e.preventDefault()
-                    handleNavigate("/auth/login")
-                  }}
+                  onClick={cancelCheckoutProgress}
                   className="btn-outline border border-zinc-600 hover:bg-zinc-800"
                 >
                   Login
