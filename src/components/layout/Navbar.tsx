@@ -97,7 +97,7 @@ const Navbar: React.FC = () => {
           <div className="flex h-16 items-center justify-between">
             {/* LEFT: logo */}
             <div className="min-w-[140px] flex items-center gap-3">
-              <Link href="/" className="flex items-center gap-2">
+              <AccessibleButton onClick={() => window.location.href = "/"} className="flex items-center gap-2">
                 <Image 
                   src="/images/broskis-gold-logo.png"
                   alt="Broski's Kitchen" 
@@ -108,7 +108,7 @@ const Navbar: React.FC = () => {
                 <span className="text-2xl font-bold leading-tight navbar-gold-text">
                   Broski&apos;s Kitchen
                 </span>
-              </Link>
+              </AccessibleButton>
             </div>
 
             {/* CENTER: main nav — perfectly centered */}
