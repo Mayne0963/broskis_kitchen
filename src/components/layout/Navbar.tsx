@@ -12,8 +12,7 @@ import { useAuthClaims } from "../../hooks/useAuthClaims"
 import { EmailVerificationBanner } from "../auth/EmailVerificationBanner"
 import { 
   AccessibleDropdown, 
-  AccessibleMenuItem, 
-  AccessibleButton 
+  AccessibleMenuItem 
 } from "../accessibility/AccessibilityEnhancer"
 import MobileMenu from "../navbar/MobileMenu"
 import { MAIN_LINKS } from "../nav/links"
@@ -97,7 +96,11 @@ const Navbar: React.FC = () => {
           <div className="flex h-16 items-center justify-between">
             {/* LEFT: logo */}
             <div className="min-w-[140px] flex items-center gap-3">
-              <AccessibleButton onClick={() => window.location.href = "/"}>
+              <Link 
+                href="/" 
+                onClick={cancelCheckoutProgress}
+                className="flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              >
                 <Image 
                   src="/images/broskis-gold-logo.png"
                   alt="Broski's Kitchen" 
@@ -108,7 +111,7 @@ const Navbar: React.FC = () => {
                 <span className="text-2xl font-bold leading-tight navbar-gold-text">
                   Broski&apos;s Kitchen
                 </span>
-              </AccessibleButton>
+              </Link>
             </div>
 
             {/* CENTER: main nav — perfectly centered */}
