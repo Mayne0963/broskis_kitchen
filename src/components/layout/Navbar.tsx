@@ -116,7 +116,7 @@ const Navbar: React.FC = () => {
               <ul className="flex items-center gap-6">
                 {navLinks.map((item) => (
                   <li key={item.href}>
-                    <Link 
+                    <AccessibleMenuItem 
                       href={item.href} 
                       onClick={() => {
                       cancelCheckoutProgress()
@@ -124,7 +124,7 @@ const Navbar: React.FC = () => {
                       className={`nav-link ${pathname === item.href ? "nav-link-active" : ""}`}
                     >
                       {item.label}
-                    </Link>
+                    </AccessibleMenuItem>
                   </li>
                 ))}
               </ul>
