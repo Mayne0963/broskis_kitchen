@@ -8,6 +8,7 @@ import { useAuth } from "../../lib/context/AuthContext";
 import { OrderItem } from "../../types/order";
 import { FaShoppingCart, FaTrash, FaPlus, FaMinus, FaArrowLeft, FaCreditCard, FaCog, FaLock } from "react-icons/fa";
 import { safeFetch } from "../../lib/utils/safeFetch";
+import { cancelCheckoutProgress } from "@/lib/utils/orderPersistence";
 import { AuthGuard } from "../../components/auth/AuthGuard";
 import { useOrderResumePrompt } from "@/hooks/useOrderResumePrompt";
 import StripePaymentForm from "@/components/checkout/StripePaymentForm";
@@ -246,7 +247,14 @@ function CartContent() {
             </div>
 
             <div className="mt-6">
-              <Link href="/menu" className="text-gold-foil hover:underline inline-flex items-center gap-2">
+              <Link
+                href="/menu"
+                className="text-gold-foil hover:underline inline-flex items-center gap-2"
+                onClick={() => {
+                  cancelCheckoutProgress();
+                  setShowInAppPayment(false);
+                }}
+              >
                 <FaArrowLeft size={14} /> Continue Shopping
               </Link>
             </div>

@@ -10,6 +10,7 @@ import { useAuth } from '../../lib/context/AuthContext'
 import { useAuthClaims } from '../../hooks/useAuthClaims'
 import { useCart } from '../../lib/context/CartContext'
 import { MAIN_LINKS } from '../nav/links'
+import { cancelCheckoutProgress } from '@/lib/utils/orderPersistence'
 
 interface MobileMenuProps {
   open: boolean
@@ -169,7 +170,10 @@ export default function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  onClick={closeMenu}
+                  onClick={() => {
+                    cancelCheckoutProgress()
+                    closeMenu()
+                  }}
                   data-testid="mobile-menu-link"
                   className={`block px-4 py-4 text-lg font-medium transition-colors duration-200 min-h-[44px] flex items-center ${
                     pathname === link.href 
@@ -190,7 +194,10 @@ export default function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
             <>
               <Link 
                 href="/account" 
-                onClick={closeMenu} 
+                onClick={() => {
+                  cancelCheckoutProgress()
+                  closeMenu()
+                }} 
                 data-testid="mobile-menu-cta"
                 className="btn btn-primary w-full"
               >
@@ -198,7 +205,10 @@ export default function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
               </Link>
               <Link 
                 href="/account/orders" 
-                onClick={closeMenu} 
+                onClick={() => {
+                  cancelCheckoutProgress()
+                  closeMenu()
+                }} 
                 data-testid="mobile-menu-cta"
                 className="btn btn-outline w-full"
               >
@@ -208,7 +218,10 @@ export default function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
                 <Link 
                   href="/admin" 
                   prefetch={false}
-                  onClick={closeMenu} 
+                  onClick={() => {
+                    cancelCheckoutProgress()
+                    closeMenu()
+                  }} 
                   data-testid="mobile-menu-cta"
                   className="btn btn-warning w-full"
                 >
@@ -218,6 +231,7 @@ export default function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
               <form action="/api/auth/logout" method="post">
                 <button 
                   data-testid="mobile-menu-cta"
+                  onClick={cancelCheckoutProgress}
                   className="btn btn-ghost w-full"
                 >
                   Logout
@@ -227,7 +241,10 @@ export default function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
           ) : (
             <Link 
               href="/auth/login" 
-              onClick={closeMenu} 
+              onClick={() => {
+                cancelCheckoutProgress()
+                closeMenu()
+              }} 
               data-testid="mobile-menu-cta"
               className="btn btn-primary w-full"
             >
@@ -236,7 +253,10 @@ export default function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
           )}
           <Link 
             href="/cart" 
-            onClick={closeMenu} 
+            onClick={() => {
+              cancelCheckoutProgress()
+              closeMenu()
+            }} 
             data-testid="mobile-menu-cta"
             className="btn w-full justify-between min-h-[44px] flex items-center"
           >

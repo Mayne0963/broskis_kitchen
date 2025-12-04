@@ -123,3 +123,12 @@ export function makeOrderPayload(items: PersistedItem[]): OrderPayload {
   const { subtotal, tax, total } = computeTotals(items)
   return { items, subtotal, tax, total, updatedAt: nowISO() }
 }
+
+// Convenience helper to cancel any in-progress checkout/resume flow
+export function cancelCheckoutProgress() {
+  if (typeof window === 'undefined') return
+  try { clearSessionOrder() } catch {}
+  try { clearLocalSnapshot() } catch {}
+  try { sessionStorage.removeItem('checkout_in_progress') } catch {}
+  try { localStorage.removeItem('checkout_in_progress') } catch {}
+}

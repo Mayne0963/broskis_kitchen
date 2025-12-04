@@ -17,6 +17,7 @@ import {
 } from "../accessibility/AccessibilityEnhancer"
 import MobileMenu from "../navbar/MobileMenu"
 import { MAIN_LINKS } from "../nav/links"
+import { cancelCheckoutProgress } from "@/lib/utils/orderPersistence"
 
 const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -117,6 +118,7 @@ const Navbar: React.FC = () => {
                   <li key={item.href}>
                     <Link 
                       href={item.href} 
+                      onClick={cancelCheckoutProgress}
                       className={`nav-link ${pathname === item.href ? "nav-link-active" : ""}`}
                     >
                       {item.label}
@@ -129,7 +131,7 @@ const Navbar: React.FC = () => {
             {/* RIGHT: actions (OTW + Login) */}
             <div className="min-w-[140px] flex items-center gap-2 justify-end">
               {/* Lunch Drop button (renamed from OTW) */}
-              <Link href="/lunch-drop" className="btn-primary">
+              <Link href="/lunch-drop" className="btn-primary" onClick={cancelCheckoutProgress}>
                 <span className="text-sm font-extrabold tracking-wide text-red-600">Lunch Drop</span>
               </Link>
 
@@ -149,26 +151,38 @@ const Navbar: React.FC = () => {
                 >
                   <AccessibleMenuItem 
                     href="/dashboard"
-                    onClick={() => setUserDropdownOpen(false)}
+                    onClick={() => {
+                      cancelCheckoutProgress()
+                      setUserDropdownOpen(false)
+                    }}
                   >
                     Dashboard
                   </AccessibleMenuItem>
                   <AccessibleMenuItem 
                     href="/account/profile"
-                    onClick={() => setUserDropdownOpen(false)}
+                    onClick={() => {
+                      cancelCheckoutProgress()
+                      setUserDropdownOpen(false)
+                    }}
                   >
                     Profile
                   </AccessibleMenuItem>
                   <AccessibleMenuItem 
                     href="/account/orders"
-                    onClick={() => setUserDropdownOpen(false)}
+                    onClick={() => {
+                      cancelCheckoutProgress()
+                      setUserDropdownOpen(false)
+                    }}
                   >
                     Order History
                   </AccessibleMenuItem>
                   {!loading && claims?.admin && (
                      <AccessibleMenuItem
                        href="/admin"
-                       onClick={() => setUserDropdownOpen(false)}
+                       onClick={() => {
+                         cancelCheckoutProgress()
+                         setUserDropdownOpen(false)
+                       }}
                        className="text-red-600 font-medium"
                      >
                        Admin
@@ -176,6 +190,7 @@ const Navbar: React.FC = () => {
                    )}
                   <AccessibleMenuItem
                     onClick={async () => {
+                      cancelCheckoutProgress()
                       await logout()
                       setUserDropdownOpen(false)
                     }}
@@ -186,6 +201,7 @@ const Navbar: React.FC = () => {
               ) : (
                 <Link
                   href="/auth/login"
+                  onClick={cancelCheckoutProgress}
                   className="btn-outline border border-zinc-600 hover:bg-zinc-800"
                 >
                   Login
