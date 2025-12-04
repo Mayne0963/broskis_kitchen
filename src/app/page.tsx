@@ -77,7 +77,7 @@ function Page() {
               </div>
 
               <div className="flex flex-wrap justify-center gap-3 md:gap-4">
-                <Link href="/otw" className="btn-primary">
+                <Link href="/menu" className="btn-primary">
                   Order Now
                 </Link>
               </div>

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useMemo } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { FaBars, FaUser } from "react-icons/fa"
 import CartDropdown from "../../components/cart/CartDropdown"
 import { useCart } from "../../lib/context/CartContext"
@@ -23,6 +23,7 @@ const Navbar: React.FC = () => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false)
   const { itemCount } = useCart()
   const pathname = usePathname()
+  const router = useRouter()
   const { user, logout } = useAuth()
   const { claims, loading } = useAuthClaims()
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -96,10 +97,14 @@ const Navbar: React.FC = () => {
           <div className="flex h-16 items-center justify-between">
             {/* LEFT: logo */}
             <div className="min-w-[140px] flex items-center gap-3">
-              <Link 
-                href="/" 
-                onClick={cancelCheckoutProgress}
-                className="flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              <AccessibleMenuItem
+                href="/"
+                onClick={(event) => {
+                  event.preventDefault()
+                  cancelCheckoutProgress()
+                  router.push("/")
+                }}
+                className="inline-flex items-center gap-2 !w-auto !px-0 !py-0 !text-current !bg-transparent hover:!bg-transparent focus:!bg-transparent focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               >
                 <Image 
                   src="/images/broskis-gold-logo.png"
@@ -111,7 +116,7 @@ const Navbar: React.FC = () => {
                 <span className="text-2xl font-bold leading-tight navbar-gold-text">
                   Broski&apos;s Kitchen
                 </span>
-              </Link>
+              </AccessibleMenuItem>
             </div>
 
             {/* CENTER: main nav — perfectly centered */}
